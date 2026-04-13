@@ -1,7 +1,0 @@
-{
-  "plugins": ["formatjs"],
-  "rules": {
-    "formatjs/enforce-id": "error",
-    "formatjs/no-literal-string-in-jsx": "warn"
-  }
-}
