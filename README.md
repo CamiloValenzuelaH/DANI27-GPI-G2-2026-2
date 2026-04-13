@@ -1,1 +1,1 @@
-"# Proyecto i18n" 
+# Proyecto i18n 
