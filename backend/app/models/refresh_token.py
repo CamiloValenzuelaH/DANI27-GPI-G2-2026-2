@@ -18,14 +18,16 @@ class RefreshToken(Base, UUIDMixin, TimestampMixin):
         index=True
     )
     
-    token_hash: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    token_hash: Mapped[str] = mapped_column(String(255), nullable=False, index=True, unique=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     is_revoked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     
     # Relationship
     user: Mapped["User"] = relationship(
-        back_populates="refresh_tokens"
+        back_populates="refresh_tokens",
+        lazy="select"
     )
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<RefreshToken user_id={self.user} revoked={self.is_revoked}>"

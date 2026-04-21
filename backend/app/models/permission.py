@@ -1,6 +1,6 @@
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Text, UniqueConstraint
+from sqlalchemy import String, UniqueConstraint
 from app.db.base import Base, TimestampMixin, UUIDMixin
 
 from typing import TYPE_CHECKING
@@ -13,12 +13,12 @@ class Permission(Base, UUIDMixin, TimestampMixin):
     
     resource: Mapped[str] = mapped_column(String(127), nullable=False, index=True)
     action: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
-    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     
     # Relationship
     role_permissions: Mapped[list["RolePermission"]] = relationship(
         back_populates="permission",
-        cascade="all, delete-orphan"
+        lazy="select"
     )
     
     # Unique restriction
@@ -26,5 +26,5 @@ class Permission(Base, UUIDMixin, TimestampMixin):
         UniqueConstraint("resource", "action", name="uq_permission_resource_action")
     )
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Permission {self.resource}:{self.action}>"
