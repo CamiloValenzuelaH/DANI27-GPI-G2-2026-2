@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.models.organization import Organization
+    from app.models.user_role import UserRole
+    from app.models.refresh_token import RefreshToken
 
 
 class User(Base, UUIDMixin, TimestampMixin):

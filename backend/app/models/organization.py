@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.models.plan import Plan
     from app.models.user import User
+    from app.models.role import Role
 
 
 class Organization(Base, UUIDMixin, TimestampMixin):
