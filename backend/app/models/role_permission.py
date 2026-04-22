@@ -35,7 +35,7 @@ class RolePermission(Base):
     
     # Unique Restriction
     __table_args__ = (
-        UniqueConstraint("role_id", "permission_id", name="uq_role_permission")
+        UniqueConstraint("role_id", "permission_id", name="uq_role_permission"),
     )
     
     def __repr__(self) -> str:

@@ -23,7 +23,7 @@ class Permission(Base, UUIDMixin, TimestampMixin):
     
     # Unique restriction
     __table_args__ = (
-        UniqueConstraint("resource", "action", name="uq_permission_resource_action")
+        UniqueConstraint("resource", "action", name="uq_permission_resource_action"),
     )
     
     def __repr__(self) -> str:

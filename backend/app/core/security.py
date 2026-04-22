@@ -1,31 +1,56 @@
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
-from typing import Any, Union
-import jwt
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
+from typing import Any
 
-# MOVER A VARIABLES DE ENTORNO .env
-SECRET_KEY = "clave_para_firmar_tokens"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
-password_hasher = PasswordHasher()
+from app.core.config import settings
 
-def get_password_hash(password: str) -> str:
-    return password_hasher.hash(password)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+# ── Password ──────────────────────────────────────────────
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+# ── Access token ──────────────────────────────────────────
+
+def create_access_token(subject: str, extra: dict[str, Any] = {}) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(
+        minutes=settings.access_token_expire_minutes
+    )
+    payload = {
+        "sub": subject,
+        "exp": expire,
+        "iat": datetime.now(timezone.utc),
+        **extra,
+    }
+    return jwt.encode(payload, settings.secret_key, algorithm="HS256")
+
+
+def decode_access_token(token: str) -> dict[str, Any]:
     try:
-        return password_hasher.verify(hashed_password, plain_password)
-    except:
-        return False
-    
-def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        
-    to_encode = {"exp": expire, "sub": str(subject)}
-    encode_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encode_jwt
+        payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
+        return payload
+    except JWTError:
+        raise ValueError("Token inválido o expirado")
+
+
+# ── Refresh token ─────────────────────────────────────────
+
+def generate_refresh_token() -> str:
+    """Genera un token opaco seguro para usar como refresh token."""
+    return secrets.token_urlsafe(64)
+
+
+def hash_refresh_token(token: str) -> str:
+    """Hashea el refresh token antes de guardarlo en DB."""
+    return hashlib.sha256(token.encode()).hexdigest()

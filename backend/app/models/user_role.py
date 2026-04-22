@@ -14,12 +14,12 @@ class UserRole(Base):
     __tablename__ = "user_roles"
     
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users_id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True
     )
     
     role_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("roles_id", ondelete="CASCADE"),
+        ForeignKey("roles.id", ondelete="CASCADE"),
         primary_key=True
     )
     
