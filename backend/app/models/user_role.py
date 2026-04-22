@@ -36,7 +36,7 @@ class UserRole(Base):
     )
     
     role: Mapped["Role"] = relationship(
-        back_populates="user_role",
+        back_populates="user_roles",
         lazy="select"
     )
     
