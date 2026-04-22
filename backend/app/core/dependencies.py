@@ -28,14 +28,14 @@ def get_current_user(
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token sin subject",
+            detail="Token without subject",
         )
 
     user = db.query(User).filter(User.id == user_id).first()
     if not user or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Usuario no encontrado o inactivo",
+            detail="User not found or inactive",
         )
 
     return user
@@ -51,7 +51,7 @@ def get_current_org(
     if not org or org.status != "active":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Organización inactiva o no encontrada",
+            detail="Organization not found or inactive",
         )
     return org
 
@@ -62,7 +62,7 @@ def require_superadmin(
     if not current_user.is_superadmin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Se requieren permisos de superadmin",
+            detail="Super-administrator permissions required",
         )
     return current_user
 
@@ -76,6 +76,6 @@ def require_plan_feature(feature: str):
         if not getattr(org.plan, feature, False):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Tu plan no incluye acceso a esta funcionalidad",
+                detail=f"Your plan does not include access to this feature",
             )
     return checker

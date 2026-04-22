@@ -48,7 +48,7 @@ def decode_access_token(token: str) -> dict[str, Any]:
         payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
         return payload
     except JWTError:
-        raise ValueError("Token inválido o expirado")
+        raise ValueError("Invalid or expirated token")
 
 
 # ── Refresh token ─────────────────────────────────────────

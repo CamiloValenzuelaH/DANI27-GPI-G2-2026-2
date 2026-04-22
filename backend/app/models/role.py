@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, String, Text, Boolean
+from sqlalchemy import ForeignKey, String, Boolean, UniqueConstraint
 from app.db.base import Base, UUIDMixin, TimestampMixin
 import uuid
 
@@ -19,7 +19,7 @@ class Role(Base, UUIDMixin, TimestampMixin):
         index=True
     )
     
-    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True) 
     is_system_role: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     
@@ -39,6 +39,11 @@ class Role(Base, UUIDMixin, TimestampMixin):
         back_populates="role",
         lazy="select",
         cascade="all, delete-orphan"
+    )
+    
+    # Unique restriction in organization
+    __table_args__ = (
+        UniqueConstraint("name", "organization_id", name="uq_role_name_org"),
     )
     
     def __repr__(self) -> str:

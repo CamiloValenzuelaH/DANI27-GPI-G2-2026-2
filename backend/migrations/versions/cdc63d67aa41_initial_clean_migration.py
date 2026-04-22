@@ -1,8 +1,8 @@
-"""init users roles permissions
+"""initial clean migration
 
-Revision ID: 54a48cfa688a
+Revision ID: cdc63d67aa41
 Revises: 
-Create Date: 2026-04-21 20:57:15.391684
+Create Date: 2026-04-22 14:33:18.553049
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '54a48cfa688a'
+revision: str = 'cdc63d67aa41'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -71,7 +71,7 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name')
+    sa.UniqueConstraint('name', 'organization_id', name='uq_role_name_org')
     )
     op.create_index(op.f('ix_roles_organization_id'), 'roles', ['organization_id'], unique=False)
     op.create_table('users',
