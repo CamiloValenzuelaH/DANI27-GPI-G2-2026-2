@@ -1,6 +1,6 @@
 from app.db.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 import uuid
 
 from typing import TYPE_CHECKING
@@ -24,12 +24,19 @@ class RolePermission(Base):
     
     # Relationship
     role: Mapped["Role"] = relationship(
-        back_populates="role_permissions"
+        back_populates="role_permissions",
+        lazy="select"
     )
     
     permission: Mapped["Permission"] = relationship(
-        back_populates="role_permissions"
+        back_populates="role_permissions",
+        lazy="select"
     )
     
-    def __repr__(self):
+    # Unique Restriction
+    __table_args__ = (
+        UniqueConstraint("role_id", "permission_id", name="uq_role_permission"),
+    )
+    
+    def __repr__(self) -> str:
         return f"<RolePermission role={self.role_id} permission={self.permission_id}>"

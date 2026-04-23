@@ -1,8 +1,8 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from app.db.base import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, DateTime, func
+from sqlalchemy import ForeignKey, DateTime, func, UniqueConstraint
 
 from typing import TYPE_CHECKING
 
@@ -14,26 +14,36 @@ class UserRole(Base):
     __tablename__ = "user_roles"
     
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users_id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         primary_key=True
     )
     
     role_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("roles_id", ondelete="CASCADE"),
+        ForeignKey("roles.id", ondelete="CASCADE"),
         primary_key=True
     )
     
     assigned_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        server_default=func.now(),
+        default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
     
     # Relationship
     user: Mapped["User"] = relationship(
-        back_populates="user_roles"
+        back_populates="user_roles",
+        lazy="select"
     )
     
     role: Mapped["Role"] = relationship(
-        back_populates="user_role"
+        back_populates="user_roles",
+        lazy="select"
     )
+    
+    # Unique Restriction
+    __table_args__ = (
+        UniqueConstraint("user_id", "role_id", name="uq_user_role"),
+    )
+    
+    def __repr__(self) -> str:
+        return f"<UserRole user={self.user_id} role={self.role_id}>"
