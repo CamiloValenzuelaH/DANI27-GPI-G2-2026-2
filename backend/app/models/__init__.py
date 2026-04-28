@@ -6,6 +6,7 @@ from app.models.permission import Permission
 from app.models.role_permission import RolePermission
 from app.models.user_role import UserRole
 from app.models.refresh_token import RefreshToken
+from app.models.asset import Asset
 
 __all__ = [
     "Plan",
@@ -16,4 +17,5 @@ __all__ = [
     "RolePermission",
     "UserRole",
     "RefreshToken",
+    "Asset",
 ]
