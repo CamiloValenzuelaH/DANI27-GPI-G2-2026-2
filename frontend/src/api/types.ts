@@ -40,3 +40,28 @@ export interface Role {
   organization_id: string
   created_at: string
 }
+
+export interface Asset {
+  id: string
+  name: string
+  description: string | null
+  asset_type: string
+  owner_id: string | null
+  location: string | null
+  status: string
+  confidentiality: number
+  integrity: number
+  availability: number
+  criticality_score: number
+  criticality_level: string
+  clause_ref: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AssetSummary {
+  total: number
+  by_type: Record<string, number>
+  by_level: Record<string, number>
+  critical_assets: Asset[]
+}

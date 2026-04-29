@@ -1,4 +1,4 @@
-export type Page = 'dashboard' | 'understand' | 'documents' | 'risks' | 'evidence' | 'findings' | 'audit' | 'integrity' | 'regfeed' | 'dora' | 'euai' | 'escalation' | 'integrations' | 'settings';
+export type Page = 'dashboard' | 'understand' | 'documents' | 'risks' | 'evidence' | 'findings' | 'audit' | 'integrity' | 'regfeed' | 'dora' | 'euai' | 'escalation' | 'integrations' | 'settings' | 'assets';
 export type Language = 'en' | 'es' | 'pt' | 'de' | 'fr';
 export type Profile = 'foundational' | 'established' | 'advanced' | 'mature';
 export type DateFormat = 'dmy' | 'mdy' | 'ymd';
@@ -71,6 +71,7 @@ export const translations = {
     'menu.escalation': 'Escalation Rules',
     'menu.integrations': 'Integrations',
     'menu.settings': 'Settings',
+    'menu.assets': 'Asset Inventory',
 
     // Dashboard
     profile: 'Profile',
@@ -158,6 +159,7 @@ export const translations = {
     'menu.escalation': 'Reglas de Escalación',
     'menu.integrations': 'Integraciones',
     'menu.settings': 'Configuración',
+    'menu.assets': 'Inventario de Activos',
 
     // Dashboard
     profile: 'Perfil',
@@ -242,6 +244,7 @@ export const translations = {
     'menu.escalation': 'Regras de Escalação',
     'menu.integrations': 'Integrações',
     'menu.settings': 'Configurações',
+    'menu.assets': 'Inventário de Ativos',
 
     profile: 'Perfil',
     exportReport: 'Exportar Relatório',
@@ -325,6 +328,7 @@ export const translations = {
     'menu.escalation': 'Eskalationsregeln',
     'menu.integrations': 'Integrationen',
     'menu.settings': 'Einstellungen',
+    'menu.assets': 'Asset-Inventar',
 
     profile: 'Profil',
     exportReport: 'Bericht Exportieren',
@@ -408,6 +412,7 @@ export const translations = {
     'menu.escalation': 'Règles d\'Escalade',
     'menu.integrations': 'Intégrations',
     'menu.settings': 'Paramètres',
+    'menu.assets': 'Inventaire des Actifs',
 
     profile: 'Profil',
     exportReport: 'Exporter le Rapport',

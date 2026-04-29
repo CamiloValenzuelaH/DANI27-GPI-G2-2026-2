@@ -58,6 +58,15 @@ export const processMenuItems: MenuItem[] = [
     isCompleted: true,
   },
   {
+    id: 'assets',
+    labelKey: 'menu.assets',
+    path: '/assets',
+    icon: '3',
+    iconType: 'emoji',
+    stepNum: '3',
+    requiredPlan: 'starter',
+  },
+  {
     id: 'documents',
     labelKey: 'menu.documents',
     path: '/documents',
@@ -136,6 +145,14 @@ export const coreModulesItems: MenuItem[] = [
     path: '/dashboard',
     icon: '📊',
     iconType: 'emoji',
+  },
+  {
+    id: 'assets',
+    labelKey: 'menu.assets',
+    path: '/assets',
+    icon: '🗂️',
+    iconType: 'emoji',
+    requiredPlan: 'starter',
   },
   {
     id: 'gap-analysis',
