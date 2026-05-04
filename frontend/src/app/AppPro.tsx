@@ -5,6 +5,8 @@ import AppShell from './components/AppShell';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import AssetsPage from './pages/AssetsPage'
+import AuditPagePro from './pages/AuditPagePro';
 
 export default function AppPro() {
   return (
@@ -30,7 +32,7 @@ export default function AppPro() {
                     <Route path="/risks" element={<PlaceholderPage title="Manage Risks" />} />
                     <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />
                     <Route path="/findings" element={<PlaceholderPage title="Manage Findings" />} />
-                    <Route path="/audit" element={<PlaceholderPage title="Prepare for Audit" />} />
+                    <Route path="/audit" element={<AuditPagePro />} />
                     <Route path="/integrity" element={<PlaceholderPage title="Compliance Integrity" />} />
                     <Route path="/regfeed" element={<PlaceholderPage title="Regulatory Feed" />} />
                     <Route path="/dora" element={<PlaceholderPage title="DORA" />} />
@@ -38,6 +40,7 @@ export default function AppPro() {
                     <Route path="/escalation" element={<PlaceholderPage title="Escalation Rules" />} />
                     <Route path="/integrations" element={<PlaceholderPage title="Integrations" />} />
                     <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+                    <Route path="/assets" element={<AssetsPage />} />
                   </Routes>
                 </AppShell>
               </ProtectedRoute>
