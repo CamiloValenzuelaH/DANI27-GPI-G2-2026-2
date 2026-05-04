@@ -22,6 +22,10 @@ class Settings(BaseSettings):
 
     # CORS
     allowed_origins: List[str] = ["http://localhost:3000"]
+    
+    # AI
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-1.5-flash"
 
     @property
     def is_production(self) -> bool:
