@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import AssetsPage from './pages/AssetsPage'
 import AuditPagePro from './pages/AuditPagePro';
+import AssessmentPage from './components/assessment/AssessmentPage';
 
 export default function AppPro() {
   return (
@@ -33,6 +34,7 @@ export default function AppPro() {
                     <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />
                     <Route path="/findings" element={<PlaceholderPage title="Manage Findings" />} />
                     <Route path="/audit" element={<AuditPagePro />} />
+                    <Route path="/assessment" element={<AssessmentPage />} />
                     <Route path="/integrity" element={<PlaceholderPage title="Compliance Integrity" />} />
                     <Route path="/regfeed" element={<PlaceholderPage title="Regulatory Feed" />} />
                     <Route path="/dora" element={<PlaceholderPage title="DORA" />} />

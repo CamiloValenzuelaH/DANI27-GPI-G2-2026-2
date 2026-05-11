@@ -42,6 +42,15 @@ export interface AuditChecklistUpsertRequest {
   items: AuditChecklistItem[];
 }
 
+export interface AssessmentProgressResponse {
+  payload: Record<string, unknown>;
+  updated_at: string | null;
+}
+
+export interface AssessmentProgressRequest {
+  payload: Record<string, unknown>;
+}
+
 export interface FileValidationResult {
   file_name: string;
   compliance_score: number;
@@ -77,6 +86,16 @@ export async function getAuditChecklist(): Promise<AuditChecklistResponse> {
 
 export async function saveAuditChecklist(payload: AuditChecklistUpsertRequest): Promise<AuditChecklistResponse> {
   const response = await axios.put<AuditChecklistResponse>('/audit/checklist', payload);
+  return response.data;
+}
+
+export async function getAssessmentProgress(): Promise<AssessmentProgressResponse> {
+  const response = await axios.get<AssessmentProgressResponse>('/audit/assessment');
+  return response.data;
+}
+
+export async function saveAssessmentProgress(payload: AssessmentProgressRequest): Promise<AssessmentProgressResponse> {
+  const response = await axios.put<AssessmentProgressResponse>('/audit/assessment', payload);
   return response.data;
 }
 

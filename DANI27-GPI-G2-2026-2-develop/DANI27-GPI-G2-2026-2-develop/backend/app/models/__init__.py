@@ -8,6 +8,7 @@ from app.models.user_role import UserRole
 from app.models.refresh_token import RefreshToken
 from app.models.asset import Asset
 from app.models.audit_checklist import AuditChecklist
+from app.models.assessment_progress import AssessmentProgress
 
 __all__ = [
     "Plan",
@@ -20,4 +21,5 @@ __all__ = [
     "RefreshToken",
     "Asset",
     "AuditChecklist",
+    "AssessmentProgress",
 ]

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from app.db.database import get_db
 from app.core.dependencies import get_current_user
+from app.models.assessment_progress import AssessmentProgress
 from app.models.audit_checklist import AuditChecklist
 from app.models.user import User
 from app.services.audit_ai_service import analyze_audit_with_ai, analyze_file_with_ai
@@ -99,6 +100,15 @@ class AuditChecklistResponse(BaseModel):
     updated_at: str | None = None
 
 
+class AssessmentProgressRequest(BaseModel):
+    payload: dict
+
+
+class AssessmentProgressResponse(BaseModel):
+    payload: dict
+    updated_at: str | None = None
+
+
 class FileValidationResponse(BaseModel):
     """Respuesta de validación de archivo"""
     file_name: str
@@ -153,6 +163,13 @@ def _build_checklist_response(items: list[dict], updated_at: datetime | None) ->
     )
 
 
+def _build_assessment_response(record: AssessmentProgress | None) -> AssessmentProgressResponse:
+    return AssessmentProgressResponse(
+        payload=(record.progress_data if record else {}),
+        updated_at=record.updated_at.isoformat() if record and record.updated_at else None,
+    )
+
+
 @router.get("/checklist", response_model=AuditChecklistResponse)
 def get_audit_checklist(
     current_user: User = Depends(get_current_user),
@@ -200,6 +217,48 @@ def upsert_audit_checklist(
     db.refresh(record)
 
     return _build_checklist_response(normalized, record.updated_at)
+
+
+@router.get("/assessment", response_model=AssessmentProgressResponse)
+def get_assessment_progress(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    record = (
+        db.query(AssessmentProgress)
+        .filter(AssessmentProgress.organization_id == current_user.organization_id)
+        .one_or_none()
+    )
+    return _build_assessment_response(record)
+
+
+@router.put("/assessment", response_model=AssessmentProgressResponse)
+def upsert_assessment_progress(
+    payload: AssessmentProgressRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    record = (
+        db.query(AssessmentProgress)
+        .filter(AssessmentProgress.organization_id == current_user.organization_id)
+        .one_or_none()
+    )
+
+    if record is None:
+        record = AssessmentProgress(
+            organization_id=current_user.organization_id,
+            updated_by_user_id=current_user.id,
+            progress_data=payload.payload,
+        )
+        db.add(record)
+    else:
+        record.progress_data = payload.payload
+        record.updated_by_user_id = current_user.id
+
+    db.commit()
+    db.refresh(record)
+
+    return _build_assessment_response(record)
 
 
 @router.post("/validate", response_model=AuditValidationResponse)
