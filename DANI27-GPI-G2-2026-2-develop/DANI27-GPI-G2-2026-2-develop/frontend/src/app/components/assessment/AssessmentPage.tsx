@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import data from '../../../data/example-data.json';
+import { getPhases, getPhaseQuestions, postAnswer } from '../../../api/assessment';
 import PhaseSelector from './PhaseSelector';
 import QuestionCard from './QuestionCard';
 import ProgressSidebar from './ProgressSidebar';
@@ -9,8 +9,8 @@ import { loadProgressLocal, saveProgressLocal } from '../../lib/storage';
 type Phase = any;
 
 export default function AssessmentPage() {
-  const phases: Phase[] = (data as any).phases || [];
-  const [currentPhaseId, setCurrentPhaseId] = useState<string>(phases[0]?.id || '');
+  const [phases, setPhases] = useState<Phase[]>([]);
+  const [currentPhaseId, setCurrentPhaseId] = useState<string>('');
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [lastSaved, setLastSaved] = useState<string | null>(null);
@@ -20,9 +20,21 @@ export default function AssessmentPage() {
       const stored = await loadProgressLocal();
       if (stored) {
         setAnswers(stored.answers || {});
-        setCurrentPhaseId(stored.currentPhaseId || phases[0]?.id || '');
+        setCurrentPhaseId(stored.currentPhaseId || '');
         setCurrentQuestionIdx(stored.currentQuestionIdx || 0);
         setLastSaved(stored.lastSaved || null);
+      }
+
+      // fetch phases from API
+      try {
+        const remote = await getPhases()
+        // map to expected shape (id as string)
+        const mapped = remote.map((p) => ({ ...p, id: String(p.id), questions: [] }))
+        setPhases(mapped)
+        if (!stored) setCurrentPhaseId(mapped[0]?.id || '')
+      } catch (err) {
+        // keep empty phases on error
+        // console.error(err)
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -32,8 +44,28 @@ export default function AssessmentPage() {
   const questions = currentPhase?.questions || [];
   const question = questions[currentQuestionIdx] || null;
 
+  // fetch questions when phase changes
+  useEffect(() => {
+    (async () => {
+      if (!currentPhaseId) return
+      try {
+        const qs = await getPhaseQuestions(currentPhaseId)
+        setPhases((prev) => prev.map((p) => (p.id === currentPhaseId ? { ...p, questions: qs.map((q) => ({ ...q, id: String(q.id) })) } : p)))
+      } catch (err) {
+        // ignore
+      }
+    })()
+  }, [currentPhaseId])
+
   const setAnswerValue = (questionId: string, value: any) => {
     setAnswers((s) => ({ ...s, [questionId]: { ...(s[questionId] || {}), value, updatedAt: new Date().toISOString() } }));
+
+    // send to backend (fire-and-forget)
+    try {
+      postAnswer({ question_id: questionId, answer: value?.value ?? value, notes: value?.notes })
+    } catch (err) {
+      // ignore
+    }
   };
 
   const addFiles = (questionId: string, files: File[]) => {

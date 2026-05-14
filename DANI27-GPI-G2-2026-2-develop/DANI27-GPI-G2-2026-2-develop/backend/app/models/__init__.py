@@ -9,6 +9,9 @@ from app.models.refresh_token import RefreshToken
 from app.models.asset import Asset
 from app.models.audit_checklist import AuditChecklist
 from app.models.assessment_progress import AssessmentProgress
+from app.models.assessment_phase import AssessmentPhase
+from app.models.assessment_question import AssessmentQuestion
+from app.models.assessment_answer import AssessmentAnswer
 
 __all__ = [
     "Plan",
@@ -22,4 +25,7 @@ __all__ = [
     "Asset",
     "AuditChecklist",
     "AssessmentProgress",
+    "AssessmentPhase",
+    "AssessmentQuestion",
+    "AssessmentAnswer",
 ]

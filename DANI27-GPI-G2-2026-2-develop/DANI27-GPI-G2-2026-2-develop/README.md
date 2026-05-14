@@ -47,3 +47,5 @@ En la pantalla de Auditoría hay una sección dedicada para subir archivos y val
 - Devuelve un score de cumplimiento (0-100%) con estado (Conforme, Revisar, No Conforme)
 - Muestra hallazgos específicos con severidad y recomendaciones
 - Endpoint backend: `POST /audit/validate-file` con multipart form-data
+ 
+ ***14-05-2026 CHECK***

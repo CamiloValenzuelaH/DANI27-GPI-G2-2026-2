@@ -4,6 +4,7 @@ from typing import Any
 import httpx
 
 from app.core.config import settings
+from app.workers.gemini_service import _post_json_with_retry
 
 
 _VALID_STATUS = {"compliant", "non_compliant", "needs_review"}
@@ -153,7 +154,10 @@ async def analyze_audit_with_ai(payload: dict[str, Any]) -> dict[str, Any] | Non
     if not settings.gemini_api_key:
         return None
 
-    endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
+    endpoint = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{settings.gemini_validation_model.removeprefix('models/')}:generateContent"
+    )
 
     request_payload = {
         "contents": [{"parts": [{"text": _build_prompt(payload)}]}],
@@ -166,22 +170,15 @@ async def analyze_audit_with_ai(payload: dict[str, Any]) -> dict[str, Any] | Non
 
     try:
         async with httpx.AsyncClient(timeout=25.0) as client:
-            response = await client.post(
-                endpoint,
-                params={"key": settings.gemini_api_key},
-                json=request_payload,
-            )
-            response.raise_for_status()
+            data = await _post_json_with_retry(client, endpoint, request_payload, timeout_label="Gemini generateContent")
 
-        parsed = _safe_parse_json(_extract_text_from_gemini(response.json()))
+        parsed = _safe_parse_json(_extract_text_from_gemini(data))
         return _normalize_result(parsed)
     except Exception as e:
-        
         print("\n" + "="*50)
         print("🚨 ERROR EN LA LLAMADA A GEMINI 🚨")
         print(f"Detalle técnico: {str(e)}")
         print("="*50 + "\n")
-        
         return None
 
 
@@ -193,7 +190,10 @@ async def analyze_file_with_ai(payload: dict[str, Any]) -> dict[str, Any] | None
     if not settings.gemini_api_key:
         return None
 
-    endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
+    endpoint = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{settings.gemini_validation_model.removeprefix('models/')}:generateContent"
+    )
 
     request_payload = {
         "contents": [{"parts": [{"text": _build_file_analysis_prompt(payload)}]}],
@@ -206,22 +206,15 @@ async def analyze_file_with_ai(payload: dict[str, Any]) -> dict[str, Any] | None
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                endpoint,
-                params={"key": settings.gemini_api_key},
-                json=request_payload,
-            )
-            response.raise_for_status()
+            data = await _post_json_with_retry(client, endpoint, request_payload, timeout_label="Gemini generateContent")
 
-        parsed = _safe_parse_json(_extract_text_from_gemini(response.json()))
+        parsed = _safe_parse_json(_extract_text_from_gemini(data))
         return _normalize_result(parsed)
     except Exception as e:
-        
         print("\n" + "="*50)
         print("🚨 ERROR EN ANÁLISIS DE ARCHIVO CON GEMINI 🚨")
         print(f"Detalle técnico: {str(e)}")
         print("="*50 + "\n")
-        
         return None
 
 

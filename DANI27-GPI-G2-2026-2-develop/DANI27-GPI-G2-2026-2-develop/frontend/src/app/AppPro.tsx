@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage';
 import AssetsPage from './pages/AssetsPage'
 import AuditPagePro from './pages/AuditPagePro';
 import AssessmentPage from './components/assessment/AssessmentPage';
+import SettingsPage from './pages/SettingsPage';
 
 export default function AppPro() {
   return (
@@ -41,7 +42,7 @@ export default function AppPro() {
                     <Route path="/euai" element={<PlaceholderPage title="EU AI Act" />} />
                     <Route path="/escalation" element={<PlaceholderPage title="Escalation Rules" />} />
                     <Route path="/integrations" element={<PlaceholderPage title="Integrations" />} />
-                    <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
+                    <Route path="/settings" element={<SettingsPage />} />
                     <Route path="/assets" element={<AssetsPage />} />
                   </Routes>
                 </AppShell>

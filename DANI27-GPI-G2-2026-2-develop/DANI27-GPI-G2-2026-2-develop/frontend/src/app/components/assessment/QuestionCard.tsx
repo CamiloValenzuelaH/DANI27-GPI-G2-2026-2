@@ -9,7 +9,7 @@ export default function QuestionCard({
   onAddFiles,
   onRemoveFile,
 }: {
-  question: { id: string; text: string; critical?: boolean };
+  question: { id: string; text: string; clause_ref?: string; is_critical?: boolean };
   answer?: { value?: string; attachments?: any[] };
   onAnswer: (v: 'yes' | 'partial' | 'no' | 'na') => void;
   onAddFiles: (files: File[]) => void;
@@ -17,10 +17,13 @@ export default function QuestionCard({
 }) {
   return (
     <div className="bg-gray-900 text-gray-100 p-6 rounded-lg shadow-md">
+      {question.clause_ref && (
+        <div className="text-xs text-indigo-400 mb-2 font-mono">Control: {question.clause_ref}</div>
+      )}
       <div className="flex items-start justify-between">
         <h3 className="text-lg font-semibold">{question.text}</h3>
-        {question.critical && (
-          <span className="ml-4 text-xs bg-red-600 text-white px-2 py-1 rounded">CRITICAL</span>
+        {question.is_critical && (
+          <span className="ml-4 text-xs bg-red-600 text-white px-2 py-1 rounded">CRÍTICO</span>
         )}
       </div>
 

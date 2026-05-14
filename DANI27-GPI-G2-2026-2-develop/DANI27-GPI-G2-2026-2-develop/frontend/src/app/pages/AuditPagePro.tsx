@@ -1,7 +1,12 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { AlertCircle, CheckCircle, AlertTriangle, MessageCircle, Send, Upload, FileUp } from 'lucide-react';
-import type { AuditValidationResponse, AuditChecklistItem, FileValidationResult } from '../../api/audit';
-import { getAuditChecklist, saveAuditChecklist, validateAudit, validateFile } from '../../api/audit';
+import type { AuditValidationResponse, AuditChecklistItem } from '../../api/audit';
+import { getAuditChecklist, saveAuditChecklist, validateAudit } from '../../api/audit';
+import {
+  enqueueExternalValidation,
+  subscribeExternalValidationJob,
+  type ValidationReportResponse,
+} from '../../api/externalValidation';
 
 interface ChatMessage {
   id: number;
@@ -26,9 +31,12 @@ export default function AuditPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // File validation states
-  const [fileValidationResult, setFileValidationResult] = useState<FileValidationResult | null>(null);
   const [isValidatingFile, setIsValidatingFile] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [externalValidationJob, setExternalValidationJob] = useState<ValidationReportResponse | null>(null);
+  const [externalValidationReport, setExternalValidationReport] = useState<ValidationReportResponse | null>(null);
+  const [externalValidationError, setExternalValidationError] = useState<string | null>(null);
+  const validationStreamRef = useRef<EventSource | null>(null);
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -208,14 +216,42 @@ export default function AuditPage() {
 
     setIsValidatingFile(true);
     setFileError(null);
+    setExternalValidationError(null);
+    setExternalValidationJob(null);
+    setExternalValidationReport(null);
+    validationStreamRef.current?.close();
+    validationStreamRef.current = null;
 
     try {
-      const result = await validateFile(file);
-      setFileValidationResult(result);
+      const job = await enqueueExternalValidation(file);
+      const queuedState: ValidationReportResponse = {
+        job_id: job.job_id,
+        status: 'queued',
+        progress: 0,
+        message: 'Job encolado',
+        total_chunks: 0,
+        findings: [],
+      };
+      setExternalValidationJob(queuedState);
+      setExternalValidationReport(queuedState);
+
+      validationStreamRef.current = subscribeExternalValidationJob(job.job_id, {
+        onProgress: (payload) => {
+          setExternalValidationJob(payload);
+          setExternalValidationReport(payload);
+        },
+        onDone: (payload) => {
+          setExternalValidationJob(payload);
+          setExternalValidationReport(payload);
+        },
+        onError: (message) => {
+          setExternalValidationError(message);
+        },
+      });
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error desconocido';
       setFileError(`Error al validar archivo: ${errorMsg}`);
-      setFileValidationResult(null);
+      setExternalValidationError(`No se pudo iniciar la validación granular: ${errorMsg}`);
     } finally {
       setIsValidatingFile(false);
       // Limpiar input
@@ -249,6 +285,12 @@ export default function AuditPage() {
     if (score >= 60) return 'text-yellow-600';
     return 'text-red-600';
   };
+
+  useEffect(() => {
+    return () => {
+      validationStreamRef.current?.close();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1119] to-[#1A1D28] p-6">
@@ -292,7 +334,38 @@ export default function AuditPage() {
             {isValidatingFile && (
               <div className="mt-4 p-4 bg-[#0F1119] rounded-lg text-center">
                 <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-[#4F6EF7] border-t-transparent"></div>
-                <p className="text-white text-sm ml-2 inline">Validando con agente...</p>
+                <p className="text-white text-sm ml-2 inline">Procesando validación granular...</p>
+              </div>
+            )}
+
+            {externalValidationJob && (
+              <div className="mt-4 bg-[#0F1119] border border-[#2A2E3D] rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-gray-400 text-xs uppercase tracking-wide">Job ID</p>
+                    <p className="text-white text-sm font-medium break-all">{externalValidationJob.job_id}</p>
+                  </div>
+                  <div className={`text-sm font-semibold ${getStatusColor(externalValidationJob.status)}`}>
+                    {externalValidationJob.status.toUpperCase()}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                    <span>Progreso</span>
+                    <span>{externalValidationJob.progress}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-[#1A1D28] overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#4F6EF7] to-[#1DB954] transition-all duration-300"
+                      style={{ width: `${externalValidationJob.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                {externalValidationJob.message && (
+                  <p className="text-gray-300 text-sm">{externalValidationJob.message}</p>
+                )}
               </div>
             )}
 
@@ -303,51 +376,69 @@ export default function AuditPage() {
               </div>
             )}
 
-            {fileValidationResult && (
+            {externalValidationError && (
+              <div className="mt-4 bg-red-900/20 border border-red-700 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="text-red-600 text-sm">{externalValidationError}</div>
+              </div>
+            )}
+
+            {externalValidationReport && externalValidationReport.status === 'completed' && (
               <div className="mt-4 space-y-3">
                 <div className="bg-[#0F1119] p-4 rounded-lg">
                   <p className="text-gray-400 text-sm mb-1">Archivo</p>
-                  <p className="text-white font-medium">{fileValidationResult.file_name}</p>
+                  <p className="text-white font-medium">{externalValidationReport.file_name}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-[#0F1119] p-4 rounded-lg">
-                    <p className="text-gray-400 text-sm mb-1">Cumplimiento</p>
-                    <p className={`text-2xl font-bold ${fileValidationResult.compliance_score >= 80 ? 'text-[#1DB954]' : fileValidationResult.compliance_score >= 60 ? 'text-yellow-500' : 'text-red-500'}`}>
-                      {fileValidationResult.compliance_score}%
+                    <p className="text-gray-400 text-sm mb-1">Cumplimiento promedio</p>
+                    <p className={`text-2xl font-bold ${getComplianceScoreColor(externalValidationReport.overall_score ?? 0)}`}>
+                      {externalValidationReport.overall_score ?? 0}%
                     </p>
                   </div>
                   <div className="bg-[#0F1119] p-4 rounded-lg">
                     <p className="text-gray-400 text-sm mb-1">Estado</p>
-                    <p className={`font-medium ${fileValidationResult.compliance_status === 'compliant' ? 'text-[#1DB954]' : fileValidationResult.compliance_status === 'needs_review' ? 'text-yellow-500' : 'text-red-500'}`}>
-                      {fileValidationResult.compliance_status === 'compliant' ? '✓ Conforme' : fileValidationResult.compliance_status === 'needs_review' ? '⚠ Revisar' : '✗ No Conforme'}
+                    <p className={`font-medium ${getStatusColor(externalValidationReport.status)}`}>
+                      {externalValidationReport.status === 'completed' ? '✓ Validación completada' : externalValidationReport.status.toUpperCase()}
                     </p>
                   </div>
                 </div>
 
                 <div className="bg-[#0F1119] p-4 rounded-lg">
                   <p className="text-gray-400 text-sm mb-2">Resumen</p>
-                  <p className="text-white text-sm">{fileValidationResult.summary}</p>
+                  <p className="text-white text-sm">{externalValidationReport.summary}</p>
                 </div>
 
-                {fileValidationResult.findings.length > 0 && (
+                {externalValidationReport.findings.length > 0 && (
                   <div className="bg-[#0F1119] p-4 rounded-lg">
-                    <p className="text-gray-400 text-sm mb-3">Hallazgos</p>
+                    <p className="text-gray-400 text-sm mb-3">Hallazgos por fragmento ISO</p>
                     <div className="space-y-2">
-                      {fileValidationResult.findings.map((finding, idx) => (
+                      {externalValidationReport.findings.map((finding, idx) => (
                         <div key={idx} className="text-sm">
                           <div className="flex items-start gap-2">
                             <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                              finding.severity === 'critical' ? 'bg-red-900 text-red-200' :
-                              finding.severity === 'high' ? 'bg-orange-900 text-orange-200' :
-                              finding.severity === 'medium' ? 'bg-yellow-900 text-yellow-200' :
-                              'bg-green-900 text-green-200'
+                              finding.observations.some((observation) => observation.severity === 'critical') ? 'bg-red-900 text-red-200' :
+                              finding.observations.some((observation) => observation.severity === 'major') ? 'bg-orange-900 text-orange-200' :
+                              'bg-yellow-900 text-yellow-200'
                             }`}>
-                              {finding.severity}
+                              {finding.clause_ref}
                             </span>
                             <div className="flex-1">
-                              <p className="text-white font-medium">{finding.issue}</p>
-                              <p className="text-gray-400 text-xs mt-1">{finding.recommendation}</p>
+                              <p className="text-white font-medium">{finding.title}</p>
+                              <p className="text-gray-400 text-xs mt-1">Score: {finding.compliance_score}% · Relevancia: {Math.round((finding.relevance_score ?? 0) * 100)}%</p>
+                              {finding.observations.length > 0 && (
+                                <ul className="mt-2 space-y-1 text-gray-300 text-xs">
+                                  {finding.observations.map((observation, observationIndex) => (
+                                    <li key={observationIndex}>
+                                      <span className="font-semibold uppercase">[{observation.severity}]</span> {observation.text}
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                              {finding.suggestions.length > 0 && (
+                                <p className="text-gray-400 text-xs mt-2">Sugerencias: {finding.suggestions.join(' · ')}</p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -355,6 +446,12 @@ export default function AuditPage() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {externalValidationReport && externalValidationReport.status === 'failed' && (
+              <div className="mt-4 bg-red-900/20 border border-red-700 rounded-lg p-4 text-red-400 text-sm">
+                {externalValidationReport.error || 'La validación granular falló.'}
               </div>
             )}
           </div>

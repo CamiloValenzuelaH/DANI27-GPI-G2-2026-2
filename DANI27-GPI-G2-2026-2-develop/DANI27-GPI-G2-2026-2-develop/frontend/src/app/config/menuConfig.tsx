@@ -193,6 +193,14 @@ export const coreModulesItems: MenuItem[] = [
     iconType: 'emoji',
   },
   {
+    id: 'pre-audit-assessment',
+    labelKey: 'menu.preAuditAssessment',
+    path: '/assessment',
+    icon: '📝',
+    iconType: 'emoji',
+    requiredPlan: 'free',
+  },
+  {
     id: 'audit-room',
     labelKey: 'menu.auditRoom',
     path: '/audit',

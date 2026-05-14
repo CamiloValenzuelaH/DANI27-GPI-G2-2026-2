@@ -13,16 +13,43 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  celery-worker:
+    build: ./backend
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=2
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:password1234@db:5432/dani27001
+      REDIS_URL: redis://redis:6379/0
+      VALIDATION_JOBS_DIR: /shared/validation_jobs
+    volumes:
+      - validation_jobs:/shared/validation_jobs
+
   backend:
     build: ./backend
     ports:
       - "8001:8000"
     depends_on:
       - db
+      - redis
+      - celery-worker
     environment:
       DATABASE_URL: postgresql://postgres:password1234@db:5432/dani27001
+      REDIS_URL: redis://redis:6379/0
+      VALIDATION_JOBS_DIR: /shared/validation_jobs
     env_file:
       - ./backend/.env
+    volumes:
+      - validation_jobs:/shared/validation_jobs
 
   frontend:
     build: ./frontend
@@ -32,6 +59,9 @@ services:
       - backend
     environment:
       VITE_API_URL: http://localhost:8001/api/v1
+      VITE_VALIDATION_API_URL: http://localhost:8001/api/validate
+      VITE_BULLMQ_API_URL: http://localhost:3001
 
 volumes:
   postgres_data:
+  validation_jobs:

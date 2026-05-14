@@ -106,3 +106,5 @@ export async function validateFile(file: File): Promise<FileValidationResult> {
   const response = await axios.post<FileValidationResult>('/audit/validate-file', formData);
   return response.data;
 }
+
+export { enqueueExternalValidation, subscribeExternalValidationJob } from './externalValidation';
