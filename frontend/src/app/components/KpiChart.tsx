@@ -8,6 +8,8 @@ import {
   Tooltip,
   CartesianGrid,
 } from 'recharts'
+import { usePreferences } from './AppShell'
+import { translations } from '../types'
 
 type KpiPoint = { name: string; value: number }
 
@@ -28,6 +30,8 @@ export default function KpiChart({
   title = 'KPIs - Trend',
   height = 300,
 }: Props) {
+  const { language } = usePreferences()
+  const t = (id: string, fallback: string) => translations[language][id] ?? fallback
   const chartData: KpiPoint[] = useMemo(() => {
     return labels.map((label, i) => ({ name: label, value: Number(data[i] ?? 0) }))
   }, [labels, data])
@@ -36,7 +40,7 @@ export default function KpiChart({
     return (
       <div className="bg-[#1A1D28] rounded-xl p-6 border border-[#2A2E3D]">
         <h2 className="text-lg font-semibold text-white mb-4">{title}</h2>
-        <div className="flex items-center justify-center text-white/60 h-40">No hay datos disponibles</div>
+        <div className="flex items-center justify-center text-white/60 h-40">{t('kpi.noData', 'No data available')}</div>
       </div>
     )
   }
@@ -66,7 +70,7 @@ export default function KpiChart({
             <Tooltip
               cursor={{ stroke: '#4F6EF7', strokeWidth: 1, strokeDasharray: '4 4' }}
               contentStyle={{ background: '#0f1724', border: '1px solid #2A2E3D', borderRadius: 8 }}
-              formatter={(value: any) => [`${formatNumber(Number(value))}%`, 'Compliance']}
+              formatter={(value: any) => [`${formatNumber(Number(value))}%`, t('kpi.compliance', 'Compliance')]}
             />
             <Area
               type="monotone"

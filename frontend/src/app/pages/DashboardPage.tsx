@@ -1,13 +1,20 @@
-import { useIntl } from 'react-intl';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import KpiChart from '../components/KpiChart';
 import HealthScoreChart from '../components/HealthScoreChart';
 import { useEffect, useState } from 'react';
 import { dashboardApi } from '../../api/dashboard';
 import type { DashboardMetricsResponse } from '../../api/types';
+import { usePreferences } from '../components/AppShell';
+import { translations } from '../types';
 
 export default function DashboardPage() {
-  const intl = useIntl();
+  const { language } = usePreferences();
+  const intl = {
+    formatMessage: ({ id, defaultMessage }: { id: string; defaultMessage?: string }) => {
+      const messages = translations[language] as Record<string, string>;
+      return messages[id] ?? defaultMessage ?? id;
+    },
+  };
   const [metrics, setMetrics] = useState<DashboardMetricsResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +30,7 @@ export default function DashboardPage() {
         setMetrics(data)
       } catch (e: any) {
         console.error('Error fetching dashboard metrics', e)
-        setError('No se pudieron cargar los KPIs')
+        setError(intl.formatMessage({ id: 'dashboard.kpiLoadError' }))
       } finally {
         if (mounted) setLoading(false)
       }
@@ -73,7 +80,7 @@ export default function DashboardPage() {
           {intl.formatMessage({ id: 'menu.dashboard' })}
         </h1>
         <p className="text-white/60 text-sm mt-1">
-          Overview of your compliance health and progress
+          {intl.formatMessage({ id: 'dashboard.overview' })}
         </p>
       </div>
 
@@ -117,23 +124,23 @@ export default function DashboardPage() {
       <div className="mb-6">
         {loading ? (
           <div className="bg-[#1A1D28] rounded-xl p-6 border border-[#2A2E3D]">
-            <div className="text-white/60">Cargando KPIs...</div>
+            <div className="text-white/60">{intl.formatMessage({ id: 'dashboard.loadingKpis' })}</div>
           </div>
         ) : (
-          <KpiChart labels={chartLabels} data={chartValues} title="Health Score Trend" />
+          <KpiChart labels={chartLabels} data={chartValues} title={intl.formatMessage({ id: 'dashboard.healthScoreTrend' })} />
         )}
         {error && <div className="text-sm text-[#E5484D] mt-2">{error}</div>}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-[#1A1D28] rounded-xl p-6 border border-[#2A2E3D]">
-          <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">{intl.formatMessage({ id: 'dashboard.recentActivity' })}</h2>
           <div className="space-y-3">
             {[
-              { title: 'Gap analysis completed for ISO 27001', time: '2 hours ago' },
-              { title: 'Evidence uploaded for A.8.1', time: '5 hours ago' },
-              { title: 'CAPA NC-2024-015 updated', time: '1 day ago' },
-              { title: 'Risk R-001 treatment plan approved', time: '2 days ago' },
+              { title: intl.formatMessage({ id: 'dashboard.activity.gapAnalysis' }), time: intl.formatMessage({ id: 'dashboard.time.2hours' }) },
+              { title: intl.formatMessage({ id: 'dashboard.activity.evidence' }), time: intl.formatMessage({ id: 'dashboard.time.5hours' }) },
+              { title: intl.formatMessage({ id: 'dashboard.activity.capa' }), time: intl.formatMessage({ id: 'dashboard.time.1day' }) },
+              { title: intl.formatMessage({ id: 'dashboard.activity.risk' }), time: intl.formatMessage({ id: 'dashboard.time.2days' }) },
             ].map((activity, index) => (
               <div
                 key={index}
@@ -150,13 +157,13 @@ export default function DashboardPage() {
         </div>
 
         <div className="bg-[#1A1D28] rounded-xl p-6 border border-[#2A2E3D]">
-          <h2 className="text-lg font-semibold text-white mb-4">Upcoming Tasks</h2>
+          <h2 className="text-lg font-semibold text-white mb-4">{intl.formatMessage({ id: 'dashboard.upcomingTasks' })}</h2>
           <div className="space-y-3">
             {[
-              { title: 'Complete evidence for A.9.2', priority: 'high', due: 'Today' },
-              { title: 'Review CAPA NC-2025-002', priority: 'high', due: 'Tomorrow' },
-              { title: 'Update risk treatment plan', priority: 'medium', due: 'This week' },
-              { title: 'Prepare audit documentation', priority: 'low', due: 'Next week' },
+              { title: intl.formatMessage({ id: 'dashboard.task.evidence' }), priority: 'high', due: intl.formatMessage({ id: 'dashboard.due.today' }) },
+              { title: intl.formatMessage({ id: 'dashboard.task.capa' }), priority: 'high', due: intl.formatMessage({ id: 'dashboard.due.tomorrow' }) },
+              { title: intl.formatMessage({ id: 'dashboard.task.risk' }), priority: 'medium', due: intl.formatMessage({ id: 'dashboard.due.thisWeek' }) },
+              { title: intl.formatMessage({ id: 'dashboard.task.auditDocs' }), priority: 'low', due: intl.formatMessage({ id: 'dashboard.due.nextWeek' }) },
             ].map((task, index) => (
               <div
                 key={index}
@@ -176,7 +183,7 @@ export default function DashboardPage() {
                       : 'bg-white/10 text-white/60'
                   }`}
                 >
-                  {task.priority.toUpperCase()}
+                  {intl.formatMessage({ id: `dashboard.priority.${task.priority}` })}
                 </span>
               </div>
             ))}

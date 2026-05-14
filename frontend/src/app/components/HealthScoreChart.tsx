@@ -1,4 +1,6 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
+import { usePreferences } from './AppShell'
+import { translations } from '../types'
 
 type Props = {
   score: number
@@ -18,6 +20,8 @@ function getTone(status: string) {
 }
 
 export default function HealthScoreChart({ score, status, title = 'Health Score' }: Props) {
+  const { language } = usePreferences()
+  const t = (id: string, fallback: string) => translations[language][id] ?? fallback
   const safeScore = Math.max(0, Math.min(100, Number.isFinite(score) ? score : 0))
   const remainder = 100 - safeScore
   const tone = getTone(status)
@@ -32,13 +36,13 @@ export default function HealthScoreChart({ score, status, title = 'Health Score'
       <div className="flex items-center justify-between gap-4 mb-4">
         <div>
           <h2 className="text-lg font-semibold text-white">{title}</h2>
-          <p className="text-white/50 text-sm mt-1">Backend-calculated compliance readiness</p>
+          <p className="text-white/50 text-sm mt-1">{t('healthScore.subtitle', 'Backend-calculated compliance readiness')}</p>
         </div>
         <span
           className="text-xs font-semibold px-3 py-1.5 rounded-full"
           style={{ backgroundColor: `${tone}22`, color: tone }}
         >
-          {status}
+          {t(`healthScore.status.${status.toLowerCase().replace(/\s+/g, '_')}`, status)}
         </span>
       </div>
 
@@ -64,8 +68,8 @@ export default function HealthScoreChart({ score, status, title = 'Health Score'
 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
           <div className="text-5xl font-bold tracking-tight text-white">{safeScore.toFixed(0)}%</div>
-          <div className="mt-2 text-sm font-semibold text-white/70">{status}</div>
-          <div className="mt-1 text-xs text-white/40">Ready level</div>
+          <div className="mt-2 text-sm font-semibold text-white/70">{t(`healthScore.status.${status.toLowerCase().replace(/\s+/g, '_')}`, status)}</div>
+          <div className="mt-1 text-xs text-white/40">{t('healthScore.readyLevel', 'Ready level')}</div>
         </div>
       </div>
     </div>
