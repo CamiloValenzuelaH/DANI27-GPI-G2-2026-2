@@ -34,6 +34,21 @@ services:
     volumes:
       - validation_jobs:/shared/validation_jobs
 
+  validation-worker:
+    build: ./validation-worker
+    command: npm start
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:password1234@db:5432/dani27001
+      REDIS_URL: redis://redis:6379/0
+      VALIDATION_JOBS_DIR: /shared/validation_jobs
+    volumes:
+      - validation_jobs:/shared/validation_jobs
+
   backend:
     build: ./backend
     ports:
