@@ -12,6 +12,7 @@ from app.models.assessment_progress import AssessmentProgress
 from app.models.assessment_phase import AssessmentPhase
 from app.models.assessment_question import AssessmentQuestion
 from app.models.assessment_answer import AssessmentAnswer
+from app.models.audit_log import AuditLog
 
 __all__ = [
     "Plan",
@@ -28,4 +29,5 @@ __all__ = [
     "AssessmentPhase",
     "AssessmentQuestion",
     "AssessmentAnswer",
+    "AuditLog",
 ]

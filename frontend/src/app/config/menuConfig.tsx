@@ -54,8 +54,7 @@ export const processMenuItems: MenuItem[] = [
     path: '/understand',
     icon: '✓',
     iconType: 'emoji',
-    stepNum: '✓',
-    isCompleted: true,
+    stepNum: '2',
   },
   {
     id: 'assets',

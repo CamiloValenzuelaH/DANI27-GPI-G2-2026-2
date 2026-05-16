@@ -1,58 +1,55 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { I18nProvider } from './i18n';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
-import AssetsPage from './pages/AssetsPage'
+import AssetsPage from './pages/AssetsPage';
 import AuditPagePro from './pages/AuditPagePro';
 import AssessmentPage from './components/assessment/AssessmentPage';
 import SettingsPage from './pages/SettingsPage';
 
 export default function AppPro() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+    <I18nProvider locale="en">
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          {/* Rutas públicas */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+            {/* Protected routes wrapped by ProtectedRoute and AppShell */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppShell />}>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/understand" element={<PlaceholderPage title="Understand My Situation" />} />
+                <Route path="/documents" element={<PlaceholderPage title="Document Controls" />} />
+                <Route path="/risks" element={<PlaceholderPage title="Manage Risks" />} />
+                <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />
+                <Route path="/findings" element={<PlaceholderPage title="Manage Findings" />} />
+                <Route path="/audit" element={<AuditPagePro />} />
+                <Route path="/assessment" element={<AssessmentPage />} />
+                <Route path="/integrity" element={<PlaceholderPage title="Compliance Integrity" />} />
+                <Route path="/regfeed" element={<PlaceholderPage title="Regulatory Feed" />} />
+                <Route path="/dora" element={<PlaceholderPage title="DORA" />} />
+                <Route path="/euai" element={<PlaceholderPage title="EU AI Act" />} />
+                <Route path="/escalation" element={<PlaceholderPage title="Escalation Rules" />} />
+                <Route path="/integrations" element={<PlaceholderPage title="Integrations" />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/assets" element={<AssetsPage />} />
+              </Route>
+            </Route>
 
-          {/* Rutas protegidas */}
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <AppShell>
-                  <Routes>
-                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/understand" element={<PlaceholderPage title="Understand My Situation" />} />
-                    <Route path="/documents" element={<PlaceholderPage title="Document Controls" />} />
-                    <Route path="/risks" element={<PlaceholderPage title="Manage Risks" />} />
-                    <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />
-                    <Route path="/findings" element={<PlaceholderPage title="Manage Findings" />} />
-                    <Route path="/audit" element={<AuditPagePro />} />
-                    <Route path="/assessment" element={<AssessmentPage />} />
-                    <Route path="/integrity" element={<PlaceholderPage title="Compliance Integrity" />} />
-                    <Route path="/regfeed" element={<PlaceholderPage title="Regulatory Feed" />} />
-                    <Route path="/dora" element={<PlaceholderPage title="DORA" />} />
-                    <Route path="/euai" element={<PlaceholderPage title="EU AI Act" />} />
-                    <Route path="/escalation" element={<PlaceholderPage title="Escalation Rules" />} />
-                    <Route path="/integrations" element={<PlaceholderPage title="Integrations" />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="/assets" element={<AssetsPage />} />
-                  </Routes>
-                </AppShell>
-              </ProtectedRoute>
-            }
-          />
-
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </I18nProvider>
   );
 }
 

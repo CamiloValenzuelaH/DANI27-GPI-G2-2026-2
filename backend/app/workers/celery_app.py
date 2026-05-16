@@ -22,5 +22,14 @@ celery_app.conf.update(
     worker_max_tasks_per_child=1000,
 )
 
+# Schedule cleanup monthly (approx every 30 days). To enable scheduling run celery beat.
+celery_app.conf.beat_schedule = {
+    "audit-cleanup-monthly": {
+        "task": "audit.cleanup_old_logs",
+        "schedule": 30 * 24 * 60 * 60,  # every ~30 days in seconds
+        "args": (),
+    }
+}
+
 # Auto-descubrir tareas
 celery_app.autodiscover_tasks(["app.workers"])

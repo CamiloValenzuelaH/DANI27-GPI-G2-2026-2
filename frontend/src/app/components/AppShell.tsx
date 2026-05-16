@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { I18nProvider } from '../i18n';
 import SidebarPro, { SidebarSkeleton } from './SidebarPro';
@@ -102,7 +103,7 @@ function loadPreferences() {
 }
 
 interface AppShellProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export default function AppShell({ children }: AppShellProps) {
@@ -229,7 +230,7 @@ export default function AppShell({ children }: AppShellProps) {
               />
 
               <main className={`flex-1 overflow-auto ${compactView ? 'p-4' : ''}`}>
-                {children}
+                {children ?? <Outlet />}
               </main>
             </div>
 

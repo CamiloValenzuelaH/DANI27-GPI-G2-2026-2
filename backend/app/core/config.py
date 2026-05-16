@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_name: str = "Dani27001"
     secret_key: str
+    encryption_key: str
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
