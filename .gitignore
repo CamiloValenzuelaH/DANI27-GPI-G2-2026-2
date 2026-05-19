@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+.vscode/
+
+# Archivos momentaneos de python
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Enviroment
+.venv/
+.env
