@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api/v1'
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8001/api/v1'
 
 const TOKEN_KEY = 'access_token'
 const REFRESH_KEY = 'refresh_token'
@@ -20,15 +20,20 @@ export const storage = {
 
 const client: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
 })
 
-// Adjunta el access token en cada request
+// Adjunta el access token en cada request y maneja FormData correctamente
 client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = storage.getToken()
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  
+  // Si es FormData, no establecer Content-Type (dejar que el navegador lo haga)
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json'
+  }
+  
   return config
 })
 

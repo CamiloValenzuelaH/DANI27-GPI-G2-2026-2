@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, String
 
 
 class Base(DeclarativeBase):
@@ -23,7 +23,10 @@ class TimestampMixin:
 
 
 class UUIDMixin:
-    id: Mapped[uuid.UUID] = mapped_column(
+    # Use String(36) to match migrations that create id as varchar(36).
+    # Default is a stringified UUID to avoid DB type-casting issues.
+    id: Mapped[str] = mapped_column(
+        String(36),
         primary_key=True,
-        default=uuid.uuid4,
+        default=lambda: str(uuid.uuid4()),
     )

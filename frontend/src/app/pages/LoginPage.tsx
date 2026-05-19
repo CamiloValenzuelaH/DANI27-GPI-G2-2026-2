@@ -3,11 +3,14 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useAuth } from '../contexts/AuthContext'
+import { useIntl } from 'react-intl'
 import type { LoginRequest } from '../../api/types'
 
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const intl = useIntl()
+  const msg = (id: string, defaultMessage: string) => intl.formatMessage({ id, defaultMessage })
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -31,19 +34,19 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-6">
 
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">Bienvenido a Dani27001</h1>
-          <p className="text-sm text-muted-foreground">Inicia sesión en tu cuenta</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{msg('login.welcome', 'Welcome to Dani27001')}</h1>
+          <p className="text-sm text-muted-foreground">{msg('login.subtitle', 'Sign in to your account')}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
           <div className="space-y-1">
-            <label className="text-sm font-medium">Email</label>
+            <label className="text-sm font-medium">{msg('login.email', 'Email')}</label>
             <input
               type="email"
-              placeholder="tu@empresa.com"
+              placeholder={msg('login.emailPlaceholder', 'you@company.com')}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              {...register('email', { required: 'El email es requerido' })}
+              {...register('email', { required: msg('login.emailRequired', 'Email is required') })}
             />
             {errors.email && (
               <p className="text-xs text-destructive">{errors.email.message}</p>
@@ -51,12 +54,12 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium">Contraseña</label>
+            <label className="text-sm font-medium">{msg('login.password', 'Password')}</label>
             <input
               type="password"
               placeholder="••••••••"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              {...register('password', { required: 'La contraseña es requerida' })}
+              {...register('password', { required: msg('login.passwordRequired', 'Password is required') })}
             />
             {errors.password && (
               <p className="text-xs text-destructive">{errors.password.message}</p>
@@ -74,14 +77,14 @@ export default function LoginPage() {
             disabled={isLoading}
             className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+            {isLoading ? msg('login.signingIn', 'Signing in...') : msg('login.signIn', 'Sign in')}
           </button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
-          ¿No tienes cuenta?{' '}
+          <p className="text-center text-sm text-muted-foreground">
+          {msg('login.noAccount', "Don't have an account?")}{' '}
           <Link to="/register" className="font-medium text-primary hover:underline">
-            Regístrate
+            {msg('login.register', 'Register')}
           </Link>
         </p>
       </div>

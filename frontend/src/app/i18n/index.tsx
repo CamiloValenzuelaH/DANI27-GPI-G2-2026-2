@@ -10,6 +10,7 @@ interface I18nProviderProps {
 export function I18nProvider({ children, locale }: I18nProviderProps) {
   return (
     <IntlProvider
+      key={locale}
       locale={locale}
       messages={translations[locale]}
       defaultLocale="en"

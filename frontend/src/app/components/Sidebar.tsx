@@ -85,7 +85,7 @@ export default function Sidebar({ activePage, setActivePage, profile, setShowPro
             <NavItem active={activePage === 'dashboard'} onClick={() => setActivePage('dashboard')} icon="step" stepNum="1">
               {t.dashboard}
             </NavItem>
-            <NavItem active={activePage === 'understand'} onClick={() => setActivePage('understand')} icon="step" stepNum="✓" completed>
+            <NavItem active={activePage === 'understand'} onClick={() => setActivePage('understand')} icon="step" stepNum="2" completed>
               {t.understand}
             </NavItem>
             <NavItem active={activePage === 'documents'} onClick={() => setActivePage('documents')} icon="step" stepNum="3" badge="4" badgeType="warn">
