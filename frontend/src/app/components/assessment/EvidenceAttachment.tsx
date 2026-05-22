@@ -1,6 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react';
+import { Trash2 } from 'lucide-react';
 import UploadModal from '../uploader/UploadModal';
 import type { UploadItem } from '../uploader/UploadModal';
+
+const DEFAULT_VISIBLE_ATTACHMENTS = 5;
 
 type UploadedHistoryItem = {
   id: string;
@@ -23,6 +26,7 @@ export type AssessmentAttachment = {
   confidence?: number;
   metadata?: Record<string, unknown>;
   source?: 'manual' | 'advanced';
+  removed?: boolean;
 };
 
 export default function EvidenceAttachment({
@@ -40,6 +44,7 @@ export default function EvidenceAttachment({
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [showUploader, setShowUploader] = useState(false);
+  const [showAllAttachments, setShowAllAttachments] = useState(false);
   const historyKey = `evidence-upload-history:${questionId}`;
   const [history, setHistory] = useState<UploadedHistoryItem[]>(() => {
     try {
@@ -74,10 +79,9 @@ export default function EvidenceAttachment({
 
   const handleUploaderComplete = useCallback((items: UploadItem[]) => {
     const completed = items.filter((item) => item.status === 'completed');
-    const completedFiles = completed.map((item) => item.file);
 
     const completedAttachments: AssessmentAttachment[] = completed.map((item) => ({
-      id: item.uploadReference || item.id,
+      id: item.id,
       name: item.file.name,
       size: item.file.size,
       uploadedAt: new Date().toISOString(),
@@ -106,10 +110,6 @@ export default function EvidenceAttachment({
 
     persistHistory(nextHistoryItems);
 
-    if (completedFiles.length > 0) {
-      onAdd(completedFiles);
-    }
-
     if (completedAttachments.length > 0) {
       onUploadComplete?.(completedAttachments);
       window.dispatchEvent(
@@ -120,7 +120,11 @@ export default function EvidenceAttachment({
     }
 
     setShowUploader(false);
-  }, [onAdd, onUploadComplete, persistHistory, questionId]);
+  }, [onUploadComplete, persistHistory, questionId]);
+
+  const hasAttachmentOverflow = attachments.length > DEFAULT_VISIBLE_ATTACHMENTS;
+  const visibleAttachments = showAllAttachments ? attachments : attachments.slice(0, DEFAULT_VISIBLE_ATTACHMENTS);
+  const hiddenAttachmentCount = Math.max(attachments.length - DEFAULT_VISIBLE_ATTACHMENTS, 0);
 
   return (
     <div>
@@ -135,8 +139,10 @@ export default function EvidenceAttachment({
             <button
               onClick={() => inputRef.current?.click()}
               className="ml-4 px-3 py-1 bg-indigo-600 rounded text-white text-sm"
+              title="Seleccionar rápido: abre el selector de archivos para subir sin entrar al modo avanzado"
+              aria-label="Seleccionar archivos rápido"
             >
-              Seleccionar
+              Seleccionar (rápido)
             </button>
             <button
               onClick={() => setShowUploader(true)}
@@ -160,16 +166,51 @@ export default function EvidenceAttachment({
       </div>
 
       <ul className="mt-3 space-y-2">
-        {attachments.map((a) => (
+        {visibleAttachments.map((a) => (
           <li key={a.id} className="flex items-center justify-between bg-gray-900 p-2 rounded">
-            <span className="text-sm">
-              {a.name} · {(a.size / 1024).toFixed(1)} KB
-              {a.controlId ? ` · ${a.controlId}` : ''}
-            </span>
-            <button onClick={() => onRemove(a.id)} className="text-xs text-red-400">Eliminar</button>
+            {a.removed ? (
+              <>
+                <span className="text-sm text-gray-400">Archivo eliminado</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    className="text-xs text-cyan-300"
+                  >
+                    Reemplazar
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="text-sm">
+                  {a.name} · {(a.size / 1024).toFixed(1)} KB
+                  {a.controlId ? ` · ${a.controlId}` : ''}
+                </span>
+                <button
+                  onClick={() => onRemove(a.id)}
+                  title="Eliminar archivo"
+                  className="ml-3 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs text-red-400 hover:bg-white/5 hover:text-red-300 pointer-events-auto"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              </>
+            )}
           </li>
         ))}
       </ul>
+
+      {hasAttachmentOverflow && (
+        <div className="mt-2 flex justify-end">
+          <button
+            type="button"
+            className="text-xs font-medium text-cyan-300 hover:text-cyan-200"
+            onClick={() => setShowAllAttachments((prev) => !prev)}
+          >
+            {showAllAttachments ? 'Ver menos' : `Ver ${hiddenAttachmentCount} más`}
+          </button>
+        </div>
+      )}
 
       {history.length > 0 && (
         <div className="mt-3 rounded-md border border-gray-700 bg-gray-900 p-3">

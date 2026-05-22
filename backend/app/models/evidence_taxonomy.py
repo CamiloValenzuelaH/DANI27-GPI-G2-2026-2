@@ -13,12 +13,13 @@ from app.db.base import Base, TimestampMixin, UUIDMixin
 EVIDENCE_TAXONOMY_TYPES = ("POLICY", "PROCEDURE", "INSTRUCTION", "CONTROL", "RECORD")
 EVIDENCE_TAXONOMY_ORDER = {value: index for index, value in enumerate(EVIDENCE_TAXONOMY_TYPES)}
 
+# Default validity mapping used in upload flows; some types may have no fixed validity (None)
 DEFAULT_VALIDITY_DAYS = {
     "POLICY": 365,
-    "PROCEDURE": 180,
-    "INSTRUCTION": 90,
-    "CONTROL": 365,
-    "RECORD": 30,
+    "PROCEDURE": 365,
+    "INSTRUCTION": 180,
+    "CONTROL": None,
+    "RECORD": 90,
 }
 
 DEFAULT_TAXONOMY_SEEDS = [
@@ -60,7 +61,11 @@ DEFAULT_TAXONOMY_SEEDS = [
 ]
 
 
-def compute_freshness_status(created_at: datetime, validity_days: int, now: datetime | None = None) -> str:
+def compute_freshness_status(created_at: datetime, validity_days: int | None, now: datetime | None = None) -> str:
+    # If there's no fixed validity, consider it always fresh
+    if validity_days is None:
+        return "fresh"
+
     reference = now or datetime.now(timezone.utc)
     age_days = max((reference - created_at).days, 0)
 
@@ -89,7 +94,7 @@ class EvidenceTaxonomy(Base, UUIDMixin, TimestampMixin):
             r"clause_ref ~ '^(([4-9]|10)(\.[0-9]+){0,2}|A\.[5-8](\.[0-9]+){0,2})$'",
             name="ck_evidence_taxonomy_clause_ref_format",
         ),
-        CheckConstraint("validity_days > 0", name="ck_evidence_taxonomy_validity_days_positive"),
+        CheckConstraint("(validity_days IS NULL) OR (validity_days > 0)", name="ck_evidence_taxonomy_validity_days_positive"),
         Index("ix_evidence_taxonomy_org_type", "organization_id", "type"),
     )
 
@@ -103,7 +108,8 @@ class EvidenceTaxonomy(Base, UUIDMixin, TimestampMixin):
     type: Mapped[str] = mapped_column(String(20), nullable=False)
     control_id: Mapped[str] = mapped_column(String(64), nullable=False)
     clause_ref: Mapped[str] = mapped_column(String(32), nullable=False)
-    validity_days: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Allow NULL for types that have no fixed validity (e.g. CONTROL)
+    validity_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     @property
     def freshness_status(self) -> str:

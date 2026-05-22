@@ -241,6 +241,18 @@ export const translations = {
     'settings.userManagement': 'User management',
     'settings.activeUser': 'Active user',
     'settings.inviteTeamMember': 'Invite team member',
+
+    // Phases
+    'phase.1': 'Context & Leadership',
+    'phase.2': 'Planning & Risk',
+    'phase.3': 'Support & Operations',
+    'phase.4': 'Annex A Controls',
+
+    // Phases
+    'phase.1': 'Contexto y Liderazgo',
+    'phase.2': 'Planificación y Riesgo',
+    'phase.3': 'Soporte y Operaciones',
+    'phase.4': 'Controles Anexo A',
   },
   es: {
     // Navigation

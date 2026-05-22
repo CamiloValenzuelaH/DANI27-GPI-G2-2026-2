@@ -421,8 +421,10 @@ function FileDropZone({ disabled = false, fileCount, onFilesSelected }: FileDrop
             className="bg-cyan-400 text-slate-950 hover:bg-cyan-300"
             disabled={disabled || fileCount >= MAX_FILES}
             onClick={() => inputRef.current?.click()}
+            title="Seleccionar rápido: abre el selector de archivos para una carga rápida sin editar metadatos"
+            aria-label="Seleccionar archivos rápido"
           >
-            Seleccionar archivos
+            Seleccionar (rápido)
           </Button>
           <span className="text-xs text-slate-400">{fileCount}/{MAX_FILES} cargados</span>
         </div>
@@ -472,7 +474,7 @@ function FileList({ files, onRemove }: FileListProps) {
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant={statusBadgeVariant(item.status)}>{statusLabel(item.status)}</Badge>
-                {onRemove && item.status === "queued" && (
+                {onRemove && item.status !== 'uploading' && (
                   <Button type="button" variant="ghost" size="icon" onClick={() => onRemove(item.id)}>
                     <X className="size-4" />
                   </Button>
@@ -670,12 +672,9 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
       const previous = raw ? JSON.parse(raw) : [];
 
       if (Array.isArray(previous) && previous.length > 0) {
-        setItems((current) => {
-          const existingRefs = new Set(current.map((it) => it.uploadReference || it.id));
-
-          const fromHistory: UploadItem[] = previous
-            .filter((h) => h && h.name)
-            .map((h) => {
+        const fromHistory: UploadItem[] = previous
+          .filter((h) => h && h.name)
+          .map((h) => {
               const fileName = String(h.name || "unknown");
               const size = typeof h.size === "number" ? h.size : 0;
               const uploadRef = String(h.id || h.uploadReference || fileName + "-hist");
@@ -707,12 +706,11 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
 
               return item;
             })
-            .filter((it) => !existingRefs.has(it.uploadReference || it.id));
+            .slice(0, MAX_FILES);
 
-          if (fromHistory.length === 0) return current;
-
-          return [...fromHistory, ...current];
-        });
+        if (fromHistory.length > 0) {
+          setItems(fromHistory);
+        }
       }
     } catch {
       // ignore storage parse errors
@@ -728,6 +726,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
     try {
       const historyKey = `evidence-upload-history:${questionId}`;
       const raw = localStorage.getItem(historyKey);
+
       if (raw) return; // already handled by previous effect
 
       const progressRaw = localStorage.getItem('assessment-progress-v1');
@@ -738,12 +737,9 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
       const q = answers[questionId];
       if (!q || !Array.isArray(q.attachments) || q.attachments.length === 0) return;
 
-      setItems((current) => {
-        const existingRefs = new Set(current.map((it) => it.uploadReference || it.id));
-
-        const fromProgress: UploadItem[] = q.attachments
-          .filter((a: any) => a && a.name)
-          .map((a: any) => {
+      const fromProgress: UploadItem[] = q.attachments
+        .filter((a: any) => a && a.name)
+        .map((a: any) => {
             const fileName = String(a.name || 'unknown');
             const size = typeof a.size === 'number' ? a.size : 0;
             const uploadRef = String(a.uploadReference || a.id || fileName + '-progress');
@@ -772,13 +768,13 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
               },
             };
 
-            return item;
-          })
-          .filter((it) => !existingRefs.has(it.uploadReference || it.id));
+        return item;
+      })
+      .slice(0, MAX_FILES);
 
-        if (fromProgress.length === 0) return current;
-        return [...fromProgress, ...current];
-      });
+      if (fromProgress.length > 0) {
+        setItems(fromProgress);
+      }
     } catch {
       // ignore
     }
@@ -985,7 +981,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="h-[92vh] w-[96vw] max-w-[1400px] overflow-auto border-white/10 bg-slate-950 p-0 text-slate-50 shadow-[0_40px_120px_rgba(0,0,0,0.65)]">
+      <DialogContent className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden border-none bg-slate-950 p-0 text-slate-50 shadow-none !left-0 !top-0 !max-w-none !rounded-none !translate-x-0 !translate-y-0">
         <div className="border-b border-white/10 bg-[linear-gradient(135deg,rgba(14,165,233,0.12),rgba(15,23,42,0.4))] px-6 py-5">
           <DialogHeader className="text-left">
             <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-50">Upload Evidence</DialogTitle>
@@ -1002,9 +998,9 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
           </div>
         </div>
 
-        <div className="grid min-w-[980px] gap-0 lg:grid-cols-[360px_1fr]">
-          <aside className="border-b border-white/10 bg-slate-950/95 p-6 lg:border-b-0 lg:border-r">
-            <div className="space-y-4">
+        <div className="grid min-h-0 min-w-0 flex-1 gap-0 overflow-hidden lg:grid-cols-[360px_1fr]">
+          <aside className="min-h-0 border-b border-white/10 bg-slate-950/95 p-6 lg:border-b-0 lg:border-r lg:overflow-hidden">
+            <div className="flex h-full min-h-0 flex-col gap-4">
               <FileDropZone disabled={isProcessing} fileCount={items.length} onFilesSelected={addFiles} />
 
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -1037,12 +1033,14 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
                 )}
               </div>
 
-              <FileList files={items} onRemove={isProcessing ? undefined : removeItem} />
+              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                <FileList files={items} onRemove={isProcessing ? undefined : removeItem} />
+              </div>
             </div>
           </aside>
 
-          <section className="bg-slate-950 px-6 py-6">
-            <ScrollArea className="h-[calc(92vh-210px)] pr-4">
+          <section className="min-h-0 overflow-hidden bg-slate-950 px-6 py-6">
+            <ScrollArea className="h-full pr-4">
               <div className="space-y-4">
                 {items.length === 0 ? (
                   <div className="flex min-h-[36vh] flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/[0.03] px-6 text-center">
@@ -1104,7 +1102,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
           </section>
         </div>
 
-        <DialogFooter className="border-t border-white/10 bg-slate-950 px-6 py-4 sm:justify-between">
+        <DialogFooter className="relative z-20 shrink-0 border-t border-white/10 bg-slate-950 px-6 py-4 sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <CheckCircle2 className="size-4 text-emerald-300" />
             <span>Cada subida crea o actualiza la evidencia documental en la taxonomía ISO.</span>

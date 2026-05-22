@@ -75,30 +75,64 @@ def _attempt_fix_json(text: str) -> str | None:
     if first != -1:
         s = s[first:]
 
-    # Quitar comas finales antes de cierres
-    s = re.sub(r",\s*([}\]])", r"\1", s)
-
-    # Balancear llaves y corchetes añadiendo cierres faltantes
-    open_braces = s.count("{")
-    close_braces = s.count("}")
-    if open_braces > close_braces:
-        s += "}" * (open_braces - close_braces)
-
-    open_brackets = s.count("[")
-    close_brackets = s.count("]")
-    if open_brackets > close_brackets:
-        s += "]" * (open_brackets - close_brackets)
-
-    # Intento final: si no hay ninguna llave, no es JSON
     if "{" not in s:
         return None
 
-    # Validar intentando parsear
-    try:
-        json.loads(s)
-        return s
-    except Exception:
-        return None
+    # Recortar hasta el último carácter potencialmente útil para JSON
+    last_useful = max(s.rfind("}"), s.rfind("]"), s.rfind('"'), s.rfind("0"), s.rfind("1"), s.rfind("2"), s.rfind("3"), s.rfind("4"), s.rfind("5"), s.rfind("6"), s.rfind("7"), s.rfind("8"), s.rfind("9"), s.rfind("e"), s.rfind("E"), s.rfind("l"), s.rfind("f"), s.rfind("t"))
+    if last_useful != -1 and last_useful + 1 < len(s):
+        s = s[: last_useful + 1]
+
+    # Cerrar comillas impares (texto truncado)
+    if s.count('"') % 2 != 0:
+        s += '"'
+
+    # Construir cierres faltantes en orden LIFO para evitar órdenes inválidas
+    stack: list[str] = []
+    in_string = False
+    escape = False
+    for char in s:
+        if in_string:
+            if escape:
+                escape = False
+            elif char == "\\":
+                escape = True
+            elif char == '"':
+                in_string = False
+            continue
+
+        if char == '"':
+            in_string = True
+        elif char == "{":
+            stack.append("}")
+        elif char == "[":
+            stack.append("]")
+        elif char in {"}", "]"} and stack and stack[-1] == char:
+            stack.pop()
+
+    candidate = s + "".join(reversed(stack))
+    candidate = re.sub(r",\s*([}\]])", r"\1", candidate)
+
+    # Pruebas progresivas de cierres típicos de truncamiento: }, ], })
+    attempts = [candidate]
+    attempts.extend([
+        candidate + "}",
+        candidate + "]",
+        candidate + "}",
+        candidate + "]}",
+        candidate + "}]",
+        candidate + "}]}",
+        candidate + "}}",
+    ])
+
+    for item in attempts:
+        fixed = re.sub(r",\s*([}\]])", r"\1", item)
+        try:
+            json.loads(fixed)
+            return fixed
+        except Exception:
+            continue
+    return None
 
 
 async def _post_json_with_retry(
@@ -198,6 +232,8 @@ async def generate_embedding(text: str) -> list[float]:
     url = f"{api_base}/models/{model}:embedContent?key={settings.gemini_api_key}"
 
     payload = {"content": {"parts": [{"text": text}]}}
+    if settings.gemini_embedding_dimensions > 0:
+        payload["outputDimensionality"] = int(settings.gemini_embedding_dimensions)
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.post(url, json=payload)
@@ -234,7 +270,12 @@ def build_validation_prompt(document_text: str, chunk: dict) -> str:
     ])
 
 
-async def analyze_chunk_with_gemini(document_text: str, chunk: dict) -> dict:
+async def analyze_chunk_with_gemini(
+    document_text: str,
+    chunk: dict,
+    *,
+    max_output_tokens: int = 2048,
+) -> dict:
     """Analiza un chunk contra un documento usando Gemini."""
     if not settings.gemini_api_key:
         raise ValueError("Falta GEMINI_API_KEY")
@@ -252,7 +293,7 @@ async def analyze_chunk_with_gemini(document_text: str, chunk: dict) -> dict:
         "generationConfig": {
             "temperature": 0.1,
             "topP": 0.8,
-            "maxOutputTokens": 2048,
+            "maxOutputTokens": int(max_output_tokens),
         },
     }
 

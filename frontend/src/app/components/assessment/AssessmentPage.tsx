@@ -91,8 +91,8 @@ export default function AssessmentPage() {
   };
 
   const addFiles = (questionId: string, files: File[]) => {
-    const metas: AssessmentAttachment[] = files.map((f) => ({
-      id: `${Date.now()}-${f.name}`,
+    const metas: AssessmentAttachment[] = files.map((f, idx) => ({
+      id: `${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 10)}-${f.name}`,
       name: f.name,
       size: f.size,
       source: 'manual',
@@ -132,7 +132,12 @@ export default function AssessmentPage() {
   const removeFile = (questionId: string, id: string) => {
     setAnswers((s) => {
       const prev = s[questionId] || { attachments: [] };
-      return { ...s, [questionId]: { ...prev, attachments: (prev.attachments || []).filter((a: any) => a.id !== id) } };
+      const attachments = (prev.attachments || []).map((a: any) =>
+        a.id === id
+          ? { ...a, removed: true, name: 'Archivo eliminado', size: 0, uploadedAt: new Date().toISOString() }
+          : a,
+      );
+      return { ...s, [questionId]: { ...prev, attachments } };
     });
   };
 

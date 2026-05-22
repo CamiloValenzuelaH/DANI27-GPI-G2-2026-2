@@ -26,7 +26,16 @@ def seed() -> None:
 
     from app.db.database import SessionLocal
     from app.models.organization import Organization
-    from app.models.evidence_taxonomy import EvidenceTaxonomy, DEFAULT_TAXONOMY_SEEDS
+    from app.models.evidence_taxonomy import EvidenceTaxonomy
+
+    # Seeds solicitados: POLICY 365, PROCEDURE 365, INSTRUCTION 180, CONTROL NULL, RECORD 90
+    SEEDS = [
+        {"type": "POLICY", "name": "Política de Seguridad", "control_id": "ISO 27001 A.5.1", "clause_ref": "A.5.1", "validity_days": 365},
+        {"type": "PROCEDURE", "name": "Procedimiento de Seguridad", "control_id": "ISO 27001 A.5.37", "clause_ref": "A.5.37", "validity_days": 365},
+        {"type": "INSTRUCTION", "name": "Instrucción Operativa", "control_id": "ISO 27001 A.8.32", "clause_ref": "A.8.32", "validity_days": 180},
+        {"type": "CONTROL", "name": "Control Anexo A", "control_id": "ISO 27001 A.8.15", "clause_ref": "A.8.15", "validity_days": None},
+        {"type": "RECORD", "name": "Registro de Ejecución", "control_id": "ISO 27001 A.8.33", "clause_ref": "A.8.33", "validity_days": 90},
+    ]
 
     db = SessionLocal()
     try:
@@ -42,7 +51,7 @@ def seed() -> None:
                 for row in db.query(EvidenceTaxonomy).filter(EvidenceTaxonomy.organization_id == org.id).all()
             }
 
-            for seed_row in DEFAULT_TAXONOMY_SEEDS:
+            for seed_row in SEEDS:
                 if seed_row["type"] in existing:
                     continue
 

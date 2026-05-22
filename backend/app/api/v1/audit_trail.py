@@ -10,7 +10,7 @@ import json
 from typing import Optional
 
 from app.db.database import get_db
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, require_superadmin
 from app.models.audit_log import AuditLog
 
 router = APIRouter(prefix="/audit-trail", tags=["audit-trail"])
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/audit-trail", tags=["audit-trail"])
 @router.get("", response_model=dict)
 def list_audit_logs(
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(require_superadmin),
     user_id: Optional[str] = Query(None),
     action: Optional[str] = Query(None),
     resource: Optional[str] = Query(None),
@@ -76,7 +76,7 @@ def list_audit_logs(
 def export_audit_logs(
     format: str = Query("csv", regex="^(csv|json|pdf)$"),
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user=Depends(require_superadmin),
     user_id: Optional[str] = Query(None),
     action: Optional[str] = Query(None),
     resource: Optional[str] = Query(None),
@@ -168,3 +168,51 @@ def export_audit_logs(
         c.save()
         buf.seek(0)
         return StreamingResponse(buf, media_type="application/pdf", headers={"Content-Disposition": "attachment; filename=export.pdf"})
+
+
+@router.get("/me", response_model=dict)
+def get_my_audit_logs(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+    start: Optional[str] = Query(None),
+    end: Optional[str] = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+):
+    query = db.query(AuditLog).filter(AuditLog.user_id == str(current_user.id))
+
+    if start:
+        try:
+            start_dt = datetime.fromisoformat(start)
+            query = query.filter(AuditLog.timestamp >= start_dt)
+        except Exception:
+            raise HTTPException(status_code=400, detail="start must be ISO datetime")
+    if end:
+        try:
+            end_dt = datetime.fromisoformat(end)
+            query = query.filter(AuditLog.timestamp <= end_dt)
+        except Exception:
+            raise HTTPException(status_code=400, detail="end must be ISO datetime")
+
+    total = query.count()
+    results = query.order_by(AuditLog.timestamp.desc()).offset(skip).limit(limit).all()
+
+    items = [
+        {
+            "id": str(r.id),
+            "user_id": r.user_id,
+            "user_role": r.user_role,
+            "action": r.action,
+            "resource": r.resource,
+            "details": r.details,
+            "timestamp": r.timestamp.isoformat() if r.timestamp else None,
+            "ip_address": r.ip_address,
+            "user_agent": r.user_agent,
+            "http_status": r.http_status,
+            "success": r.success,
+            "current_hash": r.current_hash,
+        }
+        for r in results
+    ]
+
+    return {"total": total, "items": items}

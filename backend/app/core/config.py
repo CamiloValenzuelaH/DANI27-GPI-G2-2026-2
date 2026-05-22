@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.5-flash"
     gemini_validation_model: str = "gemini-2.5-flash"
     gemini_embedding_model: str = "gemini-embedding-2"
+    gemini_embedding_dimensions: int = 1536
 
     # Validation queue / realtime state
     redis_url: str = "redis://redis:6379/0"

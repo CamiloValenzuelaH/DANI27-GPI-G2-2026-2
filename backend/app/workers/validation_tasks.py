@@ -98,10 +98,12 @@ def summarize_results(findings: list) -> str:
 
 
 async def get_top_iso_chunks(embedding: list[float], limit: int = 5) -> list[dict]:
-    """Obtiene los chunks ISO más relevantes y cae a un catálogo local si falta la tabla."""
+    """Obtiene los chunks ISO más relevantes usando similitud coseno en pgvector."""
     db = SessionLocal()
     try:
         from sqlalchemy import text
+
+        embedding_literal = "[" + ",".join(f"{float(value):.8f}" for value in embedding) + "]"
 
         query = text("""
             SELECT
@@ -109,16 +111,18 @@ async def get_top_iso_chunks(embedding: list[float], limit: int = 5) -> list[dic
                 clause_ref,
                 title,
                 content,
-                0 as relevance_score
+                1 - (embedding <=> CAST(:embedding AS vector)) as relevance_score
             FROM iso_27001_chunks
+            WHERE embedding IS NOT NULL
+            ORDER BY embedding <=> CAST(:embedding AS vector)
             LIMIT :limit
         """)
 
-        result = db.execute(query, {"embedding": embedding, "limit": limit})
+        result = db.execute(query, {"embedding": embedding_literal, "limit": limit})
         rows = result.fetchall()
 
         if not rows:
-            return _fallback_iso_chunks(limit)
+            return []
 
         chunks = []
         for row in rows:
@@ -131,7 +135,7 @@ async def get_top_iso_chunks(embedding: list[float], limit: int = 5) -> list[dic
             })
         return chunks
     except SQLAlchemyError:
-        return _fallback_iso_chunks(limit)
+        return []
     finally:
         db.close()
 
@@ -257,7 +261,9 @@ async def _validate_external_audit_async(
         })
 
         analysis = await analyze_chunk_with_gemini(
-            normalized_text[:8000], chunk
+            normalized_text[:8000],
+            chunk,
+            max_output_tokens=2048,
         )
 
         findings.append({
