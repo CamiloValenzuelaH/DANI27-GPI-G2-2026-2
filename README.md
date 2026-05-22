@@ -48,4 +48,3 @@ En la pantalla de Auditoría hay una sección dedicada para subir archivos y val
 - Muestra hallazgos específicos con severidad y recomendaciones
 - Endpoint backend: `POST /audit/validate-file` con multipart form-data
  
- ***14-05-2026 CHECK***
