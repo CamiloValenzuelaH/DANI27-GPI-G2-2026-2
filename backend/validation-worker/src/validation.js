@@ -1,5 +1,5 @@
 const { extractTextFromFile } = require('./extract');
-const { generateEmbedding, analyzeChunkWithGemini } = require('./google');
+const { generateEmbedding, analyzeChunkWithAI } = require('./ai');
 const { getTopIsoChunks } = require('./db');
 const { publishProgress } = require('./state');
 
@@ -71,7 +71,7 @@ async function runValidationJob(jobData) {
       total_chunks: chunks.length,
     });
 
-    const analysis = await analyzeChunkWithGemini({
+    const analysis = await analyzeChunkWithAI({
       documentText: normalizedText.slice(0, 16000),
       chunk,
     });

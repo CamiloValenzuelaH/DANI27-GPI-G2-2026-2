@@ -1,23 +1,19 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 console.log("DEBUG: Sistema de entorno cargado");
 
 // Leemos la key de Vite
-const API_KEY = import.meta.env.VITE_GEMINI_KEY;
-console.log("DEBUG: ¿VITE_GEMINI_KEY detectada?:", !!API_KEY);
+const API_KEY = import.meta.env.VITE_DEEPSEEK_KEY;
+console.log("DEBUG: ¿VITE_DEEPSEEK_KEY detectada?:", !!API_KEY);
 
-export class MissingGeminiKeyError extends Error {
+export class MissingDeepSeekKeyError extends Error {
   constructor() {
-    super("Falta la API Key en .env.local");
-    this.name = "MissingGeminiKeyError";
+    super("Falta la API Key de DeepSeek en .env.local");
+    this.name = "MissingDeepSeekKeyError";
   }
 }
 
-export const isMissingGeminiKeyError = (err: unknown): err is MissingGeminiKeyError => {
-  return err instanceof MissingGeminiKeyError || (err instanceof Error && err.name === "MissingGeminiKeyError");
+export const isMissingDeepSeekKeyError = (err: unknown): err is MissingDeepSeekKeyError => {
+  return err instanceof MissingDeepSeekKeyError || (err instanceof Error && err.name === "MissingDeepSeekKeyError");
 };
-
-const genAI = new GoogleGenerativeAI(API_KEY || "");
 
 export interface AuditResponse {
   veredicto: "CUMPLE" | "NO CUMPLE";
@@ -55,22 +51,10 @@ const isQuotaError = (error: unknown): boolean => {
 };
 
 export const runDoubleAgentAudit = async (evidencia: string): Promise<AuditResponse> => {
-  if (!API_KEY) throw new MissingGeminiKeyError();
+  if (!API_KEY) throw new MissingDeepSeekKeyError();
 
-  // Usamos nombres de modelo ampliamente soportados para evitar 404 en endpoints v1beta.
-  // Priorizamos el preview nuevo, con fallback a modelos estables.
-  const getModel = (modelName: string) =>
-    genAI.getGenerativeModel({
-      model: modelName,
-      generationConfig: { responseMimeType: "application/json" },
-    });
-
-  // En tu lista de modelos dentro de runDoubleAgentAudit:
-  const modelsToTry = [
-    "gemini-3-flash-preview", // <-- El motor nuevo que quieres probar
-    "gemini-2.0-flash",
-    "gemini-1.5-flash-latest",
-  ];
+  const apiBase = "https://api.deepseek.com";
+  const modelsToTry = ["deepseek-chat", "deepseek-reasoner"];
 
   // UNIFICAMOS LOS DOS AGENTES EN UN SOLO PROMPT PARA AHORRAR CRÉDITOS (Evita el error 429)
   const prompt = `
@@ -94,9 +78,31 @@ REQUISITO TÉCNICO: Responde ÚNICAMENTE en formato JSON con esta estructura:
     let lastError: unknown;
     for (const modelName of modelsToTry) {
       try {
-        const result = await getModel(modelName).generateContent(prompt);
-        const responseText = result.response.text();
-        const cleanJson = cleanModelJson(responseText);
+        const response = await fetch(`${apiBase}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages: [
+              { role: "system", content: "Responde solo JSON valido, sin markdown ni texto extra." },
+              { role: "user", content: prompt },
+            ],
+            temperature: 0.2,
+            top_p: 0.8,
+            max_tokens: 1200,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`DeepSeek ${response.status}: ${await response.text()}`);
+        }
+
+        const result = await response.json();
+        const responseText = result?.choices?.[0]?.message?.content ?? result?.choices?.[0]?.text ?? "";
+        const cleanJson = cleanModelJson(String(responseText));
         return JSON.parse(cleanJson) as AuditResponse;
       } catch (error) {
         lastError = error;

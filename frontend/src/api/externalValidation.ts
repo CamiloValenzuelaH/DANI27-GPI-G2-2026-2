@@ -1,6 +1,6 @@
 import { storage } from './client'
 
-const BASE_URL = import.meta.env.VITE_VALIDATION_API_URL ?? 'http://localhost:8001/api/validate'
+const BASE_URL = import.meta.env.VITE_VALIDATION_API_URL ?? '/api/validate'
 
 export interface ValidationObservation {
   severity: 'critical' | 'major' | 'minor'

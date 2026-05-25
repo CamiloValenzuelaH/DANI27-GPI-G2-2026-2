@@ -141,6 +141,7 @@ async def _post_json_with_retry(
     payload: dict[str, Any],
     *,
     timeout_label: str,
+    headers: dict[str, str] | None = None,
     max_attempts: int = 4,
 ) -> dict[str, Any]:
     delay_seconds = 1.0
@@ -178,7 +179,7 @@ async def _post_json_with_retry(
             except Exception:
                 payload_to_send = payload
 
-            response = await client.post(url, json=payload_to_send)
+            response = await client.post(url, json=payload_to_send, headers=headers)
             if response.status_code == 429 and attempt < max_attempts:
                 await asyncio.sleep(delay_seconds)
                 delay_seconds *= 2
@@ -220,6 +221,32 @@ async def _post_json_with_retry(
         raise last_error
 
     raise RuntimeError(f"{timeout_label}: no se pudo completar la petición")
+
+
+def _extract_text_from_deepseek(response_data: dict[str, Any]) -> str:
+    choices = response_data.get("choices") or []
+    if not choices:
+        raise ValueError("DeepSeek response without choices")
+
+    first_choice = choices[0] if isinstance(choices, list) else {}
+    message = first_choice.get("message") or {}
+    content = message.get("content") or first_choice.get("text") or ""
+
+    if isinstance(content, list):
+        parts: list[str] = []
+        for item in content:
+            if isinstance(item, dict):
+                text = item.get("text") or item.get("content") or ""
+                if text:
+                    parts.append(str(text))
+            elif item:
+                parts.append(str(item))
+        content = "".join(parts)
+
+    if not isinstance(content, str) or not content.strip():
+        raise ValueError("DeepSeek response without text")
+
+    return content.strip()
 
 
 async def generate_embedding(text: str) -> list[float]:
@@ -276,50 +303,37 @@ async def analyze_chunk_with_gemini(
     *,
     max_output_tokens: int = 2048,
 ) -> dict:
-    """Analiza un chunk contra un documento usando Gemini."""
-    if not settings.gemini_api_key:
-        raise ValueError("Falta GEMINI_API_KEY")
+    """Analiza un chunk contra un documento usando DeepSeek."""
+    if not settings.deepseek_api_key:
+        raise ValueError("Falta DEEPSEEK_API_KEY")
 
-    api_base = "https://generativelanguage.googleapis.com/v1"
-    models = _dedupe_models([
-        _normalize_generation_model(settings.gemini_validation_model),
-        _normalize_generation_model(settings.gemini_model),
-    ])
+    api_base = settings.deepseek_base_url.rstrip("/")
+    models = _dedupe_models([settings.deepseek_model])
 
     prompt = build_validation_prompt(document_text, chunk)
 
     payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.1,
-            "topP": 0.8,
-            "maxOutputTokens": int(max_output_tokens),
-        },
+        "model": models[0],
+        "messages": [
+            {"role": "system", "content": "Responde solo JSON valido, sin markdown ni texto extra."},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.1,
+        "top_p": 0.8,
+        "max_tokens": int(max_output_tokens),
     }
 
     async with httpx.AsyncClient(timeout=60.0) as client:
-        last_error: Exception | None = None
-        for model in models:
-            url = f"{api_base}/models/{model}:generateContent?key={settings.gemini_api_key}"
-            try:
-                data = await _post_json_with_retry(
-                    client,
-                    url,
-                    payload,
-                    timeout_label="Gemini generateContent",
-                )
-                break
-            except Exception as exc:
-                last_error = exc
-        else:
-            if last_error is not None:
-                raise last_error
-            raise RuntimeError("Gemini generateContent falló sin error explícito")
+        data = await _post_json_with_retry(
+            client,
+            f"{api_base}/chat/completions",
+            payload,
+            headers={"Authorization": f"Bearer {settings.deepseek_api_key}"},
+            timeout_label="DeepSeek chat/completions",
+        )
 
     # Extraer respuesta
-    content = data.get("candidates", [{}])[0].get("content", {})
-    parts = content.get("parts", [{}])
-    response_text = parts[0].get("text", "{}")
+    response_text = _extract_text_from_deepseek(data)
 
     # Limpiar markdown si existe
     response_text = _extract_json_text(response_text)

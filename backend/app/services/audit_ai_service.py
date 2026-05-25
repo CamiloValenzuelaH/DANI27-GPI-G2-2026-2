@@ -4,7 +4,7 @@ from typing import Any
 import httpx
 
 from app.core.config import settings
-from app.workers.gemini_service import _post_json_with_retry
+from app.workers.gemini_service import _extract_text_from_deepseek, _post_json_with_retry
 
 
 _VALID_STATUS = {"compliant", "non_compliant", "needs_review"}
@@ -75,23 +75,6 @@ def _build_file_analysis_prompt(payload: dict[str, Any]) -> str:
     )
 
 
-def _extract_text_from_gemini(response_data: dict[str, Any]) -> str:
-    candidates = response_data.get("candidates") or []
-    if not candidates:
-        raise ValueError("Gemini response without candidates")
-
-    content = candidates[0].get("content") or {}
-    parts = content.get("parts") or []
-    if not parts:
-        raise ValueError("Gemini response without content parts")
-
-    text = parts[0].get("text")
-    if not text:
-        raise ValueError("Gemini response without text")
-
-    return text.strip()
-
-
 def _safe_parse_json(text: str) -> dict[str, Any]:
     cleaned = text.strip()
     if cleaned.startswith("```"):
@@ -151,32 +134,39 @@ def _normalize_result(data: dict[str, Any]) -> dict[str, Any]:
 
 
 async def analyze_audit_with_ai(payload: dict[str, Any]) -> dict[str, Any] | None:
-    if not settings.gemini_api_key:
+    if not settings.deepseek_api_key:
         return None
 
     endpoint = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{settings.gemini_validation_model.removeprefix('models/')}:generateContent"
+        f"{settings.deepseek_base_url.rstrip('/')}/chat/completions"
     )
 
     request_payload = {
-        "contents": [{"parts": [{"text": _build_prompt(payload)}]}],
-        "generationConfig": {
-            "temperature": 0.2,
-            "topP": 0.8,
-            "maxOutputTokens": 1200,
-        },
+        "model": settings.deepseek_model,
+        "messages": [
+            {"role": "system", "content": "Responde solo JSON valido, sin markdown ni texto extra."},
+            {"role": "user", "content": _build_prompt(payload)},
+        ],
+        "temperature": 0.2,
+        "top_p": 0.8,
+        "max_tokens": 1200,
     }
 
     try:
         async with httpx.AsyncClient(timeout=25.0) as client:
-            data = await _post_json_with_retry(client, endpoint, request_payload, timeout_label="Gemini generateContent")
+            data = await _post_json_with_retry(
+                client,
+                endpoint,
+                request_payload,
+                headers={"Authorization": f"Bearer {settings.deepseek_api_key}"},
+                timeout_label="DeepSeek chat/completions",
+            )
 
-        parsed = _safe_parse_json(_extract_text_from_gemini(data))
+        parsed = _safe_parse_json(_extract_text_from_deepseek(data))
         return _normalize_result(parsed)
     except Exception as e:
         print("\n" + "="*50)
-        print("🚨 ERROR EN LA LLAMADA A GEMINI 🚨")
+        print("🚨 ERROR EN LA LLAMADA A DEEPSEEK 🚨")
         print(f"Detalle técnico: {str(e)}")
         print("="*50 + "\n")
         return None
@@ -187,32 +177,39 @@ async def analyze_file_with_ai(payload: dict[str, Any]) -> dict[str, Any] | None
     Analiza un archivo de evidencia usando IA especializada en auditoría.
     Usa un prompt más detallado orientado a evaluación de documentos.
     """
-    if not settings.gemini_api_key:
+    if not settings.deepseek_api_key:
         return None
 
     endpoint = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{settings.gemini_validation_model.removeprefix('models/')}:generateContent"
+        f"{settings.deepseek_base_url.rstrip('/')}/chat/completions"
     )
 
     request_payload = {
-        "contents": [{"parts": [{"text": _build_file_analysis_prompt(payload)}]}],
-        "generationConfig": {
-            "temperature": 0.3,
-            "topP": 0.85,
-            "maxOutputTokens": 1500,
-        },
+        "model": settings.deepseek_model,
+        "messages": [
+            {"role": "system", "content": "Responde solo JSON valido, sin markdown ni texto extra."},
+            {"role": "user", "content": _build_file_analysis_prompt(payload)},
+        ],
+        "temperature": 0.3,
+        "top_p": 0.85,
+        "max_tokens": 1500,
     }
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            data = await _post_json_with_retry(client, endpoint, request_payload, timeout_label="Gemini generateContent")
+            data = await _post_json_with_retry(
+                client,
+                endpoint,
+                request_payload,
+                headers={"Authorization": f"Bearer {settings.deepseek_api_key}"},
+                timeout_label="DeepSeek chat/completions",
+            )
 
-        parsed = _safe_parse_json(_extract_text_from_gemini(data))
+        parsed = _safe_parse_json(_extract_text_from_deepseek(data))
         return _normalize_result(parsed)
     except Exception as e:
         print("\n" + "="*50)
-        print("🚨 ERROR EN ANÁLISIS DE ARCHIVO CON GEMINI 🚨")
+        print("🚨 ERROR EN ANÁLISIS DE ARCHIVO CON DEEPSEEK 🚨")
         print(f"Detalle técnico: {str(e)}")
         print("="*50 + "\n")
         return None

@@ -97,8 +97,9 @@ services:
     depends_on:
       - backend
     environment:
-      VITE_API_URL: http://localhost:8001/api/v1
-      VITE_VALIDATION_API_URL: http://localhost:8001/api/validate
+      VITE_API_URL: /api/v1
+      VITE_VALIDATION_API_URL: /api/validate
+      VITE_BACKEND_PROXY_TARGET: http://host.docker.internal:8001
       VITE_BULLMQ_API_URL: http://localhost:3001
 
 volumes:

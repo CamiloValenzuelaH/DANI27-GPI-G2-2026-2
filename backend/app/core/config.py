@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     gemini_validation_model: str = "gemini-2.5-flash"
     gemini_embedding_model: str = "gemini-embedding-2"
     gemini_embedding_dimensions: int = 1536
+    deepseek_api_key: str = ""
+    deepseek_model: str = "deepseek-chat"
+    deepseek_base_url: str = "https://api.deepseek.com"
 
     # Validation queue / realtime state
     redis_url: str = "redis://redis:6379/0"

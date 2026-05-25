@@ -14,6 +14,7 @@ from app.models.assessment_phase import AssessmentPhase
 from app.models.assessment_question import AssessmentQuestion
 from app.models.assessment_answer import AssessmentAnswer
 from app.models.audit_log import AuditLog
+from app.models.risk import Risk, RiskEvaluation, risk_assets
 
 __all__ = [
     "Plan",
@@ -32,4 +33,7 @@ __all__ = [
     "AssessmentQuestion",
     "AssessmentAnswer",
     "AuditLog",
+    "Risk",
+    "RiskEvaluation",
+    "risk_assets",
 ]

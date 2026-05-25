@@ -3,6 +3,8 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
+const backendProxyTarget = process.env.VITE_BACKEND_PROXY_TARGET ?? 'http://host.docker.internal:8001'
+
 
 function figmaAssetResolver() {
   return {
@@ -17,6 +19,15 @@ function figmaAssetResolver() {
 }
 
 export default defineConfig({
+  server: {
+    host: true,
+    proxy: {
+      '/api': {
+        target: backendProxyTarget,
+        changeOrigin: true,
+      },
+    },
+  },
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if

@@ -9,7 +9,7 @@
   Ejemplo:
 
   ```bash
-  VITE_GEMINI_KEY=tu_api_key_de_gemini
+  VITE_DEEPSEEK_KEY=tu_api_key_de_deepseek
   ```
 
   Luego reinicia el server (`npm run dev`).

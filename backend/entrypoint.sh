@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 set -e
 
 AUTO_SEED="${AUTO_SEED_ISO_CHUNKS:-1}"
@@ -25,7 +25,7 @@ from sqlalchemy import create_engine, text
 
 database_url = os.getenv("DATABASE_URL")
 if not database_url:
-    raise RuntimeError("DATABASE_URL no está definido")
+    raise RuntimeError("DATABASE_URL no estÃ¡ definido")
 
 engine = create_engine(database_url)
 with engine.connect() as connection:
@@ -54,7 +54,7 @@ while [ "$attempt" -le "$MIGRATION_MAX_RETRIES" ]; do
     break
   fi
 
-  echo "[entrypoint] Migración falló (intento $attempt/$MIGRATION_MAX_RETRIES)."
+  echo "[entrypoint] MigraciÃ³n fallÃ³ (intento $attempt/$MIGRATION_MAX_RETRIES)."
   if [ "$attempt" -eq "$MIGRATION_MAX_RETRIES" ]; then
     echo "[entrypoint] No se pudieron aplicar migraciones. Abortando startup."
     exit 1
@@ -74,7 +74,7 @@ if is_true "$AUTO_SEED"; then
         exit 0
       fi
 
-      echo "[entrypoint] Seed falló (intento $attempt/$SEED_MAX_RETRIES)."
+      echo "[entrypoint] Seed fallÃ³ (intento $attempt/$SEED_MAX_RETRIES)."
       if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
         echo "[entrypoint] Se agotaron reintentos de seed."
         exit 0

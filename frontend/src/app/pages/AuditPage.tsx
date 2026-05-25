@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import Card from '../components/common/Card';
-import { isMissingGeminiKeyError, runDoubleAgentAudit, type AuditResponse } from '../../services/aiService';
+import { isMissingDeepSeekKeyError, runDoubleAgentAudit, type AuditResponse } from '../../services/aiService';
 
 type AuditPageProps = {
   // App.tsx hoy le pasa `t={t}`; lo dejamos opcional para no romper.
@@ -30,7 +30,7 @@ export default function AuditPage(_props: AuditPageProps) {
       setAuditResponse(response);
     } catch (err) {
       setAuditResponse(null);
-      if (isMissingGeminiKeyError(err)) {
+      if (isMissingDeepSeekKeyError(err)) {
         setErrorMessage(err.message);
       } else if (err instanceof Error) {
         setErrorMessage(`${intl.formatMessage({ id: 'auditPage.analysisError', defaultMessage: 'Could not run the analysis' })}: ${err.message}`);

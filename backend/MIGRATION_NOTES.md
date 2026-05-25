@@ -7,11 +7,6 @@
 
 ### Ventajas:
 
-- ✅ Un solo stack (Python)
-- ✅ Reutilización de código, modelos y schemas
-- ✅ Mantenimiento más simple
-- ✅ Menor footprint de contenedores
-- ✅ Mejor integración con FastAPI
 
 ### Estructura nueva:
 
@@ -23,7 +18,7 @@ backend/
 │       ├── celery_app.py          # Configuración de Celery
 │       ├── validation_tasks.py    # Tareas principales
 │       ├── file_extraction.py     # Extracción de archivos
-│       ├── gemini_service.py      # Integración con Gemini
+│       ├── gemini_service.py      # Cliente IA híbrido: DeepSeek para texto, Gemini para embeddings
 │       └── ...
 ```
 
@@ -47,13 +42,16 @@ docker-compose up
 
 ### Tareas disponibles:
 
-- `validate_external_audit` - Valida un archivo de auditoría contra ISO 27001
 
 ### Variables de entorno necesarias:
 
 ```
+DEEPSEEK_API_KEY=tu_key_aqui
+DEEPSEEK_MODEL=deepseek-chat
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+
+# Proveedor de embeddings si mantienes este flujo híbrido
 GEMINI_API_KEY=tu_key_aqui
-GEMINI_VALIDATION_MODEL=gemini-1.5-pro
 GEMINI_EMBEDDING_MODEL=models/embedding-004
 REDIS_URL=redis://redis:6379/0
 DATABASE_URL=postgresql://...

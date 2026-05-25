@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.models.organization import Organization
     from app.models.user import User
+    from app.models.risk import Risk
 
 
 class Asset(Base, UUIDMixin, TimestampMixin):
@@ -54,6 +55,12 @@ class Asset(Base, UUIDMixin, TimestampMixin):
 
     organization: Mapped["Organization"] = relationship(lazy="select")
     owner: Mapped["User"] = relationship(lazy="select")
+    linked_risks: Mapped[list["Risk"]] = relationship(
+        "Risk",
+        secondary="risk_assets",
+        lazy="selectin",
+        back_populates="linked_assets",
+    )
 
     def __repr__(self) -> str:
         return f"<Asset {self.name} level={self.criticality_level}>"

@@ -112,6 +112,14 @@ export const processMenuItems: MenuItem[] = [
     stepNum: '7',
     requiredPlan: 'pro',
   },
+  {
+    id: 'pre-audit-assessment',
+    labelKey: 'menu.preAuditAssessment',
+    path: '/assessment',
+    icon: '📝',
+    iconType: 'emoji',
+    requiredPlan: 'free',
+  },
 ];
 
 export const intelligenceMenuItems: MenuItem[] = [
