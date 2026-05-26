@@ -54,8 +54,7 @@ export const processMenuItems: MenuItem[] = [
     path: '/understand',
     icon: '✓',
     iconType: 'emoji',
-    stepNum: '✓',
-    isCompleted: true,
+    stepNum: '2',
   },
   {
     id: 'assets',
@@ -191,6 +190,14 @@ export const coreModulesItems: MenuItem[] = [
     path: '/findings',
     icon: '🔧',
     iconType: 'emoji',
+  },
+  {
+    id: 'pre-audit-assessment',
+    labelKey: 'menu.preAuditAssessment',
+    path: '/assessment',
+    icon: '📝',
+    iconType: 'emoji',
+    requiredPlan: 'free',
   },
   {
     id: 'audit-room',

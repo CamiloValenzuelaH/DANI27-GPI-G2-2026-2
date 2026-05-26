@@ -4,6 +4,7 @@ from typing import Any
 import httpx
 
 from app.core.config import settings
+from app.workers.gemini_service import _post_json_with_retry
 
 
 _VALID_STATUS = {"compliant", "non_compliant", "needs_review"}
@@ -30,6 +31,46 @@ def _build_prompt(payload: dict[str, Any]) -> str:
         "}\n"
         "Si no hay hallazgos, devuelve findings con un item de severidad low indicando control aceptable.\n"
         "Datos de auditoria:\n"
+        f"{json.dumps(payload, ensure_ascii=True)}"
+    )
+
+
+def _build_file_analysis_prompt(payload: dict[str, Any]) -> str:
+    """Crea un prompt especializado para análisis de archivos de evidencia."""
+    return (
+        "Eres un auditor experto en ISO 27001. Tu tarea es evaluar el documento/evidencia proporcionado "
+        "contra los controles ISO 27001 y generar un informe detallado.\n\n"
+        "INSTRUCCIONES:\n"
+        "1. Analiza el contenido del archivo de evidencia\n"
+        "2. Verifica la PRESENCIA de elementos críticos: fechas, responsables, firmas, verificaciones\n"
+        "3. Evalúa si la evidencia es legible, completa y convincente\n"
+        "4. Genera hallazgos específicos basados en qué falta o qué se encuentra\n"
+        "5. Proporciona recomendaciones accionables\n\n"
+        "Responde SOLO con JSON válido, sin markdown, sin comentarios:\n"
+        "{\n"
+        '  "status": "compliant|non_compliant|needs_review",\n'
+        '  "overall_compliance_score": 0-100,\n'
+        '  "agent_notes": "resumen ejecutivo del análisis",\n'
+        '  "findings": [\n'
+        "    {\n"
+        '      "issue": "descripción específica del hallazgo",\n'
+        '      "severity": "low|medium|high|critical",\n'
+        '      "recommendation": "acción correctiva específica",\n'
+        '      "impact": "impacto en cumplimiento ISO 27001"\n'
+        "    }\n"
+        "  ]\n"
+        "}\n\n"
+        "CRITERIOS DE EVALUACIÓN:\n"
+        "- CRÍTICO (critical): Ausencia total de evidencia o documento ilegible\n"
+        "- ALTO (high): Falta información esencial (fechas, responsables, firmas)\n"
+        "- MEDIO (medium): Información incompleta pero recuperable\n"
+        "- BAJO (low): Detalles menores o sugerencias de mejora\n\n"
+        "SCORING:\n"
+        "- 80-100: Evidencia completa, legible y verificable\n"
+        "- 60-79: Evidencia presente pero incompleta\n"
+        "- 40-59: Evidencia muy deficiente\n"
+        "- 0-39: Ausencia de evidencia documental legible\n\n"
+        "Documento a evaluar:\n"
         f"{json.dumps(payload, ensure_ascii=True)}"
     )
 
@@ -113,7 +154,10 @@ async def analyze_audit_with_ai(payload: dict[str, Any]) -> dict[str, Any] | Non
     if not settings.gemini_api_key:
         return None
 
-    endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
+    endpoint = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{settings.gemini_validation_model.removeprefix('models/')}:generateContent"
+    )
 
     request_payload = {
         "contents": [{"parts": [{"text": _build_prompt(payload)}]}],
@@ -126,22 +170,51 @@ async def analyze_audit_with_ai(payload: dict[str, Any]) -> dict[str, Any] | Non
 
     try:
         async with httpx.AsyncClient(timeout=25.0) as client:
-            response = await client.post(
-                endpoint,
-                params={"key": settings.gemini_api_key},
-                json=request_payload,
-            )
-            response.raise_for_status()
+            data = await _post_json_with_retry(client, endpoint, request_payload, timeout_label="Gemini generateContent")
 
-        parsed = _safe_parse_json(_extract_text_from_gemini(response.json()))
+        parsed = _safe_parse_json(_extract_text_from_gemini(data))
         return _normalize_result(parsed)
     except Exception as e:
-        
         print("\n" + "="*50)
         print("🚨 ERROR EN LA LLAMADA A GEMINI 🚨")
         print(f"Detalle técnico: {str(e)}")
         print("="*50 + "\n")
-        
+        return None
+
+
+async def analyze_file_with_ai(payload: dict[str, Any]) -> dict[str, Any] | None:
+    """
+    Analiza un archivo de evidencia usando IA especializada en auditoría.
+    Usa un prompt más detallado orientado a evaluación de documentos.
+    """
+    if not settings.gemini_api_key:
+        return None
+
+    endpoint = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{settings.gemini_validation_model.removeprefix('models/')}:generateContent"
+    )
+
+    request_payload = {
+        "contents": [{"parts": [{"text": _build_file_analysis_prompt(payload)}]}],
+        "generationConfig": {
+            "temperature": 0.3,
+            "topP": 0.85,
+            "maxOutputTokens": 1500,
+        },
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            data = await _post_json_with_retry(client, endpoint, request_payload, timeout_label="Gemini generateContent")
+
+        parsed = _safe_parse_json(_extract_text_from_gemini(data))
+        return _normalize_result(parsed)
+    except Exception as e:
+        print("\n" + "="*50)
+        print("🚨 ERROR EN ANÁLISIS DE ARCHIVO CON GEMINI 🚨")
+        print(f"Detalle técnico: {str(e)}")
+        print("="*50 + "\n")
         return None
 
 

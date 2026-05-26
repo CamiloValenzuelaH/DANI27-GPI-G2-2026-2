@@ -1,0 +1,38 @@
+{
+  "phases": [
+    {
+      "id": "phase-1",
+      "code": "A.5",
+      "title": "Política de Seguridad",
+      "questions": [
+        {
+          "id": "q1",
+          "text": "¿Existe una política de seguridad documentada y aprobada por la dirección?",
+          "critical": true
+        },
+        {
+          "id": "q2",
+          "text": "¿La política se revisa periódicamente?",
+          "critical": false
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "code": "A.8",
+      "title": "Gestión de Activos",
+      "questions": [
+        {
+          "id": "q3",
+          "text": "¿Almacenas datos de clientes en la nube?",
+          "critical": true
+        },
+        {
+          "id": "q4",
+          "text": "¿Los activos tienen un propietario asignado?",
+          "critical": false
+        }
+      ]
+    }
+  ]
+}

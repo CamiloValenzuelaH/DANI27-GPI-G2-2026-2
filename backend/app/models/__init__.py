@@ -7,6 +7,12 @@ from app.models.role_permission import RolePermission
 from app.models.user_role import UserRole
 from app.models.refresh_token import RefreshToken
 from app.models.asset import Asset
+from app.models.audit_checklist import AuditChecklist
+from app.models.assessment_progress import AssessmentProgress
+from app.models.assessment_phase import AssessmentPhase
+from app.models.assessment_question import AssessmentQuestion
+from app.models.assessment_answer import AssessmentAnswer
+from app.models.audit_log import AuditLog
 
 __all__ = [
     "Plan",
@@ -18,4 +24,10 @@ __all__ = [
     "UserRole",
     "RefreshToken",
     "Asset",
+    "AuditChecklist",
+    "AssessmentProgress",
+    "AssessmentPhase",
+    "AssessmentQuestion",
+    "AssessmentAnswer",
+    "AuditLog",
 ]

@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import String, Boolean, ForeignKey, DateTime
+from sqlalchemy import String, Boolean, ForeignKey, DateTime, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from app.db.base import Base, TimestampMixin, UUIDMixin
@@ -14,6 +14,9 @@ if TYPE_CHECKING:
 
 class User(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "users"
+    __table_args__ = (
+        Index("ix_users_org_active", "organization_id", "is_active"),
+    )
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("organizations.id", ondelete="CASCADE"),

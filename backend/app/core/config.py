@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_name: str = "Dani27001"
     secret_key: str
+    encryption_key: str
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
@@ -25,7 +26,15 @@ class Settings(BaseSettings):
     
     # AI
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-1.5-flash"
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_validation_model: str = "gemini-2.5-flash"
+    gemini_embedding_model: str = "gemini-embedding-2"
+
+    # Validation queue / realtime state
+    redis_url: str = "redis://redis:6379/0"
+    validation_jobs_dir: str = "/shared/validation_jobs"
+    iso_chunks_table: str = "iso_27001_chunks"
+    validation_stream_poll_seconds: float = 1.0
 
     @property
     def is_production(self) -> bool:

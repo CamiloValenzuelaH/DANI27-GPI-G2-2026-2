@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import String, ForeignKey, Text, Integer, Float
+from sqlalchemy import String, ForeignKey, Text, Integer, Float, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin, UUIDMixin
 
@@ -12,6 +12,11 @@ if TYPE_CHECKING:
 
 class Asset(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "assets"
+    __table_args__ = (
+        Index("ix_assets_org_created_at", "organization_id", "created_at"),
+        Index("ix_assets_org_owner_status", "organization_id", "owner_id", "status"),
+        Index("ix_assets_org_updated_at", "organization_id", "updated_at"),
+    )
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("organizations.id", ondelete="CASCADE"),

@@ -65,3 +65,25 @@ export interface AssetSummary {
   by_level: Record<string, number>
   critical_assets: Asset[]
 }
+
+export interface DashboardTrendItem {
+  month: string
+  documentation_percentage: number
+  implementation_percentage: number
+  tested_percentage: number
+  overall_percentage: number
+  health_score: number
+}
+
+export interface DashboardMetricsResponse {
+  documentation_percentage: number
+  implementation_percentage: number
+  tested_percentage: number
+  overall_percentage: number
+  health_score: number
+  health_status: string
+  total_assets: number
+  total_users: number
+  active_users: number
+  trend: DashboardTrendItem[]
+}
