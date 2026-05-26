@@ -5,6 +5,7 @@ import QuestionCard from './QuestionCard';
 import ProgressSidebar from './ProgressSidebar';
 import useAutosave from '../../hooks/useAutosave';
 import { loadProgressLocal, saveProgressLocal } from '../../lib/storage';
+import type { AssessmentAttachment } from './EvidenceAttachment';
 
 type Phase = any;
 
@@ -40,6 +41,26 @@ export default function AssessmentPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const handleEvidenceUploaded = (event: Event) => {
+      const customEvent = event as CustomEvent<{ questionId?: string; attachments?: AssessmentAttachment[] }>;
+      const questionId = customEvent.detail?.questionId;
+      const uploadedAttachments = customEvent.detail?.attachments || [];
+
+      if (!questionId || uploadedAttachments.length === 0) {
+        return;
+      }
+
+      addUploadedEvidence(questionId, uploadedAttachments);
+    };
+
+    window.addEventListener('assessment:evidence-uploaded', handleEvidenceUploaded as EventListener);
+
+    return () => {
+      window.removeEventListener('assessment:evidence-uploaded', handleEvidenceUploaded as EventListener);
+    };
+  }, []);
+
   const currentPhase = useMemo(() => phases.find((p) => p.id === currentPhaseId) || phases[0], [phases, currentPhaseId]);
   const questions = currentPhase?.questions || [];
   const question = questions[currentQuestionIdx] || null;
@@ -62,17 +83,49 @@ export default function AssessmentPage() {
 
     // send to backend (fire-and-forget)
     try {
-      postAnswer({ question_id: questionId, answer: value?.value ?? value, notes: value?.notes })
+      const questionIdNumber = Number(questionId)
+      postAnswer({ question_id: questionIdNumber, answer: value?.value ?? value, notes: value?.notes })
     } catch (err) {
       // ignore
     }
   };
 
   const addFiles = (questionId: string, files: File[]) => {
-    const metas = files.map((f) => ({ id: `${Date.now()}-${f.name}`, name: f.name, size: f.size }));
+    const metas: AssessmentAttachment[] = files.map((f) => ({
+      id: `${Date.now()}-${f.name}`,
+      name: f.name,
+      size: f.size,
+      source: 'manual',
+    }));
     setAnswers((s) => {
       const prev = s[questionId] || { attachments: [] };
       return { ...s, [questionId]: { ...prev, attachments: [...(prev.attachments || []), ...metas], updatedAt: new Date().toISOString() } };
+    });
+  };
+
+  const addUploadedEvidence = (questionId: string, items: AssessmentAttachment[]) => {
+    setAnswers((s) => {
+      const prev = s[questionId] || { attachments: [] };
+      const existing = Array.isArray(prev.attachments) ? prev.attachments : [];
+      const nextAttachments = [...existing];
+
+      items.forEach((item) => {
+        const idx = nextAttachments.findIndex((attachment: AssessmentAttachment) => attachment.id === item.id);
+        if (idx >= 0) {
+          nextAttachments[idx] = { ...nextAttachments[idx], ...item };
+        } else {
+          nextAttachments.push(item);
+        }
+      });
+
+      return {
+        ...s,
+        [questionId]: {
+          ...prev,
+          attachments: nextAttachments,
+          updatedAt: new Date().toISOString(),
+        },
+      };
     });
   };
 
@@ -115,6 +168,7 @@ export default function AssessmentPage() {
                 answer={answers[question.id]}
                 onAnswer={(v) => setAnswerValue(question.id, v)}
                 onAddFiles={(files) => addFiles(question.id, files)}
+                onUploadComplete={(items) => addUploadedEvidence(question.id, items)}
                 onRemoveFile={(id) => removeFile(question.id, id)}
               />
             ) : (

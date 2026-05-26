@@ -66,6 +66,15 @@ export const processMenuItems: MenuItem[] = [
     requiredPlan: 'starter',
   },
   {
+    id: 'assets',
+    labelKey: 'menu.assets',
+    path: '/assets',
+    icon: '3',
+    iconType: 'emoji',
+    stepNum: '3',
+    requiredPlan: 'starter',
+  },
+  {
     id: 'documents',
     labelKey: 'menu.documents',
     path: '/documents',

@@ -1,18 +1,20 @@
 import React from 'react';
 import AnswerSelector from './AnswerSelector';
-import EvidenceAttachment from './EvidenceAttachment';
+import EvidenceAttachment, { type AssessmentAttachment } from './EvidenceAttachment';
 
 export default function QuestionCard({
   question,
   answer,
   onAnswer,
   onAddFiles,
+  onUploadComplete,
   onRemoveFile,
 }: {
   question: { id: string; text: string; clause_ref?: string; is_critical?: boolean };
-  answer?: { value?: string; attachments?: any[] };
+  answer?: { value?: string; attachments?: AssessmentAttachment[] };
   onAnswer: (v: 'yes' | 'partial' | 'no' | 'na') => void;
   onAddFiles: (files: File[]) => void;
+  onUploadComplete: (items: AssessmentAttachment[]) => void;
   onRemoveFile: (id: string) => void;
 }) {
   return (
@@ -32,7 +34,14 @@ export default function QuestionCard({
       </div>
 
       <div className="mt-4">
-        <EvidenceAttachment attachments={answer?.attachments || []} onAdd={onAddFiles} onRemove={onRemoveFile} />
+        <EvidenceAttachment
+          key={question.id}
+          questionId={question.id}
+          attachments={answer?.attachments || []}
+          onAdd={onAddFiles}
+          onUploadComplete={onUploadComplete}
+          onRemove={onRemoveFile}
+        />
       </div>
     </div>
   );

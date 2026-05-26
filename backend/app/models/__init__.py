@@ -8,6 +8,7 @@ from app.models.user_role import UserRole
 from app.models.refresh_token import RefreshToken
 from app.models.asset import Asset
 from app.models.audit_checklist import AuditChecklist
+from app.models.evidence_taxonomy import EvidenceTaxonomy
 from app.models.assessment_progress import AssessmentProgress
 from app.models.assessment_phase import AssessmentPhase
 from app.models.assessment_question import AssessmentQuestion
@@ -25,6 +26,7 @@ __all__ = [
     "RefreshToken",
     "Asset",
     "AuditChecklist",
+    "EvidenceTaxonomy",
     "AssessmentProgress",
     "AssessmentPhase",
     "AssessmentQuestion",
