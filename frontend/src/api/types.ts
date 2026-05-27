@@ -66,6 +66,42 @@ export interface AssetSummary {
   critical_assets: Asset[]
 }
 
+export interface Threat {
+  id: string
+  organization_id: string
+  name: string
+  description: string | null
+  category: string
+  likelihood: number
+  created_at: string
+  updated_at: string
+}
+
+export interface Vulnerability {
+  id: string
+  organization_id: string
+  name: string
+  description: string | null
+  asset_id: string
+  severity: string
+  created_at: string
+  updated_at: string
+}
+
+export interface Risk {
+  id: string
+  organization_id: string
+  asset_id: string
+  name: string
+  description: string | null
+  probability: number
+  impact: number
+  inherent_risk: number
+  residual_risk: number
+  created_at: string
+  updated_at: string
+}
+
 export interface DashboardTrendItem {
   month: string
   documentation_percentage: number

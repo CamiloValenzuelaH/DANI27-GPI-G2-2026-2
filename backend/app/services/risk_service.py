@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.models.asset import Asset
 from app.models.evidence_taxonomy import EvidenceTaxonomy
 from app.models.risk import Risk, RiskEvaluation
+from app.models.threat import Threat
 from app.schemas.risk import (
     CreateRiskRequest,
     LinkRiskAssetsRequest,
@@ -38,13 +39,20 @@ def _validate_asset(asset_id: UUID, org_id: UUID, db: Session) -> Asset:
 def _get_risk_or_404(risk_id: UUID, org_id: UUID, db: Session) -> Risk:
     risk = (
         db.query(Risk)
-        .options(selectinload(Risk.evaluations), selectinload(Risk.linked_assets))
+        .options(selectinload(Risk.evaluations), selectinload(Risk.linked_assets), selectinload(Risk.linked_threats))
         .filter(Risk.id == risk_id, Risk.organization_id == org_id)
         .first()
     )
     if not risk:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Riesgo no encontrado")
     return risk
+
+
+def _get_threat_or_404(threat_id: UUID, org_id: UUID, db: Session) -> Threat:
+    threat = db.query(Threat).filter(Threat.id == threat_id, Threat.organization_id == org_id).first()
+    if not threat:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Amenaza no encontrada")
+    return threat
 
 
 def _compute_residual(
@@ -247,6 +255,18 @@ def link_assets_to_risk(risk_id: UUID, data: LinkRiskAssetsRequest, org_id: UUID
     db.commit()
     db.refresh(risk)
     return _risk_matrix_item(_get_risk_or_404(risk.id, org_id, db), org_id, db)
+
+
+def link_threat_to_risk(risk_id: UUID, threat_id: UUID, org_id: UUID, db: Session) -> Threat:
+    risk = _get_risk_or_404(risk_id, org_id, db)
+    threat = _get_threat_or_404(threat_id, org_id, db)
+
+    if all(existing.id != threat.id for existing in risk.linked_threats):
+        risk.linked_threats.append(threat)
+        db.commit()
+
+    db.refresh(threat)
+    return threat
 
 
 def get_risk_matrix(org_id: UUID, db: Session) -> RiskMatrixResponse:

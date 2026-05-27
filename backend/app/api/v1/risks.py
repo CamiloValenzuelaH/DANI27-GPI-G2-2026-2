@@ -14,6 +14,7 @@ from app.schemas.risk import (
     RiskResponse,
     UpdateRiskRequest,
 )
+from app.schemas.threat import LinkRiskThreatRequest, ThreatResponse
 from app.services import risk_service
 
 router = APIRouter(prefix="/risks", tags=["risks"])
@@ -52,6 +53,16 @@ def link_assets(
     org: Organization = Depends(get_current_org),
 ):
     return risk_service.link_assets_to_risk(risk_id, data, org.id, db)
+
+
+@router.post("/{risk_id}/threats", response_model=ThreatResponse, status_code=status.HTTP_200_OK)
+def link_threat(
+    risk_id: UUID,
+    data: LinkRiskThreatRequest,
+    db: Session = Depends(get_db),
+    org: Organization = Depends(get_current_org),
+):
+    return risk_service.link_threat_to_risk(risk_id, data.threat_id, org.id, db)
 
 
 @router.put("/{risk_id}", response_model=RiskResponse)

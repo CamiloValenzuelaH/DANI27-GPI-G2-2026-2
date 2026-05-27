@@ -13,6 +13,7 @@ from app.db.base import Base, TimestampMixin, UUIDMixin
 if TYPE_CHECKING:
     from app.models.asset import Asset
     from app.models.organization import Organization
+    from app.models.threat import Threat
 
 
 risk_assets = Table(
@@ -62,6 +63,12 @@ class Risk(Base, UUIDMixin, TimestampMixin):
     linked_assets: Mapped[list["Asset"]] = relationship(
         "Asset",
         secondary=risk_assets,
+        lazy="selectin",
+        back_populates="linked_risks",
+    )
+    linked_threats: Mapped[list["Threat"]] = relationship(
+        "Threat",
+        secondary="risk_threats",
         lazy="selectin",
         back_populates="linked_risks",
     )

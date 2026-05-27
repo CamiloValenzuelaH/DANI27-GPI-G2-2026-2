@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage';
 import AssetsPage from './pages/AssetsPage';
 import AuditPagePro from './pages/AuditPagePro';
 import AssessmentPage from './components/assessment/AssessmentPage';
+import RisksPage from './pages/RisksPage';
 import SettingsPage from './pages/SettingsPage';
 
 export default function AppPro() {
@@ -28,7 +29,7 @@ export default function AppPro() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/understand" element={<PlaceholderPage title="Understand My Situation" />} />
                 <Route path="/documents" element={<PlaceholderPage title="Document Controls" />} />
-                <Route path="/risks" element={<PlaceholderPage title="Manage Risks" />} />
+                <Route path="/risks" element={<RisksPage />} />
                 <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />
                 <Route path="/findings" element={<PlaceholderPage title="Manage Findings" />} />
                 <Route path="/audit" element={<AuditPagePro />} />
