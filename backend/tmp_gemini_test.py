@@ -1,6 +1,6 @@
 import asyncio
 import traceback
-from app.workers.gemini_service import analyze_chunk_with_gemini
+from app.workers.gemini_service import analyze_chunk_with_deepseek
 
 if __name__ == '__main__':
     doc = (
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     }
 
     try:
-        res = asyncio.run(analyze_chunk_with_gemini(doc, chunk))
+        res = asyncio.run(analyze_chunk_with_deepseek(doc, chunk))
         print('RESULT_OK:', res)
     except Exception:
         traceback.print_exc()

@@ -11,16 +11,28 @@ def _validate_likelihood(value: int) -> int:
     return value
 
 
+def _validate_impact(value: int) -> int:
+    if not 1 <= value <= 5:
+        raise ValueError("El valor debe estar entre 1 y 5")
+    return value
+
+
 class CreateThreatRequest(BaseModel):
     name: str
     description: str | None = None
     category: str
     likelihood: int
+    impact: int
 
     @field_validator("likelihood", mode="before")
     @classmethod
     def validate_likelihood(cls, value: int) -> int:
         return _validate_likelihood(int(value))
+
+    @field_validator("impact", mode="before")
+    @classmethod
+    def validate_impact(cls, value: int) -> int:
+        return _validate_impact(int(value))
 
 
 class UpdateThreatRequest(BaseModel):
@@ -28,6 +40,7 @@ class UpdateThreatRequest(BaseModel):
     description: str | None = None
     category: str | None = None
     likelihood: int | None = None
+    impact: int | None = None
 
     @field_validator("likelihood", mode="before")
     @classmethod
@@ -35,6 +48,13 @@ class UpdateThreatRequest(BaseModel):
         if value is None:
             return value
         return _validate_likelihood(int(value))
+
+    @field_validator("impact", mode="before")
+    @classmethod
+    def validate_impact(cls, value: int | None) -> int | None:
+        if value is None:
+            return value
+        return _validate_impact(int(value))
 
 
 class LinkRiskThreatRequest(BaseModel):
@@ -48,6 +68,7 @@ class ThreatResponse(BaseModel):
     description: str | None
     category: str
     likelihood: int
+    impact: int
     created_at: datetime
     updated_at: datetime
 

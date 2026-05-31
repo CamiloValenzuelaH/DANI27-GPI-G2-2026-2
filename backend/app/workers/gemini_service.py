@@ -249,6 +249,49 @@ def _extract_text_from_deepseek(response_data: dict[str, Any]) -> str:
     return content.strip()
 
 
+async def _call_deepseek_json(
+    *,
+    system_prompt: str,
+    user_prompt: str,
+    max_output_tokens: int = 1600,
+    temperature: float = 0.1,
+    top_p: float = 0.8,
+) -> dict[str, Any]:
+    if not settings.deepseek_api_key:
+        raise ValueError("Falta DEEPSEEK_API_KEY")
+
+    api_base = settings.deepseek_base_url.rstrip("/")
+    models = _dedupe_models([settings.deepseek_model])
+    payload = {
+        "model": models[0],
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "temperature": float(temperature),
+        "top_p": float(top_p),
+        "max_tokens": int(max_output_tokens),
+    }
+
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        data = await _post_json_with_retry(
+            client,
+            f"{api_base}/chat/completions",
+            payload,
+            headers={"Authorization": f"Bearer {settings.deepseek_api_key}"},
+            timeout_label="DeepSeek chat/completions",
+        )
+
+    response_text = _extract_json_text(_extract_text_from_deepseek(data))
+    try:
+        return json.loads(response_text)
+    except json.JSONDecodeError:
+        repaired = _attempt_fix_json(response_text)
+        if repaired is None:
+            raise ValueError(f"DeepSeek devolvió JSON inválido: {response_text[:1000]}")
+        return json.loads(repaired)
+
+
 async def generate_embedding(text: str) -> list[float]:
     """Genera embedding de texto usando Gemini."""
     if not settings.gemini_api_key:
@@ -276,17 +319,17 @@ async def generate_embedding(text: str) -> list[float]:
     return [float(v) for v in values]
 
 
-def build_validation_prompt(document_text: str, chunk: dict) -> str:
-    """Construye el prompt para validación de un chunk."""
+def build_chunk_classification_prompt(document_text: str, chunk: dict) -> str:
+    """Prompt 1: clasificar atingencia y control principal del documento para un chunk."""
     return "\n".join([
-        "Compara este documento contra este requisito ISO específico.",
-        "Retorna SOLO JSON válido, sin markdown ni texto extra.",
-        "Usa como máximo 2 observaciones y textos breves.",
+        "Clasifica la relación del documento con este control ISO.",
+        "Responde SOLO JSON válido.",
         "Esquema:",
         "{",
-        '  "score": 0-100,',
-        '  "observations": [{"severity":"critical|major|minor","text":"..."}],',
-        '  "suggestions": ["..."]',
+        '  "primary_control_ref": "texto",',
+        '  "is_primary_match": true,',
+        '  "relevance_score": 0-100,',
+        '  "justification": "detalle breve"',
         "}",
         "",
         f"Requisito ISO [{chunk.get('clause_ref')}] {chunk.get('title')}:",
@@ -297,67 +340,245 @@ def build_validation_prompt(document_text: str, chunk: dict) -> str:
     ])
 
 
+def build_chunk_quality_prompt(document_text: str, chunk: dict, classification: dict[str, Any]) -> str:
+    """Prompt 2: evaluar calidad, faltantes y observaciones para el control."""
+    return "\n".join([
+        "Evalúa la calidad del documento para este control ISO.",
+        "Responde SOLO JSON válido y aplica criterios ISO con precisión.",
+        "Debes incluir estado sugerido y elementos faltantes.",
+        "Esquema:",
+        "{",
+        '  "score": 0-100,',
+        '  "document_status": "COMPLETO|INCOMPLETO|INEXISTENTE",',
+        '  "is_pertinent": true,',
+        '  "justification": "explicación detallada",',
+        '  "observations": [{"severity":"critical|major|minor","text":"..."}],',
+        '  "suggestions": ["..."],',
+        '  "missing_elements": ["..."]',
+        "}",
+        "",
+        "Resultado previo de clasificación:",
+        json.dumps(classification, ensure_ascii=False),
+        "",
+        f"Control ISO objetivo [{chunk.get('clause_ref')}] {chunk.get('title')}:",
+        chunk.get('content', ''),
+        "",
+        "Documento:",
+        document_text,
+    ])
+
+
+def _normalize_observations(raw_value: Any) -> list[dict[str, str]]:
+    observations: list[dict[str, str]] = []
+    if not isinstance(raw_value, list):
+        return observations
+
+    for item in raw_value:
+        if not isinstance(item, dict):
+            continue
+        severity = str(item.get("severity", "minor")).lower().strip()
+        if severity not in {"critical", "major", "minor"}:
+            severity = "minor"
+        text = str(item.get("text") or item.get("issue") or "").strip()
+        if text:
+            observations.append({"severity": severity, "text": text})
+    return observations
+
+
+def _normalize_string_list(raw_value: Any) -> list[str]:
+    if not isinstance(raw_value, list):
+        return []
+    output: list[str] = []
+    for item in raw_value:
+        text = str(item).strip()
+        if text:
+            output.append(text)
+    return output
+
+
+def _derive_document_status(score: int, relevance_score: float, observations: list[dict[str, str]]) -> str:
+    has_critical = any(obs.get("severity") == "critical" for obs in observations)
+    has_major = any(obs.get("severity") == "major" for obs in observations)
+
+    if score < 40 or relevance_score < 70:
+        return "INEXISTENTE"
+    if score >= 85 and not has_critical:
+        return "COMPLETO"
+    if 40 <= score <= 84 or has_critical or has_major:
+        return "INCOMPLETO"
+    return "INCOMPLETO"
+
+
+async def analyze_chunk_with_deepseek(
+    document_text: str,
+    chunk: dict,
+    *,
+    max_output_tokens: int = 2048,
+) -> dict:
+    """Analiza un chunk con dos prompts secuenciales: clasificación y control de calidad."""
+    classification = await _call_deepseek_json(
+        system_prompt="Responde solo JSON válido, sin markdown.",
+        user_prompt=build_chunk_classification_prompt(document_text, chunk),
+        max_output_tokens=min(max_output_tokens, 900),
+        temperature=0.0,
+        top_p=0.8,
+    )
+
+    quality = await _call_deepseek_json(
+        system_prompt="Responde solo JSON válido, sin markdown. Evalúa cumplimiento ISO con rigor.",
+        user_prompt=build_chunk_quality_prompt(document_text, chunk, classification),
+        max_output_tokens=max_output_tokens,
+        temperature=0.1,
+        top_p=0.85,
+    )
+
+    score = min(100, max(0, int(float(quality.get("score", 0) or 0))))
+    observations = _normalize_observations(quality.get("observations"))
+    suggestions = _normalize_string_list(quality.get("suggestions"))
+    missing_elements = _normalize_string_list(quality.get("missing_elements"))
+    relevance_score = float(classification.get("relevance_score") or 0)
+
+    if relevance_score <= 1 and chunk.get("relevance_score") is not None:
+        relevance_score = float(chunk.get("relevance_score", 0)) * 100.0
+
+    document_status = _derive_document_status(score, relevance_score, observations)
+    if document_status != "INCOMPLETO":
+        missing_elements = []
+
+    justification = str(quality.get("justification") or classification.get("justification") or "").strip()
+    if justification:
+        suggestions = [f"Justificación: {justification}", *suggestions]
+
+    return {
+        "score": score,
+        "document_status": document_status,
+        "missing_elements": missing_elements,
+        "observations": observations,
+        "suggestions": suggestions,
+        "relevance_score": relevance_score,
+    }
+
+
+def build_missing_generation_prompt(
+    *,
+    document_text: str,
+    chunk: dict[str, Any],
+    missing_elements: list[str],
+    feedback: str | None,
+) -> str:
+    """Prompt de generación de contenido faltante para un control específico."""
+    feedback_block = feedback.strip() if feedback else ""
+    return "\n".join([
+        "Genera contenido faltante para completar este control ISO.",
+        "Responde SOLO JSON válido con este esquema:",
+        '{"generated_text":"..."}',
+        "El texto debe ser profesional, auditable, y listo para edición del usuario.",
+        "",
+        f"Control ISO [{chunk.get('clause_ref')}] {chunk.get('title')}:",
+        str(chunk.get("content") or ""),
+        "",
+        "Elementos faltantes detectados:",
+        json.dumps(missing_elements, ensure_ascii=False),
+        "",
+        "Documento original (resumen para contexto):",
+        document_text,
+        "",
+        "Feedback de validación anterior:",
+        feedback_block or "Sin feedback previo.",
+    ])
+
+
+def build_missing_validation_prompt(
+    *,
+    generated_text: str,
+    chunk: dict[str, Any],
+    missing_elements: list[str],
+) -> str:
+    """Prompt de control de calidad del contenido generado."""
+    return "\n".join([
+        "Valida si el texto generado cumple el control ISO y cubre lo faltante.",
+        "Responde SOLO JSON válido con el esquema:",
+        "{",
+        '  "is_valid": true,',
+        '  "score": 0-100,',
+        '  "issues": ["..."],',
+        '  "feedback": "detalle de mejoras"',
+        "}",
+        "",
+        f"Control ISO [{chunk.get('clause_ref')}] {chunk.get('title')}:",
+        str(chunk.get("content") or ""),
+        "",
+        "Elementos que debía cubrir:",
+        json.dumps(missing_elements, ensure_ascii=False),
+        "",
+        "Texto generado a validar:",
+        generated_text,
+    ])
+
+
+async def generate_missing_content_with_deepseek(
+    *,
+    document_text: str,
+    chunk: dict[str, Any],
+    missing_elements: list[str],
+    feedback: str | None = None,
+) -> str:
+    data = await _call_deepseek_json(
+        system_prompt="Responde solo JSON válido, sin markdown.",
+        user_prompt=build_missing_generation_prompt(
+            document_text=document_text,
+            chunk=chunk,
+            missing_elements=missing_elements,
+            feedback=feedback,
+        ),
+        max_output_tokens=1400,
+        temperature=0.35,
+        top_p=0.9,
+    )
+    generated_text = str(data.get("generated_text") or "").strip()
+    if not generated_text:
+        raise ValueError("DeepSeek no generó texto faltante")
+    return generated_text
+
+
+async def validate_generated_missing_content_with_deepseek(
+    *,
+    generated_text: str,
+    chunk: dict[str, Any],
+    missing_elements: list[str],
+) -> dict[str, Any]:
+    data = await _call_deepseek_json(
+        system_prompt="Responde solo JSON válido, sin markdown.",
+        user_prompt=build_missing_validation_prompt(
+            generated_text=generated_text,
+            chunk=chunk,
+            missing_elements=missing_elements,
+        ),
+        max_output_tokens=900,
+        temperature=0.0,
+        top_p=0.8,
+    )
+    score = min(100, max(0, int(float(data.get("score", 0) or 0))))
+    issues = _normalize_string_list(data.get("issues"))
+    feedback = str(data.get("feedback") or "").strip()
+    is_valid = bool(data.get("is_valid")) and score >= 85 and not issues
+    return {
+        "is_valid": is_valid,
+        "score": score,
+        "issues": issues,
+        "feedback": feedback,
+    }
+
+
 async def analyze_chunk_with_gemini(
     document_text: str,
     chunk: dict,
     *,
     max_output_tokens: int = 2048,
 ) -> dict:
-    """Analiza un chunk contra un documento usando DeepSeek."""
-    if not settings.deepseek_api_key:
-        raise ValueError("Falta DEEPSEEK_API_KEY")
-
-    api_base = settings.deepseek_base_url.rstrip("/")
-    models = _dedupe_models([settings.deepseek_model])
-
-    prompt = build_validation_prompt(document_text, chunk)
-
-    payload = {
-        "model": models[0],
-        "messages": [
-            {"role": "system", "content": "Responde solo JSON valido, sin markdown ni texto extra."},
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0.1,
-        "top_p": 0.8,
-        "max_tokens": int(max_output_tokens),
-    }
-
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        data = await _post_json_with_retry(
-            client,
-            f"{api_base}/chat/completions",
-            payload,
-            headers={"Authorization": f"Bearer {settings.deepseek_api_key}"},
-            timeout_label="DeepSeek chat/completions",
-        )
-
-    # Extraer respuesta
-    response_text = _extract_text_from_deepseek(data)
-
-    # Limpiar markdown si existe
-    response_text = _extract_json_text(response_text)
-
-    # Intento estándar de parseo
-    try:
-        result = json.loads(response_text)
-    except json.JSONDecodeError:
-        # Registrar el cuerpo completo para diagnóstico
-        logger.warning("JSON inválido de Gemini (primeros 2000 chars): %s", response_text[:2000])
-
-        # Intentar reparar con heurísticas
-        repaired = _attempt_fix_json(response_text)
-        if repaired is not None:
-            try:
-                result = json.loads(repaired)
-            except Exception:
-                logger.warning("Reparación de JSON falló: contenido reparado inválido")
-                raise ValueError(f"Gemini devolvió JSON inválido (reparación fallida): {response_text[:1000]}")
-        else:
-            raise ValueError(f"Gemini devolvió JSON inválido: {response_text[:1000]}")
-
-    return {
-        "score": min(100, max(0, int(result.get("score", 0)))),
-        "observations": result.get("observations", []),
-        "suggestions": result.get("suggestions", []),
-    }
+    """Alias de compatibilidad hacia DeepSeek; mantener hasta migrar imports."""
+    return await analyze_chunk_with_deepseek(
+        document_text,
+        chunk,
+        max_output_tokens=max_output_tokens,
+    )

@@ -37,6 +37,7 @@ def create_threat(data: CreateThreatRequest, org_id: UUID, db: Session) -> Threa
         description=data.description,
         category=data.category,
         likelihood=data.likelihood,
+        impact=data.impact,
     )
     db.add(threat)
     db.commit()
@@ -55,6 +56,8 @@ def update_threat(threat_id: UUID, data: UpdateThreatRequest, org_id: UUID, db: 
         threat.category = data.category
     if data.likelihood is not None:
         threat.likelihood = data.likelihood
+    if data.impact is not None:
+        threat.impact = data.impact
 
     db.commit()
     db.refresh(threat)

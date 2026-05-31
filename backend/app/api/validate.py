@@ -9,6 +9,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from app.core.config import settings
 from app.core.dependencies import get_current_user
@@ -16,7 +17,17 @@ from app.core.security import decode_access_token
 from app.core.redis import get_redis_client
 from app.db.database import get_db
 from app.models.user import User
-from app.schemas.validation import ValidationJobResponse, ValidationReportResponse
+from app.schemas.validation import (
+    GenerateMissingRequest,
+    GenerateMissingResponse,
+    ValidationJobResponse,
+    ValidationReportResponse,
+)
+from app.workers.file_extraction import extract_text_from_file
+from app.workers.gemini_service import (
+    generate_missing_content_with_deepseek,
+    validate_generated_missing_content_with_deepseek,
+)
 from app.workers.validation_tasks import validate_external_audit
 
 router = APIRouter(prefix="/validate", tags=["validation"])
@@ -136,6 +147,43 @@ def _get_user_from_access_token(access_token: str | None, db: Session) -> User:
     return user
 
 
+def _find_finding(report: ValidationReportResponse, chunk_id: str) -> dict | None:
+    for finding in report.findings:
+        payload = finding.model_dump(mode="python")
+        if payload.get("clause_ref") == chunk_id:
+            return payload
+    return None
+
+
+def _load_iso_chunk(db: Session, chunk_id: str, fallback_clause_ref: str | None = None) -> dict | None:
+    result = db.execute(
+        text(
+            """
+            SELECT id, clause_ref, title, content
+            FROM iso_27001_chunks
+            WHERE CAST(id AS TEXT) = :chunk_id
+               OR clause_ref = :chunk_id
+               OR (:fallback_clause_ref IS NOT NULL AND clause_ref = :fallback_clause_ref)
+            LIMIT 1
+            """
+        ),
+        {
+            "chunk_id": chunk_id,
+            "fallback_clause_ref": fallback_clause_ref,
+        },
+    ).fetchone()
+
+    if not result:
+        return None
+
+    return {
+        "id": str(result[0]),
+        "clause_ref": str(result[1]),
+        "title": str(result[2]),
+        "content": str(result[3]),
+    }
+
+
 @router.post("/external", response_model=ValidationJobResponse, status_code=status.HTTP_202_ACCEPTED)
 async def create_external_validation_job(
     file: UploadFile = File(...),
@@ -212,3 +260,94 @@ async def stream_external_validation_job(
             await asyncio.sleep(settings.validation_stream_poll_seconds)
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
+@router.post("/external/{job_id}/generate-missing", response_model=GenerateMissingResponse)
+async def generate_missing_for_chunk(
+    job_id: str,
+    payload: GenerateMissingRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    report = await _read_job_state(job_id)
+    if report.organization_id and str(report.organization_id) != str(current_user.organization_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Job fuera de alcance")
+
+    if report.status != "completed":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="La validación debe estar completada antes de generar contenido faltante",
+        )
+
+    finding = _find_finding(report, payload.chunk_id)
+    clause_ref_hint = finding.get("clause_ref") if finding else None
+    chunk = _load_iso_chunk(db, payload.chunk_id, fallback_clause_ref=clause_ref_hint)
+    if not chunk:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Control ISO no encontrado")
+
+    if finding is None and clause_ref_hint:
+        finding = _find_finding(report, clause_ref_hint)
+    if finding is None and chunk.get("clause_ref"):
+        finding = _find_finding(report, str(chunk["clause_ref"]))
+
+    document_status = str((finding or {}).get("document_status") or "")
+    missing_elements = [str(item).strip() for item in (finding or {}).get("missing_elements", []) if str(item).strip()]
+
+    if document_status and document_status != "INCOMPLETO":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Solo se puede generar contenido faltante para controles en estado INCOMPLETO",
+        )
+    if not missing_elements:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No hay elementos faltantes para este control",
+        )
+
+    source_text = ""
+    if report.file_path:
+        try:
+            source_text = await extract_text_from_file(report.file_path, 30000)
+        except Exception:
+            source_text = ""
+
+    feedback: str | None = None
+    generated_text = ""
+    validation_score = 0
+    validation_feedback: str | None = None
+    validation_passed = False
+    iterations = 0
+
+    for attempt in range(1, 4):
+        iterations = attempt
+        generated_text = await generate_missing_content_with_deepseek(
+            document_text=source_text[:12000],
+            chunk=chunk,
+            missing_elements=missing_elements,
+            feedback=feedback,
+        )
+
+        validation = await validate_generated_missing_content_with_deepseek(
+            generated_text=generated_text,
+            chunk=chunk,
+            missing_elements=missing_elements,
+        )
+
+        validation_score = int(validation.get("score", 0))
+        validation_passed = bool(validation.get("is_valid"))
+        issues = validation.get("issues", []) or []
+        feedback = str(validation.get("feedback") or "").strip() or "; ".join(str(item) for item in issues)
+        validation_feedback = feedback or None
+
+        if validation_passed:
+            break
+
+    return GenerateMissingResponse(
+        job_id=job_id,
+        chunk_id=payload.chunk_id,
+        generated_text=generated_text,
+        validation_passed=validation_passed,
+        validation_score=validation_score,
+        iterations=iterations,
+        validation_feedback=validation_feedback,
+    )

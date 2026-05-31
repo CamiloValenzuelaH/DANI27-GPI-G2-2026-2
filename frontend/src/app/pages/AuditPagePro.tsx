@@ -4,7 +4,10 @@ import type { AuditValidationResponse, AuditChecklistItem } from '../../api/audi
 import { getAuditChecklist, saveAuditChecklist, validateAudit } from '../../api/audit';
 import {
   enqueueExternalValidation,
+  generateMissingForChunk,
   subscribeExternalValidationJob,
+  type ChunkValidationResult,
+  type GenerateMissingResponse,
   type ValidationReportResponse,
 } from '../../api/externalValidation';
 import { usePreferences } from '../components/AppShell';
@@ -46,6 +49,9 @@ export default function AuditPage() {
   const [externalValidationJob, setExternalValidationJob] = useState<ValidationReportResponse | null>(null);
   const [externalValidationReport, setExternalValidationReport] = useState<ValidationReportResponse | null>(null);
   const [externalValidationError, setExternalValidationError] = useState<string | null>(null);
+  const [missingGenerationLoadingByChunk, setMissingGenerationLoadingByChunk] = useState<Record<string, boolean>>({});
+  const [missingGenerationErrorByChunk, setMissingGenerationErrorByChunk] = useState<Record<string, string>>({});
+  const [missingGenerationResultByChunk, setMissingGenerationResultByChunk] = useState<Record<string, GenerateMissingResponse>>({});
   const validationStreamRef = useRef<EventSource | null>(null);
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -250,6 +256,9 @@ export default function AuditPage() {
     setExternalValidationError(null);
     setExternalValidationJob(null);
     setExternalValidationReport(null);
+    setMissingGenerationLoadingByChunk({});
+    setMissingGenerationErrorByChunk({});
+    setMissingGenerationResultByChunk({});
     validationStreamRef.current?.close();
     validationStreamRef.current = null;
 
@@ -266,19 +275,24 @@ export default function AuditPage() {
       setExternalValidationJob(queuedState);
       setExternalValidationReport(queuedState);
 
-      validationStreamRef.current = subscribeExternalValidationJob(job.job_id, {
-        onProgress: (payload) => {
-          setExternalValidationJob(payload);
-          setExternalValidationReport(payload);
-        },
-        onDone: (payload) => {
-          setExternalValidationJob(payload);
-          setExternalValidationReport(payload);
-        },
-        onError: (message) => {
-          setExternalValidationError(message);
-        },
-      });
+      try {
+        validationStreamRef.current = await subscribeExternalValidationJob(job.job_id, {
+          onProgress: (payload) => {
+            setExternalValidationJob(payload);
+            setExternalValidationReport(payload);
+          },
+          onDone: (payload) => {
+            setExternalValidationJob(payload);
+            setExternalValidationReport(payload);
+          },
+          onError: (message) => {
+            setExternalValidationError(message);
+          },
+        });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : t('audit.unknownError', 'Unknown error');
+        setExternalValidationError(`${t('audit.granularValidationStartError', 'Could not start granular validation')}: ${message}`);
+      }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : t('audit.unknownError', 'Unknown error');
       setFileError(`${t('audit.fileValidationError', 'File validation error')}: ${errorMsg}`);
@@ -289,6 +303,28 @@ export default function AuditPage() {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+    }
+  };
+
+  const onGenerateMissingForFinding = async (finding: ChunkValidationResult) => {
+    const currentJobId = externalValidationReport?.job_id;
+    const chunkId = finding.clause_ref;
+
+    if (!currentJobId || !chunkId) {
+      return;
+    }
+
+    setMissingGenerationLoadingByChunk((previous) => ({ ...previous, [chunkId]: true }));
+    setMissingGenerationErrorByChunk((previous) => ({ ...previous, [chunkId]: '' }));
+
+    try {
+      const result = await generateMissingForChunk(currentJobId, chunkId);
+      setMissingGenerationResultByChunk((previous) => ({ ...previous, [chunkId]: result }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t('audit.unknownError', 'Unknown error');
+      setMissingGenerationErrorByChunk((previous) => ({ ...previous, [chunkId]: message }));
+    } finally {
+      setMissingGenerationLoadingByChunk((previous) => ({ ...previous, [chunkId]: false }));
     }
   };
 
@@ -315,6 +351,22 @@ export default function AuditPage() {
     if (score >= 80) return 'text-green-600';
     if (score >= 60) return 'text-yellow-600';
     return 'text-red-600';
+  };
+
+  const getDocumentStatusColor = (status?: string) => {
+    switch (status) {
+      case 'COMPLETO': return 'bg-emerald-600/25 text-emerald-300 border-emerald-500/40';
+      case 'INCOMPLETO': return 'bg-amber-600/25 text-amber-300 border-amber-500/40';
+      case 'INEXISTENTE': return 'bg-rose-700/25 text-rose-300 border-rose-500/40';
+      default: return 'bg-slate-700/25 text-slate-300 border-slate-500/40';
+    }
+  };
+
+  const getDocumentStatusLabel = (status?: string) => {
+    if (status === 'COMPLETO' || status === 'INCOMPLETO' || status === 'INEXISTENTE') {
+      return status;
+    }
+    return t('audit.statusUnknown', 'SIN ESTADO');
   };
 
   useEffect(() => {
@@ -444,6 +496,32 @@ export default function AuditPage() {
                 {externalValidationReport.findings.length > 0 && (
                   <div className="bg-[#0F1119] p-4 rounded-lg">
                     <p className="text-gray-400 text-sm mb-3">{t('audit.findingsByChunk', 'Findings by ISO chunk')}</p>
+                    <div className="mb-4">
+                      <p className="text-gray-400 text-xs mb-2">{t('audit.heatmapTitle', 'Mapa de calor por control')}</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                        {externalValidationReport.findings.map((finding, index) => (
+                          <div
+                            key={`${finding.clause_ref}-${index}`}
+                            className={`border rounded-md px-2 py-1.5 text-xs ${getDocumentStatusColor(finding.document_status)}`}
+                            title={`${finding.clause_ref} · ${finding.title} · ${getDocumentStatusLabel(finding.document_status)}`}
+                          >
+                            <div className="font-semibold truncate">{finding.clause_ref}</div>
+                            <div className="opacity-90">{getDocumentStatusLabel(finding.document_status)}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="bg-[#1A1D28] rounded px-3 py-2 text-emerald-300 border border-emerald-500/30">
+                          {t('audit.completeCount', 'COMPLETO')}: {externalValidationReport.findings.filter((item) => item.document_status === 'COMPLETO').length}
+                        </div>
+                        <div className="bg-[#1A1D28] rounded px-3 py-2 text-amber-300 border border-amber-500/30">
+                          {t('audit.incompleteCount', 'INCOMPLETO')}: {externalValidationReport.findings.filter((item) => item.document_status === 'INCOMPLETO').length}
+                        </div>
+                        <div className="bg-[#1A1D28] rounded px-3 py-2 text-rose-300 border border-rose-500/30">
+                          {t('audit.missingCount', 'INEXISTENTE')}: {externalValidationReport.findings.filter((item) => item.document_status === 'INEXISTENTE').length}
+                        </div>
+                      </div>
+                    </div>
                     <div className="space-y-2">
                       {externalValidationReport.findings.map((finding, idx) => (
                         <div key={idx} className="text-sm">
@@ -456,8 +534,59 @@ export default function AuditPage() {
                               {finding.clause_ref}
                             </span>
                             <div className="flex-1">
-                              <p className="text-white font-medium">{finding.title}</p>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-white font-medium">{finding.title}</p>
+                                <span className={`text-[11px] px-2 py-0.5 rounded border ${getDocumentStatusColor(finding.document_status)}`}>
+                                  {getDocumentStatusLabel(finding.document_status)}
+                                </span>
+                              </div>
                               <p className="text-gray-400 text-xs mt-1">{t('audit.score', 'Score')}: {finding.compliance_score}% · {t('audit.relevance', 'Relevance')}: {Math.round((finding.relevance_score ?? 0) * 100)}%</p>
+                              {(finding.missing_elements?.length ?? 0) > 0 && (
+                                <div className="mt-2">
+                                  <p className="text-rose-300 text-xs font-medium">{t('audit.missingElements', 'Elementos faltantes')}:</p>
+                                  <ul className="mt-1 space-y-1 text-rose-200 text-xs list-disc list-inside">
+                                    {finding.missing_elements?.map((missingElement, missingElementIndex) => (
+                                      <li key={missingElementIndex}>{missingElement}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {finding.document_status === 'INCOMPLETO' && (finding.missing_elements?.length ?? 0) > 0 && (
+                                <div className="mt-3 space-y-2">
+                                  <button
+                                    onClick={() => onGenerateMissingForFinding(finding)}
+                                    disabled={Boolean(missingGenerationLoadingByChunk[finding.clause_ref])}
+                                    className="px-3 py-1.5 rounded-md bg-[#4F6EF7] hover:bg-[#3D5AD7] disabled:opacity-60 text-white text-xs"
+                                  >
+                                    {missingGenerationLoadingByChunk[finding.clause_ref]
+                                      ? t('audit.generatingMissing', 'Generando texto faltante...')
+                                      : t('audit.generateMissing', 'Generar texto faltante')}
+                                  </button>
+
+                                  {missingGenerationErrorByChunk[finding.clause_ref] && (
+                                    <p className="text-rose-300 text-xs">{missingGenerationErrorByChunk[finding.clause_ref]}</p>
+                                  )}
+
+                                  {missingGenerationResultByChunk[finding.clause_ref] && (
+                                    <div className="rounded-md border border-[#2A2E3D] bg-[#131725] p-3 space-y-2">
+                                      <p className="text-xs text-gray-300">
+                                        {t('audit.generatedValidation', 'Validación')}: {missingGenerationResultByChunk[finding.clause_ref].validation_passed ? 'OK' : 'Requiere revisión'} ·
+                                        {' '}{t('audit.score', 'Score')}: {missingGenerationResultByChunk[finding.clause_ref].validation_score}% ·
+                                        {' '}{t('audit.iterations', 'Intentos')}: {missingGenerationResultByChunk[finding.clause_ref].iterations}
+                                      </p>
+                                      {missingGenerationResultByChunk[finding.clause_ref].validation_feedback && (
+                                        <p className="text-xs text-amber-300">{missingGenerationResultByChunk[finding.clause_ref].validation_feedback}</p>
+                                      )}
+                                      <textarea
+                                        readOnly
+                                        value={missingGenerationResultByChunk[finding.clause_ref].generated_text}
+                                        rows={5}
+                                        className="w-full bg-[#0F1119] border border-[#2A2E3D] rounded-md px-2 py-1.5 text-gray-200 text-xs"
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                               {finding.observations.length > 0 && (
                                 <ul className="mt-2 space-y-1 text-gray-300 text-xs">
                                   {finding.observations.map((observation, observationIndex) => (

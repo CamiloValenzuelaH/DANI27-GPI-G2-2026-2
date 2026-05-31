@@ -6,6 +6,7 @@ export interface CreateThreatRequest {
   description?: string
   category: string
   likelihood: number
+  impact: number
 }
 
 export interface UpdateThreatRequest {
@@ -13,6 +14,7 @@ export interface UpdateThreatRequest {
   description?: string
   category?: string
   likelihood?: number
+  impact?: number
 }
 
 export const threatsApi = {

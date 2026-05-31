@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 
 SeverityLevel = Literal["critical", "major", "minor"]
 JobState = Literal["queued", "processing", "completed", "failed"]
+DocumentStatus = Literal["COMPLETO", "INCOMPLETO", "INEXISTENTE"]
 
 
 class ValidationJobResponse(BaseModel):
@@ -27,6 +28,8 @@ class ChunkValidationResult(BaseModel):
     title: str
     relevance_score: float | None = None
     compliance_score: int = Field(ge=0, le=100)
+    document_status: DocumentStatus = "INCOMPLETO"
+    missing_elements: list[str] = Field(default_factory=list)
     observations: list[ValidationObservation] = Field(default_factory=list)
     suggestions: list[str] = Field(default_factory=list)
 
@@ -52,3 +55,17 @@ class ValidationReportResponse(BaseModel):
 class ValidationSSEEnvelope(BaseModel):
     event: str
     data: ValidationReportResponse
+
+
+class GenerateMissingRequest(BaseModel):
+    chunk_id: str = Field(min_length=1)
+
+
+class GenerateMissingResponse(BaseModel):
+    job_id: str
+    chunk_id: str
+    generated_text: str
+    validation_passed: bool
+    validation_score: int = Field(ge=0, le=100)
+    iterations: int = Field(ge=1, le=3)
+    validation_feedback: str | None = None

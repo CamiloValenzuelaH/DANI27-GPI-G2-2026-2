@@ -10,9 +10,18 @@ from app.schemas.threat import (
     ThreatResponse,
     UpdateThreatRequest,
 )
-from app.services import threat_service
+from app.schemas.iso_threat_catalog import ISOThreatCatalogByCategory
+from app.services import threat_service, iso_threat_catalog_service
 
 router = APIRouter(prefix="/threats", tags=["threats"])
+
+
+@router.get("/catalog", response_model=list[ISOThreatCatalogByCategory])
+def get_iso_threat_catalog(
+    db: Session = Depends(get_db),
+):
+    """Obtener el catálogo de amenazas ISO 27005 agrupado por categoría"""
+    return iso_threat_catalog_service.get_iso_threat_catalog_by_category(db)
 
 
 @router.get("", response_model=list[ThreatResponse])

@@ -51,22 +51,6 @@ services:
     volumes:
       - validation_jobs:/shared/validation_jobs
 
-  validation-worker:
-    build: ./validation-worker
-    command: npm start
-    depends_on:
-      - db
-      - redis
-    env_file:
-      - ./backend/.env
-    environment:
-      DATABASE_URL: postgresql://postgres:password1234@db:5432/dani27001
-      REDIS_URL: redis://redis:6379/0
-      VALIDATION_JOBS_DIR: /shared/validation_jobs
-      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
-    volumes:
-      - validation_jobs:/shared/validation_jobs
-
   backend:
     build: ./backend
     entrypoint: ["/app/entrypoint.sh"]
@@ -100,7 +84,6 @@ services:
       VITE_API_URL: /api/v1
       VITE_VALIDATION_API_URL: /api/validate
       VITE_BACKEND_PROXY_TARGET: http://host.docker.internal:8001
-      VITE_BULLMQ_API_URL: http://localhost:3001
 
 volumes:
   postgres_data:

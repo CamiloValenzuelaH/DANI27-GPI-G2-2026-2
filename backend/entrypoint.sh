@@ -71,12 +71,28 @@ if is_true "$AUTO_SEED"; then
     while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
       if python /app/scripts/seed_iso_chunks.py; then
         echo "[entrypoint] Seed ISO chunks finalizado."
+        break
+      fi
+
+      echo "[entrypoint] Seed ISO chunks fallÃ³ (intento $attempt/$SEED_MAX_RETRIES)."
+      if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
+        echo "[entrypoint] Se agotaron reintentos de seed ISO chunks."
+      fi
+
+      attempt=$((attempt + 1))
+      sleep "$SEED_RETRY_SECONDS"
+    done
+
+    attempt=1
+    while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
+      if python /app/scripts/seed_iso_threat_catalog.py; then
+        echo "[entrypoint] Seed catálogo de amenazas ISO finalizado."
         exit 0
       fi
 
-      echo "[entrypoint] Seed fallÃ³ (intento $attempt/$SEED_MAX_RETRIES)."
+      echo "[entrypoint] Seed catálogo de amenazas ISO fallÃ³ (intento $attempt/$SEED_MAX_RETRIES)."
       if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
-        echo "[entrypoint] Se agotaron reintentos de seed."
+        echo "[entrypoint] Se agotaron reintentos de seed catálogo de amenazas ISO."
         exit 0
       fi
 

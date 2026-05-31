@@ -38,6 +38,7 @@ class Threat(Base, UUIDMixin, TimestampMixin):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     category: Mapped[str] = mapped_column(String(50), nullable=False)
     likelihood: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    impact: Mapped[int] = mapped_column(Integer, nullable=False)
 
     organization: Mapped["Organization"] = relationship(lazy="select")
     linked_risks: Mapped[list["Risk"]] = relationship(

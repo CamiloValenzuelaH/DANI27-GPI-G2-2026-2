@@ -11,7 +11,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.db.database import SessionLocal
 from app.workers.celery_app import celery_app
 from app.workers.file_extraction import extract_text_from_file
-from app.workers.gemini_service import generate_embedding, analyze_chunk_with_gemini
+from app.workers.gemini_service import generate_embedding, analyze_chunk_with_deepseek
 from app.core.config import settings
 
 
@@ -260,7 +260,7 @@ async def _validate_external_audit_async(
             "total_chunks": len(chunks),
         })
 
-        analysis = await analyze_chunk_with_gemini(
+        analysis = await analyze_chunk_with_deepseek(
             normalized_text[:8000],
             chunk,
             max_output_tokens=2048,
@@ -271,6 +271,8 @@ async def _validate_external_audit_async(
             "title": chunk["title"],
             "relevance_score": chunk["relevance_score"],
             "compliance_score": analysis["score"],
+            "document_status": analysis.get("document_status", "INCOMPLETO"),
+            "missing_elements": analysis.get("missing_elements", []),
             "observations": analysis["observations"],
             "suggestions": analysis["suggestions"],
         })

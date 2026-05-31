@@ -29,7 +29,7 @@ export default function RisksPage() {
     handleSubmit: handleSubmitThreat,
     reset: resetThreat,
     formState: { errors: threatErrors },
-  } = useForm<CreateThreatRequest>({ defaultValues: { category: 'TECHNICAL', likelihood: 1 } })
+  } = useForm<CreateThreatRequest>({ defaultValues: { category: 'TECHNICAL', likelihood: 1, impact: 1 } })
 
   const {
     register: registerVulnerability,
@@ -72,7 +72,7 @@ export default function RisksPage() {
 
     try {
       await threatsApi.create(data)
-      resetThreat({ category: 'TECHNICAL', likelihood: 1 })
+      resetThreat({ category: 'TECHNICAL', likelihood: 1, impact: 1 })
       setSuccessMessage('Amenaza creada correctamente')
       await loadData()
     } catch (err) {
@@ -173,7 +173,7 @@ export default function RisksPage() {
                 />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-white/50">Categoría *</label>
                   <select
@@ -197,6 +197,20 @@ export default function RisksPage() {
                     {...registerThreat('likelihood', { valueAsNumber: true })}
                   >
                     {LIKELIHOOD_OPTIONS.map((option) => (
+                      <option key={option} value={option} className="bg-[#1A1D28]">
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-white/50">Impacto *</label>
+                  <select
+                    className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
+                    {...registerThreat('impact', { valueAsNumber: true })}
+                  >
+                    {[1, 2, 3, 4, 5].map((option) => (
                       <option key={option} value={option} className="bg-[#1A1D28]">
                         {option}
                       </option>
