@@ -43,6 +43,18 @@ def create_access_token(subject: str, extra: dict[str, Any] = {}) -> str:
     return jwt.encode(payload, settings.secret_key, algorithm="HS256")
 
 
+def create_temporary_token(subject: str, purpose: str, extra: dict[str, Any] | None = None, minutes: int = 10) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(minutes=minutes)
+    payload = {
+        "sub": subject,
+        "purpose": purpose,
+        "exp": expire,
+        "iat": datetime.now(timezone.utc),
+        **(extra or {}),
+    }
+    return jwt.encode(payload, settings.secret_key, algorithm="HS256")
+
+
 def decode_access_token(token: str) -> dict[str, Any]:
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])

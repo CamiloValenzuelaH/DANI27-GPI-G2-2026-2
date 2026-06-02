@@ -31,6 +31,12 @@ def get_current_user(
             detail="Token without subject",
         )
 
+    if payload.get("purpose"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Temporary authentication token cannot access protected endpoints",
+        )
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user or not user.is_active:
         raise HTTPException(

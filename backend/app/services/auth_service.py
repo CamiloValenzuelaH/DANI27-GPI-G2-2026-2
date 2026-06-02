@@ -8,7 +8,13 @@ from app.models.plan import Plan
 from app.models.role import Role
 from app.models.user_role import UserRole
 from app.models.refresh_token import RefreshToken
-from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
+from app.schemas.auth import (
+    RegisterRequest,
+    LoginRequest,
+    TokenResponse,
+    TwoFactorChallengeResponse,
+    UserResponse,
+)
 from app.core.security import (
     hash_password,
     verify_password,
@@ -78,6 +84,10 @@ def _build_tokens(db: Session, user: User) -> TokenResponse:
     )
 
 
+def issue_tokens(db: Session, user: User) -> TokenResponse:
+    return _build_tokens(db, user)
+
+
 # ── Casos de uso ──────────────────────────────────────────
 
 def register(data: RegisterRequest, db: Session) -> tuple[TokenResponse, User]:
@@ -127,7 +137,7 @@ def register(data: RegisterRequest, db: Session) -> tuple[TokenResponse, User]:
     return tokens, user
 
 
-def login(data: LoginRequest, db: Session) -> tuple[TokenResponse, User]:
+def login(data: LoginRequest, db: Session) -> tuple[TokenResponse | TwoFactorChallengeResponse, User]:
     user = db.query(User).filter(User.email == data.email).first()
 
     if not user or not verify_password(data.password, user.hashed_password):
@@ -141,6 +151,19 @@ def login(data: LoginRequest, db: Session) -> tuple[TokenResponse, User]:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Inactive account",
         )
+
+    if user.two_factor_enabled:
+        challenge_token = create_access_token(
+            subject=str(user.id),
+            extra={
+                "purpose": "two_factor_login",
+                "email": user.email,
+            },
+        )
+        return TwoFactorChallengeResponse(
+            challenge_token=challenge_token,
+            user=UserResponse.model_validate(user),
+        ), user
 
     user.last_login_at = datetime.now(timezone.utc)
     tokens = _build_tokens(db, user)

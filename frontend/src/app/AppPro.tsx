@@ -4,6 +4,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 import LoginPage from './pages/LoginPage';
+import TwoFactorPage from './pages/TwoFactorPage';
+import SetupMFAPage from './pages/SetupMFAPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import AssetsPage from './pages/AssetsPage';
@@ -20,6 +22,7 @@ export default function AppPro() {
           <Routes>
             {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/two-factor" element={<TwoFactorPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
             {/* Protected routes wrapped by ProtectedRoute and AppShell */}
@@ -41,6 +44,7 @@ export default function AppPro() {
                 <Route path="/escalation" element={<PlaceholderPage title="Escalation Rules" />} />
                 <Route path="/integrations" element={<PlaceholderPage title="Integrations" />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/setup-mfa" element={<SetupMFAPage />} />
                 <Route path="/assets" element={<AssetsPage />} />
               </Route>
             </Route>
