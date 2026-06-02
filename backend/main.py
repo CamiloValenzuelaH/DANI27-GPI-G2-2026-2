@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
+from app.api.two_factor import router as two_factor_router
 from app.api.v1 import evidences, risks
 from app.api import validate
 from app.core.config import settings
@@ -22,6 +23,7 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
+app.include_router(two_factor_router, prefix="/api")
 app.include_router(risks.router, prefix="/api")
 app.include_router(validate.router, prefix="/api")
 app.include_router(evidences.router, prefix="/api")

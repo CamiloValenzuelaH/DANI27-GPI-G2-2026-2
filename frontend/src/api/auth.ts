@@ -1,8 +1,8 @@
 import client, { storage } from './client'
-import type { LoginRequest, LoginResponse, RegisterRequest, User } from './types'
+import type { AuthLoginResponse, LoginRequest, LoginResponse, RegisterRequest, User } from './types'
 
 export const authApi = {
-  login: async (data: LoginRequest): Promise<LoginResponse> => {
+  login: async (data: LoginRequest): Promise<AuthLoginResponse> => {
     const res = await client.post<LoginResponse>('/auth/login', data)
     return res.data
   },

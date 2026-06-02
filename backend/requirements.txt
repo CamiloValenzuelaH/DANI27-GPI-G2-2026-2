@@ -16,6 +16,10 @@ pytest-asyncio==0.24.0
 bcrypt==5.0.0
 passlib[bcrypt]
 cryptography==42.0.8
+argon2-cffi==23.1.0
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+twilio==9.2.3
 PyPDF2==3.0.1
 python-docx==0.8.11
 openpyxl==3.1.2

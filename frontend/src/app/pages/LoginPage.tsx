@@ -6,6 +6,8 @@ import { useAuth } from '../contexts/AuthContext'
 import { useIntl } from 'react-intl'
 import type { LoginRequest } from '../../api/types'
 
+const TWO_FACTOR_SESSION_KEY = 'dani_two_factor_challenge'
+
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -20,7 +22,16 @@ export default function LoginPage() {
     setError(null)
     setIsLoading(true)
     try {
-      await login(data)
+      const response = await login(data)
+      if ('requires_two_factor' in response) {
+        sessionStorage.setItem(
+          TWO_FACTOR_SESSION_KEY,
+          JSON.stringify({ challengeToken: response.challenge_token, email: data.email })
+        )
+        navigate('/two-factor')
+        return
+      }
+
       navigate('/dashboard')
     } catch (err: any) {
       setError(parseFastApiError(err))

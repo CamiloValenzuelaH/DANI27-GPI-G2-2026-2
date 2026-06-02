@@ -6,6 +6,7 @@ from app.schemas.auth import (
     RegisterRequest,
     LoginRequest,
     LoginResponse,
+    TwoFactorChallengeResponse,
     TokenResponse,
     RefreshRequest,
     UserResponse,
@@ -26,13 +27,12 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login", response_model=LoginResponse | TwoFactorChallengeResponse)
 def login(data: LoginRequest, db: Session = Depends(get_db)):
-    tokens, user = auth_service.login(data, db)
-    return LoginResponse(
-        tokens=tokens,
-        user=UserResponse.model_validate(user),
-    )
+    result, user = auth_service.login(data, db)
+    if isinstance(result, TwoFactorChallengeResponse):
+        return result
+    return LoginResponse(tokens=result, user=UserResponse.model_validate(user))
 
 
 @router.post("/refresh", response_model=TokenResponse)

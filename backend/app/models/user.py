@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import String, Boolean, ForeignKey, DateTime, Index
+from sqlalchemy import String, Boolean, ForeignKey, DateTime, Index, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from app.db.base import Base, TimestampMixin, UUIDMixin
@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.models.organization import Organization
     from app.models.user_role import UserRole
     from app.models.refresh_token import RefreshToken
+    from app.models.two_factor_backup_code import TwoFactorBackupCode
 
 
 class User(Base, UUIDMixin, TimestampMixin):
@@ -28,8 +29,15 @@ class User(Base, UUIDMixin, TimestampMixin):
     )
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone_number: Mapped[str | None] = mapped_column(String(32), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_superadmin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    two_factor_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    two_factor_secret_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    two_factor_pending_secret_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    two_factor_verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     last_login_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
@@ -45,6 +53,11 @@ class User(Base, UUIDMixin, TimestampMixin):
         cascade="all, delete-orphan",
     )
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+    two_factor_backup_codes: Mapped[list["TwoFactorBackupCode"]] = relationship(
         back_populates="user",
         lazy="select",
         cascade="all, delete-orphan",

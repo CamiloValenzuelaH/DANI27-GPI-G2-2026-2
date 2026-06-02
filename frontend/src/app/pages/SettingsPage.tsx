@@ -1,6 +1,7 @@
 import { useIntl } from 'react-intl';
 import { usePreferences } from '../components/AppShell';
 import type { Language, Profile, DateFormat } from '../types';
+import TwoFactorSection from '../components/settings/TwoFactorSection';
 
 const languageNames: Record<Language, string> = {
   en: 'English',
@@ -68,6 +69,10 @@ export default function SettingsPage() {
           {intl.formatMessage({ id: 'settings.subtitle' })}
         </p>
       </div>
+
+      <Card title="Two-factor authentication">
+        <TwoFactorSection />
+      </Card>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <Card title={intl.formatMessage({ id: 'settings.organizationProfile' })}>

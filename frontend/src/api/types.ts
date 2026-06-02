@@ -2,8 +2,10 @@ export interface User {
   id: string
   email: string
   full_name: string
+  phone_number: string | null
   is_active: boolean
   organization_id: string
+  two_factor_enabled: boolean
   last_login_at: string | null
   created_at: string
 }
@@ -19,6 +21,14 @@ export interface LoginResponse {
   user: User
 }
 
+export interface TwoFactorChallengeResponse {
+  requires_two_factor: true
+  challenge_token: string
+  user: User
+}
+
+export type AuthLoginResponse = LoginResponse | TwoFactorChallengeResponse
+
 export interface LoginRequest {
   email: string
   password: string
@@ -30,6 +40,39 @@ export interface RegisterRequest {
   password: string
   organization_name: string
   organization_slug: string
+}
+
+export interface TwoFactorEnableResponse {
+  setup_token: string
+  qr_code_base64: string
+  issuer: string
+  account_name: string
+}
+
+export interface TwoFactorVerifyRequest {
+  code?: string
+  challenge_token?: string
+  setup_token?: string
+  backup_code?: string
+  delivery_method?: 'sms' | 'email'
+}
+
+export interface TwoFactorVerifyResponse {
+  verified: true
+  tokens?: TokenResponse | null
+  user?: User | null
+}
+
+export interface TwoFactorBackupCodesResponse {
+  backup_codes: string[]
+}
+
+export interface TwoFactorDisableRequest {
+  password: string
+}
+
+export interface TwoFactorDeliveryRequest {
+  challenge_token: string
 }
 
 export interface Role {
