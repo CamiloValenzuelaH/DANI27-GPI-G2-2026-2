@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import base64
+import hmac
 import hashlib
 import secrets
-import smtplib
 from datetime import datetime, timezone
-from email.message import EmailMessage
 from io import BytesIO
 from typing import Literal
 
@@ -24,6 +23,7 @@ from app.core.security import create_temporary_token, verify_password
 from app.models.audit_log import AuditLog
 from app.models.two_factor_backup_code import TwoFactorBackupCode
 from app.models.user import User
+from app.services.notification_service import send_email_message
 from app.schemas.auth import (
     TokenResponse,
     TwoFactorBackupCodesResponse,
@@ -39,6 +39,10 @@ from app.services.auth_service import issue_tokens
 
 _argon_hasher = PasswordHasher(type=Type.ID)
 _rate_limiter = redis.Redis.from_url(settings.redis_url, decode_responses=True)
+_SMS_OTP_TTL_SECONDS = 5 * 60
+_EMAIL_OTP_TTL_SECONDS = 10 * 60
+_SMS_SEND_WINDOW_SECONDS = 60 * 60
+_MAX_OTP_ATTEMPTS = 3
 
 
 def _client_key(request: Request | None) -> str:
@@ -57,6 +61,100 @@ def _rate_limit(key: str, limit: int = 5, window_seconds: int = 60) -> None:
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Too many 2FA requests, please try again later",
         )
+
+
+def _delivery_key(user_id: str, delivery_method: Literal["sms", "email"]) -> str:
+    return f"{delivery_method}_otp:{user_id}"
+
+
+def _delivery_attempts_key(user_id: str, delivery_method: Literal["sms", "email"]) -> str:
+    return f"{delivery_method}_otp_attempts:{user_id}"
+
+
+def _delivery_send_key(user_id: str, delivery_method: Literal["sms", "email"]) -> str:
+    return f"{delivery_method}_otp_send:{user_id}"
+
+
+def _delivery_ttl_seconds(delivery_method: Literal["sms", "email"]) -> int:
+    return _SMS_OTP_TTL_SECONDS if delivery_method == "sms" else _EMAIL_OTP_TTL_SECONDS
+
+
+def _clear_delivery_code(user_id: str, delivery_method: Literal["sms", "email"]) -> None:
+    _rate_limiter.delete(_delivery_key(user_id, delivery_method), _delivery_attempts_key(user_id, delivery_method))
+
+
+def _store_delivery_code(user_id: str, delivery_method: Literal["sms", "email"], code: str) -> None:
+    _rate_limiter.setex(
+        _delivery_key(user_id, delivery_method),
+        _delivery_ttl_seconds(delivery_method),
+        hashlib.sha256(code.encode("utf-8")).hexdigest(),
+    )
+    _rate_limiter.delete(_delivery_attempts_key(user_id, delivery_method))
+
+
+def _rate_limit_delivery_sends(user_id: str, delivery_method: Literal["sms", "email"]) -> None:
+    if delivery_method == "sms":
+        redis_key = _delivery_send_key(user_id, delivery_method)
+        count = _rate_limiter.incr(redis_key)
+        if count == 1:
+            _rate_limiter.expire(redis_key, _SMS_SEND_WINDOW_SECONDS)
+        if count > 3:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many SMS codes requested, please try again later",
+            )
+        return
+
+    _rate_limit(_delivery_send_key(user_id, delivery_method), limit=5, window_seconds=60)
+
+
+def _log_delivery_audit(
+    db: Session,
+    *,
+    user: User,
+    action: str,
+    method: str,
+    success: bool,
+    http_status: int,
+    request: Request | None,
+    details: dict | None = None,
+) -> None:
+    _audit(
+        db,
+        user=user,
+        action=action,
+        resource="auth/2fa",
+        details={"method": method, **(details or {})},
+        success=success,
+        http_status=http_status,
+        request=request,
+    )
+
+
+def _verify_delivery_code(user_id: str, delivery_method: Literal["sms", "email"], code: str) -> bool:
+    redis_key = _delivery_key(user_id, delivery_method)
+    attempts_key = _delivery_attempts_key(user_id, delivery_method)
+    stored_hash = _rate_limiter.get(redis_key)
+    if not stored_hash:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired 2FA code")
+
+    attempt_count = int(_rate_limiter.get(attempts_key) or 0)
+    if attempt_count >= _MAX_OTP_ATTEMPTS:
+        _clear_delivery_code(user_id, delivery_method)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired 2FA code")
+
+    candidate_hash = hashlib.sha256(code.encode("utf-8")).hexdigest()
+    if hmac.compare_digest(candidate_hash, stored_hash):
+        _clear_delivery_code(user_id, delivery_method)
+        return True
+
+    attempt_count = _rate_limiter.incr(attempts_key)
+    if attempt_count == 1:
+        _rate_limiter.expire(attempts_key, _delivery_ttl_seconds(delivery_method))
+    if attempt_count >= _MAX_OTP_ATTEMPTS:
+        _clear_delivery_code(user_id, delivery_method)
+
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired 2FA code")
 
 
 def _normalize_code(code: str) -> str:
@@ -225,6 +323,7 @@ def verify_two_factor(data: TwoFactorVerifyRequest, db: Session, request: Reques
     verified = False
 
     if data.backup_code:
+        used_method = "backup_code"
         normalized_backup = _normalize_code(data.backup_code)
         for backup_code in db.query(TwoFactorBackupCode).filter(
             TwoFactorBackupCode.user_id == user.id,
@@ -255,12 +354,22 @@ def verify_two_factor(data: TwoFactorVerifyRequest, db: Session, request: Reques
         code = _normalize_code(data.code or "")
         if not code:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A delivery code is required")
-        redis_key = f"2fa:delivery:{token}:{data.delivery_method}"
-        stored_hash = _rate_limiter.get(redis_key)
-        if stored_hash and hashlib.sha256(code.encode("utf-8")).hexdigest() == stored_hash:
-            verified = True
-            _rate_limiter.delete(redis_key)
-            used_method = data.delivery_method
+        try:
+            verified = _verify_delivery_code(str(user.id), data.delivery_method, code)
+            if verified:
+                used_method = data.delivery_method
+        except HTTPException:
+            _log_delivery_audit(
+                db,
+                user=user,
+                action=f"MFA_{data.delivery_method.upper()}_VERIFY_FAILED",
+                method=data.delivery_method,
+                success=False,
+                http_status=status.HTTP_401_UNAUTHORIZED,
+                request=request,
+                details={"reason": "invalid_or_expired_code"},
+            )
+            raise
     else:
         code = _normalize_code(data.code or "")
         if not code:
@@ -269,6 +378,16 @@ def verify_two_factor(data: TwoFactorVerifyRequest, db: Session, request: Reques
         verified = pyotp.TOTP(secret).verify(code, valid_window=1)
 
     if not verified:
+        _log_delivery_audit(
+            db,
+            user=user,
+            action="MFA_VERIFY_FAILED",
+            method=used_method,
+            success=False,
+            http_status=status.HTTP_401_UNAUTHORIZED,
+            request=request,
+            details={"reason": "invalid_code"},
+        )
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid 2FA code")
 
     user.last_login_at = datetime.now(timezone.utc)
@@ -362,11 +481,11 @@ def _store_delivery_code(token: str, delivery_method: Literal["sms", "email"], c
 
 
 def _send_sms_message(phone_number: str, message: str) -> None:
-    if not (settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_from_phone):
+    if not (settings.twilio_account_sid and settings.twilio_auth_token and settings.twilio_phone_number):
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Twilio is not configured")
 
     client = TwilioClient(settings.twilio_account_sid, settings.twilio_auth_token)
-    client.messages.create(body=message, from_=settings.twilio_from_phone, to=phone_number)
+    client.messages.create(body=message, from_=settings.twilio_phone_number, to=phone_number)
 
 
 def _send_email_message(email: str, subject: str, body: str) -> None:
@@ -388,24 +507,48 @@ def _send_email_message(email: str, subject: str, body: str) -> None:
 
 
 def send_sms_code(data: TwoFactorDeliveryRequest, db: Session, request: Request) -> dict:
-    _rate_limit(f"send-sms:{data.challenge_token}")
     user = _get_user_from_token(db, data.challenge_token, "two_factor_login")
+    _rate_limit_delivery_sends(str(user.id), "sms")
     if not user.phone_number:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The user has no phone number configured")
+        _log_delivery_audit(
+            db,
+            user=user,
+            action="MFA_SMS_SENT_FAILED",
+            method="sms",
+            success=False,
+            http_status=status.HTTP_400_BAD_REQUEST,
+            request=request,
+            details={"reason": "delivery_unavailable"},
+        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unable to send the SMS code right now")
 
     code = f"{secrets.randbelow(1_000_000):06d}"
-    _store_delivery_code(data.challenge_token, "sms", code)
-    _send_sms_message(
-        user.phone_number,
-        f"Your Dani27001 verification code is {code}. It expires in {settings.two_factor_challenge_expire_minutes} minutes.",
-    )
+    _store_delivery_code(str(user.id), "sms", code)
 
-    _audit(
+    try:
+        _send_sms_message(
+            user.phone_number,
+            f"Your Dani27001 verification code is {code}. It expires in {_SMS_OTP_TTL_SECONDS // 60} minutes.",
+        )
+    except Exception:
+        _clear_delivery_code(str(user.id), "sms")
+        _log_delivery_audit(
+            db,
+            user=user,
+            action="MFA_SMS_SENT_FAILED",
+            method="sms",
+            success=False,
+            http_status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            request=request,
+            details={"reason": "delivery_failed"},
+        )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Unable to send the SMS code right now")
+
+    _log_delivery_audit(
         db,
         user=user,
         action="MFA_SMS_SENT",
-        resource="auth/2fa",
-        details={"method": "sms"},
+        method="sms",
         success=True,
         http_status=status.HTTP_200_OK,
         request=request,
@@ -414,23 +557,42 @@ def send_sms_code(data: TwoFactorDeliveryRequest, db: Session, request: Request)
 
 
 def send_email_code(data: TwoFactorDeliveryRequest, db: Session, request: Request) -> dict:
-    _rate_limit(f"send-email:{data.challenge_token}")
     user = _get_user_from_token(db, data.challenge_token, "two_factor_login")
+    _rate_limit_delivery_sends(str(user.id), "email")
 
     code = f"{secrets.randbelow(1_000_000):06d}"
-    _store_delivery_code(data.challenge_token, "email", code)
-    _send_email_message(
-        user.email,
-        "Your Dani27001 verification code",
-        f"Your verification code is {code}. It expires in {settings.two_factor_challenge_expire_minutes} minutes.",
-    )
+    _store_delivery_code(str(user.id), "email", code)
 
-    _audit(
+    try:
+        send_email_message(
+            user.email,
+            "Your Dani27001 verification code",
+            (
+                "<html><body style='font-family:Arial,sans-serif;'>"
+                f"<p>Your verification code is <strong>{code}</strong>.</p>"
+                f"<p>It expires in {_EMAIL_OTP_TTL_SECONDS // 60} minutes.</p>"
+                "</body></html>"
+            ),
+        )
+    except Exception:
+        _clear_delivery_code(str(user.id), "email")
+        _log_delivery_audit(
+            db,
+            user=user,
+            action="MFA_EMAIL_SENT_FAILED",
+            method="email",
+            success=False,
+            http_status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            request=request,
+            details={"reason": "delivery_failed"},
+        )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Unable to send the email code right now")
+
+    _log_delivery_audit(
         db,
         user=user,
         action="MFA_EMAIL_SENT",
-        resource="auth/2fa",
-        details={"method": "email"},
+        method="email",
         success=True,
         http_status=status.HTTP_200_OK,
         request=request,

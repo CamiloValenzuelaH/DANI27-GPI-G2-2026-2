@@ -9,6 +9,24 @@ import { twoFactorApi } from '../../api/twoFactor'
 
 const TWO_FACTOR_SESSION_KEY = 'dani_two_factor_challenge'
 
+const METHOD_LABELS: Record<FormValues['mode'], string> = {
+  totp: 'Authenticator App',
+  sms: 'SMS',
+  email: 'Email',
+  backup: 'Backup code',
+}
+
+function maskEmail(email: string): string {
+  if (!email) return ''
+  return `${email.slice(0, 3)}***`
+}
+
+function maskPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '')
+  if (!digits) return ''
+  return `***${digits.slice(-4)}`
+}
+
 const schema = z.object({
   mode: z.enum(['totp', 'backup', 'sms', 'email']),
   code: z.string().trim().optional().default(''),
@@ -33,6 +51,7 @@ export default function TwoFactorPage() {
   const { completeLogin } = useAuth()
   const [challengeToken, setChallengeToken] = useState<string | null>(null)
   const [email, setEmail] = useState<string>('')
+  const [phoneNumber, setPhoneNumber] = useState<string>('')
   const [status, setStatus] = useState<string | null>(null)
   const [isSending, setIsSending] = useState<'sms' | 'email' | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -54,9 +73,10 @@ export default function TwoFactorPage() {
     }
 
     try {
-      const parsed = JSON.parse(raw) as { challengeToken?: string; email?: string }
+      const parsed = JSON.parse(raw) as { challengeToken?: string; email?: string; phoneNumber?: string }
       setChallengeToken(parsed.challengeToken ?? null)
       setEmail(parsed.email ?? '')
+      setPhoneNumber(parsed.phoneNumber ?? '')
       if (!parsed.challengeToken) {
         navigate('/login', { replace: true })
       }
@@ -71,6 +91,14 @@ export default function TwoFactorPage() {
     if (mode === 'email') return 'Enter the email code'
     return 'Enter your authenticator code'
   }, [mode])
+
+  const maskedEmail = useMemo(() => maskEmail(email), [email])
+  const maskedPhone = useMemo(() => maskPhone(phoneNumber), [phoneNumber])
+  const deliveryHint = useMemo(() => {
+    if (mode === 'sms') return maskedPhone || 'your phone number'
+    if (mode === 'email') return maskedEmail || 'your email address'
+    return ''
+  }, [maskedEmail, maskedPhone, mode])
 
   const sendDeliveryCode = async (deliveryMethod: 'sms' | 'email') => {
     if (!challengeToken) return
@@ -133,7 +161,7 @@ export default function TwoFactorPage() {
               <div className="space-y-3">
                 <h1 className="text-3xl font-semibold tracking-tight">Secure your session</h1>
                 <p className="max-w-md text-sm leading-6 text-white/70">
-                  {email ? `We need an additional verification step for ${email}.` : 'Enter the code from your authenticator app, backup code, SMS, or email.'}
+                  {maskedEmail ? `We need an additional verification step for ${maskedEmail}.` : 'Enter the code from your authenticator app, backup code, SMS, or email.'}
                 </p>
               </div>
             </div>
@@ -159,10 +187,16 @@ export default function TwoFactorPage() {
                   onClick={() => setValue('mode', value, { shouldValidate: true })}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium capitalize transition-colors ${mode === value ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-400'}`}
                 >
-                  {value.replace('_', ' ')}
+                  {METHOD_LABELS[value]}
                 </button>
               ))}
             </div>
+
+            {(mode === 'sms' || mode === 'email') && (
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                The code will be sent to {deliveryHint}.
+              </div>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5">
               {mode === 'backup' ? (
@@ -206,7 +240,7 @@ export default function TwoFactorPage() {
                   onClick={() => sendDeliveryCode('sms')}
                   className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isSending === 'sms' ? 'Sending SMS...' : 'Send SMS'}
+                  {isSending === 'sms' ? 'Sending SMS...' : 'Send SMS code'}
                 </button>
                 <button
                   type="button"
@@ -214,7 +248,7 @@ export default function TwoFactorPage() {
                   onClick={() => sendDeliveryCode('email')}
                   className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isSending === 'email' ? 'Sending email...' : 'Send email'}
+                  {isSending === 'email' ? 'Sending email...' : 'Send email code'}
                 </button>
               </div>
 

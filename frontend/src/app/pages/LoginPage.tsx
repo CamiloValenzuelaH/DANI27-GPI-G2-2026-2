@@ -26,7 +26,11 @@ export default function LoginPage() {
       if ('requires_two_factor' in response) {
         sessionStorage.setItem(
           TWO_FACTOR_SESSION_KEY,
-          JSON.stringify({ challengeToken: response.challenge_token, email: data.email })
+          JSON.stringify({
+            challengeToken: response.challenge_token,
+            email: response.user.email,
+            phoneNumber: response.user.phone_number,
+          })
         )
         navigate('/two-factor')
         return

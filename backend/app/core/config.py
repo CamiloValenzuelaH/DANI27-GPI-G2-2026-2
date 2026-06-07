@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     two_factor_challenge_expire_minutes: int = 10
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""
-    twilio_from_phone: str = ""
+    twilio_phone_number: str = ""
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_username: str = ""

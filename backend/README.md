@@ -4,6 +4,17 @@
 - **Python:** 3.12.9
 - **Base de Datos:** PostgreSQL 15+ en local
 
+### Variables de entorno relevantes
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_PHONE_NUMBER`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USERNAME`
+- `SMTP_PASSWORD`
+- `SMTP_FROM_EMAIL`
+- `REDIS_URL`
+
 ### Pasos para levantar el Backend
 1. **Clonar el repo e entrar a la carpeta:**
    ```bash
