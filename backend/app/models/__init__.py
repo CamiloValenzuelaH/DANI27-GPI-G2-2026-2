@@ -18,6 +18,7 @@ from app.models.audit_log import AuditLog
 from app.models.risk import Risk, RiskEvaluation, risk_assets
 from app.models.threat import Threat, risk_threats
 from app.models.vulnerability import Vulnerability
+from app.models.notification import Notification, NotificationPreference
 from app.models.iso_threat_catalog import ISOThreatCatalog
 
 __all__ = [
@@ -44,5 +45,7 @@ __all__ = [
     "Threat",
     "risk_threats",
     "Vulnerability",
+    "Notification",
+    "NotificationPreference",
     "ISOThreatCatalog",
 ]

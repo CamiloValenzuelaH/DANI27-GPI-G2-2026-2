@@ -1,7 +1,17 @@
 export function parseFastApiError(err: any): string {
-  const detail = err?.response?.data?.detail
+  const response = err?.response
+  const detail = response?.data?.detail
+  const status = response?.status
+  const statusText = response?.statusText
+  const message = err?.message
 
   if (!detail) {
+    if (status && statusText) {
+      return `Error ${status}: ${statusText}`
+    }
+    if (message) {
+      return message
+    }
     return 'Error inesperado, intenta nuevamente'
   }
 

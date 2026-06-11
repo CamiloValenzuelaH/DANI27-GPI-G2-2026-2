@@ -329,3 +329,30 @@ Health Checks
 ├─ Catálogo seeded correctly (count query)
 └─ Endpoints responding
 ```
+
+## Árbol completo del proyecto
+
+El árbol completo con todos los archivos y carpetas está guardado en [ARCHITECTURE_TREE_FULL.txt](ARCHITECTURE_TREE_FULL.txt).
+
+Extracto inicial:
+
+```text
+Listado de rutas de carpetas
+C:.
+|   .env
+|   .gitignore
+|   .vercelignore
+|   API_EXAMPLES.md
+|   ARCHITECTURE_DIAGRAM.md
+|   ARCHITECTURE_TREE.txt
+|   ARCHITECTURE_TREE_FULL.txt
+|   docker-compose.yml
+|   IMPLEMENTATION_SUMMARY.md
+|   IMPORTANTE_PARA_USAR_DOCKER.txt
+|   INDEX.md
+|   init.sql
+|   QUICK_START.md
+|   README.md
+```
+
+Si quieres que inserte el árbol completo aquí (archivo Markdown) o que lo divida por secciones, dime cómo prefieres la presentación.

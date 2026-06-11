@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.models.user_role import UserRole
     from app.models.refresh_token import RefreshToken
     from app.models.two_factor_backup_code import TwoFactorBackupCode
+    from app.models.notification import Notification, NotificationPreference
 
 
 class User(Base, UUIDMixin, TimestampMixin):
@@ -58,6 +59,16 @@ class User(Base, UUIDMixin, TimestampMixin):
         cascade="all, delete-orphan",
     )
     two_factor_backup_codes: Mapped[list["TwoFactorBackupCode"]] = relationship(
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+    notifications: Mapped[list["Notification"]] = relationship(
+        back_populates="user",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+    notification_preferences: Mapped[list["NotificationPreference"]] = relationship(
         back_populates="user",
         lazy="select",
         cascade="all, delete-orphan",

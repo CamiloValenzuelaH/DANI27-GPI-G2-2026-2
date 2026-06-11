@@ -3,7 +3,7 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 
-const backendProxyTarget = process.env.VITE_BACKEND_PROXY_TARGET ?? 'http://host.docker.internal:8001'
+const backendProxyTarget = process.env.VITE_BACKEND_PROXY_TARGET ?? 'http://127.0.0.1:8000'
 
 
 function figmaAssetResolver() {

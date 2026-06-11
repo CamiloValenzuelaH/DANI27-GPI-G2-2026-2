@@ -22,13 +22,13 @@ class Settings(BaseSettings):
     two_factor_challenge_expire_minutes: int = 10
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""
-    twilio_from_phone: str = ""
-    smtp_host: str = ""
-    smtp_port: int = 587
+    twilio_phone_number: str = ""
+    smtp_host: str = "mailhog"
+    smtp_port: int = 1025
     smtp_username: str = ""
     smtp_password: str = ""
-    smtp_from_email: str = ""
-    smtp_use_tls: bool = True
+    smtp_from_email: str = "no-reply@dani27.com"
+    smtp_use_tls: bool = False
 
     # Database
     database_url: str

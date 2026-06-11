@@ -85,6 +85,13 @@ services:
       VITE_VALIDATION_API_URL: /api/validate
       VITE_BACKEND_PROXY_TARGET: http://host.docker.internal:8001
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: g2_mailhog
+    ports:
+      - "1025:1025" # Puerto SMTP (el que usará tu FastAPI para enviar)
+      - "8025:8025" # Puerto Web (el que usarás tú en el navegador para ver los correos)
+
 volumes:
   postgres_data:
   validation_jobs:

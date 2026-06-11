@@ -85,3 +85,25 @@ def require_plan_feature(feature: str):
                 detail=f"Your plan does not include access to this feature",
             )
     return checker
+
+
+def require_roles(*allowed_roles: str):
+    allowed_names = {role.strip().lower() for role in allowed_roles if role and role.strip()}
+
+    def checker(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.is_superadmin:
+            return current_user
+
+        role_names = {
+            user_role.role.name.lower()
+            for user_role in current_user.user_roles
+            if user_role.role is not None and user_role.role.name
+        }
+        if not allowed_names.intersection(role_names):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permisos de rol insuficientes",
+            )
+        return current_user
+
+    return checker
