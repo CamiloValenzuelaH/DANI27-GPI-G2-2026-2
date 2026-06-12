@@ -104,6 +104,8 @@ else
   echo "[entrypoint] Auto-seed ISO chunks deshabilitado (AUTO_SEED_ISO_CHUNKS=$AUTO_SEED)."
 fi
 
+python scripts/seed_iso_chunks.py
+
 if [ "$#" -eq 0 ]; then
   set -- uvicorn main:app --host 0.0.0.0 --port 8000
 fi
