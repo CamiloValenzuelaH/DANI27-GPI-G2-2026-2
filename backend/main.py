@@ -26,11 +26,11 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
-app.include_router(two_factor_router, prefix="/api")
-app.include_router(notifications_router, prefix="/api")
-app.include_router(risks.router, prefix="/api")
-app.include_router(validate.router, prefix="/api")
-app.include_router(evidences.router, prefix="/api")
+app.include_router(two_factor_router, prefix="/api/v1")
+app.include_router(notifications_router, prefix="/api/v1")
+app.include_router(risks.router, prefix="/api/v1")
+app.include_router(validate.router, prefix="/api/v1")
+app.include_router(evidences.router, prefix="/api/v1")
 
 # Registrar middleware de auditoría (registra cada petición en tabla separada)
 app.add_middleware(AuditMiddleware)
