@@ -1,7 +1,5 @@
 import client, { storage } from './client'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
-
 export type ChatMode = 'document' | 'iso' | 'both'
 
 export interface ChatRequest {
@@ -70,8 +68,9 @@ export const streamDocumentChat = async (
   onError: (error: Error) => void,
 ): Promise<void> => {
   const token = storage.getToken()
+  const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
   try {
-    const response = await fetch(`${BASE_URL}/documents/${documentId}/chat`, {
+    const response = await fetch(`${apiBaseUrl}/documents/${documentId}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

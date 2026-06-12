@@ -32,10 +32,11 @@ const ACCEPTED_MIME_TYPES = new Set([
 ]);
 const ACCEPTED_LABEL = "PDF, DOCX, XLSX, PNG, JPG";
 
-const API_ROOT = import.meta.env.VITE_API_URL ?? "/api/v1";
-const API_BASE = API_ROOT.replace(/\/api\/v1\/?$/, "");
-const EVIDENCE_UPLOAD_URL = `${API_BASE}/api/evidences`;
-const VALIDATION_EXTERNAL_URL = `${API_BASE}/api/validate/external`;
+// Use VITE_API_URL as the base URL directly without manipulation
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Build endpoint URLs by appending to the base URL
+const EVIDENCE_UPLOAD_URL = `${API_BASE_URL}/api/evidences`;
+const VALIDATION_EXTERNAL_URL = `${API_BASE_URL}/api/validate/external`;
 
 type UploadStatus = "queued" | "uploading" | "classifying" | "completed" | "failed";
 

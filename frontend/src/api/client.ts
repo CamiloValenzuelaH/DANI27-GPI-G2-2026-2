@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
+// Use only VITE_API_URL for baseURL - must be set in environment
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
 
 const TOKEN_KEY = 'access_token'
 const REFRESH_KEY = 'refresh_token'
