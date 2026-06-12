@@ -1,7 +1,0 @@
-backend/
-validation-worker/
-.git
-.github
-node_modules
-*.md
-.env*
