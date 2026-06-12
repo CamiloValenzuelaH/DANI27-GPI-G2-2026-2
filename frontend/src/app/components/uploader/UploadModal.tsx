@@ -34,8 +34,8 @@ const ACCEPTED_LABEL = "PDF, DOCX, XLSX, PNG, JPG";
 
 const API_ROOT = import.meta.env.VITE_API_URL ?? "/api/v1";
 const API_BASE = API_ROOT.replace(/\/api\/v1\/?$/, "");
-const EVIDENCE_UPLOAD_URL = `${API_BASE}/api/evidences`;
-const VALIDATION_EXTERNAL_URL = `${API_BASE}/api/validate/external`;
+const EVIDENCE_UPLOAD_URL = `${API_BASE}/api/v1/evidences`;
+const VALIDATION_EXTERNAL_URL = `${API_BASE}/api/v1/validate/external`;
 
 type UploadStatus = "queued" | "uploading" | "classifying" | "completed" | "failed";
 
@@ -994,8 +994,8 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
           <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
             <Badge variant="outline" className="border-white/10 text-slate-200">Máximo {MAX_FILES} archivos</Badge>
             <Badge variant="outline" className="border-white/10 text-slate-200">Formatos {ACCEPTED_LABEL}</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/evidences</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/validate/external</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/v1/evidences</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/v1/validate/external</Badge>
           </div>
         </div>
 
