@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dani Platform v4 — Dashboard Wireframe</title>
+<style>
+  :root, [data-theme="light"] {
+    --bg: #F7F8FA;
+    --sidebar-bg: #0F1729;
+    --sidebar-hover: #1A2340;
+    --sidebar-active: #232E4A;
+    --card: #FFFFFF;
+    --border: #E2E5EB;
+    --text: #1A1D26;
+    --text-secondary: #5F6B7A;
+    --text-muted: #9AA3B0;
+    --accent: #4F6EF7;
+    --accent-light: #EEF1FE;
+    --green: #1DB954;
+    --green-bg: #E8F9EF;
+    --yellow: #F5A623;
+    --yellow-bg: #FFF7E6;
+    --red: #E5484D;
+    --red-bg: #FEECEE;
+    --purple: #8B5CF6;
+    --purple-bg: #F3EFFE;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.08);
+    --table-row-hover: #FAFBFC;
+    --table-border: #F3F4F6;
+    --cw-alert-bg: #FAFAFA;
+  }
+  [data-theme="dark"] {
+    --bg: #111318;
+    --sidebar-bg: #0A0D16;
+    --sidebar-hover: #161A28;
+    --sidebar-active: #1E2338;
+    --card: #1A1D28;
+    --border: #2A2E3D;
+    --text: #E4E7EE;
+    --text-secondary: #9AA3B4;
+    --text-muted: #646D7D;
+    --accent: #6B8AFF;
+    --accent-light: #1C2340;
+    --green: #34D969;
+    --green-bg: #122A1D;
+    --yellow: #F5B740;
+    --yellow-bg: #2A2210;
+    --red: #F06669;
+    --red-bg: #2A1214;
+    --purple: #A78BFA;
+    --purple-bg: #1E1636;
+    --shadow: 0 1px 3px rgba(0,0,0,.25);
+    --shadow-md: 0 4px 12px rgba(0,0,0,.35);
+    --table-row-hover: #1E2130;
+    --table-border: #252838;
+    --cw-alert-bg: #1E2030;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; transition: background .3s, color .3s; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { width: 260px; min-height: 100vh; background: var(--sidebar-bg); color: #fff; display: flex; flex-direction: column; position: fixed; top:0; left:0; bottom:0; z-index: 100; overflow-y:auto; transition: background .3s; }
+  .sidebar-header { padding: 22px 20px 18px; display:flex; align-items:center; gap:12px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar-logo { width:34px; height:34px; border-radius:8px; background: var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; }
+  .sidebar-brand { font-size:15px; font-weight:600; letter-spacing:-.2px; }
+  .sidebar-brand small { display:block; font-size:11px; font-weight:400; color: rgba(255,255,255,.45); margin-top:2px; }
+  .sidebar-profile-label { padding: 14px 20px 6px; font-size:10px; text-transform:uppercase; letter-spacing:1.2px; color: rgba(255,255,255,.35); font-weight:600; }
+  .sidebar-profile-badge { margin: 0 16px 16px; padding: 8px 12px; border-radius: 6px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition: background .15s; }
+  .sidebar-profile-badge.foundational { background: rgba(245,166,35,.15); color: #F5A623; }
+  .sidebar-profile-badge.established { background: rgba(79,110,247,.15); color: #8BA3F9; }
+  .sidebar-profile-badge.advanced { background: rgba(139,92,246,.15); color: #B794F6; }
+  .sidebar-profile-badge .dot { width:7px; height:7px; border-radius:50%; }
+  .sidebar-profile-badge.foundational .dot { background:#F5A623; }
+  .sidebar-profile-badge.established .dot { background:#8BA3F9; }
+  .sidebar-profile-badge.advanced .dot { background:#B794F6; }
+  .nav-section-label { padding: 18px 20px 8px; font-size:10px; text-transform:uppercase; letter-spacing:1.2px; color: rgba(255,255,255,.3); font-weight:600; }
+  .nav-item { display:flex; align-items:center; gap:11px; padding: 9px 20px; margin: 1px 8px; border-radius: 7px; font-size:13.5px; color: rgba(255,255,255,.6); cursor:pointer; transition: all .15s; position:relative; }
+  .nav-item:hover { background: var(--sidebar-hover); color: rgba(255,255,255,.85); }
+  .nav-item.active { background: var(--sidebar-active); color: #fff; font-weight:500; }
+  .nav-item .icon { width:18px; text-align:center; font-size:15px; flex-shrink:0; }
+  .nav-item .step-num { width:20px; height:20px; border-radius:50%; background: rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; flex-shrink:0; }
+  .nav-item.active .step-num { background: var(--accent); }
+  .nav-item.completed .step-num { background: var(--green); }
+  .nav-item .badge-count { margin-left:auto; background: var(--red); color:#fff; font-size:10px; font-weight:700; padding: 1px 6px; border-radius:10px; min-width:18px; text-align:center; }
+  .nav-item .badge-warn { margin-left:auto; background: var(--yellow); color:#fff; font-size:10px; font-weight:700; padding: 1px 6px; border-radius:10px; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .sidebar-footer:hover { background: var(--sidebar-hover); }
+  .avatar { width:32px; height:32px; border-radius:50%; background: linear-gradient(135deg, #4F6EF7, #8B5CF6); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; }
+  .sidebar-footer .user-info { font-size:12.5px; }
+  .sidebar-footer .user-info small { display:block; color: rgba(255,255,255,.4); font-size:11px; }
+
+  /* ── NAV TOGGLE ── */
+  .nav-toggle-bar { display:flex; margin: 0 16px 4px; background: rgba(255,255,255,.06); border-radius:6px; padding:3px; }
+  .nav-toggle-btn { flex:1; text-align:center; padding:6px 0; font-size:11px; font-weight:500; border-radius:4px; cursor:pointer; color: rgba(255,255,255,.45); transition: all .15s; }
+  .nav-toggle-btn.active { background: rgba(255,255,255,.1); color:#fff; }
+
+  /* ── MAIN ── */
+  .main { margin-left: 260px; flex:1; padding: 28px 32px; max-width: 1200px; transition: background .3s; }
+
+  /* ── TOP BAR ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+  .topbar h1 { font-size:22px; font-weight:700; letter-spacing:-.3px; }
+  .topbar h1 small { font-weight:400; color: var(--text-secondary); font-size:14px; margin-left:8px; }
+  .topbar-actions { display:flex; gap:10px; flex-wrap:wrap; }
+  .btn { padding: 8px 16px; border-radius:7px; border:1px solid var(--border); background:var(--card); font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px; color: var(--text); transition: all .15s; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-primary { background: var(--accent); color:#fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #3D5BE0; }
+  .btn-sm { padding:5px 10px; font-size:12px; }
+
+  /* ── FRAMEWORKS STRIP ── */
+  .frameworks-strip { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+  .fw-chip { padding: 5px 12px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border: 1.5px solid var(--border); background:var(--card); color: var(--text-secondary); transition: all .15s; }
+  .fw-chip.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+  .fw-chip .fw-dot { display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:5px; }
+  .fw-chip .fw-dot.mandatory { background: var(--red); }
+  .fw-chip .fw-dot.voluntary { background: var(--green); }
+
+  /* ── HEALTH SCORES ── */
+  .health-row { display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:16px; margin-bottom:24px; }
+  .health-card { background: var(--card); border-radius: var(--radius); padding:20px; box-shadow: var(--shadow); border: 1px solid var(--border); position:relative; overflow:hidden; transition: background .3s, border-color .3s; }
+  .health-card .health-label { font-size:12px; color: var(--text-secondary); font-weight:500; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .health-card .health-value { font-size:32px; font-weight:700; letter-spacing:-1px; }
+  .health-card .health-bar { height:6px; background: var(--border); border-radius:3px; margin-top:12px; overflow:hidden; }
+  .health-card .health-bar-fill { height:100%; border-radius:3px; transition: width .6s ease; }
+  .health-card .health-delta { font-size:11px; margin-top:6px; font-weight:500; }
+  .health-card .health-delta.up { color: var(--green); }
+  .health-card .health-delta.down { color: var(--red); }
+  .health-card .hitl-badge { position:absolute; top:12px; right:12px; font-size:10px; padding: 3px 8px; border-radius:4px; font-weight:600; display:flex; align-items:center; gap:4px; }
+  .hitl-auto { background: #E8F4FD; color: #1B8BD1; }
+  .hitl-review { background: var(--yellow-bg); color: #B47A14; }
+  .hitl-human { background: var(--red-bg); color: var(--red); }
+  [data-theme="dark"] .hitl-auto { background: #132838; color: #5CB8F0; }
+  .health-card.doc .health-bar-fill { background: linear-gradient(90deg, #1DB954, #4ADE80); }
+  .health-card.impl .health-bar-fill { background: linear-gradient(90deg, #F5A623, #FBBF24); }
+  .health-card.tested .health-bar-fill { background: linear-gradient(90deg, #E5484D, #F87171); }
+  .health-card.overall .health-bar-fill { background: linear-gradient(90deg, #4F6EF7, #818CF8); }
+
+  /* ── GRID LAYOUT ── */
+  .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:24px; }
+  .grid-2-1 { display:grid; grid-template-columns: 2fr 1fr; gap:16px; margin-bottom:24px; }
+
+  /* ── CARDS ── */
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow:hidden; transition: background .3s, border-color .3s; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .card-header h3 { font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; }
+  .card-header .card-action { font-size:12px; color: var(--accent); cursor:pointer; font-weight:500; }
+  .card-body { padding: 16px 20px; }
+
+  /* ── COMPLIANCE WASHING PANEL ── */
+  .cw-panel { border-left: 3px solid var(--red); }
+  .cw-panel .card-header { background: var(--red-bg); }
+  .cw-panel .card-header h3 { color: var(--red); }
+  .cw-alert { padding: 12px 14px; border-radius:7px; background: var(--cw-alert-bg); margin-bottom:10px; font-size:12.5px; line-height:1.55; color: var(--text); border: 1px solid var(--border); cursor:pointer; transition: all .2s; }
+  .cw-alert:last-child { margin-bottom:0; }
+  .cw-alert:hover { border-color: var(--red); }
+  .cw-alert-summary { display:flex; gap:10px; align-items:flex-start; }
+  .cw-alert .cw-severity { flex-shrink:0; width:8px; height:8px; border-radius:50%; margin-top:5px; }
+  .cw-severity.high { background: var(--red); }
+  .cw-severity.medium { background: var(--yellow); }
+  .cw-alert .cw-meta { font-size:11px; color: var(--text-muted); margin-top:4px; }
+  .cw-alert .cw-expand-icon { margin-left:auto; flex-shrink:0; font-size:14px; color:var(--text-muted); transition: transform .2s; }
+  .cw-alert.expanded .cw-expand-icon { transform: rotate(180deg); }
+  .cw-detail { max-height:0; overflow:hidden; transition: max-height .3s ease, padding .3s ease; padding:0 14px; }
+  .cw-alert.expanded .cw-detail { max-height:500px; padding:14px 14px 4px; }
+  .cw-detail-inner { border-top:1px solid var(--border); padding-top:12px; }
+  .cw-detail-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px; }
+  .cw-detail-row .label { color: var(--text-muted); font-weight:500; }
+  .cw-detail-row .value { font-weight:600; color: var(--text); }
+  .cw-detail-actions { display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border); }
+
+  /* ── CONTROLS TABLE ── */
+  .controls-table { width:100%; font-size:12.5px; border-collapse:collapse; }
+  .controls-table th { text-align:left; font-weight:600; color: var(--text-secondary); font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .controls-table td { padding: 10px 12px; border-bottom: 1px solid var(--table-border); vertical-align:middle; }
+  .controls-table tr:hover td { background: var(--table-row-hover); }
+  .controls-table .ctrl-id { font-weight:600; color: var(--accent); white-space:nowrap; }
+  .status-dot { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:500; }
+  .status-dot::before { content:''; width:7px; height:7px; border-radius:50%; }
+  .status-dot.green::before { background: var(--green); }
+  .status-dot.yellow::before { background: var(--yellow); }
+  .status-dot.red::before { background: var(--red); }
+  .status-dot.gray::before { background: #CBD5E1; }
+  .hitl-inline { font-size:10px; padding: 2px 7px; border-radius:3px; font-weight:600; white-space:nowrap; }
+  .fw-tag { display:inline-block; font-size:10px; padding: 2px 6px; border-radius:3px; margin-right:3px; background: var(--accent-light); color: var(--text-secondary); font-weight:500; }
+
+  /* ── REGULATORY FEED ── */
+  .reg-item { padding: 12px 0; border-bottom: 1px solid var(--table-border); display:flex; gap:12px; align-items:flex-start; }
+  .reg-item:last-child { border-bottom:none; }
+  .reg-icon { width:32px; height:32px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .reg-icon.update { background: var(--accent-light); color: var(--accent); }
+  .reg-icon.deadline { background: var(--red-bg); color: var(--red); }
+  .reg-icon.info { background: var(--green-bg); color: var(--green); }
+  .reg-item .reg-text { font-size:12.5px; line-height:1.5; }
+  .reg-item .reg-text strong { font-weight:600; }
+  .reg-item .reg-date { font-size:11px; color: var(--text-muted); margin-top:2px; }
+
+  /* ── PENDING ACTIONS ── */
+  .action-item { padding:12px 0; border-bottom: 1px solid var(--table-border); display:flex; align-items:center; gap:12px; }
+  .action-item:last-child { border-bottom:none; }
+  .action-priority { width:4px; height:32px; border-radius:2px; flex-shrink:0; }
+  .action-priority.p-high { background: var(--red); }
+  .action-priority.p-med { background: var(--yellow); }
+  .action-priority.p-low { background: var(--green); }
+  .action-item .action-text { flex:1; font-size:12.5px; line-height:1.45; }
+  .action-item .action-text small { display:block; color: var(--text-muted); font-size:11px; margin-top:2px; }
+  .action-hitl { flex-shrink:0; }
+
+  /* ── PAGE VIEWS (switchable content) ── */
+  .page-view { display:none; animation: fadeIn .35s ease; }
+  .page-view.active { display:block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .page-title { font-size:20px; font-weight:700; margin-bottom:6px; letter-spacing:-.3px; }
+  .page-desc { font-size:13.5px; color: var(--text-secondary); margin-bottom:24px; line-height:1.5; }
+  .empty-state { text-align:center; padding:48px 24px; }
+  .empty-state .es-icon { font-size:40px; margin-bottom:12px; }
+  .empty-state .es-title { font-size:16px; font-weight:600; margin-bottom:6px; }
+  .empty-state .es-desc { font-size:13px; color:var(--text-secondary); max-width:400px; margin:0 auto 20px; line-height:1.5; }
+  .stat-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:14px; margin-bottom:24px; }
+  .stat-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); }
+  .stat-card .stat-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+  .stat-card .stat-value { font-size:28px; font-weight:700; }
+  .stat-card .stat-sub { font-size:11px; color:var(--text-secondary); margin-top:4px; }
+  .mini-table { width:100%; font-size:12.5px; border-collapse:collapse; }
+  .mini-table th { text-align:left; font-weight:600; color:var(--text-secondary); font-size:11px; text-transform:uppercase; letter-spacing:.5px; padding:10px 14px; border-bottom:1px solid var(--border); background:var(--bg); }
+  .mini-table td { padding:10px 14px; border-bottom:1px solid var(--table-border); }
+  .mini-table tr:hover td { background:var(--table-row-hover); }
+  .progress-bar { height:8px; background:var(--border); border-radius:4px; overflow:hidden; flex:1; }
+  .progress-bar-fill { height:100%; border-radius:4px; }
+
+  /* ── DANI AI CHAT WIDGET ── */
+  .dani-chat-fab { position:fixed; bottom:24px; right:28px; width:52px; height:52px; border-radius:50%; background: linear-gradient(135deg, #4F6EF7, #8B5CF6); color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; box-shadow: 0 4px 16px rgba(79,110,247,.35); z-index:200; transition: transform .15s; }
+  .dani-chat-fab:hover { transform: scale(1.08); }
+  .dani-chat-panel { position:fixed; bottom:88px; right:28px; width:370px; max-height:480px; border-radius:14px; background:var(--card); box-shadow: 0 12px 40px rgba(0,0,0,.15); z-index:200; overflow:hidden; display:none; flex-direction:column; }
+  .dani-chat-panel.open { display:flex; }
+  .dani-chat-header { padding:16px 20px; background: linear-gradient(135deg, #4F6EF7, #8B5CF6); color:#fff; display:flex; align-items:center; gap:10px; }
+  .dani-chat-header .dani-avatar { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .dani-chat-header .dani-name { font-weight:600; font-size:14px; }
+  .dani-chat-header .dani-status { font-size:11px; opacity:.75; }
+  .dani-chat-header .close-chat { margin-left:auto; cursor:pointer; font-size:18px; opacity:.7; }
+  .dani-chat-header .close-chat:hover { opacity:1; }
+  .dani-chat-body { flex:1; padding:16px; overflow-y:auto; max-height:340px; }
+  .chat-bubble { max-width:85%; padding:10px 14px; border-radius:12px; font-size:13px; line-height:1.5; margin-bottom:10px; animation: fadeIn .3s ease; }
+  .chat-bubble.ai { background: var(--accent-light); color: var(--text); border-bottom-left-radius:4px; }
+  .chat-bubble.user { background: var(--accent); color:#fff; margin-left:auto; border-bottom-right-radius:4px; }
+  .dani-chat-input { padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; }
+  .dani-chat-input input { flex:1; border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; outline:none; background:var(--bg); color:var(--text); }
+  .dani-chat-input input:focus { border-color: var(--accent); }
+  .dani-chat-input button { background: var(--accent); color:#fff; border:none; border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; }
+
+  /* ── OVERLAYS ── */
+  .view-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:300; align-items:center; justify-content:center; }
+  .view-overlay.open { display:flex; }
+  .view-overlay-card { background:var(--card); border-radius:14px; padding:32px; max-width:500px; width:90%; box-shadow: 0 20px 60px rgba(0,0,0,.2); max-height:90vh; overflow-y:auto; }
+  .view-overlay-card h2 { font-size:18px; font-weight:700; margin-bottom:6px; }
+  .view-overlay-card p { font-size:13px; color: var(--text-secondary); margin-bottom:20px; line-height:1.5; }
+  .profile-option { padding:14px 16px; border:1.5px solid var(--border); border-radius:10px; margin-bottom:10px; cursor:pointer; transition: all .15s; display:flex; align-items:center; gap:12px; }
+  .profile-option:hover { border-color: var(--accent); background: var(--accent-light); }
+  .profile-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .profile-option .po-icon { font-size:22px; }
+  .profile-option .po-label { font-weight:600; font-size:13.5px; }
+  .profile-option .po-desc { font-size:12px; color: var(--text-secondary); margin-top:2px; }
+
+  /* ── SETTINGS PANEL ── */
+  .settings-group { margin-bottom:24px; }
+  .settings-group-title { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.8px; color:var(--text-muted); margin-bottom:12px; }
+  .setting-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--table-border); }
+  .setting-row:last-child { border-bottom:none; }
+  .setting-label { font-size:13.5px; font-weight:500; }
+  .setting-label small { display:block; font-size:11.5px; color:var(--text-muted); font-weight:400; margin-top:2px; }
+  .toggle { width:44px; height:24px; border-radius:12px; background:var(--border); position:relative; cursor:pointer; transition: background .2s; flex-shrink:0; }
+  .toggle.on { background:var(--accent); }
+  .toggle::after { content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:#fff; top:3px; left:3px; transition: transform .2s; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+  .toggle.on::after { transform: translateX(20px); }
+  select.setting-select { padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:13px; background:var(--card); color:var(--text); cursor:pointer; outline:none; min-width:140px; }
+  select.setting-select:focus { border-color:var(--accent); }
+
+  /* ── TOOLTIP ── */
+  .tooltip-wrap { position:relative; display:inline-flex; }
+  .tooltip-wrap .tooltip-text { display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background: var(--sidebar-bg); color:#fff; font-size:11px; padding:6px 10px; border-radius:6px; white-space:nowrap; z-index:50; pointer-events:none; }
+  .tooltip-wrap:hover .tooltip-text { display:block; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:#D1D5DB; border-radius:3px; }
+  [data-theme="dark"] ::-webkit-scrollbar-thumb { background:#3A3F52; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width:1100px) { .health-row { grid-template-columns: 1fr 1fr; } .grid-2, .grid-2-1 { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">D</div>
+    <div class="sidebar-brand">Dani Platform<small>v4 — Compliance Intelligence</small></div>
+  </div>
+
+  <div class="sidebar-profile-label">Organization Profile</div>
+  <div class="sidebar-profile-badge established" id="profileBadge" onclick="openProfileOverlay()">
+    <span class="dot"></span>
+    <span id="profileLabel">Established</span>
+    <span style="margin-left:auto; font-size:11px; opacity:.6;">Change ›</span>
+  </div>
+
+  <div class="nav-toggle-bar">
+    <div class="nav-toggle-btn active" onclick="setNavView('process')">By Process</div>
+    <div class="nav-toggle-btn" onclick="setNavView('module')">By Module</div>
+  </div>
+
+  <!-- PROCESS NAV -->
+  <div id="processNav">
+    <div class="nav-section-label">Compliance Journey</div>
+    <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard', this)">
+      <span class="step-num">1</span> Dashboard
+    </div>
+    <div class="nav-item completed" data-page="understand" onclick="navigateTo('understand', this)">
+      <span class="step-num">&#10003;</span> Understand My Situation
+    </div>
+    <div class="nav-item" data-page="documents" onclick="navigateTo('documents', this)">
+      <span class="step-num">3</span> Document Controls
+      <span class="badge-warn">4</span>
+    </div>
+    <div class="nav-item" data-page="risks" onclick="navigateTo('risks', this)">
+      <span class="step-num">4</span> Manage Risks
+    </div>
+    <div class="nav-item" data-page="evidence" onclick="navigateTo('evidence', this)">
+      <span class="step-num">5</span> Collect Evidence
+      <span class="badge-count">7</span>
+    </div>
+    <div class="nav-item" data-page="findings" onclick="navigateTo('findings', this)">
+      <span class="step-num">6</span> Manage Findings
+    </div>
+    <div class="nav-item" data-page="audit" onclick="navigateTo('audit', this)">
+      <span class="step-num">7</span> Prepare for Audit
+    </div>
+    <div class="nav-section-label">Intelligence</div>
+    <div class="nav-item" data-page="integrity" onclick="navigateTo('integrity', this)">
+      <span class="icon">&#9888;</span> Compliance Integrity
+      <span class="badge-count">3</span>
+    </div>
+    <div class="nav-item" data-page="regfeed" onclick="navigateTo('regfeed', this)">
+      <span class="icon">&#128225;</span> Regulatory Feed
+      <span class="badge-warn">2</span>
+    </div>
+  </div>
+
+  <!-- MODULE NAV -->
+  <div id="moduleNav" style="display:none;">
+    <div class="nav-section-label">Core Modules</div>
+    <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard', this)"><span class="icon">&#128202;</span> Dashboard</div>
+    <div class="nav-item" data-page="understand" onclick="navigateTo('understand', this)"><span class="icon">&#128269;</span> Gap Analysis</div>
+    <div class="nav-item" data-page="documents" onclick="navigateTo('documents', this)"><span class="icon">&#128196;</span> Document Generator</div>
+    <div class="nav-item" data-page="documents" onclick="navigateTo('documents', this)"><span class="icon">&#128203;</span> SOA Management</div>
+    <div class="nav-item" data-page="risks" onclick="navigateTo('risks', this)"><span class="icon">&#128506;</span> Risk Map</div>
+    <div class="nav-item" data-page="evidence" onclick="navigateTo('evidence', this)"><span class="icon">&#128230;</span> Evidence Center</div>
+    <div class="nav-item" data-page="findings" onclick="navigateTo('findings', this)"><span class="icon">&#128295;</span> CAPA Tracker</div>
+    <div class="nav-item" data-page="audit" onclick="navigateTo('audit', this)"><span class="icon">&#127963;</span> Audit Room</div>
+    <div class="nav-section-label">Intelligence</div>
+    <div class="nav-item" data-page="integrity" onclick="navigateTo('integrity', this)"><span class="icon">&#9888;</span> Compliance Integrity</div>
+    <div class="nav-item" data-page="regfeed" onclick="navigateTo('regfeed', this)"><span class="icon">&#128225;</span> Regulatory Feed</div>
+    <div class="nav-section-label">Regulatory Modules</div>
+    <div class="nav-item" data-page="dora" onclick="navigateTo('dora', this)"><span class="icon">&#127974;</span> DORA Module</div>
+    <div class="nav-item" data-page="euai" onclick="navigateTo('euai', this)"><span class="icon">&#129302;</span> EU AI Act</div>
+  </div>
+
+  <div style="margin-top:auto;">
+    <div class="nav-section-label">Settings</div>
+    <div class="nav-item" data-page="escalation" onclick="navigateTo('escalation', this)"><span class="icon">&#9881;</span> Escalation Rules</div>
+    <div class="nav-item" data-page="integrations" onclick="navigateTo('integrations', this)"><span class="icon">&#128279;</span> Integrations</div>
+    <div class="nav-item" data-page="settings" onclick="navigateTo('settings', this)"><span class="icon">&#9881;</span> Settings</div>
+    <div class="sidebar-footer">
+      <div class="avatar">MK</div>
+      <div class="user-info">Max Kellner<small>CISO · WellQ</small></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════ MAIN CONTENT ═══════════ -->
+<div class="main">
+
+<!-- ============================== -->
+<!-- PAGE: DASHBOARD                -->
+<!-- ============================== -->
+<div class="page-view active" id="page-dashboard">
+  <div class="topbar">
+    <h1>Dashboard <small>· WellQ Security Program</small></h1>
+    <div class="topbar-actions">
+      <button class="btn" onclick="openProfileOverlay()">&#9881; Profile: Established</button>
+      <button class="btn">&#128229; Export Report</button>
+      <button class="btn btn-primary">+ Add Framework</button>
+    </div>
+  </div>
+
+  <div class="frameworks-strip">
+    <div class="fw-chip active"><span class="fw-dot voluntary"></span>ISO 27001:2022</div>
+    <div class="fw-chip active"><span class="fw-dot mandatory"></span>DORA</div>
+    <div class="fw-chip"><span class="fw-dot mandatory"></span>GDPR</div>
+    <div class="fw-chip"><span class="fw-dot voluntary"></span>SOC 2 Type II</div>
+    <div class="fw-chip"><span class="fw-dot mandatory"></span>NIS2</div>
+    <div class="fw-chip" style="border-style:dashed; color:var(--text-muted);">+ Add framework</div>
+  </div>
+
+  <!-- TRIPLE HEALTH SCORES -->
+  <div class="health-row">
+    <div class="health-card overall">
+      <div class="health-label">Overall Compliance Health
+        <span class="tooltip-wrap" style="cursor:help;">&#8505;<span class="tooltip-text">Weighted average of Documentation, Implementation, and Tested scores</span></span>
+      </div>
+      <div class="health-value" style="color:var(--accent);">72<span style="font-size:18px; font-weight:400;">%</span></div>
+      <div class="health-bar"><div class="health-bar-fill" style="width:72%; background:linear-gradient(90deg,#4F6EF7,#818CF8);"></div></div>
+      <div class="health-delta up">&#8593; 4% from last month</div>
+    </div>
+    <div class="health-card doc">
+      <span class="hitl-badge hitl-auto">&#129302; Auto-tracked</span>
+      <div class="health-label">&#128196; Documentation</div>
+      <div class="health-value" style="color:var(--green);">92<span style="font-size:18px; font-weight:400;">%</span></div>
+      <div class="health-bar"><div class="health-bar-fill" style="width:92%;"></div></div>
+      <div class="health-delta up">&#8593; 2% · 3 docs pending review</div>
+    </div>
+    <div class="health-card impl">
+      <span class="hitl-badge hitl-review">&#128065; Review needed</span>
+      <div class="health-label">&#128295; Implementation</div>
+      <div class="health-value" style="color:var(--yellow);">78<span style="font-size:18px; font-weight:400;">%</span></div>
+      <div class="health-bar"><div class="health-bar-fill" style="width:78%;"></div></div>
+      <div class="health-delta up">&#8593; 6% · 8 controls unverified</div>
+    </div>
+    <div class="health-card tested">
+      <span class="hitl-badge hitl-human">&#128100; Human required</span>
+      <div class="health-label">&#129514; Tested / Effective</div>
+      <div class="health-value" style="color:var(--red);">45<span style="font-size:18px; font-weight:400;">%</span></div>
+      <div class="health-bar"><div class="health-bar-fill" style="width:45%;"></div></div>
+      <div class="health-delta down">&#8595; 2% · 14 controls untested</div>
+    </div>
+  </div>
+
+  <!-- COMPLIANCE WASHING + REG FEED -->
+  <div class="grid-2-1">
+    <div class="card cw-panel">
+      <div class="card-header">
+        <h3>&#9888; Compliance Integrity Alerts</h3>
+        <span class="card-action" onclick="navigateTo('integrity')">View all 6 alerts &#8594;</span>
+      </div>
+      <div class="card-body" id="cwAlerts">
+        <!-- Alert 1 -->
+        <div class="cw-alert" onclick="toggleAlert(this)">
+          <div class="cw-alert-summary">
+            <span class="cw-severity high"></span>
+            <div>
+              <strong>12 controls</strong> marked "Implemented" have no effectiveness test in the last 12 months.
+              <div class="cw-meta">Affects: A.5.24, A.8.13, A.5.15 + 9 more · Severity: High</div>
+            </div>
+            <span class="cw-expand-icon">&#9660;</span>
+          </div>
+          <div class="cw-detail">
+            <div class="cw-detail-inner">
+              <div class="cw-detail-row"><span class="label">Affected Controls</span><span class="value">A.5.24, A.8.13, A.5.15, A.5.29, A.8.9, A.8.1, A.6.1, A.5.23, A.8.5, A.8.12, A.7.1, A.5.10</span></div>
+              <div class="cw-detail-row"><span class="label">Last Effectiveness Test</span><span class="value" style="color:var(--red);">None in last 12 months</span></div>
+              <div class="cw-detail-row"><span class="label">Risk Level</span><span class="value"><span class="hitl-inline hitl-human">&#128308; High — Audit finding likely</span></span></div>
+              <div class="cw-detail-row"><span class="label">Recommendation</span><span class="value">Schedule penetration test + tabletop exercise covering critical controls within 30 days.</span></div>
+              <div class="cw-detail-actions">
+                <button class="btn btn-sm btn-primary">Schedule Tests</button>
+                <button class="btn btn-sm">Assign to Team</button>
+                <button class="btn btn-sm">Dismiss</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Alert 2 -->
+        <div class="cw-alert" onclick="toggleAlert(this)">
+          <div class="cw-alert-summary">
+            <span class="cw-severity high"></span>
+            <div>
+              Access control policy approved <strong>14 months ago</strong> — no evidence of quarterly access review process occurring.
+              <div class="cw-meta">Control: A.5.15 · Expected: Q4 2025 review · Severity: High</div>
+            </div>
+            <span class="cw-expand-icon">&#9660;</span>
+          </div>
+          <div class="cw-detail">
+            <div class="cw-detail-inner">
+              <div class="cw-detail-row"><span class="label">Control</span><span class="value">A.5.15 — Access Control</span></div>
+              <div class="cw-detail-row"><span class="label">Policy Approved</span><span class="value">Jan 15, 2025 (14 months ago)</span></div>
+              <div class="cw-detail-row"><span class="label">Expected Review Cycle</span><span class="value">Quarterly (Q1, Q2, Q3, Q4)</span></div>
+              <div class="cw-detail-row"><span class="label">Reviews Completed</span><span class="value" style="color:var(--red);">0 of 4 expected</span></div>
+              <div class="cw-detail-row"><span class="label">Mapped Frameworks</span><span class="value"><span class="fw-tag">ISO 27001</span><span class="fw-tag">DORA</span><span class="fw-tag">NIS2</span></span></div>
+              <div class="cw-detail-actions">
+                <button class="btn btn-sm btn-primary">Start Access Review</button>
+                <button class="btn btn-sm">View Policy</button>
+                <button class="btn btn-sm">Create CAPA</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Alert 3 -->
+        <div class="cw-alert" onclick="toggleAlert(this)">
+          <div class="cw-alert-summary">
+            <span class="cw-severity medium"></span>
+            <div>
+              Overall score is <strong>72%</strong> but <strong>0%</strong> of critical controls have been tested under real conditions.
+              <div class="cw-meta">Critical controls: A.5.24, A.8.13 · Severity: Medium</div>
+            </div>
+            <span class="cw-expand-icon">&#9660;</span>
+          </div>
+          <div class="cw-detail">
+            <div class="cw-detail-inner">
+              <div class="cw-detail-row"><span class="label">Overall Health Score</span><span class="value">72%</span></div>
+              <div class="cw-detail-row"><span class="label">Critical Controls Tested</span><span class="value" style="color:var(--red);">0%</span></div>
+              <div class="cw-detail-row"><span class="label">Why This Matters</span><span class="value">A high overall score with zero tested critical controls is a classic indicator of compliance washing — documentation exists but real-world resilience is unverified.</span></div>
+              <div class="cw-detail-actions">
+                <button class="btn btn-sm btn-primary">Plan Testing Sprint</button>
+                <button class="btn btn-sm">View Critical Controls</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Alert 4 -->
+        <div class="cw-alert" onclick="toggleAlert(this)">
+          <div class="cw-alert-summary">
+            <span class="cw-severity medium"></span>
+            <div>
+              3 auto-collected AWS evidences show correct config, but open CAPA <strong>NC-2024-015</strong> on same control is 45 days stale.
+              <div class="cw-meta">Control: A.8.9 · CAPA age: 45 days · Severity: Medium</div>
+            </div>
+            <span class="cw-expand-icon">&#9660;</span>
+          </div>
+          <div class="cw-detail">
+            <div class="cw-detail-inner">
+              <div class="cw-detail-row"><span class="label">Control</span><span class="value">A.8.9 — Configuration Management</span></div>
+              <div class="cw-detail-row"><span class="label">Auto-Collected Evidence</span><span class="value" style="color:var(--green);">3 AWS configs — all passing</span></div>
+              <div class="cw-detail-row"><span class="label">Open CAPA</span><span class="value" style="color:var(--red);">NC-2024-015 — 45 days without progress</span></div>
+              <div class="cw-detail-row"><span class="label">Contradiction</span><span class="value">Automated evidence says "compliant" but an open non-conformity on the same control has not been resolved. This suggests the auto-evidence may not capture the full picture.</span></div>
+              <div class="cw-detail-actions">
+                <button class="btn btn-sm btn-primary">Review CAPA</button>
+                <button class="btn btn-sm">Inspect Evidence</button>
+                <button class="btn btn-sm">Escalate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regulatory Feed -->
+    <div class="card">
+      <div class="card-header">
+        <h3>&#128225; Regulatory Feed</h3>
+        <span class="card-action" onclick="navigateTo('regfeed')">View all &#8594;</span>
+      </div>
+      <div class="card-body">
+        <div class="reg-item"><div class="reg-icon deadline">&#9200;</div><div><div class="reg-text"><strong>DORA TLPT deadline</strong> — Significant entities must complete first round by Q2 2026.</div><div class="reg-date">Deadline: Jun 30, 2026 · 92 days left</div></div></div>
+        <div class="reg-item"><div class="reg-icon update">&#128203;</div><div><div class="reg-text"><strong>NIS2 transposition update</strong> — Spain published national transposition with sector-specific annexes.</div><div class="reg-date">Published: Mar 14, 2026 · Affects your profile</div></div></div>
+        <div class="reg-item"><div class="reg-icon info">&#10003;</div><div><div class="reg-text"><strong>ISO 27001:2022</strong> — No changes. Next review cycle: 2028.</div><div class="reg-date">Status: Current · No action needed</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS TABLE -->
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+      <h3>&#127899; Control Status — Cross-Framework View</h3>
+      <span class="card-action">View SOA &#8594;</span>
+    </div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table class="controls-table">
+        <thead><tr><th>Control</th><th>Description</th><th>Documented</th><th>Implemented</th><th>Tested</th><th>Frameworks</th><th>Decision Level</th></tr></thead>
+        <tbody>
+          <tr><td class="ctrl-id">A.5.15</td><td>Access control</td><td><span class="status-dot green">Done</span></td><td><span class="status-dot yellow">Partial</span></td><td><span class="status-dot red">Overdue</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span><span class="fw-tag">NIS2</span></td><td><span class="hitl-inline hitl-human">&#128100; Human</span></td></tr>
+          <tr><td class="ctrl-id">A.5.24</td><td>Incident management</td><td><span class="status-dot green">Done</span></td><td><span class="status-dot green">Done</span></td><td><span class="status-dot red">Not tested</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA Art.17</span></td><td><span class="hitl-inline hitl-human">&#128100; Human</span></td></tr>
+          <tr><td class="ctrl-id">A.8.13</td><td>Information backup</td><td><span class="status-dot green">Done</span></td><td><span class="status-dot green">Done</span></td><td><span class="status-dot yellow">Scheduled</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span></td><td><span class="hitl-inline hitl-review">&#128065; Review</span></td></tr>
+          <tr><td class="ctrl-id">A.8.24</td><td>Use of cryptography</td><td><span class="status-dot green">Done</span></td><td><span class="status-dot green">Done</span></td><td><span class="status-dot green">Passed</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">PCI 3.5</span><span class="fw-tag">DORA Art.9</span></td><td><span class="hitl-inline hitl-auto">&#129302; Auto</span></td></tr>
+          <tr><td class="ctrl-id">A.5.29</td><td>Business continuity</td><td><span class="status-dot green">Done</span></td><td><span class="status-dot yellow">Partial</span></td><td><span class="status-dot gray">Not started</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA Art.11</span></td><td><span class="hitl-inline hitl-human">&#128100; Human</span></td></tr>
+          <tr><td class="ctrl-id">A.5.31</td><td>Legal requirements</td><td><span class="status-dot yellow">Draft</span></td><td><span class="status-dot gray">Pending</span></td><td><span class="status-dot gray">—</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">GDPR</span></td><td><span class="hitl-inline hitl-review">&#128065; Review</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PRIORITY ACTIONS + PRE-AUDIT -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><h3>&#128204; Priority Actions</h3><span class="card-action">View all 12 &#8594;</span></div>
+      <div class="card-body">
+        <div class="action-item"><div class="action-priority p-high"></div><div class="action-text">Schedule penetration test for critical controls (A.5.24, A.8.13)<small>Effectiveness testing · Due: Apr 15, 2026</small></div><div class="action-hitl"><span class="hitl-inline hitl-human">&#128100; Human</span></div></div>
+        <div class="action-item"><div class="action-priority p-high"></div><div class="action-text">Complete quarterly access review for A.5.15<small>14 months since last review · Compliance integrity alert</small></div><div class="action-hitl"><span class="hitl-inline hitl-human">&#128100; Human</span></div></div>
+        <div class="action-item"><div class="action-priority p-med"></div><div class="action-text">Resolve open CAPA NC-2024-015 (cloud configuration)<small>Open 45 days · Contradicts auto-collected evidence</small></div><div class="action-hitl"><span class="hitl-inline hitl-review">&#128065; Review</span></div></div>
+        <div class="action-item"><div class="action-priority p-med"></div><div class="action-text">Review and approve 3 generated policy documents<small>Document Generator · Ready for CISO sign-off</small></div><div class="action-hitl"><span class="hitl-inline hitl-review">&#128065; Review</span></div></div>
+        <div class="action-item"><div class="action-priority p-low"></div><div class="action-text">Connect Azure AD for automated evidence collection<small>Integration · Reduces manual evidence effort by ~30%</small></div><div class="action-hitl"><span class="hitl-inline hitl-auto">&#129302; Auto</span></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>&#127963; Pre-Audit Self-Assessment</h3><span class="card-action" onclick="navigateTo('audit')">Full report &#8594;</span></div>
+      <div class="card-body">
+        <div style="text-align:center; padding:12px 0 20px;">
+          <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:8px;">Estimated Audit Readiness</div>
+          <div style="font-size:44px; font-weight:700; color:var(--yellow);">68<span style="font-size:20px;">%</span></div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">3 high-risk non-conformity areas detected</div>
+        </div>
+        <div style="border-top:1px solid var(--border); padding-top:14px;">
+          <div style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--text-muted); letter-spacing:.5px; margin-bottom:10px;">Likely Audit Findings</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><span style="width:8px; height:8px; border-radius:50%; background:var(--red); flex-shrink:0;"></span><span style="font-size:12.5px;">Access management — evidence expired</span></div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><span style="width:8px; height:8px; border-radius:50%; background:var(--red); flex-shrink:0;"></span><span style="font-size:12.5px;">Business continuity — no recovery test in 2025</span></div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;"><span style="width:8px; height:8px; border-radius:50%; background:var(--red); flex-shrink:0;"></span><span style="font-size:12.5px;">Incident management — CAPA open 45+ days</span></div>
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:8px; height:8px; border-radius:50%; background:var(--yellow); flex-shrink:0;"></span><span style="font-size:12.5px;">Cryptography policy — draft not yet approved</span></div>
+        </div>
+        <div style="margin-top:16px; text-align:center;"><button class="btn btn-primary" style="width:100%; justify-content:center;">Generate Pre-Audit Report</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HITL LEGEND -->
+  <div style="margin-top:8px; padding:14px 20px; background:var(--card); border-radius:var(--radius); border:1px solid var(--border); display:flex; gap:24px; align-items:center; font-size:12px; color:var(--text-secondary); box-shadow:var(--shadow); flex-wrap:wrap;">
+    <strong style="color:var(--text); font-size:11px; text-transform:uppercase; letter-spacing:.5px;">Decision Level Legend:</strong>
+    <span><span class="hitl-inline hitl-auto" style="margin-right:4px;">&#129302; Auto</span> System executes without intervention</span>
+    <span><span class="hitl-inline hitl-review" style="margin-right:4px;">&#128065; Review</span> AI proposes, human validates</span>
+    <span><span class="hitl-inline hitl-human" style="margin-right:4px;">&#128100; Human</span> Requires human decision — legal/regulatory implications</span>
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- PAGE: MANAGE RISKS             -->
+<!-- ============================== -->
+<div class="page-view" id="page-risks">
+  <div class="topbar"><h1>Manage Risks <small>· Risk Map</small></h1><div class="topbar-actions"><button class="btn">&#128229; Export</button><button class="btn btn-primary">+ Add Risk</button></div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total Risks Identified</div><div class="stat-value">24</div><div class="stat-sub">Across 4 risk categories</div></div>
+    <div class="stat-card"><div class="stat-label">High / Critical Risks</div><div class="stat-value" style="color:var(--red);">6</div><div class="stat-sub">3 require immediate treatment</div></div>
+    <div class="stat-card"><div class="stat-label">Risks with Treatment Plans</div><div class="stat-value" style="color:var(--green);">18 / 24</div><div class="stat-sub">75% coverage</div></div>
+  </div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header"><h3>&#128506; Risk Register</h3><span class="card-action">Open Risk Map &#8594;</span></div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table class="mini-table">
+        <thead><tr><th>ID</th><th>Risk</th><th>Category</th><th>Likelihood</th><th>Impact</th><th>Level</th><th>Treatment</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600; color:var(--accent);">R-001</td><td>Ransomware attack on production systems</td><td>Cyber Threat</td><td>High (4)</td><td>Critical (5)</td><td><span class="hitl-inline hitl-human" style="background:var(--red-bg); color:var(--red);">Critical</span></td><td>Mitigate</td><td>CISO</td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">R-002</td><td>Unauthorized access to customer PII</td><td>Data Protection</td><td>Medium (3)</td><td>High (4)</td><td><span class="hitl-inline hitl-human" style="background:var(--red-bg); color:var(--red);">High</span></td><td>Mitigate</td><td>DPO</td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">R-003</td><td>Third-party ICT provider failure</td><td>Supply Chain</td><td>Medium (3)</td><td>High (4)</td><td><span class="hitl-inline hitl-human" style="background:var(--red-bg); color:var(--red);">High</span></td><td>Transfer</td><td>IT Dir.</td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">R-004</td><td>Business continuity plan untested</td><td>Operational</td><td>Medium (3)</td><td>Medium (3)</td><td><span class="hitl-inline hitl-review" style="background:var(--yellow-bg); color:#B47A14;">Medium</span></td><td>Mitigate</td><td>COO</td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">R-005</td><td>Regulatory non-compliance (DORA)</td><td>Compliance</td><td>Medium (3)</td><td>High (4)</td><td><span class="hitl-inline hitl-human" style="background:var(--red-bg); color:var(--red);">High</span></td><td>Mitigate</td><td>CISO</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="padding:16px 20px; background:var(--card); border:1px solid var(--border); border-radius:var(--radius); font-size:12.5px; color:var(--text-secondary);">
+    <strong>&#128161; Sector Benchmark:</strong> For financial services organizations of your size, the average ransomware probability is rated 3-4 (Medium-High). Your current rating of 4 aligns with industry benchmarks.
+    <span class="hitl-inline hitl-review" style="margin-left:8px;">&#128065; Review</span>
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- PAGE: COLLECT EVIDENCE         -->
+<!-- ============================== -->
+<div class="page-view" id="page-evidence">
+  <div class="topbar"><h1>Collect Evidence <small>· Evidence Center</small></h1><div class="topbar-actions"><button class="btn">&#128279; Manage Connectors</button><button class="btn btn-primary">+ Upload Evidence</button></div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total Evidence Items</div><div class="stat-value">142</div><div class="stat-sub">Across 93 controls</div></div>
+    <div class="stat-card"><div class="stat-label">Auto-Collected (Config)</div><div class="stat-value" style="color:var(--green);">87</div><div class="stat-sub"><span class="hitl-inline hitl-auto">&#129302; Auto</span> From AWS, Azure, Okta</div></div>
+    <div class="stat-card"><div class="stat-label">Effectiveness Evidence</div><div class="stat-value" style="color:var(--red);">12</div><div class="stat-sub"><span class="hitl-inline hitl-human">&#128100; Human</span> Pen tests, tabletops, drills</div></div>
+  </div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header"><h3>&#128230; Evidence by Type</h3><span class="card-action">View all evidence &#8594;</span></div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table class="mini-table">
+        <thead><tr><th>Evidence Type</th><th>Count</th><th>Coverage</th><th>Decision Level</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>&#9881; Configuration Evidence (AWS, Azure)</td><td>87</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="progress-bar-fill" style="width:82%; background:var(--green);"></div></div><span style="font-size:11px;">82%</span></div></td><td><span class="hitl-inline hitl-auto">&#129302; Auto</span></td><td><span class="status-dot green">Current</span></td></tr>
+          <tr><td>&#128196; Policy & Procedure Documents</td><td>43</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="progress-bar-fill" style="width:92%; background:var(--green);"></div></div><span style="font-size:11px;">92%</span></div></td><td><span class="hitl-inline hitl-review">&#128065; Review</span></td><td><span class="status-dot yellow">3 expiring</span></td></tr>
+          <tr><td>&#129514; Penetration Test Reports</td><td>4</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="progress-bar-fill" style="width:35%; background:var(--red);"></div></div><span style="font-size:11px;">35%</span></div></td><td><span class="hitl-inline hitl-human">&#128100; Human</span></td><td><span class="status-dot red">Gaps</span></td></tr>
+          <tr><td>&#127891; Tabletop Exercise Results</td><td>2</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="progress-bar-fill" style="width:20%; background:var(--red);"></div></div><span style="font-size:11px;">20%</span></div></td><td><span class="hitl-inline hitl-human">&#128100; Human</span></td><td><span class="status-dot red">Insufficient</span></td></tr>
+          <tr><td>&#128260; Backup Restoration Tests</td><td>6</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="progress-bar"><div class="progress-bar-fill" style="width:55%; background:var(--yellow);"></div></div><span style="font-size:11px;">55%</span></div></td><td><span class="hitl-inline hitl-human">&#128100; Human</span></td><td><span class="status-dot yellow">Partial</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="padding:14px 20px; background:var(--yellow-bg); border:1px solid var(--yellow); border-radius:var(--radius); font-size:12.5px; color:var(--text);">
+    <strong>&#9888; Effectiveness Gap:</strong> 82% of evidence is configuration-based (auto-collected). Only 8% covers real-world effectiveness testing. Auditors will flag this imbalance.
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- PAGE: MANAGE FINDINGS          -->
+<!-- ============================== -->
+<div class="page-view" id="page-findings">
+  <div class="topbar"><h1>Manage Findings <small>· CAPA Tracker</small></h1><div class="topbar-actions"><button class="btn">&#128229; Export</button><button class="btn btn-primary">+ New CAPA</button></div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Open CAPAs</div><div class="stat-value" style="color:var(--red);">8</div><div class="stat-sub">3 overdue</div></div>
+    <div class="stat-card"><div class="stat-label">Avg. Resolution Time</div><div class="stat-value">32<span style="font-size:14px; font-weight:400;"> days</span></div><div class="stat-sub">Target: 30 days</div></div>
+    <div class="stat-card"><div class="stat-label">Closed This Quarter</div><div class="stat-value" style="color:var(--green);">14</div><div class="stat-sub">vs. 11 last quarter</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>&#128295; Open Corrective Actions</h3><span class="card-action">View closed &#8594;</span></div>
+    <div class="card-body" style="padding:0; overflow-x:auto;">
+      <table class="mini-table">
+        <thead><tr><th>CAPA ID</th><th>Finding</th><th>Control</th><th>Age</th><th>Priority</th><th>Owner</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600; color:var(--accent);">NC-2024-015</td><td>Cloud config non-conformity (AWS S3)</td><td>A.8.9</td><td style="color:var(--red); font-weight:600;">45 days</td><td><span class="hitl-inline" style="background:var(--red-bg); color:var(--red);">High</span></td><td>Cloud Eng.</td><td><span class="status-dot red">Overdue</span></td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">NC-2025-002</td><td>Missing access review evidence Q4</td><td>A.5.15</td><td style="color:var(--red); font-weight:600;">38 days</td><td><span class="hitl-inline" style="background:var(--red-bg); color:var(--red);">High</span></td><td>IT Admin</td><td><span class="status-dot red">Overdue</span></td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">NC-2025-003</td><td>BCP test not executed in 2025</td><td>A.5.29</td><td style="color:var(--yellow); font-weight:500;">22 days</td><td><span class="hitl-inline" style="background:var(--yellow-bg); color:#B47A14;">Medium</span></td><td>COO</td><td><span class="status-dot yellow">In Progress</span></td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">NC-2025-004</td><td>Incident response plan revision needed</td><td>A.5.24</td><td>14 days</td><td><span class="hitl-inline" style="background:var(--yellow-bg); color:#B47A14;">Medium</span></td><td>SecOps</td><td><span class="status-dot yellow">In Progress</span></td></tr>
+          <tr><td style="font-weight:600; color:var(--accent);">OBS-2025-001</td><td>Encryption key rotation frequency</td><td>A.8.24</td><td>7 days</td><td><span class="hitl-inline hitl-auto">Low</span></td><td>Crypto Eng.</td><td><span class="status-dot green">On Track</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- PAGE: PREPARE FOR AUDIT        -->
+<!-- ============================== -->
+<div class="page-view" id="page-audit">
+  <div class="topbar"><h1>Prepare for Audit <small>· Audit Room</small></h1><div class="topbar-actions"><button class="btn">&#128279; Invite Auditor</button><button class="btn btn-primary">Generate Pre-Audit Report</button></div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Audit Readiness</div><div class="stat-value" style="color:var(--yellow);">68%</div><div class="stat-sub">Target: 85% before audit</div></div>
+    <div class="stat-card"><div class="stat-label">Evidence Coverage</div><div class="stat-value">78%</div><div class="stat-sub">22% of controls missing evidence</div></div>
+    <div class="stat-card"><div class="stat-label">Open Non-Conformities</div><div class="stat-value" style="color:var(--red);">3</div><div class="stat-sub">High risk for audit findings</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><h3>&#128680; Predicted Audit Findings</h3></div>
+      <div class="card-body">
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Based on current platform data, these are the most likely non-conformities an auditor would identify.</div>
+        <div class="action-item"><div class="action-priority p-high"></div><div class="action-text"><strong>Major NC — Access Management (A.5.15)</strong><small>Policy approved 14mo ago, no quarterly reviews executed. Evidence gap across ISO, DORA, NIS2.</small></div></div>
+        <div class="action-item"><div class="action-priority p-high"></div><div class="action-text"><strong>Major NC — Business Continuity (A.5.29)</strong><small>No disaster recovery test performed in 2025. DORA Art.11 requires periodic testing.</small></div></div>
+        <div class="action-item"><div class="action-priority p-high"></div><div class="action-text"><strong>Major NC — Incident Management (A.5.24)</strong><small>CAPA open 45+ days. Incident response tabletop not conducted this cycle.</small></div></div>
+        <div class="action-item"><div class="action-priority p-med"></div><div class="action-text"><strong>Minor NC — Cryptography Policy (A.8.24)</strong><small>Policy document still in draft status. Key rotation frequency observation open.</small></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>&#128197; Audit Timeline</h3></div>
+      <div class="card-body">
+        <div style="font-size:12.5px;">
+          <div style="display:flex; gap:12px; margin-bottom:16px; align-items:flex-start;">
+            <div style="width:12px; height:12px; border-radius:50%; background:var(--green); margin-top:3px; flex-shrink:0;"></div>
+            <div><strong>Stage 1 — Document Review</strong><div style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Completed Feb 2026 · 2 minor observations</div></div>
+          </div>
+          <div style="display:flex; gap:12px; margin-bottom:16px; align-items:flex-start;">
+            <div style="width:12px; height:12px; border-radius:50%; background:var(--yellow); margin-top:3px; flex-shrink:0;"></div>
+            <div><strong>Pre-Audit Remediation</strong><div style="color:var(--text-secondary); font-size:12px; margin-top:2px;">In progress · 3 critical items remaining</div></div>
+          </div>
+          <div style="display:flex; gap:12px; margin-bottom:16px; align-items:flex-start;">
+            <div style="width:12px; height:12px; border-radius:50%; border:2px solid var(--border); margin-top:3px; flex-shrink:0;"></div>
+            <div><strong>Stage 2 — On-Site Audit</strong><div style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Scheduled: May 12-16, 2026 · 43 days away</div></div>
+          </div>
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div style="width:12px; height:12px; border-radius:50%; border:2px solid var(--border); margin-top:3px; flex-shrink:0;"></div>
+            <div><strong>Certification Decision</strong><div style="color:var(--text-secondary); font-size:12px; margin-top:2px;">Expected: Jun 2026</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- PAGE: SETTINGS                 -->
+<!-- ============================== -->
+<div class="page-view" id="page-settings">
+  <div class="topbar"><h1>Settings</h1></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><h3>&#127760; Language & Region</h3></div>
+      <div class="card-body">
+        <div class="settings-group">
+          <div class="setting-row">
+            <div class="setting-label">Interface Language<small>Controls the language of the entire platform UI</small></div>
+            <select class="setting-select" id="langSelect" onchange="changeLang(this.value)">
+              <option value="en" selected>English</option>
+              <option value="es">Espanol</option>
+              <option value="pt">Portugues</option>
+              <option value="de">Deutsch</option>
+              <option value="fr">Francais</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Document Generation Language<small>Language used when generating policies and reports</small></div>
+            <select class="setting-select">
+              <option value="en" selected>English</option>
+              <option value="es">Espanol</option>
+              <option value="pt">Portugues</option>
+              <option value="de">Deutsch</option>
+              <option value="fr">Francais</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Date Format<small>How dates are displayed across the platform</small></div>
+            <select class="setting-select">
+              <option value="dmy">DD/MM/YYYY</option>
+              <option value="mdy">MM/DD/YYYY</option>
+              <option value="ymd">YYYY-MM-DD</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Timezone<small>Used for deadlines, audit dates, and evidence timestamps</small></div>
+            <select class="setting-select">
+              <option>Europe/London (UTC+0)</option>
+              <option selected>Europe/Madrid (UTC+1)</option>
+              <option>America/New_York (UTC-5)</option>
+              <option>America/Sao_Paulo (UTC-3)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>&#127912; Appearance</h3></div>
+      <div class="card-body">
+        <div class="settings-group">
+          <div class="setting-row">
+            <div class="setting-label">Dark Mode<small>Switch between light and dark interface themes</small></div>
+            <div class="toggle" id="darkToggle" onclick="toggleDarkMode()"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Compact Mode<small>Reduce spacing for denser information display</small></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Show HitL Badges<small>Display Human-in-the-Loop decision indicators</small></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Sidebar Default View<small>Choose default navigation style on login</small></div>
+            <select class="setting-select">
+              <option selected>By Process (Journey)</option>
+              <option>By Module</option>
+              <option>Auto (based on profile)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>&#128276; Notifications</h3></div>
+      <div class="card-body">
+        <div class="settings-group">
+          <div class="setting-row"><div class="setting-label">Compliance Integrity Alerts<small>Get notified when compliance washing signals are detected</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div class="setting-label">Regulatory Feed Updates<small>Notifications for new regulatory changes affecting your profile</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div class="setting-label">Evidence Expiry Warnings<small>Alert when evidence is approaching or past expiration</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="setting-row"><div class="setting-label">CAPA Deadline Reminders<small>Reminders for upcoming and overdue corrective actions</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>&#128339; Automation & Scheduling</h3></div>
+      <div class="card-body">
+        <div class="settings-group">
+          <div class="settings-group-title">Gap Analysis</div>
+          <div class="setting-row">
+            <div class="setting-label">Auto-Run Gap Analysis<small>Automatically re-run gap analysis on a defined schedule</small></div>
+            <div class="toggle on" id="gapAutoToggle" onclick="this.classList.toggle('on'); updateGapScheduleUI()"></div>
+          </div>
+          <div class="setting-row" id="gapFreqRow">
+            <div class="setting-label">Run Frequency<small>How often the gap analysis is executed automatically</small></div>
+            <select class="setting-select" id="gapFreqSelect" onchange="updateGapScheduleUI()">
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Every 2 Weeks</option>
+              <option value="monthly" selected>Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="biannual">Every 6 Months</option>
+              <option value="annual">Annually</option>
+            </select>
+          </div>
+          <div class="setting-row" id="gapDayRow">
+            <div class="setting-label">Preferred Run Day<small>Day of the week (weekly/biweekly) or day of month</small></div>
+            <select class="setting-select" id="gapDaySelect">
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option value="1">1st of month</option>
+              <option value="15" selected>15th of month</option>
+              <option value="last">Last day of month</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Notify on Completion<small>Send email + in-app notification when auto-run finishes</small></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Notify on New Gaps Found<small>Immediate alert if the auto-run detects new gaps</small></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Auto-Create CAPAs for New Gaps<small>Automatically generate corrective actions for newly detected gaps</small></div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div id="gapNextRun" style="margin-top:12px; padding:10px 14px; background:var(--accent-light); border-radius:7px; font-size:12px; color:var(--accent); display:flex; align-items:center; gap:8px;">
+            <span style="font-size:15px;">&#128339;</span>
+            <span><strong>Next scheduled run:</strong> Apr 15, 2026 · Monthly on the 15th</span>
+          </div>
+        </div>
+        <div class="settings-group" style="margin-top:20px;">
+          <div class="settings-group-title">Evidence Collection</div>
+          <div class="setting-row">
+            <div class="setting-label">Auto-Collect Evidence<small>Automatically pull evidence from connected integrations</small></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Collection Frequency<small>How often connectors pull fresh evidence</small></div>
+            <select class="setting-select">
+              <option>Every 6 Hours</option>
+              <option selected>Daily</option>
+              <option>Weekly</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-group" style="margin-top:20px;">
+          <div class="settings-group-title">Compliance Integrity Scan</div>
+          <div class="setting-row">
+            <div class="setting-label">Auto-Run Integrity Check<small>Scan for compliance washing signals on a schedule</small></div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-label">Scan Frequency</div>
+            <select class="setting-select">
+              <option selected>Weekly</option>
+              <option>Bi-weekly</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3>&#128101; User Management</h3></div>
+      <div class="card-body">
+        <div class="settings-group">
+          <div class="setting-row"><div class="setting-label">Max Kellner<small>CISO · Full admin access</small></div><button class="btn btn-sm">Edit</button></div>
+          <div class="setting-row"><div class="setting-label">Ana Rodriguez<small>Compliance Manager · Can approve low-risk controls</small></div><button class="btn btn-sm">Edit</button></div>
+          <div class="setting-row"><div class="setting-label">Carlos Mendez<small>IT Manager · Evidence upload only</small></div><button class="btn btn-sm">Edit</button></div>
+        </div>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;">+ Invite Team Member</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================== -->
+<!-- GENERIC PLACEHOLDER PAGES      -->
+<!-- ============================== -->
+<div class="page-view" id="page-understand">
+  <div class="topbar"><h1>Understand My Situation <small>· Gap Analysis</small></h1><div class="topbar-actions"><button class="btn" onclick="toggleGapView('summary')">Summary</button><button class="btn btn-primary" onclick="toggleGapView('report')">View Gap Report</button><button class="btn">Re-run Assessment</button></div></div>
+
+  <!-- SCHEDULE BANNER -->
+  <div id="gapScheduleBanner" style="padding:14px 20px; background:var(--accent-light); border:1px solid var(--accent); border-radius:var(--radius); margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <div style="display:flex; align-items:center; gap:10px; font-size:13px;">
+      <span style="font-size:18px;">&#128339;</span>
+      <div>
+        <div><strong>Auto-Run Enabled</strong> — Gap analysis runs <strong id="gapBannerFreq">monthly</strong> on the <strong id="gapBannerDay">15th</strong></div>
+        <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">Next run: <strong id="gapBannerNext">Apr 15, 2026</strong> · Last run: Mar 15, 2026 (no new gaps found)</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn btn-sm" onclick="navigateTo('settings')">&#9881; Schedule Settings</button>
+      <button class="btn btn-sm btn-primary" onclick="simulateGapRun()">Run Now</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY VIEW -->
+  <div id="gapSummary">
+    <div style="padding:16px 20px; background:var(--green-bg); border:1px solid var(--green); border-radius:var(--radius); margin-bottom:24px; font-size:13px; color:var(--text);">
+      <strong>&#10003; Gap Analysis Complete</strong> — Completed on Feb 10, 2026. 14 gaps identified across ISO 27001 and DORA. <strong>9 remediated</strong>, 5 remaining.
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Gaps Identified</div><div class="stat-value">14</div><div class="stat-sub">Across ISO 27001 + DORA</div></div>
+      <div class="stat-card"><div class="stat-label">Remediated</div><div class="stat-value" style="color:var(--green);">9</div><div class="stat-sub">64% closure rate</div></div>
+      <div class="stat-card"><div class="stat-label">Open Gaps</div><div class="stat-value" style="color:var(--red);">5</div><div class="stat-sub">3 high priority</div></div>
+    </div>
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header"><h3>&#128269; Open Gaps by Priority</h3><span class="card-action" onclick="toggleGapView('report')">Full report &#8594;</span></div>
+      <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table class="mini-table">
+          <thead><tr><th>Gap ID</th><th>Description</th><th>Framework</th><th>Control</th><th>Priority</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600; color:var(--accent);">GAP-003</td><td>No formal access review process implemented</td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span><span class="fw-tag">NIS2</span></td><td>A.5.15</td><td><span class="hitl-inline" style="background:var(--red-bg); color:var(--red);">High</span></td><td><span class="status-dot yellow">In Progress</span></td></tr>
+            <tr><td style="font-weight:600; color:var(--accent);">GAP-007</td><td>Business continuity plan never tested under real conditions</td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA Art.11</span></td><td>A.5.29</td><td><span class="hitl-inline" style="background:var(--red-bg); color:var(--red);">High</span></td><td><span class="status-dot red">Open</span></td></tr>
+            <tr><td style="font-weight:600; color:var(--accent);">GAP-009</td><td>Incident reporting flow missing DORA-specific timelines (4h/72h/1mo)</td><td><span class="fw-tag">DORA Art.17-23</span></td><td>A.5.24</td><td><span class="hitl-inline" style="background:var(--red-bg); color:var(--red);">High</span></td><td><span class="status-dot yellow">In Progress</span></td></tr>
+            <tr><td style="font-weight:600; color:var(--accent);">GAP-011</td><td>Third-party ICT provider contracts missing DORA exit clauses</td><td><span class="fw-tag">DORA Art.28-44</span></td><td>A.5.19</td><td><span class="hitl-inline" style="background:var(--yellow-bg); color:#B47A14;">Medium</span></td><td><span class="status-dot red">Open</span></td></tr>
+            <tr><td style="font-weight:600; color:var(--accent);">GAP-013</td><td>Cryptography policy incomplete — no key lifecycle management</td><td><span class="fw-tag">ISO</span><span class="fw-tag">PCI 3.5</span></td><td>A.8.24</td><td><span class="hitl-inline" style="background:var(--yellow-bg); color:#B47A14;">Medium</span></td><td><span class="status-dot yellow">In Progress</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><h3>&#10003; Remediated Gaps</h3></div>
+        <div class="card-body" style="padding:0; overflow-x:auto;">
+          <table class="mini-table">
+            <thead><tr><th>Gap</th><th>Description</th><th>Closed</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-001</td><td>Missing information security policy</td><td>Feb 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-002</td><td>No ISMS scope definition</td><td>Feb 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-004</td><td>No formal risk assessment methodology</td><td>Feb 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-005</td><td>Asset inventory incomplete</td><td>Mar 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-006</td><td>No evidence collection process</td><td>Mar 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-008</td><td>No DORA ICT risk framework mapping</td><td>Mar 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-010</td><td>User awareness training not documented</td><td>Mar 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-012</td><td>No SOA drafted</td><td>Feb 2026</td></tr>
+              <tr><td style="font-weight:600; color:var(--green);">GAP-014</td><td>No internal audit plan</td><td>Mar 2026</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>&#128202; Maturity Assessment Results</h3></div>
+        <div class="card-body">
+          <div style="font-size:12.5px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span>Regulatory Context</span>
+              <div style="display:flex; align-items:center; gap:8px;"><div class="progress-bar" style="width:120px;"><div class="progress-bar-fill" style="width:85%; background:var(--green);"></div></div><span style="font-size:11px; font-weight:600;">85%</span></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span>Documentation Maturity</span>
+              <div style="display:flex; align-items:center; gap:8px;"><div class="progress-bar" style="width:120px;"><div class="progress-bar-fill" style="width:72%; background:var(--yellow);"></div></div><span style="font-size:11px; font-weight:600;">72%</span></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span>Technical Capability</span>
+              <div style="display:flex; align-items:center; gap:8px;"><div class="progress-bar" style="width:120px;"><div class="progress-bar-fill" style="width:78%; background:var(--yellow);"></div></div><span style="font-size:11px; font-weight:600;">78%</span></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <span>Resource Capacity</span>
+              <div style="display:flex; align-items:center; gap:8px;"><div class="progress-bar" style="width:120px;"><div class="progress-bar-fill" style="width:65%; background:var(--yellow);"></div></div><span style="font-size:11px; font-weight:600;">65%</span></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Control Effectiveness</span>
+              <div style="display:flex; align-items:center; gap:8px;"><div class="progress-bar" style="width:120px;"><div class="progress-bar-fill" style="width:45%; background:var(--red);"></div></div><span style="font-size:11px; font-weight:600;">45%</span></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border); padding-top:12px; font-size:12px; color:var(--text-secondary);">
+            Profile assigned: <strong style="color:var(--accent);">Established</strong> · Assessment date: Feb 10, 2026
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUN HISTORY -->
+    <div class="card" style="margin-top:24px;">
+      <div class="card-header"><h3>&#128340; Run History</h3><span class="card-action">Export history &#8594;</span></div>
+      <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table class="mini-table">
+          <thead><tr><th>Run Date</th><th>Trigger</th><th>Frameworks Scanned</th><th>Gaps Found</th><th>New Gaps</th><th>Resolved Since Last</th><th>Duration</th><th>Report</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600;">Mar 15, 2026</td><td><span class="hitl-inline hitl-auto">&#128339; Scheduled</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span></td><td>5</td><td style="color:var(--green);">0 new</td><td style="color:var(--green);">+2 resolved</td><td>4m 12s</td><td><span style="color:var(--accent); cursor:pointer; font-weight:500;" onclick="toggleGapView('report')">View</span></td></tr>
+            <tr><td style="font-weight:600;">Feb 15, 2026</td><td><span class="hitl-inline hitl-auto">&#128339; Scheduled</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span></td><td>7</td><td style="color:var(--red);">0 new</td><td style="color:var(--green);">+3 resolved</td><td>4m 38s</td><td><span style="color:var(--accent); cursor:pointer; font-weight:500;" onclick="toggleGapView('report')">View</span></td></tr>
+            <tr><td style="font-weight:600;">Feb 10, 2026</td><td><span class="hitl-inline hitl-human">&#128100; Manual</span></td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span></td><td>14</td><td style="color:var(--red);">14 new</td><td>— (initial)</td><td>6m 52s</td><td><span style="color:var(--accent); cursor:pointer; font-weight:500;" onclick="toggleGapView('report')">View</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL GAP REPORT VIEW -->
+  <div id="gapReport" style="display:none;">
+    <div style="padding:16px 20px; background:var(--accent-light); border:1px solid var(--accent); border-radius:var(--radius); margin-bottom:24px; font-size:13px; color:var(--text);">
+      <strong>&#128196; Full Gap Analysis Report</strong> — Generated Feb 10, 2026 · ISO 27001:2022 + DORA · WellQ Ltd.
+    </div>
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header"><h3>&#128203; Executive Summary</h3></div>
+      <div class="card-body" style="font-size:13px; line-height:1.65; color:var(--text-secondary);">
+        <p style="margin-bottom:12px;">The gap analysis assessed WellQ's information security posture against <strong>ISO 27001:2022</strong> (93 Annex A controls) and <strong>DORA</strong> (Digital Operational Resilience Act) requirements applicable to financial technology entities operating within the EU.</p>
+        <p style="margin-bottom:12px;">Of the <strong>114 combined control requirements</strong> evaluated, <strong>86 (75%)</strong> were found to be fully or partially addressed. <strong>14 gaps</strong> were identified requiring remediation before certification audit and DORA compliance deadline. The most critical gaps concern <strong>control effectiveness testing</strong>, <strong>access review processes</strong>, and <strong>DORA-specific incident reporting timelines</strong>.</p>
+        <p>The organization's maturity profile is classified as <strong>Established</strong>, with strong documentation practices but significant gaps in operational testing and sector-specific regulatory requirements.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-header"><h3>&#128308; Gap Detail — All 14 Findings</h3></div>
+      <div class="card-body" style="padding:0; overflow-x:auto;">
+        <table class="mini-table">
+          <thead><tr><th>ID</th><th>Gap Description</th><th>Framework</th><th>Control</th><th>Severity</th><th>Remediation Status</th><th>Target Date</th></tr></thead>
+          <tbody>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-001</td><td>Missing information security policy</td><td><span class="fw-tag">ISO 4.3</span></td><td>A.5.1</td><td>High</td><td><span class="status-dot green">Closed</span></td><td>Feb 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-002</td><td>No ISMS scope definition</td><td><span class="fw-tag">ISO 4.3</span></td><td>—</td><td>High</td><td><span class="status-dot green">Closed</span></td><td>Feb 2026</td></tr>
+            <tr style="background:var(--red-bg);"><td style="font-weight:600; color:var(--red);">GAP-003</td><td>No formal access review process implemented</td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span><span class="fw-tag">NIS2</span></td><td>A.5.15</td><td><strong style="color:var(--red);">Critical</strong></td><td><span class="status-dot yellow">In Progress</span></td><td>Apr 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-004</td><td>No formal risk assessment methodology</td><td><span class="fw-tag">ISO 6.1</span></td><td>—</td><td>High</td><td><span class="status-dot green">Closed</span></td><td>Feb 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-005</td><td>Asset inventory incomplete</td><td><span class="fw-tag">ISO</span></td><td>A.5.9</td><td>Medium</td><td><span class="status-dot green">Closed</span></td><td>Mar 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-006</td><td>No evidence collection process</td><td><span class="fw-tag">ISO 9.1</span></td><td>—</td><td>Medium</td><td><span class="status-dot green">Closed</span></td><td>Mar 2026</td></tr>
+            <tr style="background:var(--red-bg);"><td style="font-weight:600; color:var(--red);">GAP-007</td><td>Business continuity plan never tested under real conditions</td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA Art.11</span></td><td>A.5.29</td><td><strong style="color:var(--red);">Critical</strong></td><td><span class="status-dot red">Open</span></td><td>May 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-008</td><td>No DORA ICT risk framework mapping</td><td><span class="fw-tag">DORA Art.5-16</span></td><td>—</td><td>High</td><td><span class="status-dot green">Closed</span></td><td>Mar 2026</td></tr>
+            <tr style="background:var(--red-bg);"><td style="font-weight:600; color:var(--red);">GAP-009</td><td>Incident reporting flow missing DORA timelines (4h / 72h / 1mo)</td><td><span class="fw-tag">DORA Art.17-23</span></td><td>A.5.24</td><td><strong style="color:var(--red);">Critical</strong></td><td><span class="status-dot yellow">In Progress</span></td><td>Apr 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-010</td><td>User awareness training not documented</td><td><span class="fw-tag">ISO</span></td><td>A.6.3</td><td>Medium</td><td><span class="status-dot green">Closed</span></td><td>Mar 2026</td></tr>
+            <tr style="background:var(--yellow-bg);"><td style="font-weight:600; color:var(--yellow);">GAP-011</td><td>Third-party ICT provider contracts missing DORA exit clauses</td><td><span class="fw-tag">DORA Art.28-44</span></td><td>A.5.19</td><td><strong style="color:var(--yellow);">High</strong></td><td><span class="status-dot red">Open</span></td><td>May 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-012</td><td>No SOA drafted</td><td><span class="fw-tag">ISO 6.1.3</span></td><td>—</td><td>High</td><td><span class="status-dot green">Closed</span></td><td>Feb 2026</td></tr>
+            <tr style="background:var(--yellow-bg);"><td style="font-weight:600; color:var(--yellow);">GAP-013</td><td>Cryptography policy incomplete — no key lifecycle management</td><td><span class="fw-tag">ISO</span><span class="fw-tag">PCI 3.5</span></td><td>A.8.24</td><td><strong style="color:var(--yellow);">High</strong></td><td><span class="status-dot yellow">In Progress</span></td><td>Apr 2026</td></tr>
+            <tr><td style="font-weight:600; color:var(--green);">GAP-014</td><td>No internal audit plan</td><td><span class="fw-tag">ISO 9.2</span></td><td>—</td><td>Medium</td><td><span class="status-dot green">Closed</span></td><td>Mar 2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="text-align:center; padding:16px;">
+      <button class="btn" onclick="toggleGapView('summary')">&#8592; Back to Summary</button>
+    </div>
+  </div>
+</div>
+
+<div class="page-view" id="page-documents">
+  <div class="topbar"><h1>Document Controls <small>· Document Generator</small></h1><div class="topbar-actions"><button class="btn btn-primary">+ Generate Document</button></div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total Documents</div><div class="stat-value">38</div><div class="stat-sub">Policies, procedures, records</div></div>
+    <div class="stat-card"><div class="stat-label">Pending Approval</div><div class="stat-value" style="color:var(--yellow);">4</div><div class="stat-sub">Awaiting CISO sign-off</div></div>
+    <div class="stat-card"><div class="stat-label">Expiring Soon</div><div class="stat-value" style="color:var(--red);">3</div><div class="stat-sub">Review deadline within 30 days</div></div>
+  </div>
+  <div class="card"><div class="card-header"><h3>&#128196; Document Library</h3><span style="font-size:12px; color:var(--text-muted);">Click any document to preview</span></div>
+    <div class="card-body" style="padding:0;"><table class="mini-table"><thead><tr><th>Document</th><th>Type</th><th>Framework</th><th>Status</th><th>Last Updated</th></tr></thead><tbody>
+      <tr style="cursor:pointer;" onclick="openDocModal('isp')"><td>Information Security Policy</td><td>Policy</td><td><span class="fw-tag">ISO</span><span class="fw-tag">DORA</span></td><td><span class="status-dot green">Approved</span></td><td>Jan 2025</td></tr>
+      <tr style="cursor:pointer;" onclick="openDocModal('acp')"><td>Access Control Procedure</td><td>Procedure</td><td><span class="fw-tag">ISO</span><span class="fw-tag">NIS2</span></td><td><span class="status-dot yellow">Review Due</span></td><td>Jan 2025</td></tr>
+      <tr style="cursor:pointer;" onclick="openDocModal('ram')"><td>Risk Assessment Methodology</td><td>Procedure</td><td><span class="fw-tag">ISO</span></td><td><span class="status-dot green">Approved</span></td><td>Nov 2025</td></tr>
+      <tr style="cursor:pointer;" onclick="openDocModal('irp')"><td>Incident Response Plan (DORA)</td><td>Plan</td><td><span class="fw-tag">DORA Art.17</span></td><td><span class="status-dot yellow">Draft</span></td><td>Mar 2026</td></tr>
+      <tr style="cursor:pointer;" onclick="openDocModal('crypto')"><td>Cryptography Policy</td><td>Policy</td><td><span class="fw-tag">ISO</span><span class="fw-tag">PCI</span></td><td><span class="status-dot yellow">Draft</span></td><td>Mar 2026</td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+
+<div class="page-view" id="page-integrity">
+  <div class="topbar"><h1>Compliance Integrity <small>· Anti-Compliance Washing</small></h1></div>
+  <div class="page-desc">This module identifies signals where your documented compliance posture may not reflect actual security effectiveness. Alerts are generated by cross-referencing documentation status, implementation evidence, and real-world testing results.</div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Active Alerts</div><div class="stat-value" style="color:var(--red);">6</div><div class="stat-sub">2 high, 4 medium severity</div></div>
+    <div class="stat-card"><div class="stat-label">Controls at Risk</div><div class="stat-value" style="color:var(--yellow);">14</div><div class="stat-sub">Implementation claimed but untested</div></div>
+    <div class="stat-card"><div class="stat-label">Integrity Score</div><div class="stat-value">58<span style="font-size:14px;">%</span></div><div class="stat-sub">% of controls with verified effectiveness</div></div>
+  </div>
+  <div class="card"><div class="card-header"><h3>&#9888; All Integrity Alerts</h3></div><div class="card-body"><div style="font-size:13px; color:var(--text-secondary);">Same expandable alerts as on the dashboard — click any alert to see full details, recommendations, and action buttons.</div></div></div>
+</div>
+
+<div class="page-view" id="page-regfeed">
+  <div class="topbar"><h1>Regulatory Feed <small>· Intelligence</small></h1></div>
+  <div class="page-desc">Real-time monitoring of regulatory changes relevant to your active frameworks and jurisdictions. Updates are filtered to your organization profile.</div>
+  <div class="card"><div class="card-body">
+    <div class="reg-item"><div class="reg-icon deadline">&#9200;</div><div><div class="reg-text"><strong>DORA TLPT deadline</strong> — Significant entities must complete first round by Q2 2026.</div><div class="reg-date">Deadline: Jun 30, 2026 · 92 days left</div></div></div>
+    <div class="reg-item"><div class="reg-icon update">&#128203;</div><div><div class="reg-text"><strong>NIS2 transposition update</strong> — Spain published national transposition with sector-specific annexes.</div><div class="reg-date">Published: Mar 14, 2026 · Affects your profile</div></div></div>
+    <div class="reg-item"><div class="reg-icon update">&#128203;</div><div><div class="reg-text"><strong>EU AI Act — High-risk AI deadline</strong> — Classification requirements for high-risk AI systems take effect Aug 2026.</div><div class="reg-date">Deadline: Aug 2, 2026 · Informational</div></div></div>
+    <div class="reg-item"><div class="reg-icon info">&#10003;</div><div><div class="reg-text"><strong>ISO 27001:2022</strong> — No changes. Next review cycle: 2028.</div><div class="reg-date">Status: Current · No action needed</div></div></div>
+    <div class="reg-item"><div class="reg-icon info">&#10003;</div><div><div class="reg-text"><strong>PCI-DSS v4.0</strong> — Transition period ended Mar 2025. All organizations must be fully compliant.</div><div class="reg-date">Status: Fully in effect</div></div></div>
+  </div></div>
+</div>
+
+<div class="page-view" id="page-dora"><div class="topbar"><h1>DORA Module <small>· Digital Operational Resilience</small></h1></div><div class="card"><div class="card-body"><div class="empty-state"><div class="es-icon">&#127974;</div><div class="es-title">DORA Compliance Module</div><div class="es-desc">Manage ICT Risk Framework (Art. 5-16), Major Incident Reporting (Art. 17-23), TLPT Assessment (Art. 26), and Third-Party Risk (Art. 28-44) — all tailored to your entity classification.</div><button class="btn btn-primary">Open DORA Dashboard</button></div></div></div></div>
+
+<div class="page-view" id="page-euai"><div class="topbar"><h1>EU AI Act <small>· AI Governance</small></h1></div><div class="card"><div class="card-body"><div class="empty-state"><div class="es-icon">&#129302;</div><div class="es-title">EU AI Act Module</div><div class="es-desc">Map your AI systems to risk categories, track compliance obligations, and generate required documentation under the EU AI Act.</div><button class="btn btn-primary">Get Started</button></div></div></div></div>
+
+<div class="page-view" id="page-escalation"><div class="topbar"><h1>Escalation Rules <small>· Governance</small></h1></div><div class="card"><div class="card-body"><div class="empty-state"><div class="es-icon">&#9881;</div><div class="es-title">Escalation Rules Engine</div><div class="es-desc">Define which decisions each role can make autonomously vs. which require CISO/management approval. Configurable per control risk level.</div><button class="btn btn-primary">Configure Rules</button></div></div></div></div>
+
+<div class="page-view" id="page-integrations"><div class="topbar"><h1>Integrations <small>· Connectors</small></h1></div><div class="card"><div class="card-body"><div class="empty-state"><div class="es-icon">&#128279;</div><div class="es-title">Integration Hub</div><div class="es-desc">Connect AWS, Azure, Google Cloud, Okta, Jira, ServiceNow, and other tools for automated evidence collection and asset discovery.</div><button class="btn btn-primary">Manage Connectors</button></div></div></div></div>
+
+</div><!-- end .main -->
+
+<!-- ═══════════ DOCUMENT PREVIEW MODAL ═══════════ -->
+<div class="view-overlay" id="docModal">
+  <div class="view-overlay-card" style="max-width:720px; padding:0; display:flex; flex-direction:column; max-height:88vh;">
+    <!-- Modal Header -->
+    <div style="padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+      <div>
+        <div id="docModalTitle" style="font-size:17px; font-weight:700;"></div>
+        <div id="docModalMeta" style="font-size:12px; color:var(--text-secondary); margin-top:3px; display:flex; align-items:center; gap:10px;"></div>
+      </div>
+      <span onclick="closeDocModal()" style="cursor:pointer; font-size:20px; color:var(--text-muted); padding:4px 8px;">&#10005;</span>
+    </div>
+    <!-- Modal Body — scrollable document content -->
+    <div id="docModalBody" style="flex:1; overflow-y:auto; padding:24px; font-size:13.5px; line-height:1.75; color:var(--text);"></div>
+    <!-- Modal Footer -->
+    <div style="padding:14px 24px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; background:var(--bg);">
+      <div style="font-size:11.5px; color:var(--text-muted);" id="docModalFooter"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-sm" onclick="closeDocModal()">Close</button>
+        <button class="btn btn-sm" id="docEditBtn">&#9998; Edit</button>
+        <button class="btn btn-sm btn-primary" onclick="downloadDoc()">&#11015; Download .docx</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DANI AI CHAT ═══════════ -->
+<div class="dani-chat-panel" id="chatPanel">
+  <div class="dani-chat-header">
+    <div class="dani-avatar">&#129302;</div>
+    <div><div class="dani-name">Dani AI</div><div class="dani-status">Compliance Assistant · Online</div></div>
+    <span class="close-chat" onclick="toggleChat()">&#10005;</span>
+  </div>
+  <div class="dani-chat-body">
+    <div class="chat-bubble ai">Hi Max! I noticed your <strong>Tested/Effective score dropped to 45%</strong>. The biggest gap is that 12 controls haven't had effectiveness testing in over a year. Want me to help you prioritize which tests to schedule first?</div>
+    <div class="chat-bubble ai">I'd also recommend addressing the <strong>access review for A.5.15</strong> as a priority — it's flagged as a compliance integrity alert and is likely to be a finding in your next audit.</div>
+  </div>
+  <div class="dani-chat-input"><input type="text" placeholder="Ask Dani anything about your compliance..."><button>Send</button></div>
+</div>
+<div class="dani-chat-fab" onclick="toggleChat()">&#128172;</div>
+
+<!-- ═══════════ PROFILE OVERLAY ═══════════ -->
+<div class="view-overlay" id="profileOverlay">
+  <div class="view-overlay-card">
+    <h2>Organization Profile</h2>
+    <p>Your profile was set during the Maturity Intake Assessment. It configures navigation, automation levels, and guidance depth across the platform.</p>
+    <div class="profile-option" onclick="setProfile('foundational', this)">
+      <span class="po-icon">&#127793;</span>
+      <div><div class="po-label">Foundational</div><div class="po-desc">Guided mode · Process-first navigation · AI explains every concept</div></div>
+    </div>
+    <div class="profile-option selected" onclick="setProfile('established', this)">
+      <span class="po-icon">&#127959;</span>
+      <div><div class="po-label">Established</div><div class="po-desc">Balanced mode · Process or module nav · AI assists on demand</div></div>
+    </div>
+    <div class="profile-option" onclick="setProfile('advanced', this)">
+      <span class="po-icon">&#128640;</span>
+      <div><div class="po-label">Advanced</div><div class="po-desc">API-first · Module navigation · Bulk import · Minimal guidance</div></div>
+    </div>
+    <div style="text-align:right; margin-top:16px;"><button class="btn" onclick="closeProfileOverlay()">Done</button></div>
+  </div>
+</div>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script>
+  // --- Page navigation ---
+  function navigateTo(pageId, navEl) {
+    // Hide all pages, show target
+    document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + pageId);
+    if (target) target.classList.add('active');
+
+    // Update active nav in current visible nav
+    if (navEl) {
+      const parent = navEl.closest('#processNav, #moduleNav, .sidebar');
+      if (parent) parent.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      navEl.classList.add('active');
+    }
+  }
+
+  // --- Nav view toggle ---
+  function setNavView(view) {
+    document.getElementById('processNav').style.display = view === 'process' ? 'block' : 'none';
+    document.getElementById('moduleNav').style.display = view === 'module' ? 'block' : 'none';
+    document.querySelectorAll('.nav-toggle-btn').forEach(b => b.classList.remove('active'));
+    if (view === 'process') {
+      document.querySelector('.nav-toggle-bar .nav-toggle-btn:first-child').classList.add('active');
+    } else {
+      document.querySelector('.nav-toggle-bar .nav-toggle-btn:last-child').classList.add('active');
+    }
+  }
+
+  // --- Chat toggle ---
+  function toggleChat() { document.getElementById('chatPanel').classList.toggle('open'); }
+
+  // --- Profile overlay ---
+  function openProfileOverlay() { document.getElementById('profileOverlay').classList.add('open'); }
+  function closeProfileOverlay() { document.getElementById('profileOverlay').classList.remove('open'); }
+  document.getElementById('profileOverlay').addEventListener('click', function(e) { if (e.target === this) closeProfileOverlay(); });
+
+  function setProfile(level, el) {
+    document.querySelectorAll('.profile-option').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('profileBadge').className = 'sidebar-profile-badge ' + level;
+    document.getElementById('profileLabel').textContent = level.charAt(0).toUpperCase() + level.slice(1);
+    if (level === 'advanced') setNavView('module'); else setNavView('process');
+  }
+
+  // --- Gap view toggle ---
+  function toggleGapView(view) {
+    document.getElementById('gapSummary').style.display = view === 'summary' ? 'block' : 'none';
+    document.getElementById('gapReport').style.display = view === 'report' ? 'block' : 'none';
+  }
+
+  // --- Gap schedule UI sync ---
+  function updateGapScheduleUI() {
+    var enabled = document.getElementById('gapAutoToggle').classList.contains('on');
+    var freq = document.getElementById('gapFreqSelect').value;
+    var freqLabels = { weekly:'weekly', biweekly:'every 2 weeks', monthly:'monthly', quarterly:'quarterly', biannual:'every 6 months', annual:'annually' };
+    var nextDates = { weekly:'Apr 6, 2026', biweekly:'Apr 13, 2026', monthly:'Apr 15, 2026', quarterly:'Jun 15, 2026', biannual:'Sep 15, 2026', annual:'Mar 15, 2027' };
+    // Update settings next-run indicator
+    var nextRunEl = document.getElementById('gapNextRun');
+    if (nextRunEl) {
+      nextRunEl.style.display = enabled ? 'flex' : 'none';
+      nextRunEl.querySelector('span:last-child').innerHTML = '<strong>Next scheduled run:</strong> ' + (nextDates[freq] || 'Apr 15, 2026') + ' · ' + (freqLabels[freq] || 'Monthly');
+    }
+    // Update banner on gap page
+    var banner = document.getElementById('gapScheduleBanner');
+    if (banner) {
+      banner.style.display = enabled ? 'flex' : 'none';
+      var bFreq = document.getElementById('gapBannerFreq');
+      var bNext = document.getElementById('gapBannerNext');
+      if (bFreq) bFreq.textContent = freqLabels[freq] || 'monthly';
+      if (bNext) bNext.textContent = nextDates[freq] || 'Apr 15, 2026';
+    }
+  }
+
+  // --- Simulate a manual gap run ---
+  function simulateGapRun() {
+    var banner = document.getElementById('gapScheduleBanner');
+    var origHTML = banner.innerHTML;
+    banner.style.background = 'var(--yellow-bg)';
+    banner.style.borderColor = 'var(--yellow)';
+    banner.innerHTML = '<div style="display:flex;align-items:center;gap:10px;font-size:13px;"><span style="font-size:18px;">&#9203;</span><div><strong>Gap Analysis Running...</strong><div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">Scanning ISO 27001 + DORA controls against current evidence and documentation...</div></div></div>';
+    setTimeout(function() {
+      banner.style.background = 'var(--green-bg)';
+      banner.style.borderColor = 'var(--green)';
+      banner.innerHTML = '<div style="display:flex;align-items:center;gap:10px;font-size:13px;"><span style="font-size:18px;">&#10003;</span><div><strong>Gap Analysis Complete</strong> — No new gaps found. 5 open gaps remain.<div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">Completed just now · Duration: 4m 12s</div></div></div><div style="display:flex;gap:8px;"><button class="btn btn-sm" onclick="navigateTo(\'settings\')">&#9881; Schedule Settings</button><button class="btn btn-sm btn-primary" onclick="toggleGapView(\'report\')">View Report</button></div>';
+      setTimeout(function() {
+        banner.style.background = 'var(--accent-light)';
+        banner.style.borderColor = 'var(--accent)';
+        banner.innerHTML = origHTML;
+      }, 5000);
+    }, 3000);
+  }
+
+  // --- CW Alert expand/collapse ---
+  function toggleAlert(el) {
+    el.classList.toggle('expanded');
+  }
+
+  // --- Dark mode ---
+  function toggleDarkMode() {
+    const toggle = document.getElementById('darkToggle');
+    toggle.classList.toggle('on');
+    const isDark = toggle.classList.contains('on');
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  }
+
+  // --- Language (visual feedback) ---
+  function changeLang(val) {
+    // Visual indication only in wireframe
+    const labels = { en: 'English', es: 'Espanol', pt: 'Portugues', de: 'Deutsch', fr: 'Francais' };
+    document.title = 'Dani Platform v4 — ' + (labels[val] || 'Dashboard');
+  }
+
+  // --- Document preview modal ---
+  var docData = {
+    isp: {
+      title: 'Information Security Policy',
+      type: 'Policy', status: 'Approved', version: '2.1', author: 'Max Kellner (CISO)', approved: 'Jan 15, 2025', nextReview: 'Jan 15, 2026', frameworks: 'ISO 27001 (A.5.1) · DORA (Art. 5.4)', fileSize: '245 KB',
+      body: '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">1. Purpose</h2>'
+        + '<p style="margin-bottom:16px;">This policy establishes the information security management framework for WellQ Ltd., ensuring the confidentiality, integrity, and availability of information assets in accordance with ISO/IEC 27001:2022 and applicable regulatory requirements including the Digital Operational Resilience Act (DORA).</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">2. Scope</h2>'
+        + '<p style="margin-bottom:16px;">This policy applies to all employees, contractors, and third-party service providers who access, process, or manage WellQ information assets. It covers all information systems, networks, applications, and data repositories operated by or on behalf of WellQ across all jurisdictions.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">3. Policy Statements</h2>'
+        + '<p style="margin-bottom:10px;"><strong>3.1 Information Classification</strong> — All information assets shall be classified according to their sensitivity and criticality. Classification levels are: Public, Internal, Confidential, and Restricted.</p>'
+        + '<p style="margin-bottom:10px;"><strong>3.2 Access Control</strong> — Access to information systems shall be granted on a need-to-know basis following the principle of least privilege. All access shall be formally authorized, documented, and reviewed quarterly.</p>'
+        + '<p style="margin-bottom:10px;"><strong>3.3 Risk Management</strong> — Information security risks shall be identified, assessed, and treated in accordance with the Risk Assessment Methodology. Risk assessments shall be conducted annually and upon significant changes to the operating environment.</p>'
+        + '<p style="margin-bottom:10px;"><strong>3.4 Incident Management</strong> — All information security incidents shall be reported, recorded, and managed through the established incident response process. Major ICT incidents shall be reported to the competent authority within the timelines established by DORA (4 hours initial notification, 72 hours interim report, 1 month final report).</p>'
+        + '<p style="margin-bottom:16px;"><strong>3.5 Business Continuity</strong> — Business continuity and disaster recovery plans shall be maintained and tested at least annually to ensure operational resilience as required by ISO 27001 and DORA Article 11.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">4. Governance</h2>'
+        + '<p style="margin-bottom:10px;">The CISO is responsible for the implementation and maintenance of this policy. In accordance with DORA Article 5.4, this policy shall be reviewed and approved annually by the management body (Board of Directors).</p>'
+        + '<p style="margin-bottom:16px;">Policy violations shall be subject to disciplinary action as defined in the Human Resources policy framework.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">5. Review</h2>'
+        + '<p>This policy shall be reviewed at least annually or upon significant changes to the regulatory environment, organizational structure, or threat landscape. The next scheduled review is January 2026.</p>'
+    },
+    acp: {
+      title: 'Access Control Procedure',
+      type: 'Procedure', status: 'Review Due', version: '1.3', author: 'Ana Rodriguez', approved: 'Jan 20, 2025', nextReview: 'Jan 20, 2026 (overdue)', frameworks: 'ISO 27001 (A.5.15) · NIS2', fileSize: '189 KB',
+      body: '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">1. Purpose</h2>'
+        + '<p style="margin-bottom:16px;">This procedure defines the processes for managing user access to WellQ information systems, ensuring that access is granted, modified, and revoked in a controlled and auditable manner.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">2. User Provisioning</h2>'
+        + '<p style="margin-bottom:10px;"><strong>2.1</strong> All access requests must be submitted through the IT Service Portal with line manager approval.</p>'
+        + '<p style="margin-bottom:10px;"><strong>2.2</strong> Access shall be provisioned based on predefined role profiles aligned with job functions.</p>'
+        + '<p style="margin-bottom:16px;"><strong>2.3</strong> Privileged access (administrator, root) requires additional approval from the CISO or IT Director.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">3. Access Review</h2>'
+        + '<p style="margin-bottom:10px;"><strong>3.1</strong> All user access rights shall be reviewed quarterly by system owners and line managers.</p>'
+        + '<p style="margin-bottom:10px;"><strong>3.2</strong> Privileged access shall be reviewed monthly.</p>'
+        + '<p style="margin-bottom:16px;"><strong>3.3</strong> Review results shall be documented and any discrepancies remediated within 5 business days.</p>'
+        + '<div style="padding:12px 16px; background:var(--red-bg); border:1px solid var(--red); border-radius:8px; margin-bottom:16px; font-size:12.5px;">'
+        + '<strong style="color:var(--red);">&#9888; Compliance Integrity Alert:</strong> The quarterly access review for Q4 2025 and Q1 2026 has not been completed. This document is flagged for immediate action.</div>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">4. De-Provisioning</h2>'
+        + '<p style="margin-bottom:10px;"><strong>4.1</strong> Upon employee termination, all access shall be revoked within 24 hours.</p>'
+        + '<p><strong>4.2</strong> Upon role change, access shall be reviewed and adjusted within 5 business days.</p>'
+    },
+    ram: {
+      title: 'Risk Assessment Methodology',
+      type: 'Procedure', status: 'Approved', version: '1.0', author: 'Max Kellner (CISO)', approved: 'Nov 12, 2025', nextReview: 'Nov 12, 2026', frameworks: 'ISO 27001 (Clause 6.1)', fileSize: '312 KB',
+      body: '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">1. Methodology Overview</h2>'
+        + '<p style="margin-bottom:16px;">WellQ employs a qualitative risk assessment methodology based on ISO 27005, adapted to incorporate sector-specific benchmarks for financial technology organizations. Risks are evaluated against a 5x5 likelihood-impact matrix.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">2. Likelihood Scale</h2>'
+        + '<table style="width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12.5px;"><thead><tr style="background:var(--bg);"><th style="padding:8px 12px; border:1px solid var(--border); text-align:left;">Rating</th><th style="padding:8px 12px; border:1px solid var(--border); text-align:left;">Level</th><th style="padding:8px 12px; border:1px solid var(--border); text-align:left;">Description</th></tr></thead><tbody>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border);">1</td><td style="padding:8px 12px; border:1px solid var(--border);">Rare</td><td style="padding:8px 12px; border:1px solid var(--border);">May occur only in exceptional circumstances</td></tr>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border);">2</td><td style="padding:8px 12px; border:1px solid var(--border);">Unlikely</td><td style="padding:8px 12px; border:1px solid var(--border);">Could occur but not expected</td></tr>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border);">3</td><td style="padding:8px 12px; border:1px solid var(--border);">Possible</td><td style="padding:8px 12px; border:1px solid var(--border);">Might occur at some time</td></tr>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border);">4</td><td style="padding:8px 12px; border:1px solid var(--border);">Likely</td><td style="padding:8px 12px; border:1px solid var(--border);">Will probably occur in most circumstances</td></tr>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border);">5</td><td style="padding:8px 12px; border:1px solid var(--border);">Almost Certain</td><td style="padding:8px 12px; border:1px solid var(--border);">Expected to occur regularly</td></tr>'
+        + '</tbody></table>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">3. Risk Treatment Options</h2>'
+        + '<p style="margin-bottom:10px;"><strong>Mitigate</strong> — Implement controls to reduce likelihood or impact.</p>'
+        + '<p style="margin-bottom:10px;"><strong>Transfer</strong> — Transfer risk through insurance or contractual arrangements.</p>'
+        + '<p style="margin-bottom:10px;"><strong>Accept</strong> — Formally accept the risk with documented justification and CISO approval.</p>'
+        + '<p><strong>Avoid</strong> — Eliminate the activity that gives rise to the risk.</p>'
+    },
+    irp: {
+      title: 'Incident Response Plan (DORA)',
+      type: 'Plan', status: 'Draft', version: '0.9', author: 'SecOps Team', approved: 'Pending approval', nextReview: 'Upon approval', frameworks: 'DORA (Art. 17-23) · ISO 27001 (A.5.24)', fileSize: '278 KB',
+      body: '<div style="padding:12px 16px; background:var(--yellow-bg); border:1px solid var(--yellow); border-radius:8px; margin-bottom:16px; font-size:12.5px;">'
+        + '<strong style="color:#B47A14;">&#128196; Draft Document</strong> — This document is pending CISO approval. Content may change before finalization.</div>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">1. Purpose</h2>'
+        + '<p style="margin-bottom:16px;">This plan establishes the procedures for detecting, reporting, and managing major ICT-related incidents in compliance with the Digital Operational Resilience Act (DORA) Articles 17-23.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">2. DORA Reporting Timelines</h2>'
+        + '<table style="width:100%; border-collapse:collapse; margin-bottom:16px; font-size:12.5px;"><thead><tr style="background:var(--bg);"><th style="padding:8px 12px; border:1px solid var(--border); text-align:left;">Report</th><th style="padding:8px 12px; border:1px solid var(--border); text-align:left;">Deadline</th><th style="padding:8px 12px; border:1px solid var(--border); text-align:left;">Content</th></tr></thead><tbody>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border); font-weight:600; color:var(--red);">Initial Notification</td><td style="padding:8px 12px; border:1px solid var(--border);">4 hours</td><td style="padding:8px 12px; border:1px solid var(--border);">Nature, affected systems, initial classification</td></tr>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border); font-weight:600; color:var(--yellow);">Interim Report</td><td style="padding:8px 12px; border:1px solid var(--border);">72 hours</td><td style="padding:8px 12px; border:1px solid var(--border);">Updated assessment, containment measures, impact analysis</td></tr>'
+        + '<tr><td style="padding:8px 12px; border:1px solid var(--border); font-weight:600; color:var(--green);">Final Report</td><td style="padding:8px 12px; border:1px solid var(--border);">1 month</td><td style="padding:8px 12px; border:1px solid var(--border);">Root cause analysis, remediation, lessons learned</td></tr>'
+        + '</tbody></table>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">3. Classification Criteria</h2>'
+        + '<p style="margin-bottom:10px;">An ICT incident is classified as <strong>major</strong> if it meets two or more of the following criteria:</p>'
+        + '<p style="margin-bottom:8px; padding-left:16px;">&#8226; Affects more than 10% of clients or users</p>'
+        + '<p style="margin-bottom:8px; padding-left:16px;">&#8226; Causes service disruption exceeding 2 hours</p>'
+        + '<p style="margin-bottom:8px; padding-left:16px;">&#8226; Results in data breach involving personal or financial data</p>'
+        + '<p style="margin-bottom:8px; padding-left:16px;">&#8226; Causes direct financial loss exceeding EUR 100,000</p>'
+        + '<p style="padding-left:16px;">&#8226; Impacts critical or important functions as classified in the ICT Risk Framework</p>'
+    },
+    crypto: {
+      title: 'Cryptography Policy',
+      type: 'Policy', status: 'Draft', version: '0.7', author: 'Crypto Engineering', approved: 'Pending approval', nextReview: 'Upon approval', frameworks: 'ISO 27001 (A.8.24) · PCI-DSS (Req. 3.5)', fileSize: '156 KB',
+      body: '<div style="padding:12px 16px; background:var(--yellow-bg); border:1px solid var(--yellow); border-radius:8px; margin-bottom:16px; font-size:12.5px;">'
+        + '<strong style="color:#B47A14;">&#128196; Draft Document</strong> — This document is pending CISO approval. Key lifecycle management section is incomplete.</div>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">1. Purpose</h2>'
+        + '<p style="margin-bottom:16px;">This policy establishes the requirements for the use of cryptographic controls to protect the confidentiality, integrity, and authenticity of WellQ information assets.</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">2. Approved Algorithms</h2>'
+        + '<p style="margin-bottom:10px;"><strong>Symmetric Encryption:</strong> AES-256-GCM (required for data at rest and in transit)</p>'
+        + '<p style="margin-bottom:10px;"><strong>Asymmetric Encryption:</strong> RSA-4096 or ECDSA P-384 (for key exchange and digital signatures)</p>'
+        + '<p style="margin-bottom:16px;"><strong>Hashing:</strong> SHA-384 or SHA-512 (SHA-256 permitted for legacy systems with documented exception)</p>'
+        + '<h2 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text);">3. Key Management</h2>'
+        + '<p style="margin-bottom:10px;"><strong>3.1 Generation:</strong> Keys shall be generated using FIPS 140-2 validated hardware security modules (HSMs) or approved cloud KMS services.</p>'
+        + '<p style="margin-bottom:10px;"><strong>3.2 Storage:</strong> Private keys shall never be stored in plaintext. All key material must be stored in HSMs or encrypted key vaults.</p>'
+        + '<p style="margin-bottom:10px; padding:10px 14px; background:var(--red-bg); border-radius:6px; font-size:12px;"><strong style="color:var(--red);">&#9888; Section Incomplete:</strong> Key rotation frequency and lifecycle procedures are pending definition. CAPA OBS-2025-001 tracks this gap.</p>'
+        + '<p><strong>3.3 Destruction:</strong> Cryptographic keys shall be destroyed using NIST SP 800-88 compliant methods when no longer required.</p>'
+    }
+  };
+
+  function openDocModal(docId) {
+    var doc = docData[docId];
+    if (!doc) return;
+    document.getElementById('docModalTitle').textContent = doc.title;
+    var statusColor = doc.status === 'Approved' ? 'var(--green)' : doc.status === 'Draft' ? 'var(--yellow)' : 'var(--red)';
+    document.getElementById('docModalMeta').innerHTML =
+      '<span style="font-weight:500;">' + doc.type + '</span>'
+      + '<span style="color:' + statusColor + '; font-weight:600;">&#9679; ' + doc.status + '</span>'
+      + '<span>v' + doc.version + '</span>'
+      + '<span>' + doc.frameworks + '</span>';
+    document.getElementById('docModalBody').innerHTML =
+      '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; padding:14px; background:var(--bg); border-radius:8px; font-size:12px;">'
+      + '<div><span style="color:var(--text-muted);">Author:</span> <strong>' + doc.author + '</strong></div>'
+      + '<div><span style="color:var(--text-muted);">Approved:</span> <strong>' + doc.approved + '</strong></div>'
+      + '<div><span style="color:var(--text-muted);">Next Review:</span> <strong>' + doc.nextReview + '</strong></div>'
+      + '<div><span style="color:var(--text-muted);">File Size:</span> <strong>' + doc.fileSize + '</strong></div>'
+      + '</div>'
+      + '<div style="border-top:1px solid var(--border); padding-top:20px;">' + doc.body + '</div>';
+    document.getElementById('docModalFooter').textContent = doc.title + ' · v' + doc.version + ' · ' + doc.fileSize;
+    document.getElementById('docModal').classList.add('open');
+  }
+
+  function closeDocModal() {
+    document.getElementById('docModal').classList.remove('open');
+  }
+
+  document.getElementById('docModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDocModal();
+  });
+
+  function downloadDoc() {
+    var title = document.getElementById('docModalTitle').textContent;
+    var body = document.getElementById('docModalBody').innerText;
+    var blob = new Blob([title + '\n\n' + body], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = title.replace(/[^a-zA-Z0-9]/g, '_') + '.docx';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // --- Framework chip toggle ---
+  document.querySelectorAll('.fw-chip').forEach(chip => {
+    chip.addEventListener('click', function() { if (!this.style.borderStyle) this.classList.toggle('active'); });
+  });
+</script>
+
+</body>
+</html>
