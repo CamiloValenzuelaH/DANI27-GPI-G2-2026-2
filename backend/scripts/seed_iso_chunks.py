@@ -13,6 +13,7 @@ reemplazar el contenido del catálogo sin tocar el resto del pipeline.
 from __future__ import annotations
 
 import asyncio
+import time
 import os
 import sys
 import uuid
@@ -128,6 +129,7 @@ async def seed_async() -> None:
             if not chunk.content.strip():
                 continue
 
+            time.sleep(1.5)  # Respiro para no saturar la API de Gemini (Error 429)
             embedding = await generate_embedding(chunk.content)
             embedding_literal = embedding_to_literal(embedding)
             db.execute(
