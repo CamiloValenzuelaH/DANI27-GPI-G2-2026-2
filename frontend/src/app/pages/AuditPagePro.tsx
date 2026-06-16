@@ -11,6 +11,7 @@ import {
   type ValidationReportResponse,
 } from '../../api/externalValidation';
 import { usePreferences } from '../components/AppShell';
+import { formatDateTime } from '../lib/date';
 import { translations } from '../types';
 
 interface ChatMessage {
@@ -22,7 +23,7 @@ interface ChatMessage {
 
 export default function AuditPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { language } = usePreferences();
+  const { language, dateFormat } = usePreferences();
   const intl = {
     formatMessage: ({ id, defaultMessage }: { id: string; defaultMessage?: string }) => {
       const messages = translations[language] as Record<string, string>;
@@ -81,13 +82,10 @@ export default function AuditPage() {
     if (checklistSaving) return t('audit.checklistSaving', 'Saving...');
     if (checklistDirty) return t('audit.checklistDirty', 'Pending changes');
     if (lastChecklistSavedAt) {
-      const dt = new Date(lastChecklistSavedAt);
-      if (!Number.isNaN(dt.getTime())) {
-        return `${t('audit.savedAt', 'Saved')} ${dt.toLocaleTimeString()}`;
-      }
+      return `${t('audit.savedAt', 'Saved')} ${formatDateTime(lastChecklistSavedAt, dateFormat, language)}`;
     }
     return t('audit.noChanges', 'No changes');
-  }, [checklistSaving, checklistDirty, lastChecklistSavedAt, intl]);
+  }, [checklistSaving, checklistDirty, lastChecklistSavedAt, t, dateFormat, language]);
 
   const getChecklistTitle = (item: AuditChecklistItem) => {
     return t(`audit.checklist.${item.control_code}`, item.title);

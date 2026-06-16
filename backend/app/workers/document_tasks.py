@@ -65,7 +65,9 @@ async def publish_document_progress(
         "current_attempt": str(current_attempt or 0),
         "last_event": event,
         "created_at": now,
+        "created_date": datetime.now(timezone.utc).date().isoformat(),
         "updated_at": now,
+        "updated_date": datetime.now(timezone.utc).date().isoformat(),
     }
 
     if isinstance(event_data.get("document_text"), str):

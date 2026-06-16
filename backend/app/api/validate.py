@@ -61,6 +61,7 @@ async def _write_initial_job_state(
 ) -> None:
     redis_client = get_redis_client()
     now = datetime.now(timezone.utc).isoformat()
+    now_date = datetime.now(timezone.utc).date().isoformat()
     await redis_client.hset(
         _job_key(job_id),
         mapping={
@@ -78,7 +79,9 @@ async def _write_initial_job_state(
             "summary": "",
             "error": "",
             "created_at": now,
+            "created_date": now_date,
             "updated_at": now,
+            "updated_date": now_date,
         },
     )
     await redis_client.expire(_job_key(job_id), JOB_TTL_SECONDS)
@@ -121,6 +124,7 @@ async def _read_job_state(job_id: str) -> ValidationReportResponse:
         error=raw.get("error") or None,
         created_at=_parse_dt(raw.get("created_at")),
         updated_at=_parse_dt(raw.get("updated_at")),
+        created_date=(raw.get("created_date") or (datetime.fromisoformat(raw.get("created_at")).date().isoformat() if raw.get("created_at") else None)),
     )
 
 

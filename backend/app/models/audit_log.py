@@ -57,6 +57,15 @@ class AuditLog(Base, UUIDMixin):
         data = json.dumps(payload, sort_keys=True, ensure_ascii=False)
         return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
+    @property
+    def timestamp_date(self) -> str | None:
+        if getattr(self, "timestamp", None):
+            try:
+                return self.timestamp.date().isoformat()
+            except Exception:
+                return None
+        return None
+
 
 # Prevent DELETE/UPDATE on audit_logs at the DB level (Postgres function + trigger)
 _prevent_mutation_ddl = DDL(

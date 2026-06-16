@@ -20,6 +20,23 @@ class TimestampMixin:
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+    @property
+    def created_date(self) -> str | None:
+        if getattr(self, "created_at", None):
+            try:
+                return self.created_at.date().isoformat()
+            except Exception:
+                return None
+        return None
+
+    @property
+    def updated_date(self) -> str | None:
+        if getattr(self, "updated_at", None):
+            try:
+                return self.updated_at.date().isoformat()
+            except Exception:
+                return None
+        return None
 
 
 class UUIDMixin:

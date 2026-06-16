@@ -12,6 +12,7 @@ class ChatRequest(BaseModel):
     message: str
     conversation_id: str | None = Field(default=None, alias="conversationId")
     mode: Literal["document", "iso", "both"] = "iso"
+    language: Literal["es", "en", "pt", "de", "fr", "it"] = Field(default="es", alias="language")
 
 
 class ChatActionOption(BaseModel):

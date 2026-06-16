@@ -211,6 +211,7 @@ class NotificationService:
                                 "body": notification.body,
                                 "is_read": notification.is_read,
                                 "created_at": notification.created_at.isoformat(),
+                                "created_date": notification.created_at.date().isoformat(),
                                 "payload": payload_json,
                             },
                         },

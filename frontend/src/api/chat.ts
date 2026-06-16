@@ -8,6 +8,7 @@ export interface ChatRequest {
   message: string
   conversationId?: string
   mode: ChatMode
+  language?: 'es' | 'en' | 'pt' | 'it' | 'de' | 'fr'
 }
 
 export interface ChatHistoryItem {
@@ -46,6 +47,12 @@ export interface ChatActionExecutionRequest {
   action: ChatActionOption
   conversationId?: string
   mode: ChatMode
+}
+
+export const clearChatConversation = async (conversationId: string): Promise<void> => {
+  await client.delete('/chat/history', {
+    params: { conversationId },
+  })
 }
 
 export const executeDocumentChatAction = async (

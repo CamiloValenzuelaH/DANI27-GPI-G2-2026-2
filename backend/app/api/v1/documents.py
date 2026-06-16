@@ -69,11 +69,19 @@ async def _list_user_documents(current_user: User) -> list[DocumentMetadata]:
             await redis_client.srem(_user_document_index_key(str(current_user.organization_id)), document_id)
             continue
 
+        created_date = raw.get("created_date")
+        if not created_date and raw.get("created_at"):
+            try:
+                created_date = datetime.fromisoformat(raw.get("created_at")).date().isoformat()
+            except Exception:
+                created_date = None
+
         documents.append(DocumentMetadata(
             documentId=document_id,
             title=raw.get("title", "Documento sin título"),
             description=raw.get("description"),
             created_at=datetime.fromisoformat(raw.get("created_at")) if raw.get("created_at") else None,
+            created_date=created_date,
         ))
 
     return documents
@@ -178,6 +186,8 @@ async def _read_job_state(job_id: str) -> DocumentGenerationProgressResponse:
         sections=sections,
         created_at=_parse_datetime(raw.get("created_at")),
         updated_at=_parse_datetime(raw.get("updated_at")),
+        created_date=(raw.get("created_date")
+                      or (datetime.fromisoformat(raw.get("created_at")).date().isoformat() if raw.get("created_at") else None)),
     )
 
 
@@ -238,6 +248,7 @@ async def create_document_generation_job(
             "last_event": "job_queued",
             "event_data": json.dumps({"document_title": payload.title}, ensure_ascii=False),
             "created_at": datetime.utcnow().isoformat(),
+            "created_date": datetime.utcnow().date().isoformat(),
             "updated_at": datetime.utcnow().isoformat(),
         },
     )
@@ -287,7 +298,9 @@ async def upload_document(
             "description": description or "",
             "document_text": document_text,
             "created_at": datetime.utcnow().isoformat(),
+            "created_date": datetime.utcnow().date().isoformat(),
             "updated_at": datetime.utcnow().isoformat(),
+            "updated_date": datetime.utcnow().date().isoformat(),
             "last_event": "uploaded",
         },
     )
@@ -300,6 +313,7 @@ async def upload_document(
         title=title,
         description=description,
         message="Documento subido correctamente",
+        created_date=datetime.utcnow().date().isoformat(),
     )
 
 
@@ -396,6 +410,7 @@ async def update_document(
             "title": title.strip(),
             "document_text": content.strip(),
             "updated_at": datetime.utcnow().isoformat(),
+            "updated_date": datetime.utcnow().date().isoformat(),
         },
     )
 

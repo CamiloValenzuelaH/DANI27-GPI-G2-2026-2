@@ -20,6 +20,9 @@ export default function RegisterPage() {
     setIsLoading(true)
     try {
       await registerUser(data)
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('dani_show_onboarding', '1')
+      }
       navigate('/dashboard')
     } catch (err: any) {
       setError(parseFastApiError(err))

@@ -20,6 +20,7 @@ from app.models.threat import Threat, risk_threats
 from app.models.vulnerability import Vulnerability
 from app.models.notification import Notification, NotificationPreference
 from app.models.iso_threat_catalog import ISOThreatCatalog
+from app.models.report_job import ReportJob
 
 __all__ = [
     "Plan",
@@ -48,4 +49,5 @@ __all__ = [
     "Notification",
     "NotificationPreference",
     "ISOThreatCatalog",
+    "ReportJob",
 ]

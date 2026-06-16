@@ -32,6 +32,7 @@ class DocumentUploadResponse(BaseModel):
     title: str
     description: str | None = None
     message: str | None = None
+    created_date: str | None = None
 
 
 class DocumentMetadata(BaseModel):
@@ -39,6 +40,7 @@ class DocumentMetadata(BaseModel):
     title: str
     description: str | None = None
     created_at: datetime | None = None
+    created_date: str | None = None
 
 
 class DocumentDetailResponse(DocumentMetadata):
@@ -71,3 +73,4 @@ class DocumentGenerationProgressResponse(BaseModel):
     sections: list[dict[str, Any]] = Field(default_factory=list)
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    created_date: str | None = None

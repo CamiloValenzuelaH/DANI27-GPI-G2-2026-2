@@ -5,16 +5,20 @@ import QuestionCard from './QuestionCard';
 import ProgressSidebar from './ProgressSidebar';
 import useAutosave from '../../hooks/useAutosave';
 import { loadProgressLocal, saveProgressLocal } from '../../lib/storage';
+import { usePreferences } from '../AppShell';
+import { formatDateTime } from '../../lib/date';
 import type { AssessmentAttachment } from './EvidenceAttachment';
 
 type Phase = any;
 
 export default function AssessmentPage() {
+  const { dateFormat, language } = usePreferences();
   const [phases, setPhases] = useState<Phase[]>([]);
   const [currentPhaseId, setCurrentPhaseId] = useState<string>('');
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [lastSaved, setLastSaved] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -26,16 +30,28 @@ export default function AssessmentPage() {
         setLastSaved(stored.lastSaved || null);
       }
 
-      // fetch phases from API
       try {
-        const remote = await getPhases()
-        // map to expected shape (id as string)
-        const mapped = remote.map((p) => ({ ...p, id: String(p.id), questions: [] }))
-        setPhases(mapped)
-        if (!stored) setCurrentPhaseId(mapped[0]?.id || '')
+        const remote = await getPhases();
+        const mapped = remote
+          .map((p) => ({ ...p, id: String(p.id), questions: [] }))
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+
+        const firstPhaseId = mapped[0]?.id || '';
+        const initialPhaseId = stored?.currentPhaseId && mapped.some((p) => p.id === String(stored.currentPhaseId))
+          ? String(stored.currentPhaseId)
+          : firstPhaseId;
+
+        const initialQuestionIdx = typeof stored?.currentQuestionIdx === 'number' ? stored.currentQuestionIdx : 0;
+        setPhases(mapped);
+        setCurrentPhaseId(initialPhaseId);
+        setCurrentQuestionIdx(initialQuestionIdx);
+
+        if (!initialPhaseId) {
+          setIsLoading(false);
+        }
       } catch (err) {
         // keep empty phases on error
-        // console.error(err)
+        setIsLoading(false);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -67,16 +83,28 @@ export default function AssessmentPage() {
 
   // fetch questions when phase changes
   useEffect(() => {
+    if (!currentPhaseId) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setCurrentQuestionIdx(0);
     (async () => {
-      if (!currentPhaseId) return
       try {
-        const qs = await getPhaseQuestions(currentPhaseId)
-        setPhases((prev) => prev.map((p) => (p.id === currentPhaseId ? { ...p, questions: qs.map((q) => ({ ...q, id: String(q.id) })) } : p)))
+        const qs = await getPhaseQuestions(currentPhaseId);
+        setPhases((prev) =>
+          prev.map((p) =>
+            p.id === currentPhaseId ? { ...p, questions: qs.map((q) => ({ ...q, id: String(q.id) })) } : p
+          )
+        );
       } catch (err) {
         // ignore
+      } finally {
+        setIsLoading(false);
       }
-    })()
-  }, [currentPhaseId])
+    })();
+  }, [currentPhaseId]);
 
   const setAnswerValue = (questionId: string, value: any) => {
     setAnswers((s) => ({ ...s, [questionId]: { ...(s[questionId] || {}), value, updatedAt: new Date().toISOString() } }));
@@ -152,6 +180,16 @@ export default function AssessmentPage() {
     return res;
   }, [phases, answers]);
 
+  const answeredCount = useMemo(
+    () => Object.values(answers).filter((answer) => answer?.value !== undefined && answer?.value !== null && answer?.value !== '').length,
+    [answers]
+  );
+
+  const totalQuestionCount = useMemo(
+    () => phases.reduce((sum, phase) => sum + (phase.questions?.length || 0), 0),
+    [phases]
+  );
+
   const saveNow = async () => {
     const payload = { answers, currentPhaseId, currentQuestionIdx, lastSaved: new Date().toISOString() };
     await saveProgressLocal(payload);
@@ -161,13 +199,21 @@ export default function AssessmentPage() {
   useAutosave(saveNow, 2000, [answers, currentPhaseId, currentQuestionIdx]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 p-6">
+    <div className="overflow-x-hidden min-h-screen bg-gray-950 text-gray-100 p-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
         <main>
-          <PhaseSelector phases={phases} currentPhaseId={currentPhaseId} onSelect={(id) => { setCurrentPhaseId(id); setCurrentQuestionIdx(0); }} />
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <PhaseSelector phases={phases} currentPhaseId={currentPhaseId} onSelect={(id) => { setCurrentPhaseId(id); setCurrentQuestionIdx(0); }} />
+            <div className="rounded-xl bg-gray-900 border border-gray-800 px-4 py-2 text-sm text-gray-300">
+              <span className="font-medium text-white">Respondido</span>{' '}
+              {answeredCount} / {totalQuestionCount}
+            </div>
+          </div>
 
           <div className="mt-6">
-            {question ? (
+            {isLoading ? (
+              <div className="text-gray-400">Cargando preguntas...</div>
+            ) : question ? (
               <QuestionCard
                 question={question}
                 answer={answers[question.id]}
@@ -188,7 +234,9 @@ export default function AssessmentPage() {
             >
               Anterior
             </button>
-            <div className="text-sm text-gray-400">{lastSaved ? `Guardado: ${new Date(lastSaved).toLocaleTimeString()}` : 'Sin guardar aún'}</div>
+            <div className="text-sm text-gray-400">
+              {lastSaved ? `Guardado: ${formatDateTime(lastSaved, dateFormat, language)}` : 'Sin guardar aún'}
+            </div>
             <button
               onClick={() => setCurrentQuestionIdx((i) => Math.min(questions.length - 1, i + 1))}
               className="px-4 py-2 bg-indigo-600 rounded text-white"

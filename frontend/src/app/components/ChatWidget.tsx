@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { X, MessageCircle, Send } from 'lucide-react';
-import { executeDocumentChatAction, getChatHistory, sendChatMessage, streamDocumentChat, type ChatMode, type ChatActionOption } from '../../api/chat';
+import { usePreferences } from '../components/AppShell';
+import { clearChatConversation, executeDocumentChatAction, getChatHistory, sendChatMessage, streamDocumentChat, type ChatMode, type ChatActionOption } from '../../api/chat';
 
 interface ChatMessage {
   id: number;
@@ -25,6 +26,50 @@ function createConversationId() {
   return `conv-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
 }
 
+const localizedUiText = {
+  es: {
+    clear: 'Limpiar',
+    documentMode: 'Modo ISO habilitado. Abre un documento para usar el modo de documento.',
+  },
+  en: {
+    clear: 'Clear',
+    documentMode: 'ISO mode enabled. Open a document to use document mode.',
+  },
+  pt: {
+    clear: 'Limpar',
+    documentMode: 'Modo ISO ativado. Abra um documento para usar o modo de documento.',
+  },
+  it: {
+    clear: 'Pulisci',
+    documentMode: 'Modalità ISO abilitata. Apri un documento per usare la modalità documento.',
+  },
+  de: {
+    clear: 'Löschen',
+    documentMode: 'ISO-Modus aktiviert. Öffne ein Dokument, um den Dokumentmodus zu verwenden.',
+  },
+  fr: {
+    clear: 'Effacer',
+    documentMode: 'Mode ISO activé. Ouvrez un document pour utiliser le mode document.',
+  },
+} as const;
+
+function getInitialGreeting(language: 'es' | 'en' | 'pt' | 'it' | 'de' | 'fr') {
+  switch (language) {
+    case 'en':
+      return 'Hello, I am Dani, your professional ISO 27001 compliance assistant. How can I help you?';
+    case 'pt':
+      return 'Olá, sou Dani, seu assistente profissional de conformidade ISO 27001. Como posso ajudar?';
+    case 'de':
+      return 'Hallo, ich bin Dani, Ihr professioneller ISO 27001-Compliance-Assistent. Wie kann ich Ihnen helfen?';
+    case 'it':
+      return 'Ciao, sono Dani, il tuo assistente professionale per la conformità ISO 27001. Come posso aiutarti?';
+    case 'fr':
+      return 'Bonjour, je suis Dani, votre assistant professionnel de conformité ISO 27001. Comment puis-je vous aider?';
+    default:
+      return 'Hola, soy Dani, tu asistente profesional de cumplimiento ISO 27001. ¿En qué puedo ayudarte?';
+  }
+}
+
 export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
   const location = useLocation();
   const [showChat, setShowChat] = useState(false);
@@ -33,6 +78,7 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
   const [conversationId, setConversationId] = useState<string>('');
   const [mode, setMode] = useState<ChatMode>('iso');
   const [isStreaming, setIsStreaming] = useState(false);
+  const preferences = usePreferences();
   const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [actionOptions, setActionOptions] = useState<ChatActionOption[]>([]);
@@ -40,6 +86,8 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
   const nextIdRef = useRef(1);
 
   const documentId = useMemo(() => new URLSearchParams(location.search).get('docId'), [location.search]);
+
+  const chatLanguage = (preferences.language || 'es') as 'es' | 'en' | 'pt' | 'it' | 'de' | 'fr';
 
   useEffect(() => {
     const handleOpenChat = () => setShowChat(true);
@@ -81,7 +129,7 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
         setChatMessages([
           {
             id: nextIdRef.current++,
-            text: 'Hola, soy Dani, tu asistente profesional de cumplimiento ISO 27001. ¿En qué puedo ayudarte?',
+            text: getInitialGreeting(chatLanguage),
             role: 'assistant',
             timestamp: new Date().toISOString(),
           },
@@ -153,6 +201,7 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
       message: userText,
       conversationId,
       mode: documentId ? mode : 'iso',
+      language: chatLanguage,
     };
 
     if (documentId && mode !== 'iso') {
@@ -275,6 +324,32 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
     }
   };
 
+  const clearConversation = async () => {
+    if (isStreaming) return;
+
+    try {
+      await clearChatConversation(conversationId);
+    } catch {
+      // Ignorar errores al limpiar el historial remoto
+    }
+
+    const newConversationId = createConversationId();
+    window.localStorage.setItem(CHAT_CONVERSATION_KEY, newConversationId);
+    setConversationId(newConversationId);
+    setChatMessage('');
+    setChatMessages([
+      {
+        id: nextIdRef.current++,
+        text: getInitialGreeting(chatLanguage),
+        role: 'assistant',
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+    setError(null);
+    setActionOptions([]);
+    setUnreadCount(0);
+  };
+
   const toggleChat = () => {
     setShowChat((prev) => !prev);
   };
@@ -294,13 +369,20 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
       </button>
 
       {showChat && (
-        <div className={`fixed bottom-[88px] right-7 w-[380px] rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden ${darkMode ? 'bg-[#1A1D28]' : 'bg-white'}`}>
+        <div className={`fixed bottom-[88px] right-7 w-[420px] min-h-[520px] rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden ${darkMode ? 'bg-[#1A1D28]' : 'bg-white'}`}>
           <div className="px-5 py-4 bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-sm">🤖</div>
             <div className="flex-1">
               <div className="font-semibold text-sm">Dani AI</div>
               <div className="text-[11px] opacity-75">Asistente ISO 27001</div>
             </div>
+            <button
+              type="button"
+              onClick={clearConversation}
+              className="mr-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[12px] text-white transition hover:bg-white/20"
+            >
+              {localizedUiText[chatLanguage].clear}
+            </button>
             <button onClick={toggleChat} className="opacity-70 hover:opacity-100">
               <X className="w-5 h-5" />
             </button>
@@ -321,7 +403,7 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
                 </select>
               </div>
             ) : (
-              <div>Modo ISO habilitado. Abre un documento para usar el modo de documento.</div>
+              <div>{localizedUiText[chatLanguage].documentMode}</div>
             )}
           </div>
 

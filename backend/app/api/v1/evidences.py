@@ -161,4 +161,5 @@ async def upload_evidence(
         "content_type": file.content_type,
         "size_bytes": len(content),
         "file_path": str(destination.as_posix()),
+        "created_date": evidence_row.created_at.date().isoformat() if evidence_row.created_at else None,
     }

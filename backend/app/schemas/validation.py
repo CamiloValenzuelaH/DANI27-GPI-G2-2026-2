@@ -50,6 +50,7 @@ class ValidationReportResponse(BaseModel):
     error: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    created_date: str | None = None
 
 
 class ValidationSSEEnvelope(BaseModel):

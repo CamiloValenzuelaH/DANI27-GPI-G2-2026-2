@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -148,6 +148,12 @@ async def _load_chat_history(org_id: str, user_id: str, conversation_id: str) ->
         except (ValueError, TypeError):
             continue
     return items
+
+
+async def _clear_chat_history(org_id: str, user_id: str, conversation_id: str) -> None:
+    redis_client = get_redis_client()
+    history_key = _build_chat_history_key(org_id, user_id, conversation_id)
+    await redis_client.delete(history_key)
 
 
 async def _load_iso_contexts(db: Session, message: str) -> list[dict[str, str]]:
@@ -472,19 +478,26 @@ def _detect_language(message: str) -> str:
     return top_languages[0]
 
 
-def _build_obsolete_iso_2013_directive(message: str) -> str | None:
+def _build_obsolete_iso_2013_directive(message: str, target_lang: str) -> str | None:
+    lang_mapping = {
+        "es": "Spanish",
+        "en": "English",
+        "it": "Italian",
+        "de": "German",
+        "pt": "Portuguese"
+    }
+    idioma_destino = lang_mapping.get(target_lang.lower(), "Spanish")
+
     if re.search(r"\bA\.(?:9|1[0-8])(?:\.[0-9]+)*\b", message.upper()):
         return (
-            "[CRITICAL DIRECTIVE - STRICT LANGUAGE LOCALIZATION REQUIRED]\n"
-            "1. DETECTION: The user is asking about an obsolete control or domain from the ISO 27001:2013 standard (prefixes A.9 to A.18).\n"
-            "2. MANDATORY LANGUAGE RULE: You MUST identify the language utilized by the user in their prompt (e.g., Italian, Portuguese, German, English, Spanish). Your entire response MUST be written exclusively in that exact language.\n"
-            "3. NO MIXED LANGUAGES: Do NOT use English if the user asked in Italian or German. Do NOT use the original Spanish names of the controls (like 'Separación de entornos'). You must translate everything, including the ISO 27001:2022 control titles and names, into the user's language.\n"
-            "4. REQUIRED RESPONSE STRUCTURE (Fully translated into the user's language):\n"
-            "   - Clearly state that the requested code or domain does not exist in the current ISO/IEC 27001:2022 standard and belongs to the obsolete 2013 version.\n"
-            "   - Map the concept to its correct 2022 equivalents under the new domains (A.5 to A.8). For instance:\n"
-            "     * Old A.9 (Access Control) maps to the 2022 equivalents for Identity Management (A.5.15), Access Rights (A.5.16), and Authentication Information (A.5.17).\n"
-            "     * Old A.14 (Development) maps to Secure Development Lifecycle (A.8.25) and Separation of Development, Test, and Production Environments (A.8.31).\n"
-            "   - Politely ask the user to reformulate their query using the valid ISO 27001:2022 framework."
+            f"[CRITICAL DIRECTIVE - ENFORCED LOCALIZATION TO {idioma_destino.upper()}]\n"
+            f"1. DETECTION: The user is asking about an obsolete control or domain from the ISO 27001:2013 standard.\n"
+            f"2. ABSOLUTE LANGUAGE RULE: You MUST write your entire response, including all explanations, titles, and structural text, strictly and exclusively in {idioma_destino}.\n"
+            f"3. STUCTURAL TRANSLATION: Do NOT include any Spanish words, Spanish text headers, or Spanish descriptions (such as 'Control de acceso' or 'Gestión de vulnerabilidades'). You must translate every single control name dynamically into {idioma_destino}.\n"
+            f"4. REQUIRED RESPONSE STRUCTURE:\n"
+            f"   - State that the requested code belongs to the obsolete 2013 standard.\n"
+            f"   - Provide the 2022 equivalents (such as A.5.15, A.5.16, A.5.17 for old access concepts, or A.8.25, A.8.31 for old development concepts) and translate their official definitions completely into {idioma_destino}.\n"
+            f"   - Conclude by asking the user to reformulate the query using the valid ISO 27001:2022 framework."
         )
     return None
 
@@ -797,6 +810,7 @@ async def _generate_chat_response(
     current_user: User,
     db: Session,
     document_id: str | None = None,
+    user_language: str | None = None,
 ) -> tuple[str, list[str], str | None, list[dict[str, str]]]:
     if _is_simple_greeting(message):
         return (
@@ -806,8 +820,9 @@ async def _generate_chat_response(
             [],
         )
 
-    language = _detect_language(message)
-    obsolete_directive = _build_obsolete_iso_2013_directive(message)
+    supported_languages = {"es", "en", "pt", "de", "fr", "it"}
+    language = user_language if user_language in supported_languages else _detect_language(message)
+    obsolete_directive = _build_obsolete_iso_2013_directive(message, language)
     iso_contexts = await _load_iso_contexts(db, message)
     document_text = None
     if document_id:
@@ -924,6 +939,7 @@ async def chat_general(
         current_user,
         db,
         document_id=None if payload.mode == "iso" else None,
+        user_language=payload.language,
     )
 
     await _append_chat_message(
@@ -963,6 +979,19 @@ async def chat_history(
     return history
 
 
+@router.delete("/chat/history", status_code=status.HTTP_204_NO_CONTENT)
+async def chat_clear_history(
+    conversation_id: str | None = Query(None, alias="conversationId"),
+    current_user: User = Depends(get_current_user),
+):
+    await _clear_chat_history(
+        str(current_user.organization_id),
+        str(current_user.id),
+        conversation_id or DEFAULT_CONVERSATION_ID,
+    )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 @router.post("/documents/{document_id}/chat")
 async def chat_document_stream(
     document_id: str,
@@ -979,6 +1008,7 @@ async def chat_document_stream(
         current_user,
         db,
         document_id=document_id_to_use,
+        user_language=payload.language,
     )
 
     await _append_chat_message(

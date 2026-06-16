@@ -44,6 +44,14 @@ export function LayoutProvider({ children, initialPlan = 'free' }: LayoutProvide
   const [userPlan, setUserPlan] = useState<UserPlan>(initialPlan);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Helper functions
+  const preventMiddleClick = (e: MouseEvent) => {
+    if (e.button === 1) {
+      e.preventDefault();
+      return false;
+    }
+  };
+
   // Persist navView to localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -63,6 +71,41 @@ export function LayoutProvider({ children, initialPlan = 'free' }: LayoutProvide
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // ALWAYS prevent horizontal page scrolling - keep layout static
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Force overflow-x hidden on document element permanently
+    document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.overflowX = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.overflowX = 'hidden';
+
+    // Block wheel scroll with horizontal delta ONLY
+    const preventHorizontalWheel = (e: WheelEvent) => {
+      if (e.deltaX !== 0) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    // Block middle mouse button (autoscroll feature)
+    const preventMiddleClick = (e: MouseEvent) => {
+      if (e.button === 1) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    document.addEventListener('wheel', preventHorizontalWheel, { passive: false });
+    document.addEventListener('mousedown', preventMiddleClick, { passive: false });
+
+    return () => {
+      document.removeEventListener('wheel', preventHorizontalWheel);
+      document.removeEventListener('mousedown', preventMiddleClick);
+    };
+  }, []);
+
   const setNavView = (view: NavView) => {
     setNavViewState(view);
   };
@@ -71,6 +114,54 @@ export function LayoutProvider({ children, initialPlan = 'free' }: LayoutProvide
     setIsSidebarOpen((prev) => !prev);
   };
 
+  // Block horizontal scroll on all overflow elements globally
+  useEffect(() => {
+    const preventMiddleClick = (e: MouseEvent) => {
+      if (e.button === 1) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    const blockHorizontalScrollOnElement = (el: Element) => {
+      const htmlEl = el as HTMLElement;
+      
+      // Block only horizontal wheel scrolling
+      htmlEl.addEventListener('wheel', (e: WheelEvent) => {
+        if (e.deltaX !== 0) {
+          e.preventDefault();
+          return false;
+        }
+      }, { passive: false });
+      
+      // Block middle mouse button
+      htmlEl.addEventListener('mousedown', preventMiddleClick, { passive: false });
+    };
+
+    // Apply to existing overflow elements
+    const allElements = document.querySelectorAll('[class*="overflow"]');
+    allElements.forEach(blockHorizontalScrollOnElement);
+
+    // Observe for new elements
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              const el = node as Element;
+              if (el.className && el.className.includes('overflow')) {
+                blockHorizontalScrollOnElement(el);
+              }
+            }
+          });
+        }
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
   return (
     <LayoutContext.Provider
       value={{

@@ -127,7 +127,7 @@ async def get_top_iso_chunks(embedding: list[float], limit: int = 5) -> list[dic
         chunks = []
         for row in rows:
             chunks.append({
-                "id": row[0],
+                "id": str(row[0]),
                 "clause_ref": row[1],
                 "title": row[2],
                 "content": row[3],
@@ -142,7 +142,10 @@ async def get_top_iso_chunks(embedding: list[float], limit: int = 5) -> list[dic
 
 async def publish_progress(job_id: str, fields: dict) -> None:
     """Publica el progreso de un job en Redis."""
-    fields["updated_at"] = fields.get("updated_at") or datetime.utcnow().isoformat()
+    now_iso = datetime.utcnow().isoformat()
+    now_date = datetime.utcnow().date().isoformat()
+    fields["updated_at"] = fields.get("updated_at") or now_iso
+    fields["updated_date"] = fields.get("updated_date") or now_date
     
     # Convertir listas/dicts a JSON strings para Redis
     for key, value in fields.items():

@@ -982,7 +982,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden border-none bg-slate-950 p-0 text-slate-50 shadow-none !left-0 !top-0 !max-w-none !rounded-none !translate-x-0 !translate-y-0">
+      <DialogContent className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden border-none bg-slate-950 p-0 text-slate-50 shadow-none !left-0 !top-0 !max-w-none !rounded-none !translate-x-0 !translate-y-0 lg:!inset-auto lg:!top-[50%] lg:!left-[50%] lg:!translate-x-[-50%] lg:!translate-y-[-50%] lg:h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-2rem)] lg:w-[min(100vw-2rem,1120px)] lg:max-w-[1120px] lg:rounded-[32px] lg:shadow-2xl">
         <div className="border-b border-white/10 bg-[linear-gradient(135deg,rgba(14,165,233,0.12),rgba(15,23,42,0.4))] px-6 py-5">
           <DialogHeader className="text-left">
             <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-50">Upload Evidence</DialogTitle>
@@ -999,7 +999,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
           </div>
         </div>
 
-        <div className="grid min-h-0 min-w-0 flex-1 gap-0 overflow-hidden lg:grid-cols-[360px_1fr]">
+        <div className="grid min-h-0 min-w-0 flex-1 gap-4 overflow-hidden lg:grid-cols-[360px_1fr]">
           <aside className="min-h-0 border-b border-white/10 bg-slate-950/95 p-6 lg:border-b-0 lg:border-r lg:overflow-hidden">
             <div className="flex h-full min-h-0 flex-col gap-4">
               <FileDropZone disabled={isProcessing} fileCount={items.length} onFilesSelected={addFiles} />
