@@ -45,11 +45,14 @@ async function generateEmbedding(text) {
 function buildValidationPrompt({ documentText, chunk }) {
   return [
     'Compara este documento contra este requisito ISO específico.',
+    'Usa únicamente la información que aparece en el texto proporcionado.',
+    'No agregues suposiciones ni inventes datos que no estén presentes en el fragmento.',
+    'Si no hay evidencia clara, indica que no se encontró información relevante.',
     'Retorna solo JSON válido con este esquema:',
     '{',
     '  "score": 0-100,',
     '  "observations": [{"severity":"critical|major|minor","text":"..."}],',
-    '  "suggestions": ["..."]',
+    '  "suggestions": ["..." ]',
     '}',
     '',
     `Requisito ISO [${chunk.clause_ref}] ${chunk.title}:`,
@@ -59,7 +62,6 @@ function buildValidationPrompt({ documentText, chunk }) {
     documentText,
   ].join('\n');
 }
-
 async function analyzeChunkWithAI({ documentText, chunk }) {
   if (!deepseekApiKey) {
     throw new Error('Falta DEEPSEEK_API_KEY');

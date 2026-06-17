@@ -8,15 +8,15 @@ from docx import Document
 from openpyxl import load_workbook
 
 
-async def extract_text_from_pdf(buffer: bytes, max_chars: int = 50000) -> str:
+async def extract_text_from_pdf(buffer: bytes, max_chars: int | None = 50000) -> str:
     """Extrae texto de un PDF."""
     try:
         pdf_reader = PyPDF2.PdfReader(io.BytesIO(buffer))
         text_parts = []
         for page in pdf_reader.pages:
-            text_parts.append(page.extract_text())
+            text_parts.append(page.extract_text() or "")
         text = "".join(text_parts)
-        return text[:max_chars]
+        return text[:max_chars] if max_chars is not None else text
     except Exception as e:
         raise ValueError(f"Error extrayendo PDF: {e}") from e
 
@@ -52,7 +52,7 @@ async def extract_text_from_excel(buffer: bytes, max_chars: int = 50000) -> str:
         raise ValueError(f"Error extrayendo XLSX: {e}") from e
 
 
-async def extract_text_from_file(file_path: str, max_chars: int = 50000) -> str:
+async def extract_text_from_file(file_path: str, max_chars: int | None = None) -> str:
     """Extrae texto desde un archivo según su tipo."""
     path = Path(file_path)
     ext = path.suffix.lower()

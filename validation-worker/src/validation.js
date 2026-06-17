@@ -18,6 +18,64 @@ function summarizeResults(results) {
   return `Validación granular completada sobre ${results.length} fragmentos ISO. Score promedio ${average}. Hallazgos críticos: ${criticalCount}. Hallazgos mayores: ${majorCount}.`;
 }
 
+function normalizeText(text) {
+  return String(text || '').replace(/\s+/g, ' ').trim();
+}
+
+function buildDocumentContext(documentText, chunk, maxChars = 12000) {
+  const fullText = String(documentText || '');
+  if (fullText.length <= maxChars) {
+    return fullText;
+  }
+
+  const terms = [];
+  if (chunk?.clause_ref) {
+    terms.push(chunk.clause_ref);
+  }
+  if (chunk?.title) {
+    terms.push(chunk.title);
+  }
+  if (chunk?.content) {
+    terms.push(...String(chunk.content).split(/\s+/).filter((token) => token.length > 4));
+  }
+
+  const uniqueTerms = [...new Set(terms.map((term) => String(term).trim()).filter(Boolean))];
+  const snippets = [];
+  const addSnippet = (index, radius = 1200) => {
+    const start = Math.max(0, index - radius);
+    const end = Math.min(fullText.length, index + radius);
+    snippets.push(fullText.slice(start, end));
+  };
+
+  for (const term of uniqueTerms.slice(0, 15)) {
+    const normalizedTerm = term.replace(/[^a-zA-Z0-9]/g, ' ').trim();
+    if (!normalizedTerm) continue;
+    const idx = fullText.toLowerCase().indexOf(normalizedTerm.toLowerCase());
+    if (idx !== -1) {
+      addSnippet(idx);
+      if (snippets.join('').length >= maxChars - 2000) {
+        break;
+      }
+    }
+  }
+
+  if (snippets.length === 0) {
+    snippets.push(fullText.slice(0, 3000));
+    snippets.push(fullText.slice(-3000));
+  }
+
+  const preview = [
+    '--- Inicio del documento ---',
+    snippets[0],
+  ];
+  for (let i = 1; i < snippets.length; i += 1) {
+    preview.push('--- Fragmento relevante ---');
+    preview.push(snippets[i]);
+  }
+  const combined = preview.join('\n\n');
+  return combined.length <= maxChars ? combined : combined.slice(0, maxChars);
+}
+
 async function runValidationJob(jobData) {
   const { job_id: jobId, file_path: filePath, file_name: fileName, organization_id: organizationId, user_id: userId } = jobData;
 
@@ -37,8 +95,8 @@ async function runValidationJob(jobData) {
     error: '',
   });
 
-  const documentText = await extractTextFromFile(filePath, 100000);
-  const normalizedText = documentText.trim();
+  const documentText = await extractTextFromFile(filePath);
+  const normalizedText = normalizeText(documentText);
   if (normalizedText.length < 20) {
     throw new Error('No se pudo extraer suficiente texto del documento');
   }
@@ -71,8 +129,28 @@ async function runValidationJob(jobData) {
       total_chunks: chunks.length,
     });
 
+    const snippet = buildDocumentContext(normalizedText, chunk, 12000);
+    if (!snippet) {
+      findings.push({
+        clause_ref: chunk.clause_ref,
+        title: chunk.title,
+        relevance_score: Number(chunk.relevance_score ?? 0),
+        compliance_score: 0,
+        observations: [
+          {
+            severity: 'major',
+            text: `No se encontró un fragmento relevante en el documento para el control ${chunk.clause_ref}.`, 
+          },
+        ],
+        suggestions: [
+          'No hay suficiente texto recuperado para validar este control sin inventar información.',
+        ],
+      });
+      continue;
+    }
+
     const analysis = await analyzeChunkWithAI({
-      documentText: normalizedText.slice(0, 16000),
+      documentText: snippet,
       chunk,
     });
 

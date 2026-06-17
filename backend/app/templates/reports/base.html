@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title or 'Reporte Ejecutivo' }}</title>
+    <style>
+        :root {
+            --brand-color: #0b4f6c;
+            --accent-color: #2a9d8f;
+            --text-color: #1f2933;
+            --muted-color: #6b7280;
+            --bg-page: #f4f6f8;
+            --bg-panel: #ffffff;
+            --border-color: #d1d5db;
+            --font-family: 'Helvetica', 'Arial', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-family);
+            color: var(--text-color);
+            background: var(--bg-page);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-page);
+        }
+
+        .page {
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 40px;
+        }
+
+        .cover {
+            min-height: 100vh;
+            padding-top: 160px;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f6f8 100%);
+        }
+
+        .cover-card {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 40px;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 18px 60px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .logo {
+            width: 180px;
+            margin-bottom: 32px;
+        }
+
+        .report-title {
+            margin: 0;
+            font-size: 42px;
+            line-height: 1.05;
+            color: var(--brand-color);
+        }
+
+        .report-subtitle {
+            margin: 18px 0 0;
+            font-size: 18px;
+            color: var(--muted-color);
+            line-height: 1.7;
+            max-width: 720px;
+        }
+
+        .cover-meta {
+            margin-top: 48px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .meta-card {
+            padding: 22px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .meta-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--muted-color);
+        }
+
+        .meta-value {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 56px;
+            padding: 16px 40px;
+            background: white;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        header .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--brand-color);
+            letter-spacing: 0.03em;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            padding: 10px 40px;
+            font-size: 12px;
+            color: var(--muted-color);
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .content {
+            margin: 0 auto;
+            max-width: 880px;
+            padding-top: 120px;
+            padding-bottom: 80px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 32px;
+            background: var(--bg-panel);
+            border-radius: 20px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .section-title {
+            margin: 0 0 18px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--brand-color);
+        }
+
+        .section-text {
+            margin: 0;
+            line-height: 1.8;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 14px 16px;
+            background: var(--brand-color);
+            color: white;
+            font-size: 13px;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        td, th {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+            vertical-align: top;
+        }
+
+        .stat-box {
+            display: grid;
+            gap: 16px;
+        }
+
+        .stat-card {
+            padding: 24px;
+            background: #eef6fb;
+            border-radius: 18px;
+            border: 1px solid rgba(11, 79, 108, 0.14);
+        }
+
+        .stat-number {
+            margin: 0;
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--brand-color);
+        }
+
+        .stat-label {
+            margin: 4px 0 0;
+            font-size: 13px;
+            color: var(--muted-color);
+        }
+
+        .chart-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .donut-wrapper {
+            width: 240px;
+            height: 240px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .donut-center {
+            font-size: 28px;
+            font-weight: 800;
+            fill: #0b4f6c;
+            text-anchor: middle;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-major {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-minor {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+
+        .report-label {
+            display: inline-block;
+            margin-bottom: 16px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--muted-color);
+        }
+
+        .report-meta-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .report-meta-item {
+            padding: 18px 20px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid rgba(11, 79, 108, 0.12);
+        }
+
+        .report-meta-item strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 11px;
+            color: var(--muted-color);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .report-meta-item span {
+            font-size: 15px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .cover {
+            min-height: 100vh;
+            padding-top: 100px;
+            background: linear-gradient(180deg, #ffffff 0%, #e9f2f8 100%);
+        }
+
+        .cover-card {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 44px;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 24px 64px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .logo {
+            width: 170px;
+            margin-bottom: 32px;
+            display: block;
+        }
+
+        .report-subtitle {
+            margin: 18px 0 0;
+            font-size: 18px;
+            color: #475569;
+            line-height: 1.75;
+            max-width: 720px;
+        }
+
+        .note {
+            margin-top: 18px;
+            font-size: 12px;
+            color: var(--muted-color);
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        @page {
+            size: A4;
+            margin: 100px 40px 80px;
+        }
+
+        @bottom-left {
+            content: "{{ organization_name }} - {{ generated_at }}";
+            font-size: 10px;
+        }
+
+        @bottom-right {
+            content: "Página " counter(page) " de " counter(pages);
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cover page">
+        <div class="cover-card">
+            {% if logo_url %}
+            <div class="logo">
+                <img src="{{ logo_url }}" alt="Logo" style="max-width: 180px; height: auto;" />
+            </div>
+            {% endif %}
+            <h1 class="report-title">{{ title }}</h1>
+            <p class="report-subtitle">{{ description }}</p>
+            <div class="cover-meta">
+                <div class="meta-card">
+                    <span class="meta-label">Empresa auditada</span>
+                    <p class="meta-value">{{ organization_name }}</p>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-label">Plantilla</span>
+                    <p class="meta-value">{{ template_name }}</p>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-label">Fecha de generación</span>
+                    <p class="meta-value">{{ generated_at }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page content">
+        <header>
+            <div class="brand">Reporte Ejecutivo - {{ organization_name }}</div>
+        </header>
+        {% block main %}{% endblock %}
+        <footer></footer>
+    </div>
+</body>
+</html>

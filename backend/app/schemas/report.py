@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict, root_validator
 
 ReportTemplate = Literal["soa", "risk_register", "audit_report", "gap_analysis"]
 ReportFormat = Literal["pdf", "xlsx", "docx", "csv"]
@@ -16,11 +16,20 @@ class ReportBranding(BaseModel):
 
 
 class ReportGenerateRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     title: str = Field(min_length=5)
     description: str | None = None
-    template: ReportTemplate
+    template: ReportTemplate | None = None
+    type: ReportTemplate | None = Field(default=None, alias="type")
     format: ReportFormat
     branding: ReportBranding | None = None
+
+    @root_validator(pre=True)
+    def normalize_type_alias(cls, values: dict[str, Any]) -> dict[str, Any]:
+        if values.get("type") and not values.get("template"):
+            values["template"] = values["type"]
+        return values
 
 
 class ReportJobResponse(BaseModel):

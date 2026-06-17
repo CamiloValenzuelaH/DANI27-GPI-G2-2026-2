@@ -4,17 +4,19 @@ const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
 const XLSX = require('xlsx');
 
-async function extractTextFromPdf(buffer, maxChars = 50000) {
+async function extractTextFromPdf(buffer, maxChars = null) {
   const data = await pdfParse(buffer);
-  return String(data.text || '').slice(0, maxChars);
+  const text = String(data.text || '');
+  return maxChars ? text.slice(0, maxChars) : text;
 }
 
-async function extractTextFromDocx(buffer, maxChars = 50000) {
+async function extractTextFromDocx(buffer, maxChars = null) {
   const result = await mammoth.extractRawText({ buffer });
-  return String(result.value || '').slice(0, maxChars);
+  const text = String(result.value || '');
+  return maxChars ? text.slice(0, maxChars) : text;
 }
 
-async function extractTextFromExcel(buffer, maxChars = 50000) {
+async function extractTextFromExcel(buffer, maxChars = null) {
   const workbook = XLSX.read(buffer, { type: 'buffer' });
   const lines = [];
   const sheetNames = workbook.SheetNames.slice(0, 5);
@@ -31,7 +33,7 @@ async function extractTextFromExcel(buffer, maxChars = 50000) {
   return lines.join('\n').slice(0, maxChars);
 }
 
-async function extractTextFromFile(filePath, maxChars = 50000) {
+async function extractTextFromFile(filePath, maxChars) {
   const ext = path.extname(filePath).toLowerCase();
   const buffer = await fs.readFile(filePath);
 

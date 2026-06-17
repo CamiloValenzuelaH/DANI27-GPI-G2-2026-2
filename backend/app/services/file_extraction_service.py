@@ -27,7 +27,7 @@ except ImportError:
     pytesseract = None
 
 
-def extract_text_from_pdf(content: bytes, max_chars: int = 50000) -> str:
+def extract_text_from_pdf(content: bytes, max_chars: int | None = None) -> str:
     """Extrae texto de un PDF."""
     if not PdfReader:
         return "[No se pudo extraer texto: librería PyPDF2 no disponible]"
@@ -35,21 +35,22 @@ def extract_text_from_pdf(content: bytes, max_chars: int = 50000) -> str:
     try:
         pdf_file = io.BytesIO(content)
         reader = PdfReader(pdf_file)
-        text = ""
+        text_parts = []
         
-        for page_num, page in enumerate(reader.pages[:10]):  # Máximo 10 páginas
+        for page_num, page in enumerate(reader.pages):
             try:
-                text += f"\n--- Página {page_num + 1} ---\n"
-                text += page.extract_text()
+                text_parts.append(f"\n--- Página {page_num + 1} ---\n")
+                text_parts.append(page.extract_text() or "")
             except Exception as e:
-                text += f"[Error extrayendo página {page_num + 1}: {str(e)}]"
+                text_parts.append(f"[Error extrayendo página {page_num + 1}: {str(e)}]")
         
-        return text[:max_chars]
+        text = "".join(text_parts)
+        return text if max_chars is None else text[:max_chars]
     except Exception as e:
         return f"[Error al procesar PDF: {str(e)}]"
 
 
-def extract_text_from_docx(content: bytes, max_chars: int = 50000) -> str:
+def extract_text_from_docx(content: bytes, max_chars: int | None = None) -> str:
     """Extrae texto de un documento Word (.docx)."""
     if not Document:
         return "[No se pudo extraer texto: librería python-docx no disponible]"
@@ -94,12 +95,12 @@ def extract_text_from_docx(content: bytes, max_chars: int = 50000) -> str:
         text = re.sub(r"[\t\r\f\v]+", " ", text)
         text = re.sub(r"\n{3,}", "\n\n", text).strip()
         
-        return text[:max_chars]
+        return text if max_chars is None else text[:max_chars]
     except Exception as e:
         return f"[Error al procesar DOCX: {str(e)}]"
 
 
-def extract_text_from_excel(content: bytes, max_chars: int = 50000) -> str:
+def extract_text_from_excel(content: bytes, max_chars: int | None = None) -> str:
     """Extrae texto de un archivo Excel (.xlsx, .xls)."""
     if not load_workbook:
         return "[No se pudo extraer texto: librería openpyxl no disponible]"
@@ -117,7 +118,7 @@ def extract_text_from_excel(content: bytes, max_chars: int = 50000) -> str:
                 row_text = " | ".join(str(cell) if cell is not None else "" for cell in row)
                 text += row_text + "\n"
         
-        return text[:max_chars]
+        return text if max_chars is None else text[:max_chars]
     except Exception as e:
         return f"[Error al procesar Excel: {str(e)}]"
 
@@ -152,15 +153,15 @@ def extract_text_from_image(content: bytes, max_chars: int = 50000) -> str:
         return f"[Error al procesar imagen: {str(e)}]"
 
 
-def extract_text_from_txt(content: bytes, max_chars: int = 50000) -> str:
+def extract_text_from_txt(content: bytes, max_chars: int | None = None) -> str:
     """Extrae texto de un archivo de texto plano."""
     try:
         text = content.decode('utf-8')
-        return text[:max_chars]
+        return text if max_chars is None else text[:max_chars]
     except UnicodeDecodeError:
         try:
             text = content.decode('latin-1')
-            return text[:max_chars]
+            return text if max_chars is None else text[:max_chars]
         except Exception as e:
             return f"[Error al procesar archivo de texto: {str(e)}]"
 
@@ -168,7 +169,7 @@ def extract_text_from_txt(content: bytes, max_chars: int = 50000) -> str:
 def extract_text_from_file(
     content: bytes,
     file_extension: str,
-    max_chars: int = 50000
+    max_chars: int | None = None
 ) -> str:
     """
     Extrae texto del contenido del archivo basado en su extensión.
@@ -176,7 +177,7 @@ def extract_text_from_file(
     Args:
         content: Bytes del contenido del archivo
         file_extension: Extensión del archivo (ej: '.pdf', '.docx')
-        max_chars: Máximo número de caracteres a extraer
+        max_chars: Máximo número de caracteres a extraer, o None para sin límite
     
     Returns:
         Texto extraído del archivo

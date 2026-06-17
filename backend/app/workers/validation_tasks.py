@@ -2,11 +2,15 @@
 
 import asyncio
 import json
+import logging
+import re
 from datetime import datetime
 from math import sqrt
 
 from redis.asyncio import Redis
 from sqlalchemy.exc import SQLAlchemyError
+
+logger = logging.getLogger(__name__)
 
 from app.db.database import SessionLocal
 from app.workers.celery_app import celery_app
@@ -61,6 +65,65 @@ def _cosine_similarity(left: list[float], right: list[float]) -> float:
     if left_norm == 0 or right_norm == 0:
         return 0.0
     return dot_product / (left_norm * right_norm)
+
+
+def _normalize_whitespace(text: str) -> str:
+    return re.sub(r"\s+", " ", str(text or "")).strip()
+
+
+def _build_control_ref_regex(control_ref: str):
+    if not control_ref:
+        return None
+
+    escaped = re.escape(control_ref.strip())
+    pattern = escaped.replace(r"\.", r"\s*\.\s*")
+    return re.compile(pattern, re.IGNORECASE)
+
+
+def _extract_relevant_snippet(document_text: str, chunk: dict, radius: int = 1400) -> str | None:
+    text = _normalize_whitespace(document_text)
+    clause_ref = _normalize_whitespace(str(chunk.get("clause_ref") or ""))
+    title = _normalize_whitespace(str(chunk.get("title") or ""))
+    content = _normalize_whitespace(str(chunk.get("content") or ""))
+
+    patterns = []
+    if clause_ref:
+        regex = _build_control_ref_regex(clause_ref)
+        if regex:
+            patterns.append(regex)
+        patterns.append(re.compile(re.escape(clause_ref), re.IGNORECASE))
+
+    if title:
+        patterns.append(re.compile(re.escape(title), re.IGNORECASE))
+    if content:
+        snippet = " ".join(content.split()[:12])
+        if snippet:
+            patterns.append(re.compile(re.escape(snippet), re.IGNORECASE))
+
+    for pattern in patterns:
+        try:
+            match = pattern.search(text)
+        except re.error:
+            continue
+        if match:
+            start = max(0, match.start() - radius)
+            end = min(len(text), match.end() + radius)
+            return text[start:end]
+
+    if clause_ref:
+        start = text.find(clause_ref)
+        if start != -1:
+            end = start + len(clause_ref)
+            return text[max(0, start - radius): min(len(text), end + radius)]
+
+    return None
+
+
+def _build_document_context(document_text: str, chunk: dict, max_chars: int = 12000) -> str | None:
+    snippet = _extract_relevant_snippet(document_text, chunk)
+    if snippet:
+        return snippet[:max_chars]
+    return None
 
 
 def _fallback_iso_chunks(limit: int) -> list[dict]:
@@ -227,7 +290,7 @@ async def _validate_external_audit_async(
         "error": "",
     })
 
-    document_text = await extract_text_from_file(file_path, 100000)
+    document_text = await extract_text_from_file(file_path, None)
     normalized_text = document_text.strip()
 
     if len(normalized_text) < 20:
@@ -263,8 +326,29 @@ async def _validate_external_audit_async(
             "total_chunks": len(chunks),
         })
 
+        snippet = _build_document_context(normalized_text, chunk, 12000)
+        if snippet is None:
+            findings.append({
+                "clause_ref": chunk["clause_ref"],
+                "title": chunk["title"],
+                "relevance_score": chunk.get("relevance_score", 0.0),
+                "compliance_score": 0,
+                "document_status": "INEXISTENTE",
+                "missing_elements": [],
+                "observations": [
+                    {
+                        "severity": "major",
+                        "text": f"No se encontró información de este control ({chunk['clause_ref']}) en el documento recuperado.",
+                    }
+                ],
+                "suggestions": [
+                    "No se encontró información suficiente en el documento recuperado para este control."
+                ],
+            })
+            continue
+
         analysis = await analyze_chunk_with_deepseek(
-            normalized_text[:8000],
+            snippet,
             chunk,
             max_output_tokens=2048,
         )

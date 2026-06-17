@@ -322,7 +322,10 @@ async def generate_embedding(text: str) -> list[float]:
 def build_chunk_classification_prompt(document_text: str, chunk: dict) -> str:
     """Prompt 1: clasificar atingencia y control principal del documento para un chunk."""
     return "\n".join([
-        "Clasifica la relación del documento con este control ISO.",
+        "Clasifica la relación entre el fragmento recuperado y este control ISO.",
+        "Usa únicamente la información que aparece en el texto del documento proporcionado.",
+        "No agregues suposiciones ni conocimiento general sobre ISO 27001.",
+        "No completes ni inventes información que no esté en el fragmento.",
         "Responde SOLO JSON válido.",
         "Esquema:",
         "{",
@@ -332,10 +335,12 @@ def build_chunk_classification_prompt(document_text: str, chunk: dict) -> str:
         '  "justification": "detalle breve"',
         "}",
         "",
+        "Si no hay evidencia clara de este control en el fragmento, responde is_primary_match false, relevance_score 0 y justificación breve.",
+        "",
         f"Requisito ISO [{chunk.get('clause_ref')}] {chunk.get('title')}:",
         chunk.get('content', ''),
         "",
-        "Documento:",
+        "Fragmento del documento:",
         document_text,
     ])
 
@@ -343,9 +348,11 @@ def build_chunk_classification_prompt(document_text: str, chunk: dict) -> str:
 def build_chunk_quality_prompt(document_text: str, chunk: dict, classification: dict[str, Any]) -> str:
     """Prompt 2: evaluar calidad, faltantes y observaciones para el control."""
     return "\n".join([
-        "Evalúa la calidad del documento para este control ISO.",
-        "Responde SOLO JSON válido y aplica criterios ISO con precisión.",
-        "Debes incluir estado sugerido y elementos faltantes.",
+        "Evalúa la calidad del fragmento recuperado para este control ISO.",
+        "RESPONDE SOLO con base en el texto proporcionado; no uses conocimiento general ni inferencias fuera del documento.",
+        "Si el texto no contiene evidencia del control, establece document_status como INEXISTENTE, score 0 y observations explicando que no se encontró información.",
+        "No inventes controles, responsabilidades, riesgos ni estados que no estén expresamente en el texto.",
+        "Si la clasificación previa indica que el fragmento no es un match primario, no intentes validar ni proponer mejoras; responde sin inventario.",
         "Esquema:",
         "{",
         '  "score": 0-100,',
@@ -354,8 +361,10 @@ def build_chunk_quality_prompt(document_text: str, chunk: dict, classification: 
         '  "justification": "explicación detallada",',
         '  "observations": [{"severity":"critical|major|minor","text":"..."}],',
         '  "suggestions": ["..."],',
-        '  "missing_elements": ["..."]',
+        '  "missing_elements": ["..."],',
         "}",
+        "",
+        "Si no hay evidencia relevante en el texto para este control, NOTA: no inventes ningún estado, responsable, riesgo ni madurez.",
         "",
         "Resultado previo de clasificación:",
         json.dumps(classification, ensure_ascii=False),
@@ -363,7 +372,7 @@ def build_chunk_quality_prompt(document_text: str, chunk: dict, classification: 
         f"Control ISO objetivo [{chunk.get('clause_ref')}] {chunk.get('title')}:",
         chunk.get('content', ''),
         "",
-        "Documento:",
+        "Fragmento del documento:",
         document_text,
     ])
 
@@ -396,16 +405,28 @@ def _normalize_string_list(raw_value: Any) -> list[str]:
     return output
 
 
-def _derive_document_status(score: int, relevance_score: float, observations: list[dict[str, str]]) -> str:
+def _is_primary_match(classification: dict[str, Any]) -> bool:
+    if isinstance(classification.get("is_primary_match"), bool):
+        return classification.get("is_primary_match") is True
+
+    value = str(classification.get("is_primary_match") or "").strip().lower()
+    return value in {"true", "yes", "si", "sí"}
+
+
+def _derive_document_status(
+    score: int,
+    relevance_score: float,
+    observations: list[dict[str, str]],
+    evidence_found: bool,
+) -> str:
+    if not evidence_found:
+        return "INEXISTENTE"
+
     has_critical = any(obs.get("severity") == "critical" for obs in observations)
     has_major = any(obs.get("severity") == "major" for obs in observations)
 
-    if score < 40 or relevance_score < 70:
-        return "INEXISTENTE"
     if score >= 85 and not has_critical:
         return "COMPLETO"
-    if 40 <= score <= 84 or has_critical or has_major:
-        return "INCOMPLETO"
     return "INCOMPLETO"
 
 
@@ -424,6 +445,28 @@ async def analyze_chunk_with_deepseek(
         top_p=0.8,
     )
 
+    evidence_found = _is_primary_match(classification)
+    relevance_score = float(classification.get("relevance_score") or 0)
+    if relevance_score <= 1 and chunk.get("relevance_score") is not None:
+        relevance_score = float(chunk.get("relevance_score", 0)) * 100.0
+
+    if not evidence_found:
+        return {
+            "score": 0,
+            "document_status": "INEXISTENTE",
+            "missing_elements": [],
+            "observations": [
+                {
+                    "severity": "major",
+                    "text": "No hay evidencia clara de este control en el fragmento recuperado.",
+                }
+            ],
+            "suggestions": [
+                "No se encontró evidencia del control en el fragmento recuperado.",
+            ],
+            "relevance_score": relevance_score,
+        }
+
     quality = await _call_deepseek_json(
         system_prompt="Responde solo JSON válido, sin markdown. Evalúa cumplimiento ISO con rigor.",
         user_prompt=build_chunk_quality_prompt(document_text, chunk, classification),
@@ -436,12 +479,13 @@ async def analyze_chunk_with_deepseek(
     observations = _normalize_observations(quality.get("observations"))
     suggestions = _normalize_string_list(quality.get("suggestions"))
     missing_elements = _normalize_string_list(quality.get("missing_elements"))
-    relevance_score = float(classification.get("relevance_score") or 0)
 
-    if relevance_score <= 1 and chunk.get("relevance_score") is not None:
-        relevance_score = float(chunk.get("relevance_score", 0)) * 100.0
-
-    document_status = _derive_document_status(score, relevance_score, observations)
+    document_status = _derive_document_status(
+        score,
+        relevance_score,
+        observations,
+        evidence_found=evidence_found,
+    )
     if document_status != "INCOMPLETO":
         missing_elements = []
 

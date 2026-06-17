@@ -1,0 +1,50 @@
+{% extends 'reports/base.html' %}
+{% block main %}
+    <section class="section">
+        <h2 class="section-title">Resumen Ejecutivo</h2>
+        <p class="section-text">{{ sections[1]['paragraphs'][0] if sections|length > 1 and sections[1]['paragraphs'] else 'No hay resumen ejecutivo disponible.' }}</p>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Inventario de Riesgos</h2>
+        {% if sections|length > 3 and sections[3]['rows'] %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Riesgo</th>
+                            <th>Activo</th>
+                            <th>Probabilidad</th>
+                            <th>Impacto</th>
+                            <th>Nivel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in sections[3]['rows'][1:] %}
+                        <tr>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }}</td>
+                            <td>{{ row[4] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="section-text">No hay riesgos registrados para esta organización.</p>
+        {% endif %}
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Clasificación de Riesgos</h2>
+        {% if sections|length > 4 and sections[4]['paragraphs'] %}
+            {% for paragraph in sections[4]['paragraphs'] %}
+                <p class="section-text">{{ paragraph }}</p>
+            {% endfor %}
+        {% else %}
+            <p class="section-text">No se encontró clasificación de riesgos para este reporte.</p>
+        {% endif %}
+    </section>
+{% endblock %}

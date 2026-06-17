@@ -311,9 +311,15 @@ async def generate_missing_for_chunk(
     source_text = ""
     if report.file_path:
         try:
-            source_text = await extract_text_from_file(report.file_path, 30000)
+            source_text = await extract_text_from_file(report.file_path)
         except Exception:
             source_text = ""
+
+    def _build_relevant_snippet(text: str, max_chars: int = 12000) -> str:
+        source = " ".join(str(text or "").split())
+        if len(source) <= max_chars:
+            return source
+        return source[:3000] + "\n\n--- Fragmento relevante ---\n\n" + source[-9000:]
 
     feedback: str | None = None
     generated_text = ""
@@ -325,7 +331,7 @@ async def generate_missing_for_chunk(
     for attempt in range(1, 4):
         iterations = attempt
         generated_text = await generate_missing_content_with_deepseek(
-            document_text=source_text[:12000],
+            document_text=_build_relevant_snippet(source_text, 12000),
             chunk=chunk,
             missing_elements=missing_elements,
             feedback=feedback,

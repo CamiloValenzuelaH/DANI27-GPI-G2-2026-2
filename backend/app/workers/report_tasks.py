@@ -5,17 +5,24 @@ import base64
 import csv
 import io
 import json
+import shutil
+import subprocess
 import textwrap
 import uuid
+from abc import ABC, abstractmethod
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 import docx as python_docx
 import openpyxl
-from openpyxl.styles import Font
+import pandas as pd
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 import redis.asyncio as aioredis
 from app.core.config import settings
 from app.db.database import SessionLocal
+from app.models.organization import Organization
 from celery.exceptions import SoftTimeLimitExceeded
 from app.models.report_job import ReportJob
 from app.models.assessment_progress import AssessmentProgress
@@ -24,12 +31,269 @@ from app.models.notification import NotificationType
 from app.models.risk import Risk
 from app.services.notification_service import notification_service
 from app.workers.celery_app import celery_app
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+
 
 JOB_KEY_PREFIX = "report:job:"
 JOB_TTL_SECONDS = 60 * 60 * 24 * 7
 REPORT_DIR = "/tmp/reports"
+TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
+
+
+class BaseReportService(ABC):
+    def __init__(self, organization_id: str, request_data: dict[str, Any], user_id: str | None = None):
+        self.organization_id = organization_id
+        self.request_data = request_data
+        self.user_id = user_id
+        self.template = request_data.get("template")
+        self.title = request_data.get("title")
+        self.description = request_data.get("description")
+        self.branding = request_data.get("branding") or {}
+        self.health_score = 0
+        self.findings: list[dict[str, Any]] = []
+        self.controls: list[dict[str, Any]] = []
+        self.documents: list[dict[str, Any]] = []
+        self.progress_data: dict[str, Any] = {}
+        self.organization_name: str | None = None
+        self.rendered: dict[str, Any] = {}
+
+    def generate(self, output_format: str, generated_at: str) -> bytes:
+        self.validate_security()
+        self.fetch_tenant_data()
+        self.transform_data()
+        document = self.build_report_document(generated_at)
+        return self.generate_file(output_format, document)
+
+    @abstractmethod
+    def validate_security(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def fetch_tenant_data(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def transform_data(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def generate_file(self, output_format: str, document: dict[str, Any]) -> bytes:
+        raise NotImplementedError
+
+    def build_report_document(self, generated_at: str) -> dict[str, Any]:
+        document = _build_report_document(
+            self.template,
+            self.rendered,
+            self.title,
+            self.description,
+            generated_at,
+        )
+        document.update(
+            {
+                "health_score": self.health_score,
+                "findings": self.findings,
+                "controls": self.controls,
+                "documents": self.documents,
+            }
+        )
+        return document
+
+    def generate_signed_url(self, job_id: str) -> str:
+        return f"/api/v1/reports/{job_id}/download"
+
+
+class TenantReportService(BaseReportService):
+    def validate_security(self) -> None:
+        if not self.organization_id:
+            raise ValueError("Organization ID requerido para generar reportes.")
+        if self.template not in {"soa", "risk_register", "audit_report", "gap_analysis"}:
+            raise ValueError("Template de reporte no soportado.")
+
+    def fetch_tenant_data(self) -> None:
+        with SessionLocal() as db:
+            org = db.query(Organization).filter(Organization.id == self.organization_id).first()
+            self.organization_name = org.name if org else "Organización"
+            audit = db.query(AuditChecklist).filter(AuditChecklist.organization_id == self.organization_id).first()
+            progress = db.query(AssessmentProgress).filter(AssessmentProgress.organization_id == self.organization_id).first()
+
+        self.controls = self._build_controls(audit)
+        self.documents = self._extract_documents(self.controls)
+        self.findings = self._build_findings(self.controls)
+        self.health_score = self._calculate_health_score(self.controls)
+        self.progress_data = progress.progress_data if progress and isinstance(progress.progress_data, dict) else {}
+
+    def transform_data(self) -> None:
+        self.rendered = {
+            "summary": self._build_summary(),
+            "controls": self.controls,
+            "implemented_controls": sum(1 for c in self.controls if c["status"] == "implemented"),
+            "pending_controls": sum(1 for c in self.controls if c["status"] == "planned"),
+            "not_implemented_controls": sum(1 for c in self.controls if c["status"] == "not_implemented"),
+            "risk_counts": self._build_risk_counts(),
+            "breaches": [f for f in self.findings if f["severity"] in {"critical", "major", "minor"}],
+            "phases": self._build_phase_summary(),
+            "score": self.health_score,
+            "trend": self.progress_data.get("status", "Estable"),
+            "health_score": self.health_score,
+            "findings": self.findings,
+        }
+
+    def generate_file(self, output_format: str, document: dict[str, Any]) -> bytes:
+        if output_format == "pdf":
+            return _generate_pdf(
+                document,
+                self.title,
+                self.description,
+                self.template,
+                datetime.now(timezone.utc).isoformat(),
+                self.organization_name,
+                self.branding,
+            )
+        if output_format == "csv":
+            return _generate_csv(document)
+        if output_format == "docx":
+            return _generate_docx(document)
+        if output_format == "xlsx":
+            return _generate_xlsx(document)
+        raise ValueError("Formato de reporte no soportado.")
+
+    def _build_controls(self, audit: AuditChecklist | None) -> list[dict[str, Any]]:
+        controls: list[dict[str, Any]] = []
+        if audit and isinstance(audit.checklist_data, list):
+            for idx, item in enumerate(audit.checklist_data, start=1):
+                status = self._normalize_status(str(item.get("status", "not_implemented")))
+                severity = self._normalize_severity(str(item.get("severity") or item.get("risk_level") or "minor"))
+                controls.append(
+                    {
+                        "code": str(item.get("control_code") or f"CTRL-{idx:03}"),
+                        "domain": str(item.get("domain") or self._guess_domain(idx)),
+                        "name": str(item.get("control") or item.get("name") or f"Control {idx}"),
+                        "status": status,
+                        "documents": item.get("documents", []),
+                        "evidence_freshness": str(item.get("evidence_freshness") or item.get("freshness") or "unknown"),
+                        "severity": severity,
+                        "recommendation": str(item.get("recommendation") or "Revisar el control para establecer estado y evidencia documental."),
+                    }
+                )
+        if len(controls) < 93:
+            controls.extend(self._generate_placeholder_controls(len(controls)))
+        return controls[:93]
+
+    def _normalize_status(self, status: str) -> str:
+        normalized = status.strip().lower()
+        if normalized in {"implemented", "implementado", "done", "completo", "cerrado"}:
+            return "implemented"
+        if normalized in {"planned", "planificado", "pendiente", "scheduled"}:
+            return "planned"
+        return "not_implemented"
+
+    def _normalize_severity(self, severity: str) -> str:
+        normalized = severity.strip().lower()
+        if normalized in {"critical", "critico", "crítico"}:
+            return "critical"
+        if normalized in {"major", "alto", "high"}:
+            return "major"
+        if normalized in {"minor", "bajo", "low"}:
+            return "minor"
+        return "suggestion"
+
+    def _guess_domain(self, index: int) -> str:
+        if index <= 20:
+            return "A.5 Organizacional"
+        if index <= 45:
+            return "A.6 Personas"
+        if index <= 65:
+            return "A.7 Físico"
+        return "A.8 Tecnológico"
+
+    def _generate_placeholder_controls(self, start_index: int) -> list[dict[str, Any]]:
+        placeholders: list[dict[str, Any]] = []
+        for idx in range(start_index + 1, 94):
+            placeholders.append(
+                {
+                    "code": f"ISO-{idx:03}",
+                    "domain": self._guess_domain(idx),
+                    "name": f"Control ISO {idx}",
+                    "status": "not_implemented",
+                    "documents": [],
+                    "evidence_freshness": "unknown",
+                    "severity": "minor",
+                    "recommendation": "Registrar evidencia y completar el control según ISO 27001.",
+                }
+            )
+        return placeholders
+
+    def _extract_documents(self, controls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        documents: list[dict[str, Any]] = []
+        for control in controls:
+            for document in control.get("documents", []):
+                documents.append(
+                    {
+                        "control_code": control["code"],
+                        "type": document.get("type", "UNKNOWN"),
+                        "name": document.get("name", "Documento de evidencia"),
+                        "status": document.get("status", "unknown"),
+                        "freshness": document.get("freshness", "unknown"),
+                    }
+                )
+        return documents
+
+    def _build_findings(self, controls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        findings = []
+        for control in controls:
+            if control["status"] != "implemented" or control["severity"] in {"critical", "major"}:
+                findings.append(
+                    {
+                        "item": f"{control['code']} - {control['name']}",
+                        "status": control["status"],
+                        "severity": control["severity"],
+                        "recommendation": control["recommendation"],
+                    }
+                )
+        if not findings:
+            findings.append(
+                {
+                    "item": "No hay hallazgos relevantes",
+                    "status": "implemented",
+                    "severity": "minor",
+                    "recommendation": "El programa cumple con los controles disponibles.",
+                }
+            )
+        return findings
+
+    def _calculate_health_score(self, controls: list[dict[str, Any]]) -> int:
+        if not controls:
+            return 0
+        implemented = sum(1 for control in controls if control["status"] == "implemented")
+        return int((implemented / len(controls)) * 100)
+
+    def _build_summary(self) -> str:
+        return (
+            f"Reporte ISO 27001 para {self.organization_name}. "
+            f"Se evaluaron {len(self.controls)} controles con {self.health_score}% implementados. "
+            f"Se identificaron {sum(1 for c in self.controls if c['status'] != 'implemented')} controles por atender."
+        )
+
+    def _build_risk_counts(self) -> dict[str, int]:
+        counts: dict[str, int] = {}
+        for control in self.controls:
+            bucket = control["severity"].capitalize()
+            counts[bucket] = counts.get(bucket, 0) + 1
+        return counts
+
+    def _build_phase_summary(self) -> list[dict[str, Any]]:
+        if not self.progress_data:
+            return []
+        phases = self.progress_data.get("phases", [])
+        if isinstance(phases, list):
+            return [
+                {
+                    "phase": phase.get("name", f"Fase {idx + 1}"),
+                    "status": phase.get("status", "Pendiente"),
+                    "recommendation": phase.get("recommendation", "Revisar fase."),
+                }
+                for idx, phase in enumerate(phases)
+            ]
+        return []
 
 
 def _job_key(job_id: str) -> str:
@@ -115,111 +379,132 @@ async def _write_initial_job_state(job_id: str, metadata: dict[str, Any]) -> Non
     )
 
 
+def _get_template_environment() -> Environment:
+    return Environment(
+        loader=FileSystemLoader(str(TEMPLATES_DIR)),
+        autoescape=select_autoescape(["html", "xml"]),
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+
+
+def _render_report_html(template_name: str, context: dict[str, Any]) -> str:
+    env = _get_template_environment()
+    template = env.get_template(template_name)
+    return template.render(**context)
+
+
+def _get_organization_name(organization_id: str) -> str | None:
+    try:
+        org_id = uuid.UUID(organization_id)
+    except ValueError:
+        org_id = organization_id
+
+    with SessionLocal() as db:
+        org = db.query(Organization).filter(Organization.id == org_id).first()
+        return org.name if org else None
+
+
 def _generate_pdf(
-    content: str,
-    branding: dict[str, str] | None,
+    document: dict[str, Any],
     title: str | None,
     description: str | None,
     template: str,
     generated_at: str,
+    organization_name: str | None,
+    branding: dict[str, Any] | None = None,
 ) -> bytes:
-    buf = io.BytesIO()
-    c = canvas.Canvas(buf, pagesize=letter)
-    width, height = letter
-    x_margin = 40
-    y = height - 60
+    branding = branding or {}
+    context = {
+        "title": title or "Reporte Ejecutivo",
+        "description": description or "",
+        "template_name": template.replace("_", " ").title(),
+        "generated_at": generated_at,
+        "organization_name": organization_name or "Empresa auditada",
+        "sections": document.get("sections", []),
+        "health_score": document.get("health_score", 0),
+        "findings": document.get("findings", []),
+        "logo_url": branding.get("logo_url"),
+        "primary_color": branding.get("primary_color", "#0b4f6c"),
+        "accent_color": branding.get("accent_color", "#2a9d8f"),
+        "implemented_controls": document.get("implemented_controls", 0),
+        "pending_controls": document.get("pending_controls", 0),
+        "not_implemented_controls": document.get("not_implemented_controls", 0),
+        "controls": document.get("controls", []),
+    }
+    template_name = "reports/soa_report.html" if template == "soa" else f"reports/{template}.html"
+    html = _render_report_html(template_name, context)
 
-    def _new_page() -> None:
-        nonlocal y
-        c.showPage()
-        y = height - 60
+    weasy_error: Exception | None = None
+    try:
+        from weasyprint import HTML
+        from weasyprint.text.fonts import FontConfiguration
 
-    def _draw_line(text: str, font_name: str, font_size: int, leading: int) -> None:
-        nonlocal y
-        if y < 80:
-            _new_page()
-        c.setFont(font_name, font_size)
-        wrapped = textwrap.wrap(text, width=100)
-        for part in wrapped:
-            if y < 80:
-                _new_page()
-            c.drawString(x_margin, y, part)
-            y -= leading
+        font_config = FontConfiguration()
+        return HTML(string=html, base_url=str(TEMPLATES_DIR)).write_pdf(font_config=font_config)
+    except Exception as exc:
+        weasy_error = exc
 
-    # Portada simple
-    c.setFont("Helvetica-Bold", 22)
-    c.drawString(x_margin, y, title or "Reporte Ejecutivo")
-    y -= 28
+    wkhtmltopdf_path = shutil.which("wkhtmltopdf")
+    if not wkhtmltopdf_path:
+        possible_paths = [
+            Path("/usr/bin/wkhtmltopdf"),
+            Path("/usr/local/bin/wkhtmltopdf"),
+            Path(r"C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe"),
+            Path(r"C:/Program Files (x86)/wkhtmltopdf/bin/wkhtmltopdf.exe"),
+        ]
+        for possible_path in possible_paths:
+            if possible_path.exists():
+                wkhtmltopdf_path = str(possible_path)
+                break
 
-    c.setFont("Helvetica", 11)
-    if description:
-        for line in textwrap.wrap(description, width=95):
-            c.drawString(x_margin, y, line)
-            y -= 14
-        y -= 10
+    if wkhtmltopdf_path:
+        process = subprocess.run(
+            [
+                wkhtmltopdf_path,
+                "--enable-local-file-access",
+                "--page-size",
+                "A4",
+                "--margin-top",
+                "25mm",
+                "--margin-bottom",
+                "25mm",
+                "--margin-left",
+                "20mm",
+                "--margin-right",
+                "20mm",
+                "-",
+                "-",
+            ],
+            input=html.encode("utf-8"),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        if process.returncode == 0:
+            return process.stdout
 
-    c.setFont("Helvetica-Oblique", 9)
-    c.drawString(x_margin, y, f"Plantilla: {template.replace('_', ' ').title()}    Generado: {generated_at}")
-    y -= 16
+        raise RuntimeError(
+            "WeasyPrint falló y fallback wkhtmltopdf también falló: "
+            + process.stderr.decode("utf-8", errors="replace")
+            + f". Error WeasyPrint: {weasy_error}"
+        )
 
-    c.setStrokeColorRGB(0.65, 0.65, 0.65)
-    c.setLineWidth(0.8)
-    c.line(x_margin, y, width - x_margin, y)
-    y -= 26
-
-    # Contenido principal
-    for line in content.split("\n"):
-        if not line.strip():
-            y -= 10
-            continue
-        if line.endswith(":") and not line.startswith("•"):
-            c.setFont("Helvetica-Bold", 12)
-            if y < 80:
-                _new_page()
-            c.drawString(x_margin, y, line)
-            y -= 18
-            continue
-
-        if line.startswith("•"):
-            c.setFont("Helvetica", 10)
-            if y < 80:
-                _new_page()
-            wrapped = textwrap.wrap(line[2:], width=92)
-            c.drawString(x_margin + 12, y, "• " + wrapped[0])
-            y -= 14
-            for part in wrapped[1:]:
-                if y < 80:
-                    _new_page()
-                c.drawString(x_margin + 20, y, part)
-                y -= 14
-            continue
-
-        _draw_line(line, "Helvetica", 10, 14)
-
-    c.save()
-    buf.seek(0)
-    return buf.read()
+    raise RuntimeError(
+        "No se pudo generar el PDF. WeasyPrint falló con: "
+        f"{weasy_error}. Instale las dependencias nativas de WeasyPrint "
+        "(GTK, gobject, pango) o asegúrese de que wkhtmltopdf esté instalado en el contenedor."
+    )
 
 
 def _generate_csv(document: dict[str, Any]) -> bytes:
-    buf = io.StringIO()
-    writer = csv.writer(buf)
-    for section in document.get("sections", []):
-        heading = section.get("heading")
-        if heading:
-            writer.writerow([heading])
-        if section.get("paragraphs"):
-            for paragraph in section.get("paragraphs", []):
-                writer.writerow(["", paragraph])
-        if section.get("rows"):
-            rows = section.get("rows", [])
-            if rows:
-                writer.writerow(["", ""])
-                writer.writerow(rows[0])
-                for row in rows[1:]:
-                    writer.writerow(row)
-        writer.writerow([])
-    return buf.getvalue().encode("utf-8")
+    rows = _render_rows(document.get("template", ""), document, document.get("title"), document.get("description"))
+    if not rows:
+        return "".encode("utf-8-sig")
+    max_cols = max(len(row) for row in rows)
+    normalized = [row + [""] * (max_cols - len(row)) for row in rows]
+    df = pd.DataFrame(normalized)
+    csv_text = df.to_csv(index=False, header=False, encoding="utf-8-sig")
+    return csv_text.encode("utf-8-sig")
 
 
 def _generate_docx(document: dict[str, Any]) -> bytes:
@@ -247,37 +532,31 @@ def _generate_docx(document: dict[str, Any]) -> bytes:
 
 
 def _generate_xlsx(document: dict[str, Any]) -> bytes:
-    workbook = openpyxl.Workbook()
-    sheet = workbook.active
-    row_index = 1
-    for section in document.get("sections", []):
-        if section.get("heading"):
-            cell = sheet.cell(row=row_index, column=1, value=section["heading"])
-            cell.font = Font(bold=True, size=12)
-            row_index += 1
-        if section.get("paragraphs"):
-            for paragraph in section.get("paragraphs", []):
-                sheet.cell(row=row_index, column=1, value=paragraph)
-                row_index += 1
-        if section.get("rows"):
-            rows = section.get("rows", [])
-            if rows:
-                header = rows[0]
-                for col_index, cell_value in enumerate(header, start=1):
-                    cell = sheet.cell(row=row_index, column=col_index, value=cell_value)
-                    cell.font = Font(bold=True)
-                row_index += 1
-                for row in rows[1:]:
-                    for col_index, cell_value in enumerate(row, start=1):
-                        sheet.cell(row=row_index, column=col_index, value=cell_value)
-                    row_index += 1
-        row_index += 1
-    for column_cells in sheet.columns:
-        length = max(len(str(cell.value or "")) for cell in column_cells)
-        if length:
-            sheet.column_dimensions[column_cells[0].column_letter].width = min(length + 4, 40)
+    rows = _render_rows(document.get("template", ""), document, document.get("title"), document.get("description"))
+    if not rows:
+        return b""
+    max_cols = max(len(row) for row in rows)
+    normalized = [row + [""] * (max_cols - len(row)) for row in rows]
+    df = pd.DataFrame(normalized)
     out = io.BytesIO()
-    workbook.save(out)
+    with pd.ExcelWriter(out, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, header=False, sheet_name="Reporte")
+        sheet = writer.sheets["Reporte"]
+        header_fill = PatternFill(fill_type="solid", fgColor="0B4F6C")
+        header_font = Font(bold=True, color="FFFFFF")
+        alignment = Alignment(vertical="top", wrap_text=True)
+        for cell in sheet[1]:
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = alignment
+        sheet.freeze_panes = sheet["A2"]
+        for column_cells in sheet.columns:
+            max_length = 0
+            column_letter = column_cells[0].column_letter
+            for cell in column_cells:
+                if cell.value is not None:
+                    max_length = max(max_length, len(str(cell.value)))
+            sheet.column_dimensions[column_letter].width = min(max(max_length + 4, 15), 50)
     out.seek(0)
     return out.read()
 
@@ -361,11 +640,16 @@ def _render_template_data(template: str, organization_id: str, db_payload: dict[
             progress = db.query(AssessmentProgress).filter(AssessmentProgress.organization_id == org_id).first()
             breaches = []
             for item in (audit.checklist_data if audit and isinstance(audit.checklist_data, list) else [])[:12]:
+                status = item.get("status", "Pendiente")
+                severity = item.get("severity") or item.get("risk_level") or "Major"
+                if severity.lower() not in {"critical", "major", "minor"}:
+                    severity = "Major"
                 breaches.append(
                     {
                         "item": item.get("control", "Control"),
-                        "status": item.get("status", "Pendiente"),
+                        "status": status,
                         "recommendation": item.get("recommendation", "Revisar el control."),
+                        "severity": severity.capitalize(),
                     }
                 )
             if not breaches:
@@ -374,12 +658,15 @@ def _render_template_data(template: str, organization_id: str, db_payload: dict[
                         "item": "No hay hallazgos disponibles",
                         "status": "N/A",
                         "recommendation": "Agregar datos de checklist para generar un audit report completo.",
+                        "severity": "Minor",
                     }
                 ]
             score = 0
             total = len(breaches)
             if total > 0:
-                score = sum(1 for breach in breaches if breach["status"].lower() in {"implementado", "completo", "cerrado", "done"}) * 100 // total
+                score = sum(
+                    1 for breach in breaches if breach["status"].lower() in {"implementado", "completo", "cerrado", "done"}
+                ) * 100 // total
             overall_status = "Satisfactorio" if score >= 70 else "Moderado" if score >= 40 else "Crítico"
             trend = "Estable" if not progress or not isinstance(progress.progress_data, dict) else progress.progress_data.get("status", "Estable")
             return {
@@ -390,6 +677,8 @@ def _render_template_data(template: str, organization_id: str, db_payload: dict[
                 "breaches": breaches,
                 "score": score,
                 "trend": trend,
+                "health_score": score,
+                "findings": breaches,
             }
 
         if template == "gap_analysis":
@@ -455,13 +744,21 @@ def _build_report_document(
         controls = rendered.get("controls", [])
         sections.append({
             "heading": "Controles de seguridad",
-            "rows": [["Control", "Estado", "Justificación"]] + [[c["control"], c["status"], c["justification"]] for c in controls],
+            "rows": [["Control", "Dominio", "Estado", "Severidad", "Evidencia", "Recomendación"]] + [[
+                f"{c['code']} - {c['name']}",
+                c.get("domain", ""),
+                c["status"],
+                c["severity"],
+                c.get("evidence_freshness", ""),
+                c["recommendation"],
+            ] for c in controls],
         })
         sections.append({
             "heading": "Conclusiones",
             "paragraphs": [
                 f"Controles implementados: {rendered.get('implemented_controls', 0)}.",
-                f"Controles pendientes: {rendered.get('pending_controls', 0)}.",
+                f"Controles planificados: {rendered.get('pending_controls', 0)}.",
+                f"Controles no implementados: {rendered.get('not_implemented_controls', 0)}.",
                 "Recomendación: priorizar el cierre de controles pendientes y documentar evidencia clara para cada uno.",
             ],
         })
@@ -481,7 +778,12 @@ def _build_report_document(
         breaches = rendered.get("breaches", [])
         sections.append({
             "heading": "Hallazgos clave",
-            "rows": [["Hallazgo", "Estado", "Recomendación"]] + [[b["item"], b["status"], b["recommendation"]] for b in breaches],
+            "rows": [["Hallazgo", "Severidad", "Estado", "Recomendación"]] + [[
+                b["item"],
+                b.get("severity", "Major"),
+                b["status"],
+                b["recommendation"],
+            ] for b in breaches],
         })
         sections.append({
             "heading": "Indicadores",
@@ -490,6 +792,10 @@ def _build_report_document(
                 f"Tendencia: {rendered.get('trend', 'No definido')}.",
             ],
         })
+        extra_fields = {
+            "health_score": rendered.get("health_score", 0),
+            "findings": rendered.get("findings", []),
+        }
     elif template == "gap_analysis":
         phases = rendered.get("phases", [])
         sections.append({
@@ -507,7 +813,10 @@ def _build_report_document(
     if generated_at:
         sections.insert(0, {"heading": "Metadatos", "paragraphs": [f"Generado: {generated_at}", f"Plantilla: {template.replace('_', ' ').title()}"]})
 
-    return {"title": title, "description": description, "template": template, "generated_at": generated_at, "sections": sections}
+    document = {"title": title, "description": description, "template": template, "generated_at": generated_at, "sections": sections}
+    if "extra_fields" in locals():
+        document.update(extra_fields)
+    return document
 
 
 def _render_report_text(
@@ -530,15 +839,17 @@ def _render_report_text(
     if template == "soa":
         implemented = rendered.get("implemented_controls")
         pending = rendered.get("pending_controls")
+        not_implemented = rendered.get("not_implemented_controls")
         if implemented is not None and pending is not None:
             lines.append("Estado actual de controles:")
             lines.append(f"- Controles implementados: {implemented}")
-            lines.append(f"- Controles pendientes: {pending}")
+            lines.append(f"- Controles planificados: {pending}")
+            lines.append(f"- Controles no implementados: {not_implemented}")
             lines.append("")
         lines.append("Detalles de controles:")
         for control in rendered.get("controls", []):
             lines.append(
-                f"• {control['control']} — Estado: {control['status']}. Justificación: {control['justification']}"
+                f"• {control['code']} - {control['name']} — Estado: {control['status']}. Recomendación: {control['recommendation']}"
             )
         lines.append("")
         lines.append("Recomendaciones principales:")
@@ -618,12 +929,23 @@ def _render_rows(
     rows.append([])
 
     if template == "soa":
-        rows.append(["Control", "Estado", "Justificación"])
-        rows.extend([[c["control"], c["status"], c["justification"]] for c in rendered.get("controls", [])])
+        rows.append(["Control", "Dominio", "Estado", "Severidad", "Evidencia", "Recomendación"])
+        rows.extend([
+            [
+                control.get("code", ""),
+                control.get("domain", ""),
+                control.get("status", ""),
+                control.get("severity", ""),
+                control.get("evidence_freshness", ""),
+                control.get("recommendation", ""),
+            ]
+            for control in rendered.get("controls", [])
+        ])
         rows.append([])
         rows.append(["Indicadores", "Valor"])
         rows.append(["Controles implementados", rendered.get("implemented_controls", "-")])
-        rows.append(["Controles pendientes", rendered.get("pending_controls", "-")])
+        rows.append(["Controles planificados", rendered.get("pending_controls", "-")])
+        rows.append(["Controles no implementados", rendered.get("not_implemented_controls", "-")])
         return rows
     if template == "risk_register":
         rows.append(["Riesgo", "Activo", "Probabilidad", "Impacto", "Nivel"])
@@ -680,41 +1002,11 @@ def generate_report(
         }
 
         await _update_state("started", 10, "Iniciando generación de reporte", metadata)
-        rendered = _render_template_data(request_data.get("template"), organization_id, request_data)
-        document = _build_report_document(
-            request_data.get("template"),
-            rendered,
-            request_data.get("title"),
-            request_data.get("description"),
-            metadata["created_at"],
-        )
-        text_content = _render_report_text(
-            request_data.get("template"),
-            rendered,
-            request_data.get("title"),
-            request_data.get("description"),
-        )
-
         await _update_state("processing", 50, "Generando contenido", metadata)
 
         report_format = request_data.get("format")
-        if report_format == "pdf":
-            report_bytes = _generate_pdf(
-                text_content,
-                request_data.get("branding") or {},
-                request_data.get("title"),
-                request_data.get("description"),
-                request_data.get("template"),
-                metadata["created_at"],
-            )
-        elif report_format == "csv":
-            report_bytes = _generate_csv(document)
-        elif report_format == "docx":
-            report_bytes = _generate_docx(document)
-        elif report_format == "xlsx":
-            report_bytes = _generate_xlsx(document)
-        else:
-            raise ValueError("Formato de reporte no soportado")
+        service = TenantReportService(organization_id, request_data, user_id)
+        report_bytes = service.generate(report_format, metadata["created_at"])
 
         encoded = base64.b64encode(report_bytes).decode("utf-8")
         download_key = f"report:download:{job_id}"

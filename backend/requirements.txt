@@ -23,6 +23,9 @@ twilio==9.2.3
 PyPDF2==3.0.1
 python-docx==0.8.11
 openpyxl==3.1.2
+pandas==2.2.3
 Pillow==10.1.0
 google-generativeai==0.7.2
+Jinja2==3.1.2
+WeasyPrint==59.0
 reportlab==4.0.0

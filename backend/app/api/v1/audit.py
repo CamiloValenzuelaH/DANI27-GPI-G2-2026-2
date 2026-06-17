@@ -14,6 +14,21 @@ from app.services.file_extraction_service import extract_text_from_file
 router = APIRouter(prefix="/audit", tags=["audit"])
 
 
+def normalize_text(text: str) -> str:
+    return " ".join(str(text or "").split())
+
+
+def build_document_context(document_text: str, max_chars: int = 12000) -> str:
+    full_text = str(document_text or "")
+    if len(full_text) <= max_chars:
+        return full_text
+
+    preview = [full_text[:3000], full_text[-3000:]]
+    combined = "\n\n--- Fragmento relevante ---\n\n".join(preview)
+    return combined[:max_chars]
+
+
+
 ALLOWED_CHECKLIST_STATUS = {"pending", "in_progress", "done", "blocked"}
 
 DEFAULT_AUDIT_CHECKLIST = [
@@ -401,8 +416,8 @@ async def validate_file(
             )
     
     # Intentar extraer texto del archivo usando el servicio especializado
-    file_text = extract_text_from_file(content, file_ext, max_chars=100000)
-    normalized_text = file_text.strip()
+    file_text = extract_text_from_file(content, file_ext, max_chars=None)
+    normalized_text = normalize_text(file_text)
     extraction_failed = normalized_text.startswith("[") and (
         "Error" in normalized_text or "No se pudo extraer texto" in normalized_text or "no soportado" in normalized_text
     )
@@ -413,7 +428,7 @@ async def validate_file(
         "file_name": file.filename or "archivo",
         "file_size_bytes": file_size,
         "file_extension": file_ext,
-        "content_preview": normalized_text,
+        "content_preview": build_document_context(normalized_text, max_chars=12000),
         "analysis_context": "Evaluación de documento de evidencia para cumplimiento ISO 27001"
     }
     
