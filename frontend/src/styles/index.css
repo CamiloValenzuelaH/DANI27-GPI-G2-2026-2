@@ -1,3 +1,47 @@
+<<<<<<< HEAD
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+=======
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* Lock all scrolling - make layout completely static */
+html {
+  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  scroll-behavior: auto !important;
+}
+
+body {
+  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Hide all scrollbars */
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+::-webkit-scrollbar-track {
+  display: none !important;
+}
+
+::-webkit-scrollbar-thumb {
+  display: none !important;
+}
+
+/* Block overflow on all elements */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+>>>>>>> Chat-bot

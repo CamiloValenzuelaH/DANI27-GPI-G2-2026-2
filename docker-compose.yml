@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Levanta PostgreSQL, el backend y el frontend del proyecto con sus puertos y variables de entorno.
 services:
   db:
@@ -98,4 +99,102 @@ services:
 
 volumes:
   postgres_data:
+=======
+# Levanta PostgreSQL, el backend y el frontend del proyecto con sus puertos y variables de entorno.
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password1234
+      POSTGRES_DB: dani27001
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+  celery-worker:
+    build: ./backend
+    command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=2
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:password1234@db:5432/dani27001
+      REDIS_URL: redis://redis:6379/0
+      VALIDATION_JOBS_DIR: /shared/validation_jobs
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    volumes:
+      - validation_jobs:/shared/validation_jobs
+
+  celery-beat:
+    build: ./backend
+    command: celery -A app.workers.celery_app beat --loglevel=info
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:password1234@db:5432/dani27001
+      REDIS_URL: redis://redis:6379/0
+      VALIDATION_JOBS_DIR: /shared/validation_jobs
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+    volumes:
+      - validation_jobs:/shared/validation_jobs
+
+  backend:
+    build: ./backend
+    entrypoint: ["/app/entrypoint.sh"]
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+      - redis
+      - celery-worker
+    environment:
+      DATABASE_URL: postgresql://postgres:password1234@db:5432/dani27001
+      REDIS_URL: redis://redis:6379/0
+      VALIDATION_JOBS_DIR: /shared/validation_jobs
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      AUTO_SEED_ISO_CHUNKS: ${AUTO_SEED_ISO_CHUNKS:-1}
+      AUTO_SEED_MAX_RETRIES: ${AUTO_SEED_MAX_RETRIES:-15}
+      AUTO_SEED_RETRY_SECONDS: ${AUTO_SEED_RETRY_SECONDS:-3}
+      FORCE_RESEED_ISO_CHUNKS: ${FORCE_RESEED_ISO_CHUNKS:-0}
+    env_file:
+      - ./backend/.env
+    volumes:
+      - validation_jobs:/shared/validation_jobs
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: /api/v1
+      VITE_VALIDATION_API_URL: /api/validate
+      VITE_BACKEND_PROXY_TARGET: http://host.docker.internal:8001
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: g2_mailhog
+    ports:
+      - "1025:1025" # Puerto SMTP (el que usará tu FastAPI para enviar)
+      - "8025:8025" # Puerto Web (el que usarás tú en el navegador para ver los correos)
+
+volumes:
+  postgres_data:
+>>>>>>> Chat-bot
   validation_jobs:

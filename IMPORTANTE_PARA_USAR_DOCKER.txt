@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Antes de empezar, el archivo ".env" que contiene las llaves hay que pedirlo. Una vez
 se diponga del archivo ".env" se debe pegar en la carpeta "backend/".
 
@@ -15,4 +16,23 @@ Ya con docker instalado:
         "docker-compose up"
     
     Si se realizaron cambios en el codigo o se volvio a baja el repositorio como ya se
+=======
+Antes de empezar, el archivo ".env" que contiene las llaves hay que pedirlo. Una vez
+se diponga del archivo ".env" se debe pegar en la carpeta "backend/".
+
+Se debe tener instalado docker y ojala Docker Desktop
+
+Ya con docker instalado:
+    CADA VEZ QUE  SE BAJE EL REPOSITORIO DE GITHUB, INCLUIDO LA PRIMERA VEZ se debe
+    ejecutar:
+
+        "docker-compose up --build"
+
+    Esto para que se construya el contenedor completo.
+    Si se ejecuta con el repositorio en local y el docker ya se construyo se usa:
+
+        "docker-compose up"
+    
+    Si se realizaron cambios en el codigo o se volvio a baja el repositorio como ya se
+>>>>>>> Chat-bot
     dijo antes, se usa el primer comando para que se vuelva a construir el contenedor.

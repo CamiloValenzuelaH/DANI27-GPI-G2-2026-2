@@ -1,0 +1,103 @@
+{% extends 'reports/base.html' %}
+{% block main %}
+    <section class="cover">
+        <div class="cover-card">
+            {% if logo_url %}
+                <img src="{{ logo_url }}" class="logo" alt="Logo" />
+            {% endif %}
+            <span class="report-label">Audit Report</span>
+            <h1 class="report-title">{{ title or 'Audit Report' }}</h1>
+            <p class="report-subtitle">{{ description or 'Informe ejecutivo de hallazgos, severidad y recomendaciones para el programa de seguridad.' }}</p>
+            <div class="cover-meta">
+                <div class="meta-card">
+                    <span class="meta-label">Cliente</span>
+                    <p class="meta-value">{{ organization_name }}</p>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-label">Plantilla</span>
+                    <p class="meta-value">Audit Report</p>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-label">Generado</span>
+                    <p class="meta-value">{{ generated_at }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Resumen Ejecutivo</h2>
+        {% set executive_section = sections | selectattr('heading', 'equalto', 'Resumen ejecutivo') | list | first %}
+        {% set executive_section = executive_section or (sections[1] if sections|length > 1 else None) %}
+        <p class="section-text">{{ executive_section.paragraphs[0] if executive_section and executive_section.paragraphs else 'No hay resumen ejecutivo disponible.' }}</p>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Health Score y Brechas Críticas</h2>
+        <div class="chart-panel">
+            <div>
+                <div class="stat-card">
+                    <p class="stat-label">Health Score</p>
+                    <p class="stat-number">{{ health_score }}%</p>
+                    <p class="stat-label">Evaluación del cierre y control</p>
+                </div>
+                <div class="note">El health score sintetiza el nivel de control operativo para la organización.</div>
+            </div>
+            <div class="donut-wrapper">
+                <svg class="donut-svg" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="16" />
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="#0b4f6c" stroke-width="16"
+                        stroke-dasharray="{{ (health_score / 100 * 326)|round(1) }} 326"
+                        stroke-dashoffset="25"
+                        stroke-linecap="round"
+                    />
+                    <text x="60" y="65" class="donut-center">{{ health_score }}%</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Hallazgos Clasificados</h2>
+        {% if findings %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hallazgo</th>
+                            <th>Severidad</th>
+                            <th>Estado</th>
+                            <th>Recomendación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for finding in findings %}
+                            {% set severity = finding.severity|lower %}
+                            {% set badge_class = 'badge-critical' if severity == 'critical' else 'badge-major' if severity == 'major' else 'badge-minor' %}
+                            <tr>
+                                <td>{{ finding.item }}</td>
+                                <td><span class="badge {{ badge_class }}">{{ finding.severity }}</span></td>
+                                <td>{{ finding.status }}</td>
+                                <td>{{ finding.recommendation }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="section-text">No se encontraron hallazgos para este reporte.</p>
+        {% endif %}
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Indicadores del Programa</h2>
+        {% set program_section = sections | selectattr('heading', 'equalto', 'Indicadores') | list | first %}
+        {% if program_section and program_section.paragraphs %}
+            {% for paragraph in program_section.paragraphs %}
+                <p class="section-text">{{ paragraph }}</p>
+            {% endfor %}
+        {% else %}
+            <p class="section-text">No hay métricas disponibles para este reporte.</p>
+        {% endif %}
+    </section>
+{% endblock %}

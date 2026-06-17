@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title or 'Reporte SOA' }}</title>
+    <style>
+        :root {
+            --brand-color: #0b4f6c;
+            --accent-color: #2a9d8f;
+            --text-color: #1f2933;
+            --muted-color: #6b7280;
+            --bg-page: #f4f6f8;
+            --bg-panel: #ffffff;
+            --border-color: #d1d5db;
+            --font-family: 'Helvetica', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-family);
+            color: var(--text-color);
+            background: var(--bg-page);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-page);
+            font-size: 12pt;
+        }
+
+        .page {
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 40px;
+            background: var(--bg-page);
+        }
+
+        .cover {
+            min-height: 100vh;
+            padding-top: 120px;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f6f8 100%);
+        }
+
+        .cover-card {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 40px;
+            border-radius: 24px;
+            background: white;
+            box-shadow: 0 18px 60px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .logo {
+            width: 160px;
+            height: auto;
+            margin-bottom: 28px;
+        }
+
+        .report-title {
+            margin: 0;
+            font-size: 42px;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--brand-color);
+        }
+
+        .report-subtitle {
+            margin: 18px 0 0;
+            font-size: 16px;
+            color: var(--muted-color);
+            max-width: 720px;
+            line-height: 1.7;
+        }
+
+        .cover-meta {
+            margin-top: 42px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .meta-card {
+            padding: 18px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .meta-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--muted-color);
+        }
+
+        .meta-value {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+            font-size: 12px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--brand-color);
+        }
+
+        .header-caption {
+            color: var(--muted-color);
+            font-size: 12px;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            padding: 10px 40px;
+            font-size: 11px;
+            color: var(--muted-color);
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+            background: white;
+        }
+
+        .footer-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .content {
+            margin: 0 auto;
+            max-width: 880px;
+            padding-top: 120px;
+            padding-bottom: 88px;
+        }
+
+        .section {
+            margin-bottom: 34px;
+            padding: 30px;
+            background: var(--bg-panel);
+            border-radius: 20px;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+        }
+
+        .section-title {
+            margin: 0 0 16px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--brand-color);
+        }
+
+        .section-text {
+            margin: 0;
+            line-height: 1.75;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .chart-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 24px;
+            border-radius: 18px;
+            background: #eef6fb;
+            border: 1px solid rgba(11, 79, 108, 0.12);
+            align-items: center;
+        }
+
+        .donut-chart {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto;
+        }
+
+        .donut-chart circle {
+            fill: none;
+            stroke-width: 24;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            stroke-linecap: round;
+        }
+
+        .donut-track {
+            stroke: #e2e8f0;
+        }
+
+        .donut-value {
+            stroke: var(--brand-color);
+        }
+
+        .donut-center {
+            font-size: 26px;
+            font-weight: 700;
+            fill: var(--brand-color);
+            text-anchor: middle;
+        }
+
+        .legend {
+            display: grid;
+            gap: 12px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        .legend-swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-critical {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-major {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-minor {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 14px 16px;
+            background: var(--brand-color);
+            color: white;
+            font-size: 13px;
+            letter-spacing: 0.01em;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+            vertical-align: top;
+        }
+
+        tbody tr:hover {
+            background: rgba(11, 79, 108, 0.04);
+        }
+
+        .small-note {
+            margin: 0;
+            font-size: 12px;
+            color: var(--muted-color);
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        @page {
+            size: A4;
+            margin: 100px 40px 84px;
+        }
+
+        @bottom-left {
+            content: "{{ organization_name }} - {{ generated_at }}";
+            font-size: 10px;
+            color: var(--muted-color);
+        }
+
+        @bottom-right {
+            content: "Página " counter(page) " de " counter(pages);
+            font-size: 10px;
+            color: var(--muted-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="cover page">
+        <div class="cover-card">
+            {% if logo_url %}
+                <img src="{{ logo_url }}" class="logo" alt="Logo" />
+            {% endif %}
+            <span class="small-note">Reporte confidencial</span>
+            <h1 class="report-title">{{ title or 'SOA Ejecutivo' }}</h1>
+            <p class="report-subtitle">{{ description or 'Informe de conformidad ISO 27001 con enfoque en la implementación de controles y brechas de evidencia.' }}</p>
+
+            <div class="cover-meta">
+                <div class="meta-card">
+                    <span class="meta-label">Empresa auditada</span>
+                    <p class="meta-value">{{ organization_name }}</p>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-label">Plantilla</span>
+                    <p class="meta-value">{{ template_name }}</p>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-label">Generado</span>
+                    <p class="meta-value">{{ generated_at }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page content">
+        <header>
+            <div class="header-brand">
+                {% if logo_url %}
+                    <img src="{{ logo_url }}" alt="DANI27" />
+                {% endif %}
+                <span>DANI27 Compliance Intelligence</span>
+            </div>
+            <div class="header-caption">Reporte SOA</div>
+        </header>
+
+        <section class="section" style="margin-top: 40px;">
+            <h2 class="section-title">Resumen Ejecutivo</h2>
+            {% set executive = sections | selectattr('heading', 'equalto', 'Resumen ejecutivo') | list | first %}
+            <p class="section-text">{{ executive.paragraphs[0] if executive and executive.paragraphs else 'No hay resumen ejecutivo disponible.' }}</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Estado de Controles</h2>
+            {% set implemented = implemented_controls or 0 %}
+            {% set pending = pending_controls or 0 %}
+            {% set total = implemented + pending + (not_implemented_controls or 0) %}
+            {% set implemented_pct = total > 0 and (implemented / total) * 100 or 0 %}
+            {% set pending_pct = total > 0 and (pending / total) * 100 or 0 %}
+            {% set not_implemented_pct = total > 0 and ((not_implemented_controls or 0) / total) * 100 or 0 %}
+
+            <div class="chart-card">
+                <div class="donut-chart" role="img" aria-label="Porcentaje de controles implementados vs pendientes">
+                    <svg viewBox="0 0 120 120" width="220" height="220">
+                        <circle class="donut-track" cx="60" cy="60" r="44" />
+                        <circle class="donut-value" cx="60" cy="60" r="44"
+                            stroke-dasharray="{{ implemented_pct }} {{ 100 - implemented_pct }}"
+                            stroke-dashoffset="25"
+                        />
+                        <text x="60" y="60" class="donut-center">{{ implemented_pct|round(0) }}%</text>
+                    </svg>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <span class="legend-swatch" style="background: #0b4f6c;"></span>
+                        <div><strong>{{ implemented }}</strong> controles implementados ({{ implemented_pct|round(1) }}%)</div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-swatch" style="background: #fbbf24;"></span>
+                        <div><strong>{{ pending }}</strong> controles planificados ({{ pending_pct|round(1) }}%)</div>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-swatch" style="background: #ef4444;"></span>
+                        <div><strong>{{ not_implemented_controls or 0 }}</strong> no implementados ({{ not_implemented_pct|round(1) }}%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Control</th>
+                            <th>Dominio</th>
+                            <th>Estado</th>
+                            <th>Severidad</th>
+                            <th>Evidencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for control in controls[:20] %}
+                            {% set status = control.status if control.status else '' %}
+                            {% set badge_class = 'badge-critical' if control.severity == 'critical' else 'badge-major' if control.severity == 'major' else 'badge-minor' %}
+                            <tr>
+                                <td>{{ control.code }} – {{ control.name }}</td>
+                                <td>{{ control.domain }}</td>
+                                <td><span class="badge {{ badge_class }}">{{ status }}</span></td>
+                                <td>{{ control.severity }}</td>
+                                <td>{{ control.evidence_freshness }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="small-note">Solo se muestran los primeros 20 controles en este resumen. El archivo completo incluye el total de controles disponibles.</p>
+        </section>
+
+        <section class="section">
+            <h2 class="section-title">Recomendaciones y Conclusiones</h2>
+            {% set conclusion = sections | selectattr('heading', 'equalto', 'Conclusiones') | list | first %}
+            {% if conclusion and conclusion.paragraphs %}
+                {% for paragraph in conclusion.paragraphs %}
+                    <p class="section-text">{{ paragraph }}</p>
+                {% endfor %}
+            {% else %}
+                <p class="section-text">No hay conclusiones disponibles para este reporte.</p>
+            {% endif %}
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-text">
+            <span>Reporte SOA - DANI27 Compliance Intelligence</span>
+            <span>Página <span class="page-number"></span></span>
+        </div>
+    </footer>
+</body>
+</html>
