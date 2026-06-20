@@ -233,32 +233,7 @@ const deriveClauseFromControl = (controlId: string): string => {
   return match?.[0] ?? "";
 };
 
-const enqueueExternalValidationJob = async (file: File): Promise<unknown> => {
-  const token = storage.getToken();
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await fetch(VALIDATION_EXTERNAL_URL, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
-
-  const text = await response.text();
-  if (!text.trim()) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
-};
+// enqueueExternalValidationJob moved into UploadModal component
 
 const requestWithAuth = async (url: string, init: RequestInit): Promise<Response> => {
   const token = storage.getToken();
@@ -661,6 +636,44 @@ function statusLabel(status: UploadStatus): string {
 
 export function UploadModal({ open, onOpenChange, onComplete, questionId }: UploadModalProps) {
   const [items, setItems] = React.useState<UploadItem[]>([]);
+
+  const enqueueExternalValidationJob = async (file: File): Promise<unknown> => {
+    const token = storage.getToken();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Collect clause_refs from current items' metadata (allow comma-separated lists)
+    const clauseRefs = Array.from(new Set(
+      items.flatMap((it) => (it.metadata?.clause_ref || "").split(",").map((s) => s.trim()).filter(Boolean))
+    ));
+
+    const url = clauseRefs.length
+      ? `${VALIDATION_EXTERNAL_URL}?${clauseRefs.map((r) => `clause_refs=${encodeURIComponent(r)}`).join("&")}`
+      : VALIDATION_EXTERNAL_URL;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    const text = await response.text();
+    if (!text.trim()) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
+  };
+
+
   const [globalError, setGlobalError] = React.useState<string | null>(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
 
