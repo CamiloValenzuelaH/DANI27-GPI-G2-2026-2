@@ -1,6 +1,6 @@
 const { extractTextFromFile } = require('./extract');
 const { generateEmbedding, analyzeChunkWithAI } = require('./ai');
-const { getTopIsoChunks } = require('./db');
+const { getTopIsoChunks, getChunksByClauseRefs } = require('./db');
 const { publishProgress } = require('./state');
 
 function clampScore(score) {
@@ -19,7 +19,7 @@ function summarizeResults(results) {
 }
 
 async function runValidationJob(jobData) {
-  const { job_id: jobId, file_path: filePath, file_name: fileName, organization_id: organizationId, user_id: userId } = jobData;
+  const { job_id: jobId, file_path: filePath, file_name: fileName, organization_id: organizationId, user_id: userId, clause_refs: clauseRefs } = jobData;
 
   await publishProgress(jobId, {
     job_id: jobId,
@@ -57,7 +57,9 @@ async function runValidationJob(jobData) {
     message: 'Buscando fragmentos ISO relevantes con pgvector',
   });
 
-  const chunks = await getTopIsoChunks(embedding, 5);
+  const chunks = clauseRefs?.length
+    ? await getChunksByClauseRefs(clauseRefs)
+    : await getTopIsoChunks(embedding, 5);
   const findings = [];
 
   for (let index = 0; index < chunks.length; index += 1) {
