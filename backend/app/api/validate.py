@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -191,6 +191,7 @@ def _load_iso_chunk(db: Session, chunk_id: str, fallback_clause_ref: str | None 
 @router.post("/external", response_model=ValidationJobResponse, status_code=status.HTTP_202_ACCEPTED)
 async def create_external_validation_job(
     file: UploadFile = File(...),
+    clause_refs: list[str] | None = Query(None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -218,6 +219,7 @@ async def create_external_validation_job(
         organization_id=str(current_user.organization_id),
         user_id=str(current_user.id),
         content_type=file.content_type or "application/octet-stream",
+        clause_refs=clause_refs,
     )
 
     return ValidationJobResponse(

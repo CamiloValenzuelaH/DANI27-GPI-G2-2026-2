@@ -18,6 +18,39 @@ function summarizeResults(results) {
   return `Validación granular completada sobre ${results.length} fragmentos ISO. Score promedio ${average}. Hallazgos críticos: ${criticalCount}. Hallazgos mayores: ${majorCount}.`;
 }
 
+/**
+ * Construye un fragmento contextual del documento centrado en `clauseRef`.
+ * - Si se encuentra `clauseRef` devuelve hasta 3k antes y 3k después.
+ * - Añade los primeros 2k como prefijo de contexto general.
+ * - Si no se encuentra, devuelve el head como fallback (16k).
+ */
+function buildDocumentContext(normalizedText, clauseRef) {
+  if (!normalizedText) return '';
+  if (!clauseRef) return normalizedText.slice(0, 16000);
+
+  const idx = normalizedText.indexOf(clauseRef);
+  if (clauseRef === 'A.5.25') {
+    console.log('[DEBUG A.5.25] indexOf result:', idx);
+    if (idx !== -1) {
+      console.log('[DEBUG A.5.25] text around:', normalizedText.slice(Math.max(0, idx - 50), Math.min(normalizedText.length, idx + clauseRef.length + 100)));
+    }
+  }
+
+  if (idx === -1) {
+    return normalizedText.slice(0, 16000);
+  }
+
+  const before = 3000;
+  const after = 3000;
+  const prefix = normalizedText.slice(0, 2000);
+  const start = Math.max(0, idx - before);
+  const end = Math.min(normalizedText.length, idx + clauseRef.length + after);
+  const window = normalizedText.slice(start, end);
+
+  // Prefer incluir prefijo breve para contexto global y luego el fragmento localizado.
+  return `${prefix}\n\n${window}`;
+}
+
 async function runValidationJob(jobData) {
   const { job_id: jobId, file_path: filePath, file_name: fileName, organization_id: organizationId, user_id: userId, clause_refs: clauseRefs } = jobData;
 
@@ -39,6 +72,8 @@ async function runValidationJob(jobData) {
 
   const documentText = await extractTextFromFile(filePath, 100000);
   const normalizedText = documentText.trim();
+  console.log('[DEBUG TEXT] length:', normalizedText.length, '| has A.5.25:', normalizedText.includes('A.5.25'), '| pos:', normalizedText.indexOf('A.5.25'));
+  console.log('[DEBUG SAMPLE] chars 9000-9500:', JSON.stringify(normalizedText.slice(9000, 9500)));
   if (normalizedText.length < 20) {
     throw new Error('No se pudo extraer suficiente texto del documento');
   }
@@ -74,7 +109,7 @@ async function runValidationJob(jobData) {
     });
 
     const analysis = await analyzeChunkWithAI({
-      documentText: normalizedText.slice(0, 16000),
+      documentText: buildDocumentContext(normalizedText, chunk.clause_ref),
       chunk,
     });
 

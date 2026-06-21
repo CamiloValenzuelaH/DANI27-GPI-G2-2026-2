@@ -1,0 +1,195 @@
+﻿{
+    "job_id":  "442c1915-08d9-4ed0-813a-704976e48b7d",
+    "status":  "completed",
+    "progress":  100,
+    "message":  "ValidaciÃ³n completada",
+    "organization_id":  "95c8377d-a0c8-4deb-a045-bccb31b63310",
+    "user_id":  "c89e0cc7-ffc4-459e-b445-e7485d093224",
+    "file_name":  "a40ad106-f374-4396-a10a-a9b04edf02ad__683b5448-919d-4ee0-af92-ba148c6a3474__ISO27001_Anexo_A_93_Controles_Documento_Prueba.pdf",
+    "file_path":  "/shared/validation_jobs/442c1915-08d9-4ed0-813a-704976e48b7d__a40ad106-f374-4396-a10a-a9b04edf02ad__683b5448-919d-4ee0-af92-ba148c6a3474__ISO27001_Anexo_A_93_Controles_Documento_Prueba.pdf",
+    "total_chunks":  5,
+    "overall_score":  41,
+    "findings":  [
+                     {
+                         "clause_ref":  "A.5.2",
+                         "title":  "Anexo A - A.5.2",
+                         "relevance_score":  null,
+                         "compliance_score":  75,
+                         "document_status":  "INCOMPLETO",
+                         "missing_elements":  [
+                                                  "DescripciÃ³n del rol de seguridad asignado.",
+                                                  "Evidencia de comunicaciÃ³n formal de roles y responsabilidades.",
+                                                  "DocumentaciÃ³n de la aceptaciÃ³n del rol por parte del responsable."
+                                              ],
+                         "observations":  [
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "No se proporciona una descripciÃ³n detallada del rol de seguridad asignado al responsable \u0027TI / Infraestructura\u0027."
+                                              },
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "No se incluye evidencia de que los roles y responsabilidades hayan sido comunicados formalmente a las partes interesadas."
+                                              },
+                                              {
+                                                  "severity":  "minor",
+                                                  "text":  "El documento es sintÃ©tico y generado para fines de prueba, lo que reduce su fiabilidad como evidencia de auditorÃ­a real."
+                                              }
+                                          ],
+                         "suggestions":  [
+                                             "JustificaciÃ³n: El documento evalÃºa el control A.5.2 con estado \u0027Implementado\u0027, madurez 3 y riesgo Medio, asignando responsable \u0027TI / Infraestructura\u0027, lo que evidencia la asignaciÃ³n de roles y responsabilidades requerida por el control. Sin embargo, no se incluye una descripciÃ³n explÃ­cita del rol ni evidencia de comunicaciÃ³n formal, elementos esenciales segÃºn el control ISO. AdemÃ¡s, el documento es sintÃ©tico y de prueba, lo que limita su validez como evidencia real de cumplimiento.",
+                                             "Incluir una descripciÃ³n formal del rol de seguridad para el responsable \u0027TI / Infraestructura\u0027.",
+                                             "Agregar evidencia de comunicaciÃ³n (ej. actas de reuniÃ³n, correos, polÃ­ticas firmadas) que demuestre que los roles fueron comunicados.",
+                                             "Actualizar el documento con datos reales de la organizaciÃ³n para que sea vÃ¡lido como evidencia de cumplimiento."
+                                         ]
+                     },
+                     {
+                         "clause_ref":  "A.5.25",
+                         "title":  "Anexo A - A.5.25",
+                         "relevance_score":  null,
+                         "compliance_score":  15,
+                         "document_status":  "INEXISTENTE",
+                         "missing_elements":  [
+
+                                              ],
+                         "observations":  [
+                                              {
+                                                  "severity":  "critical",
+                                                  "text":  "No se incluye el procedimiento documentado para evaluar eventos de seguridad y decidir si son incidentes."
+                                              },
+                                              {
+                                                  "severity":  "critical",
+                                                  "text":  "No se presentan registros de decisiones sobre eventos de seguridad (ej. actas, informes de evaluaciÃ³n)."
+                                              },
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "El documento es un informe de evaluaciÃ³n de controles, no un procedimiento ni un registro de decisiones, por lo que no cumple con la evidencia requerida por A.5.25."
+                                              }
+                                          ],
+                         "suggestions":  [
+                                             "JustificaciÃ³n: El documento es un informe de evaluaciÃ³n de controles del Anexo A completo, pero no contiene el procedimiento documentado para evaluar eventos de seguridad ni registros de decisiones sobre incidentes, que son la evidencia bÃ¡sica requerida por A.5.25. El documento no aborda el control objetivo de A.5.25.",
+                                             "Desarrollar un procedimiento documentado que describa el proceso de evaluaciÃ³n de eventos de seguridad y criterios para declarar incidentes.",
+                                             "Implementar un registro (fÃ­sico o electrÃ³nico) que capture las decisiones tomadas sobre cada evento de seguridad, incluyendo fecha, responsable y resultado.",
+                                             "Revisar el alcance del documento actual para alinearlo con los requisitos especÃ­ficos de A.5.25."
+                                         ]
+                     },
+                     {
+                         "clause_ref":  "A.5.35",
+                         "title":  "Anexo A - A.5.35",
+                         "relevance_score":  null,
+                         "compliance_score":  45,
+                         "document_status":  "INCOMPLETO",
+                         "missing_elements":  [
+                                                  "DeclaraciÃ³n de independencia del revisor.",
+                                                  "Plan de acciÃ³n detallado con responsables y fechas.",
+                                                  "Hallazgos concretos de auditorÃ­a con evidencia.",
+                                                  "Firma o acreditaciÃ³n del auditor independiente.",
+                                                  "Referencia explÃ­cita al control A.5.35 y su cumplimiento."
+                                              ],
+                         "observations":  [
+                                              {
+                                                  "severity":  "critical",
+                                                  "text":  "No se menciona la independencia del revisor o equipo auditor, requisito fundamental de A.5.35."
+                                              },
+                                              {
+                                                  "severity":  "critical",
+                                                  "text":  "No incluye un plan de acciÃ³n detallado con responsables, fechas y recursos para abordar los hallazgos."
+                                              },
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "El documento es explÃ­citamente sintÃ©tico y de prueba, no representa una evaluaciÃ³n real ni una revisiÃ³n independiente."
+                                              },
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "Faltan hallazgos concretos de auditorÃ­a; solo se presentan estados y niveles de riesgo sin anÃ¡lisis de causas o evidencias."
+                                              },
+                                              {
+                                                  "severity":  "minor",
+                                                  "text":  "El resumen ejecutivo y mapas de calor son Ãºtiles, pero no sustituyen la narrativa de una revisiÃ³n independiente."
+                                              }
+                                          ],
+                         "suggestions":  [
+                                             "JustificaciÃ³n: El documento es un informe de evaluaciÃ³n de controles del Anexo A que cubre 93 controles con mapas de calor, madurez y riesgo, lo cual es pertinente para A.5.35 (revisiÃ³n independiente). Sin embargo, carece de elementos esenciales: no menciona la independencia del revisor, no incluye hallazgos concretos ni un plan de acciÃ³n detallado, y su contenido es sintÃ©tico y de prueba, no una auditorÃ­a real. La puntuaciÃ³n refleja que, aunque la estructura es adecuada, la falta de evidencia de independencia y de un plan de acciÃ³n limita su cumplimiento.",
+                                             "Incluir una declaraciÃ³n explÃ­cita de independencia del revisor o equipo auditor.",
+                                             "Agregar un plan de acciÃ³n detallado con responsables, fechas y recursos para cada hallazgo crÃ­tico o alto.",
+                                             "Desarrollar hallazgos concretos con evidencia de auditorÃ­a, no solo estados de implementaciÃ³n.",
+                                             "Eliminar la advertencia de \u0027datos sintÃ©ticos\u0027 o reemplazar el contenido con datos reales de una auditorÃ­a.",
+                                             "AÃ±adir una secciÃ³n de conclusiones que relacione los resultados con el cumplimiento de A.5.35."
+                                         ]
+                     },
+                     {
+                         "clause_ref":  "A.5.36",
+                         "title":  "Anexo A - A.5.36",
+                         "relevance_score":  null,
+                         "compliance_score":  35,
+                         "document_status":  "INEXISTENTE",
+                         "missing_elements":  [
+
+                                              ],
+                         "observations":  [
+                                              {
+                                                  "severity":  "critical",
+                                                  "text":  "No se incluye la polÃ­tica de seguridad de la informaciÃ³n vigente como evidencia del control A.5.36."
+                                              },
+                                              {
+                                                  "severity":  "critical",
+                                                  "text":  "No se presentan registros de revisiÃ³n de cumplimiento con polÃ­ticas, reglas y normas de seguridad de la informaciÃ³n."
+                                              },
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "El control A.5.36 aparece en la tabla con estado \u0027No implementado\u0027 y madurez 1, pero no se detalla cÃ³mo se verifica el cumplimiento ni se proporcionan evidencias."
+                                              },
+                                              {
+                                                  "severity":  "minor",
+                                                  "text":  "El documento es un informe de prueba con datos sintÃ©ticos, lo que limita su validez como evidencia real de cumplimiento."
+                                              }
+                                          ],
+                         "suggestions":  [
+                                             "JustificaciÃ³n: El documento es un informe de evaluaciÃ³n de controles del Anexo A de ISO 27001, que incluye el control A.5.36 sobre verificaciÃ³n de cumplimiento con polÃ­ticas. Sin embargo, no proporciona evidencia especÃ­fica de cumplimiento, como la polÃ­tica vigente o registros de revisiÃ³n de cumplimiento. El documento es pertinente pero incompleto para demostrar el control A.5.36.",
+                                             "Incluir la polÃ­tica de seguridad de la informaciÃ³n vigente como documento de referencia.",
+                                             "Agregar registros de revisiones periÃ³dicas de cumplimiento (actas, informes, listas de verificaciÃ³n).",
+                                             "Detallar el proceso de verificaciÃ³n de cumplimiento para el control A.5.36.",
+                                             "Actualizar el estado del control A.5.36 a \u0027Implementado\u0027 con evidencia concreta."
+                                         ]
+                     },
+                     {
+                         "clause_ref":  "A.6.3",
+                         "title":  "Anexo A - A.6.3",
+                         "relevance_score":  null,
+                         "compliance_score":  35,
+                         "document_status":  "INEXISTENTE",
+                         "missing_elements":  [
+
+                                              ],
+                         "observations":  [
+                                              {
+                                                  "severity":  "critical",
+                                                  "text":  "El control A.6.3 no aparece en el detalle de controles del dominio Personas (A.6). No se proporciona estado, madurez, riesgo ni responsable para este control especÃ­fico."
+                                              },
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "No se incluye evidencia bÃ¡sica requerida para A.6.3: plan de formaciÃ³n en seguridad de la informaciÃ³n ni registros de capacitaciÃ³n."
+                                              },
+                                              {
+                                                  "severity":  "major",
+                                                  "text":  "El dominio Personas (A.6) solo muestra 8 controles en el resumen, pero el Anexo A de ISO 27001:2022 incluye 8 controles en ese dominio; sin embargo, el detalle de controles no lista ninguno del dominio Personas, lo que impide verificar la evaluaciÃ³n de A.6.3."
+                                              },
+                                              {
+                                                  "severity":  "minor",
+                                                  "text":  "El documento es sintÃ©tico y de prueba, lo que limita su validez como evidencia real de cumplimiento."
+                                              }
+                                          ],
+                         "suggestions":  [
+                                             "JustificaciÃ³n: El documento evalÃºa controles del Anexo A, incluyendo el dominio Personas (A.6) donde se ubica A.6.3. Aunque el resumen ejecutivo muestra que el dominio Personas tiene madurez promedio 2.0 y 5 riesgos alto/crÃ­tico, lo que sugiere debilidades en concienciaciÃ³n y formaciÃ³n, el detalle de controles no incluye especÃ­ficamente el control A.6.3 ni proporciona evidencia de un plan de formaciÃ³n o registros de capacitaciÃ³n. Por lo tanto, el documento es pertinente pero incompleto para evaluar el control objetivo.",
+                                             "Incluir el control A.6.3 en el catÃ¡logo detallado con estado, madurez, riesgo y responsable.",
+                                             "Agregar evidencia documental como un plan de formaciÃ³n anual en seguridad de la informaciÃ³n y registros de asistencia a capacitaciones.",
+                                             "Complementar el informe con una secciÃ³n especÃ­fica de concienciaciÃ³n y formaciÃ³n que demuestre la implementaciÃ³n del control.",
+                                             "Actualizar el resumen ejecutivo para reflejar el estado real del control A.6.3."
+                                         ]
+                     }
+                 ],
+    "summary":  "ValidaciÃ³n granular completada sobre 5 fragmentos ISO. Score promedio 41. Hallazgos crÃ­ticos: 7. Hallazgos mayores: 8.",
+    "error":  null,
+    "created_at":  "2026-06-21T00:38:44.962814Z",
+    "updated_at":  "2026-06-21T00:39:30.119251",
+    "created_date":  "2026-06-21"
+}

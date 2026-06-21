@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, Bell, ChevronDown, X, MessageCircle, Send } from 'lucide-react';
 import AuditPage from './pages/AuditPage';
 import Card from './components/common/Card';
+import UnderstandPage from './pages/UnderstandPage';
+import RisksPage from './pages/RisksPage';
 
 type Page = 'dashboard' | 'understand' | 'documents' | 'risks' | 'evidence' | 'findings' | 'audit' | 'integrity' | 'regfeed' | 'dora' | 'euai' | 'escalation' | 'integrations' | 'settings';
 type NavView = 'process' | 'module';
@@ -132,6 +134,58 @@ export default function App() {
       needTreatment: 'need immediate treatment',
       coverage: 'coverage',
       riskRegister: 'Risk Register',
+      'risks.title': 'Risk Management',
+      'risks.subtitle': 'Create threats, vulnerabilities, and link threats to existing risks.',
+      'risks.createThreatTitle': 'Create Threat',
+      'risks.createThreatDescription': 'Identify threats linked to your risk program.',
+      'risks.threatNameLabel': 'Name',
+      'risks.threatNamePlaceholder': 'e.g. Internal phishing',
+      'risks.fieldRequired': 'This field is required',
+      'risks.threatDescriptionLabel': 'Description',
+      'risks.threatDescriptionPlaceholder': 'Additional information about the threat',
+      'risks.threatCategoryLabel': 'Category',
+      'risks.selectCategory': 'Select category',
+      'risks.category.human': 'Human',
+      'risks.category.technical': 'Technical',
+      'risks.category.environmental': 'Environmental',
+      'risks.category.organizational': 'Organizational',
+      'risks.threatLikelihoodLabel': 'Likelihood',
+      'risks.threatImpactLabel': 'Impact',
+      'risks.saving': 'Saving...',
+      'risks.createThreatButton': 'Create Threat',
+      'risks.createVulnerabilityTitle': 'Create Vulnerability',
+      'risks.createVulnerabilityDescription': 'Register vulnerabilities related to critical assets.',
+      'risks.vulnerabilityNameLabel': 'Name',
+      'risks.vulnerabilityNamePlaceholder': 'e.g. Outdated version',
+      'risks.vulnerabilityDescriptionLabel': 'Description',
+      'risks.vulnerabilityDescriptionPlaceholder': 'Details of the vulnerability',
+      'risks.vulnerabilityAssetLabel': 'Affected Asset',
+      'risks.selectAsset': 'Select asset',
+      'risks.vulnerabilitySeverityLabel': 'Severity',
+      'risks.selectSeverity': 'Select severity',
+      'risks.severity.low': 'Low',
+      'risks.severity.medium': 'Medium',
+      'risks.severity.high': 'High',
+      'risks.severity.critical': 'Critical',
+      'risks.createVulnerabilityButton': 'Create Vulnerability',
+      'risks.linkThreatTitle': 'Link Threat to Risk',
+      'risks.linkThreatDescription': 'Select a risk and an existing threat.',
+      'risks.selectRiskLabel': 'Risk',
+      'risks.selectRiskPlaceholder': 'Select risk',
+      'risks.selectThreatLabel': 'Threat',
+      'risks.selectThreatPlaceholder': 'Select threat',
+      'risks.linking': 'Linking...',
+      'risks.linkThreatButton': 'Link Threat',
+      'risks.recentThreatsTitle': 'Recent Threats',
+      'risks.loadingThreats': 'Loading threats...',
+      'risks.noThreats': 'No threats registered.',
+      'risks.recentVulnerabilitiesTitle': 'Recent Vulnerabilities',
+      'risks.loadingVulnerabilities': 'Loading vulnerabilities...',
+      'risks.noVulnerabilities': 'No vulnerabilities registered.',
+      'risks.threatCreatedSuccess': 'Threat created successfully',
+      'risks.vulnerabilityCreatedSuccess': 'Vulnerability created successfully',
+      'risks.linkSelectionRequired': 'Please select a risk and a threat to link',
+      'risks.threatLinkedSuccess': 'Threat linked to risk successfully',
 
       // Evidence
       evidenceCenter: 'Evidence Center',
@@ -280,6 +334,58 @@ export default function App() {
       needTreatment: 'necesitan tratamiento inmediato',
       coverage: 'cobertura',
       riskRegister: 'Registro de Riesgos',
+      'risks.title': 'Gestión de Riesgos',
+      'risks.subtitle': 'Crea amenazas, vulnerabilidades y vincula amenazas a riesgos existentes.',
+      'risks.createThreatTitle': 'Crear Amenaza',
+      'risks.createThreatDescription': 'Identifica amenazas vinculadas a tu programa de riesgos.',
+      'risks.threatNameLabel': 'Nombre',
+      'risks.threatNamePlaceholder': 'ej. Phishing interno',
+      'risks.fieldRequired': 'Este campo es obligatorio',
+      'risks.threatDescriptionLabel': 'Descripción',
+      'risks.threatDescriptionPlaceholder': 'Información adicional sobre la amenaza',
+      'risks.threatCategoryLabel': 'Categoría',
+      'risks.selectCategory': 'Selecciona categoría',
+      'risks.category.human': 'Humano',
+      'risks.category.technical': 'Técnico',
+      'risks.category.environmental': 'Ambiental',
+      'risks.category.organizational': 'Organizacional',
+      'risks.threatLikelihoodLabel': 'Probabilidad',
+      'risks.threatImpactLabel': 'Impacto',
+      'risks.saving': 'Guardando...',
+      'risks.createThreatButton': 'Crear Amenaza',
+      'risks.createVulnerabilityTitle': 'Crear Vulnerabilidad',
+      'risks.createVulnerabilityDescription': 'Registra vulnerabilidades relacionadas con activos críticos.',
+      'risks.vulnerabilityNameLabel': 'Nombre',
+      'risks.vulnerabilityNamePlaceholder': 'ej. Versión obsoleta',
+      'risks.vulnerabilityDescriptionLabel': 'Descripción',
+      'risks.vulnerabilityDescriptionPlaceholder': 'Detalles de la vulnerabilidad',
+      'risks.vulnerabilityAssetLabel': 'Activo Afectado',
+      'risks.selectAsset': 'Selecciona activo',
+      'risks.vulnerabilitySeverityLabel': 'Severidad',
+      'risks.selectSeverity': 'Selecciona severidad',
+      'risks.severity.low': 'Bajo',
+      'risks.severity.medium': 'Medio',
+      'risks.severity.high': 'Alto',
+      'risks.severity.critical': 'Crítico',
+      'risks.createVulnerabilityButton': 'Crear Vulnerabilidad',
+      'risks.linkThreatTitle': 'Vincular Amenaza a Riesgo',
+      'risks.linkThreatDescription': 'Selecciona un riesgo y una amenaza existente.',
+      'risks.selectRiskLabel': 'Riesgo',
+      'risks.selectRiskPlaceholder': 'Selecciona riesgo',
+      'risks.selectThreatLabel': 'Amenaza',
+      'risks.selectThreatPlaceholder': 'Selecciona amenaza',
+      'risks.linking': 'Vinculando...',
+      'risks.linkThreatButton': 'Vincular Amenaza',
+      'risks.recentThreatsTitle': 'Amenazas Recientes',
+      'risks.loadingThreats': 'Cargando amenazas...',
+      'risks.noThreats': 'Sin amenazas registradas.',
+      'risks.recentVulnerabilitiesTitle': 'Vulnerabilidades Recientes',
+      'risks.loadingVulnerabilities': 'Cargando vulnerabilidades...',
+      'risks.noVulnerabilities': 'Sin vulnerabilidades registradas.',
+      'risks.threatCreatedSuccess': 'Amenaza creada exitosamente',
+      'risks.vulnerabilityCreatedSuccess': 'Vulnerabilidad creada exitosamente',
+      'risks.linkSelectionRequired': 'Por favor selecciona un riesgo y una amenaza para vincular',
+      'risks.threatLinkedSuccess': 'Amenaza vinculada a riesgo exitosamente',
 
       // Evidence
       evidenceCenter: 'Centro de Evidencias',
@@ -428,6 +534,58 @@ export default function App() {
       needTreatment: 'precisam de tratamento imediato',
       coverage: 'cobertura',
       riskRegister: 'Registro de Riscos',
+      'risks.title': 'Gerenciamento de Riscos',
+      'risks.subtitle': 'Crie ameaças, vulnerabilidades e vincule ameaças a riscos existentes.',
+      'risks.createThreatTitle': 'Criar Ameaça',
+      'risks.createThreatDescription': 'Identifique ameaças vinculadas ao seu programa de riscos.',
+      'risks.threatNameLabel': 'Nome',
+      'risks.threatNamePlaceholder': 'ex. Phishing interno',
+      'risks.fieldRequired': 'Este campo é obrigatório',
+      'risks.threatDescriptionLabel': 'Descrição',
+      'risks.threatDescriptionPlaceholder': 'Informações adicionais sobre a ameaça',
+      'risks.threatCategoryLabel': 'Categoria',
+      'risks.selectCategory': 'Selecione a categoria',
+      'risks.category.human': 'Humano',
+      'risks.category.technical': 'Técnico',
+      'risks.category.environmental': 'Ambiental',
+      'risks.category.organizational': 'Organizacional',
+      'risks.threatLikelihoodLabel': 'Probabilidade',
+      'risks.threatImpactLabel': 'Impacto',
+      'risks.saving': 'Salvando...',
+      'risks.createThreatButton': 'Criar Ameaça',
+      'risks.createVulnerabilityTitle': 'Criar Vulnerabilidade',
+      'risks.createVulnerabilityDescription': 'Registre vulnerabilidades relacionadas a ativos críticos.',
+      'risks.vulnerabilityNameLabel': 'Nome',
+      'risks.vulnerabilityNamePlaceholder': 'ex. Versão desatualizada',
+      'risks.vulnerabilityDescriptionLabel': 'Descrição',
+      'risks.vulnerabilityDescriptionPlaceholder': 'Detalhes da vulnerabilidade',
+      'risks.vulnerabilityAssetLabel': 'Ativo Afetado',
+      'risks.selectAsset': 'Selecione o ativo',
+      'risks.vulnerabilitySeverityLabel': 'Severidade',
+      'risks.selectSeverity': 'Selecione a severidade',
+      'risks.severity.low': 'Baixo',
+      'risks.severity.medium': 'Médio',
+      'risks.severity.high': 'Alto',
+      'risks.severity.critical': 'Crítico',
+      'risks.createVulnerabilityButton': 'Criar Vulnerabilidade',
+      'risks.linkThreatTitle': 'Vincular Ameaça ao Risco',
+      'risks.linkThreatDescription': 'Selecione um risco e uma ameaça existente.',
+      'risks.selectRiskLabel': 'Risco',
+      'risks.selectRiskPlaceholder': 'Selecione o risco',
+      'risks.selectThreatLabel': 'Ameaça',
+      'risks.selectThreatPlaceholder': 'Selecione a ameaça',
+      'risks.linking': 'Vinculando...',
+      'risks.linkThreatButton': 'Vincular Ameaça',
+      'risks.recentThreatsTitle': 'Ameaças Recentes',
+      'risks.loadingThreats': 'Carregando ameaças...',
+      'risks.noThreats': 'Sem ameaças registradas.',
+      'risks.recentVulnerabilitiesTitle': 'Vulnerabilidades Recentes',
+      'risks.loadingVulnerabilities': 'Carregando vulnerabilidades...',
+      'risks.noVulnerabilities': 'Sem vulnerabilidades registradas.',
+      'risks.threatCreatedSuccess': 'Ameaça criada com sucesso',
+      'risks.vulnerabilityCreatedSuccess': 'Vulnerabilidade criada com sucesso',
+      'risks.linkSelectionRequired': 'Por favor selecione um risco e uma ameaça para vincular',
+      'risks.threatLinkedSuccess': 'Ameaça vinculada ao risco com sucesso',
 
       // Evidence
       evidenceCenter: 'Centro de Evidências',
@@ -576,6 +734,58 @@ export default function App() {
       needTreatment: 'benötigen sofortige Behandlung',
       coverage: 'Abdeckung',
       riskRegister: 'Risikoregister',
+      'risks.title': 'Risikomanagement',
+      'risks.subtitle': 'Erstellen Sie Bedrohungen, Schwachstellen und verknüpfen Sie Bedrohungen mit bestehenden Risiken.',
+      'risks.createThreatTitle': 'Bedrohung Erstellen',
+      'risks.createThreatDescription': 'Identifizieren Sie Bedrohungen, die mit Ihrem Risikoprogramm verknüpft sind.',
+      'risks.threatNameLabel': 'Name',
+      'risks.threatNamePlaceholder': 'z.B. Internes Phishing',
+      'risks.fieldRequired': 'Dieses Feld ist erforderlich',
+      'risks.threatDescriptionLabel': 'Beschreibung',
+      'risks.threatDescriptionPlaceholder': 'Zusätzliche Informationen über die Bedrohung',
+      'risks.threatCategoryLabel': 'Kategorie',
+      'risks.selectCategory': 'Kategorie auswählen',
+      'risks.category.human': 'Mensch',
+      'risks.category.technical': 'Technisch',
+      'risks.category.environmental': 'Umwelt',
+      'risks.category.organizational': 'Organisatorisch',
+      'risks.threatLikelihoodLabel': 'Wahrscheinlichkeit',
+      'risks.threatImpactLabel': 'Auswirkung',
+      'risks.saving': 'Wird gespeichert...',
+      'risks.createThreatButton': 'Bedrohung Erstellen',
+      'risks.createVulnerabilityTitle': 'Schwachstelle Erstellen',
+      'risks.createVulnerabilityDescription': 'Registrieren Sie Schwachstellen im Zusammenhang mit kritischen Assets.',
+      'risks.vulnerabilityNameLabel': 'Name',
+      'risks.vulnerabilityNamePlaceholder': 'z.B. Veraltete Version',
+      'risks.vulnerabilityDescriptionLabel': 'Beschreibung',
+      'risks.vulnerabilityDescriptionPlaceholder': 'Details der Schwachstelle',
+      'risks.vulnerabilityAssetLabel': 'Betroffenes Asset',
+      'risks.selectAsset': 'Asset auswählen',
+      'risks.vulnerabilitySeverityLabel': 'Schweregrad',
+      'risks.selectSeverity': 'Schweregrad auswählen',
+      'risks.severity.low': 'Niedrig',
+      'risks.severity.medium': 'Mittel',
+      'risks.severity.high': 'Hoch',
+      'risks.severity.critical': 'Kritisch',
+      'risks.createVulnerabilityButton': 'Schwachstelle Erstellen',
+      'risks.linkThreatTitle': 'Bedrohung mit Risiko Verknüpfen',
+      'risks.linkThreatDescription': 'Wählen Sie ein Risiko und eine bestehende Bedrohung aus.',
+      'risks.selectRiskLabel': 'Risiko',
+      'risks.selectRiskPlaceholder': 'Risiko auswählen',
+      'risks.selectThreatLabel': 'Bedrohung',
+      'risks.selectThreatPlaceholder': 'Bedrohung auswählen',
+      'risks.linking': 'Wird verknüpft...',
+      'risks.linkThreatButton': 'Bedrohung Verknüpfen',
+      'risks.recentThreatsTitle': 'Aktuelle Bedrohungen',
+      'risks.loadingThreats': 'Bedrohungen werden geladen...',
+      'risks.noThreats': 'Keine Bedrohungen registriert.',
+      'risks.recentVulnerabilitiesTitle': 'Aktuelle Schwachstellen',
+      'risks.loadingVulnerabilities': 'Schwachstellen werden geladen...',
+      'risks.noVulnerabilities': 'Keine Schwachstellen registriert.',
+      'risks.threatCreatedSuccess': 'Bedrohung erfolgreich erstellt',
+      'risks.vulnerabilityCreatedSuccess': 'Schwachstelle erfolgreich erstellt',
+      'risks.linkSelectionRequired': 'Bitte wählen Sie ein Risiko und eine Bedrohung aus zum Verknüpfen',
+      'risks.threatLinkedSuccess': 'Bedrohung erfolgreich mit Risiko verknüpft',
 
       // Evidence
       evidenceCenter: 'Beweiszentrum',
@@ -724,6 +934,58 @@ export default function App() {
       needTreatment: 'nécessitent un traitement immédiat',
       coverage: 'couverture',
       riskRegister: 'Registre des Risques',
+      'risks.title': 'Gestion des Risques',
+      'risks.subtitle': 'Créez des menaces, des vulnérabilités et liez les menaces aux risques existants.',
+      'risks.createThreatTitle': 'Créer une Menace',
+      'risks.createThreatDescription': 'Identifiez les menaces liées à votre programme de gestion des risques.',
+      'risks.threatNameLabel': 'Nom',
+      'risks.threatNamePlaceholder': 'ex. Hameçonnage interne',
+      'risks.fieldRequired': 'Ce champ est obligatoire',
+      'risks.threatDescriptionLabel': 'Description',
+      'risks.threatDescriptionPlaceholder': 'Informations supplémentaires sur la menace',
+      'risks.threatCategoryLabel': 'Catégorie',
+      'risks.selectCategory': 'Sélectionner la catégorie',
+      'risks.category.human': 'Humain',
+      'risks.category.technical': 'Technique',
+      'risks.category.environmental': 'Environnemental',
+      'risks.category.organizational': 'Organisationnel',
+      'risks.threatLikelihoodLabel': 'Probabilité',
+      'risks.threatImpactLabel': 'Impact',
+      'risks.saving': 'Enregistrement en cours...',
+      'risks.createThreatButton': 'Créer une Menace',
+      'risks.createVulnerabilityTitle': 'Créer une Vulnérabilité',
+      'risks.createVulnerabilityDescription': 'Enregistrez les vulnérabilités liées aux actifs critiques.',
+      'risks.vulnerabilityNameLabel': 'Nom',
+      'risks.vulnerabilityNamePlaceholder': 'ex. Version obsolète',
+      'risks.vulnerabilityDescriptionLabel': 'Description',
+      'risks.vulnerabilityDescriptionPlaceholder': 'Détails de la vulnérabilité',
+      'risks.vulnerabilityAssetLabel': 'Actif Affecté',
+      'risks.selectAsset': 'Sélectionner l\'actif',
+      'risks.vulnerabilitySeverityLabel': 'Sévérité',
+      'risks.selectSeverity': 'Sélectionner la sévérité',
+      'risks.severity.low': 'Faible',
+      'risks.severity.medium': 'Moyen',
+      'risks.severity.high': 'Élevée',
+      'risks.severity.critical': 'Critique',
+      'risks.createVulnerabilityButton': 'Créer une Vulnérabilité',
+      'risks.linkThreatTitle': 'Lier une Menace au Risque',
+      'risks.linkThreatDescription': 'Sélectionnez un risque et une menace existante.',
+      'risks.selectRiskLabel': 'Risque',
+      'risks.selectRiskPlaceholder': 'Sélectionner le risque',
+      'risks.selectThreatLabel': 'Menace',
+      'risks.selectThreatPlaceholder': 'Sélectionner la menace',
+      'risks.linking': 'Liaison en cours...',
+      'risks.linkThreatButton': 'Lier la Menace',
+      'risks.recentThreatsTitle': 'Menaces Récentes',
+      'risks.loadingThreats': 'Chargement des menaces...',
+      'risks.noThreats': 'Aucune menace enregistrée.',
+      'risks.recentVulnerabilitiesTitle': 'Vulnérabilités Récentes',
+      'risks.loadingVulnerabilities': 'Chargement des vulnérabilités...',
+      'risks.noVulnerabilities': 'Aucune vulnérabilité enregistrée.',
+      'risks.threatCreatedSuccess': 'Menace créée avec succès',
+      'risks.vulnerabilityCreatedSuccess': 'Vulnérabilité créée avec succès',
+      'risks.linkSelectionRequired': 'Veuillez sélectionner un risque et une menace à lier',
+      'risks.threatLinkedSuccess': 'Menace liée au risque avec succès',
 
       // Evidence
       evidenceCenter: 'Centre de Preuves',
@@ -933,7 +1195,7 @@ export default function App() {
                 {t.dashboard}
               </NavItem>
               <NavItem active={activePage === 'understand'} onClick={() => setActivePage('understand')} icon="step" stepNum="✓" completed>
-                {t.understand}
+                {t.gapAnalysis}
               </NavItem>
               <NavItem active={activePage === 'documents'} onClick={() => setActivePage('documents')} icon="step" stepNum="3" badge="4" badgeType="warn">
                 {t.documents}
@@ -1067,7 +1329,12 @@ export default function App() {
         {/* Page Content */}
         <div className="p-8 max-w-[1200px]">
           {activePage === 'dashboard' && <DashboardPage t={t} />}
-          {activePage === 'understand' && <UnderstandPage t={t} />}
+          {activePage === 'understand' && <UnderstandPage t={t} onNavigate={(route) => {
+            const [path, qs] = route.split('?')
+            // if route contains query, attempt to parse and map to page and params
+            setActivePage(path as Page)
+            // optional: could store query params in state or handle navigation differently
+          }} />}
           {activePage === 'documents' && <DocumentsPage t={t} />}
           {activePage === 'risks' && <RisksPage t={t} />}
           {activePage === 'evidence' && <EvidencePage t={t} />}
@@ -1374,21 +1641,7 @@ interface PageProps {
   t: typeof translations['en'];
 }
 
-function UnderstandPage({ t }: PageProps) {
-  return (
-    <div>
-      <h1 className="text-xl font-bold mb-4 text-[#1A1D26] dark:text-[#E4E7EE]">{t.gapAnalysis}</h1>
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <StatCard label={t.totalGaps} value="24" sub={t.acrossFrameworks} />
-        <StatCard label={t.criticalGaps} value="6" valueColor="text-[#E5484D]" sub={t.requireAction} />
-        <StatCard label={t.gapsClosed} value="18 / 24" valueColor="text-[#1DB954]" sub={`75% ${t.progress}`} />
-      </div>
-      <Card title={t.gapAnalysis}>
-        <p className="text-sm text-[#5F6B7A]">Detailed gap analysis coming soon...</p>
-      </Card>
-    </div>
-  );
-}
+// `UnderstandPage` moved to a separate file for reuse across App and AppPro
 
 function DocumentsPage() {
   const [activeStep, setActiveStep] = useState(0);
@@ -1674,27 +1927,6 @@ FECHA: ${new Date().toLocaleDateString('es-ES')}`);
           </div>
         </Card>
       )}
-    </div>
-  );
-}
-
-function RisksPage() {
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Risk Map</h1>
-        <button className="px-4 py-2 bg-[#4F6EF7] text-white rounded-lg text-[13px] font-medium">
-          + Add Risk
-        </button>
-      </div>
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <StatCard label="Total Risks" value="24" sub="Across 4 categories" />
-        <StatCard label="High / Critical" value="6" valueColor="text-[#E5484D]" sub="3 need immediate treatment" />
-        <StatCard label="With Treatment Plans" value="18 / 24" valueColor="text-[#1DB954]" sub="75% coverage" />
-      </div>
-      <Card title="🛡 Risk Register">
-        <p className="text-sm text-[#5F6B7A]">Risk management interface coming soon...</p>
-      </Card>
     </div>
   );
 }

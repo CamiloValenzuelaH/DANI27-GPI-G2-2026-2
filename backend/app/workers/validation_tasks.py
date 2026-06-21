@@ -170,6 +170,7 @@ def validate_external_audit(
     organization_id: str,
     user_id: str,
     content_type: str = "application/octet-stream",
+    clause_refs: list[str] | None = None,
 ):
     """Tarea principal de validación de auditoría externa."""
     
@@ -185,6 +186,7 @@ def validate_external_audit(
                 file_name=file_name,
                 organization_id=organization_id,
                 user_id=user_id,
+                clause_refs=clause_refs,
             )
         )
         return result
@@ -207,6 +209,7 @@ async def _validate_external_audit_async(
     file_name: str,
     organization_id: str,
     user_id: str,
+    clause_refs: list[str] | None = None,
 ) -> dict:
     """Lógica async de validación."""
     
@@ -249,10 +252,72 @@ async def _validate_external_audit_async(
         "message": "Buscando fragmentos ISO relevantes con pgvector",
     })
 
-    chunks = await get_top_iso_chunks(embedding, 5)
+    # If clause_refs provided by user, select those controls deterministically
+    if clause_refs:
+        selected_chunks: list[dict] = []
+        db = SessionLocal()
+        try:
+            from sqlalchemy import text
+            for ref in clause_refs:
+                row = db.execute(
+                    text("SELECT id, clause_ref, title, content FROM iso_27001_chunks WHERE clause_ref = :ref LIMIT 1"),
+                    {"ref": ref},
+                ).fetchone()
+                if not row:
+                    continue
+                selected_chunks.append({
+                    "id": str(row[0]),
+                    "clause_ref": row[1],
+                    "title": row[2],
+                    "content": row[3],
+                    "relevance_score": None,
+                })
+        except SQLAlchemyError:
+            selected_chunks = []
+        finally:
+            db.close()
+
+        chunks = selected_chunks[:5]
+    else:
+        chunks = await get_top_iso_chunks(embedding, 5)
     findings = []
 
     # Paso 4: Analizar cada chunk
+    def build_document_context(normalized_text: str, clause_ref: str) -> str:
+        if not normalized_text:
+            return ""
+        if not clause_ref:
+            return normalized_text[:16000]
+
+        idx = normalized_text.find(clause_ref)
+        if clause_ref == "A.5.25":
+            print("[DEBUG A.5.25] indexOf result:", idx)
+            print("[DEBUG A.5.25] clause_ref:", repr(clause_ref))
+            print("[DEBUG A.5.25] normalized_text length:", len(normalized_text))
+            print("[DEBUG A.5.25] first 5000 chars search...")
+            first_idx = normalized_text[:min(20000, len(normalized_text))].find(clause_ref)
+            print("[DEBUG A.5.25] first 20k indexOf result:", first_idx)
+            if first_idx != -1:
+                snippet = normalized_text[max(0, first_idx - 50): min(len(normalized_text), first_idx + len(clause_ref) + 100)]
+                print("[DEBUG A.5.25] text around:", repr(snippet))
+            # Show content sample
+            search_pattern = "5.25"
+            if search_pattern in normalized_text:
+                pos = normalized_text.find(search_pattern)
+                print("[DEBUG A.5.25] found '5.25' at pos:", pos, "context:", repr(normalized_text[max(0, pos-100):pos+150]))
+
+        if idx == -1:
+            return normalized_text[:16000]
+
+        before = 3000
+        after = 3000
+        prefix = normalized_text[:2000]
+        start = max(0, idx - before)
+        end = min(len(normalized_text), idx + len(clause_ref) + after)
+        window = normalized_text[start:end]
+
+        return f"{prefix}\n\n{window}"
+
     for index, chunk in enumerate(chunks):
         progress = 30 + int(((index + 1) / max(len(chunks), 1)) * 60)
 
@@ -264,7 +329,7 @@ async def _validate_external_audit_async(
         })
 
         analysis = await analyze_chunk_with_deepseek(
-            normalized_text[:8000],
+            build_document_context(normalized_text, chunk["clause_ref"]),
             chunk,
             max_output_tokens=2048,
         )

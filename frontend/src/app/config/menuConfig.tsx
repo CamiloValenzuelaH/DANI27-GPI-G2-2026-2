@@ -50,7 +50,7 @@ export const processMenuItems: MenuItem[] = [
   },
   {
     id: 'understand',
-    labelKey: 'menu.understand',
+    labelKey: 'menu.gapAnalysis',
     path: '/understand',
     icon: '✓',
     iconType: 'emoji',

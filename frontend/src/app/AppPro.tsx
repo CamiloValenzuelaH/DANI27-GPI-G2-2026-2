@@ -12,6 +12,7 @@ import AssetsPage from './pages/AssetsPage';
 import AuditPagePro from './pages/AuditPagePro';
 import AssessmentPage from './components/assessment/AssessmentPage';
 import RisksPage from './pages/RisksPage';
+import UnderstandPage from './pages/UnderstandPage';
 import SettingsPage from './pages/SettingsPage';
 import DocumentGeneratorPage from './pages/DocumentGeneratorPage';
 
@@ -31,7 +32,7 @@ export default function AppPro() {
               <Route element={<AppShell />}>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/understand" element={<PlaceholderPage title="Understand My Situation" />} />
+                <Route path="/understand" element={<UnderstandPage />} />
                 <Route path="/documents" element={<DocumentGeneratorPage />} />
                 <Route path="/risks" element={<RisksPage />} />
                 <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />

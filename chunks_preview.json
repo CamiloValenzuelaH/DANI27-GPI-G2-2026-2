@@ -1,0 +1,467 @@
+[
+  {
+    "clause_ref": "A.5.1",
+    "title": "Anexo A - A.5.1",
+    "content_preview": "Control A.5.1: Políticas de seguridad de la información.\nCriterios de implementación:\n- Conjunto documentado de política"
+  },
+  {
+    "clause_ref": "A.5.10",
+    "title": "Anexo A - A.5.10",
+    "content_preview": "Control A.5.10: uso aceptable de información y activos asociados. Implementación según ISO 27001:2022. Requiere: documen"
+  },
+  {
+    "clause_ref": "A.5.11",
+    "title": "Anexo A - A.5.11",
+    "content_preview": "Control A.5.11: devolución de activos. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimient"
+  },
+  {
+    "clause_ref": "A.5.12",
+    "title": "Anexo A - A.5.12",
+    "content_preview": "Control A.5.12: clasificación de la información. Implementación según ISO 27001:2022. Requiere: documentación formal, pr"
+  },
+  {
+    "clause_ref": "A.5.13",
+    "title": "Anexo A - A.5.13",
+    "content_preview": "Control A.5.13: etiquetado de la información. Implementación según ISO 27001:2022. Requiere: documentación formal, proce"
+  },
+  {
+    "clause_ref": "A.5.14",
+    "title": "Anexo A - A.5.14",
+    "content_preview": "Control A.5.14: transferencia de información. Implementación según ISO 27001:2022. Requiere: documentación formal, proce"
+  },
+  {
+    "clause_ref": "A.5.15",
+    "title": "Anexo A - A.5.15",
+    "content_preview": "Control A.5.15: control de acceso. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos d"
+  },
+  {
+    "clause_ref": "A.5.16",
+    "title": "Anexo A - A.5.16",
+    "content_preview": "Control A.5.16: gestión de identidades. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimien"
+  },
+  {
+    "clause_ref": "A.5.17",
+    "title": "Anexo A - A.5.17",
+    "content_preview": "Control A.5.17: información de autenticación. Implementación según ISO 27001:2022. Requiere: documentación formal, proce"
+  },
+  {
+    "clause_ref": "A.5.18",
+    "title": "Anexo A - A.5.18",
+    "content_preview": "Control A.5.18: derechos de acceso. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos "
+  },
+  {
+    "clause_ref": "A.5.19",
+    "title": "Anexo A - A.5.19",
+    "content_preview": "Control A.5.19: seguridad de la información en las relaciones con proveedores. Implementación según ISO 27001:2022. Requ"
+  },
+  {
+    "clause_ref": "A.5.2",
+    "title": "Anexo A - A.5.2",
+    "content_preview": "Control A.5.2: Roles y responsabilidades de seguridad de la información.\nCriterios de implementación:\n- Estructura organ"
+  },
+  {
+    "clause_ref": "A.5.20",
+    "title": "Anexo A - A.5.20",
+    "content_preview": "Control A.5.20: seguridad de la información en acuerdos con proveedores. Implementación según ISO 27001:2022. Requiere: "
+  },
+  {
+    "clause_ref": "A.5.21",
+    "title": "Anexo A - A.5.21",
+    "content_preview": "Control A.5.21: gestión de la seguridad de la información en la cadena de suministro TIC. Implementación según ISO 27001"
+  },
+  {
+    "clause_ref": "A.5.22",
+    "title": "Anexo A - A.5.22",
+    "content_preview": "Control A.5.22: supervisión, revisión y gestión de cambios de servicios de proveedores. Implementación según ISO 27001:2"
+  },
+  {
+    "clause_ref": "A.5.23",
+    "title": "Anexo A - A.5.23",
+    "content_preview": "Control A.5.23: seguridad de la información para el uso de servicios en la nube. Implementación según ISO 27001:2022. Re"
+  },
+  {
+    "clause_ref": "A.5.24",
+    "title": "Anexo A - A.5.24",
+    "content_preview": "Control A.5.24: planificación y preparación para la gestión de incidentes de seguridad de la información. Implementación"
+  },
+  {
+    "clause_ref": "A.5.25",
+    "title": "Anexo A - A.5.25",
+    "content_preview": "Control A.5.25: Evaluación y decisión sobre eventos de seguridad de la información.\nCriterios de implementación:\n- Proce"
+  },
+  {
+    "clause_ref": "A.5.26",
+    "title": "Anexo A - A.5.26",
+    "content_preview": "Control A.5.26: respuesta a incidentes de seguridad de la información. Implementación según ISO 27001:2022. Requiere: do"
+  },
+  {
+    "clause_ref": "A.5.27",
+    "title": "Anexo A - A.5.27",
+    "content_preview": "Control A.5.27: aprendizaje de incidentes de seguridad de la información. Implementación según ISO 27001:2022. Requiere:"
+  },
+  {
+    "clause_ref": "A.5.28",
+    "title": "Anexo A - A.5.28",
+    "content_preview": "Control A.5.28: recolección de evidencia. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimi"
+  },
+  {
+    "clause_ref": "A.5.29",
+    "title": "Anexo A - A.5.29",
+    "content_preview": "Control A.5.29: seguridad de la información durante una interrupción. Implementación según ISO 27001:2022. Requiere: doc"
+  },
+  {
+    "clause_ref": "A.5.3",
+    "title": "Anexo A - A.5.3",
+    "content_preview": "Control A.5.3: segregación de funciones. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimie"
+  },
+  {
+    "clause_ref": "A.5.30",
+    "title": "Anexo A - A.5.30",
+    "content_preview": "Control A.5.30: preparación TIC para la continuidad del negocio. Implementación según ISO 27001:2022. Requiere: document"
+  },
+  {
+    "clause_ref": "A.5.31",
+    "title": "Anexo A - A.5.31",
+    "content_preview": "Control A.5.31: requisitos legales, regulatorios, contractuales y estatutarios. Implementación según ISO 27001:2022. Req"
+  },
+  {
+    "clause_ref": "A.5.32",
+    "title": "Anexo A - A.5.32",
+    "content_preview": "Control A.5.32: derechos de propiedad intelectual. Implementación según ISO 27001:2022. Requiere: documentación formal, "
+  },
+  {
+    "clause_ref": "A.5.33",
+    "title": "Anexo A - A.5.33",
+    "content_preview": "Control A.5.33: protección de registros. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimie"
+  },
+  {
+    "clause_ref": "A.5.34",
+    "title": "Anexo A - A.5.34",
+    "content_preview": "Control A.5.34: privacidad y protección de datos personales. Implementación según ISO 27001:2022. Requiere: documentació"
+  },
+  {
+    "clause_ref": "A.5.35",
+    "title": "Anexo A - A.5.35",
+    "content_preview": "Control A.5.35: Revisión independiente de la seguridad de la información.\nCriterios de implementación:\n- Revisión indepe"
+  },
+  {
+    "clause_ref": "A.5.36",
+    "title": "Anexo A - A.5.36",
+    "content_preview": "Control A.5.36: Gestión de las adquisiciones con suministradores de servicios de tecnología de la información.\nCriterios"
+  },
+  {
+    "clause_ref": "A.5.37",
+    "title": "Anexo A - A.5.37",
+    "content_preview": "Control A.5.37: procedimientos operativos documentados. Implementación según ISO 27001:2022. Requiere: documentación for"
+  },
+  {
+    "clause_ref": "A.5.4",
+    "title": "Anexo A - A.5.4",
+    "content_preview": "Control A.5.4: responsabilidades de la dirección. Implementación según ISO 27001:2022. Requiere: documentación formal, p"
+  },
+  {
+    "clause_ref": "A.5.5",
+    "title": "Anexo A - A.5.5",
+    "content_preview": "Control A.5.5: contacto con autoridades. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimie"
+  },
+  {
+    "clause_ref": "A.5.6",
+    "title": "Anexo A - A.5.6",
+    "content_preview": "Control A.5.6: contacto con grupos de interés especial. Implementación según ISO 27001:2022. Requiere: documentación for"
+  },
+  {
+    "clause_ref": "A.5.7",
+    "title": "Anexo A - A.5.7",
+    "content_preview": "Control A.5.7: inteligencia de amenazas. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimie"
+  },
+  {
+    "clause_ref": "A.5.8",
+    "title": "Anexo A - A.5.8",
+    "content_preview": "Control A.5.8: seguridad de la información en la gestión de proyectos. Implementación según ISO 27001:2022. Requiere: do"
+  },
+  {
+    "clause_ref": "A.5.9",
+    "title": "Anexo A - A.5.9",
+    "content_preview": "Control A.5.9: inventario de información y otros activos asociados. Implementación según ISO 27001:2022. Requiere: docum"
+  },
+  {
+    "clause_ref": "A.6.1",
+    "title": "Anexo A - A.6.1",
+    "content_preview": "Control A.6.1: verificación de antecedentes. Implementación según ISO 27001:2022. Requiere: documentación formal, proced"
+  },
+  {
+    "clause_ref": "A.6.2",
+    "title": "Anexo A - A.6.2",
+    "content_preview": "Control A.6.2: términos y condiciones de empleo. Implementación según ISO 27001:2022. Requiere: documentación formal, pr"
+  },
+  {
+    "clause_ref": "A.6.3",
+    "title": "Anexo A - A.6.3",
+    "content_preview": "Control A.6.3: Cumplimiento de requisitos relativos a la protección de información.\nCriterios de implementación:\n- Inven"
+  },
+  {
+    "clause_ref": "A.6.4",
+    "title": "Anexo A - A.6.4",
+    "content_preview": "Control A.6.4: proceso disciplinario. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimiento"
+  },
+  {
+    "clause_ref": "A.6.5",
+    "title": "Anexo A - A.6.5",
+    "content_preview": "Control A.6.5: responsabilidades después de la terminación o cambio de empleo. Implementación según ISO 27001:2022. Requ"
+  },
+  {
+    "clause_ref": "A.6.6",
+    "title": "Anexo A - A.6.6",
+    "content_preview": "Control A.6.6: acuerdos de confidencialidad o no divulgación. Implementación según ISO 27001:2022. Requiere: documentaci"
+  },
+  {
+    "clause_ref": "A.6.7",
+    "title": "Anexo A - A.6.7",
+    "content_preview": "Control A.6.7: trabajo remoto. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos defin"
+  },
+  {
+    "clause_ref": "A.6.8",
+    "title": "Anexo A - A.6.8",
+    "content_preview": "Control A.6.8: notificación de eventos de seguridad de la información. Implementación según ISO 27001:2022. Requiere: do"
+  },
+  {
+    "clause_ref": "A.7.1",
+    "title": "Anexo A - A.7.1",
+    "content_preview": "Control A.7.1: perímetros de seguridad física. Implementación según ISO 27001:2022. Requiere: documentación formal, proc"
+  },
+  {
+    "clause_ref": "A.7.10",
+    "title": "Anexo A - A.7.10",
+    "content_preview": "Control A.7.10: medios de almacenamiento. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimi"
+  },
+  {
+    "clause_ref": "A.7.11",
+    "title": "Anexo A - A.7.11",
+    "content_preview": "Control A.7.11: servicios de soporte. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimiento"
+  },
+  {
+    "clause_ref": "A.7.12",
+    "title": "Anexo A - A.7.12",
+    "content_preview": "Control A.7.12: seguridad del cableado. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimien"
+  },
+  {
+    "clause_ref": "A.7.13",
+    "title": "Anexo A - A.7.13",
+    "content_preview": "Control A.7.13: mantenimiento de equipos. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimi"
+  },
+  {
+    "clause_ref": "A.7.14",
+    "title": "Anexo A - A.7.14",
+    "content_preview": "Control A.7.14: disposición segura o reutilización de equipos. Implementación según ISO 27001:2022. Requiere: documentac"
+  },
+  {
+    "clause_ref": "A.7.2",
+    "title": "Anexo A - A.7.2",
+    "content_preview": "Control A.7.2: controles de entrada física. Implementación según ISO 27001:2022. Requiere: documentación formal, procedi"
+  },
+  {
+    "clause_ref": "A.7.3",
+    "title": "Anexo A - A.7.3",
+    "content_preview": "Control A.7.3: seguridad de oficinas, salas e instalaciones. Implementación según ISO 27001:2022. Requiere: documentació"
+  },
+  {
+    "clause_ref": "A.7.4",
+    "title": "Anexo A - A.7.4",
+    "content_preview": "Control A.7.4: monitoreo de seguridad física. Implementación según ISO 27001:2022. Requiere: documentación formal, proce"
+  },
+  {
+    "clause_ref": "A.7.5",
+    "title": "Anexo A - A.7.5",
+    "content_preview": "Control A.7.5: protección contra amenazas físicas y ambientales. Implementación según ISO 27001:2022. Requiere: document"
+  },
+  {
+    "clause_ref": "A.7.6",
+    "title": "Anexo A - A.7.6",
+    "content_preview": "Control A.7.6: trabajo en áreas seguras. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimie"
+  },
+  {
+    "clause_ref": "A.7.7",
+    "title": "Anexo A - A.7.7",
+    "content_preview": "Control A.7.7: escritorio limpio y pantalla limpia. Implementación según ISO 27001:2022. Requiere: documentación formal,"
+  },
+  {
+    "clause_ref": "A.7.8",
+    "title": "Anexo A - A.7.8",
+    "content_preview": "Control A.7.8: ubicación y protección de equipos. Implementación según ISO 27001:2022. Requiere: documentación formal, p"
+  },
+  {
+    "clause_ref": "A.7.9",
+    "title": "Anexo A - A.7.9",
+    "content_preview": "Control A.7.9: seguridad de activos fuera de las instalaciones. Implementación según ISO 27001:2022. Requiere: documenta"
+  },
+  {
+    "clause_ref": "A.8.1",
+    "title": "Anexo A - A.8.1",
+    "content_preview": "Control A.8.1: dispositivos de usuario final. Implementación según ISO 27001:2022. Requiere: documentación formal, proce"
+  },
+  {
+    "clause_ref": "A.8.10",
+    "title": "Anexo A - A.8.10",
+    "content_preview": "Control A.8.10: eliminación de información. Implementación según ISO 27001:2022. Requiere: documentación formal, procedi"
+  },
+  {
+    "clause_ref": "A.8.11",
+    "title": "Anexo A - A.8.11",
+    "content_preview": "Control A.8.11: enmascaramiento de datos. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimi"
+  },
+  {
+    "clause_ref": "A.8.12",
+    "title": "Anexo A - A.8.12",
+    "content_preview": "Control A.8.12: prevención de fuga de datos. Implementación según ISO 27001:2022. Requiere: documentación formal, proced"
+  },
+  {
+    "clause_ref": "A.8.13",
+    "title": "Anexo A - A.8.13",
+    "content_preview": "Control A.8.13: respaldo de información. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimie"
+  },
+  {
+    "clause_ref": "A.8.14",
+    "title": "Anexo A - A.8.14",
+    "content_preview": "Control A.8.14: redundancia de las instalaciones de procesamiento de información. Implementación según ISO 27001:2022. R"
+  },
+  {
+    "clause_ref": "A.8.15",
+    "title": "Anexo A - A.8.15",
+    "content_preview": "Control A.8.15: registro de eventos. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos"
+  },
+  {
+    "clause_ref": "A.8.16",
+    "title": "Anexo A - A.8.16",
+    "content_preview": "Control A.8.16: actividades de monitoreo. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimi"
+  },
+  {
+    "clause_ref": "A.8.17",
+    "title": "Anexo A - A.8.17",
+    "content_preview": "Control A.8.17: sincronización de relojes. Implementación según ISO 27001:2022. Requiere: documentación formal, procedim"
+  },
+  {
+    "clause_ref": "A.8.18",
+    "title": "Anexo A - A.8.18",
+    "content_preview": "Control A.8.18: uso de programas utilitarios privilegiados. Implementación según ISO 27001:2022. Requiere: documentación"
+  },
+  {
+    "clause_ref": "A.8.19",
+    "title": "Anexo A - A.8.19",
+    "content_preview": "Control A.8.19: instalación de software en sistemas operativos. Implementación según ISO 27001:2022. Requiere: documenta"
+  },
+  {
+    "clause_ref": "A.8.2",
+    "title": "Anexo A - A.8.2",
+    "content_preview": "Control A.8.2: derechos de acceso privilegiado. Implementación según ISO 27001:2022. Requiere: documentación formal, pro"
+  },
+  {
+    "clause_ref": "A.8.20",
+    "title": "Anexo A - A.8.20",
+    "content_preview": "Control A.8.20: seguridad de redes. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos "
+  },
+  {
+    "clause_ref": "A.8.21",
+    "title": "Anexo A - A.8.21",
+    "content_preview": "Control A.8.21: seguridad de los servicios de red. Implementación según ISO 27001:2022. Requiere: documentación formal, "
+  },
+  {
+    "clause_ref": "A.8.22",
+    "title": "Anexo A - A.8.22",
+    "content_preview": "Control A.8.22: segregación de redes. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimiento"
+  },
+  {
+    "clause_ref": "A.8.23",
+    "title": "Anexo A - A.8.23",
+    "content_preview": "Control A.8.23: filtrado web. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos defini"
+  },
+  {
+    "clause_ref": "A.8.24",
+    "title": "Anexo A - A.8.24",
+    "content_preview": "Control A.8.24: uso de criptografía. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos"
+  },
+  {
+    "clause_ref": "A.8.25",
+    "title": "Anexo A - A.8.25",
+    "content_preview": "Control A.8.25: ciclo de vida de desarrollo seguro. Implementación según ISO 27001:2022. Requiere: documentación formal,"
+  },
+  {
+    "clause_ref": "A.8.26",
+    "title": "Anexo A - A.8.26",
+    "content_preview": "Control A.8.26: requisitos de seguridad de aplicaciones. Implementación según ISO 27001:2022. Requiere: documentación fo"
+  },
+  {
+    "clause_ref": "A.8.27",
+    "title": "Anexo A - A.8.27",
+    "content_preview": "Control A.8.27: principios de arquitectura e ingeniería segura de sistemas. Implementación según ISO 27001:2022. Requier"
+  },
+  {
+    "clause_ref": "A.8.28",
+    "title": "Anexo A - A.8.28",
+    "content_preview": "Control A.8.28: codificación segura. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos"
+  },
+  {
+    "clause_ref": "A.8.29",
+    "title": "Anexo A - A.8.29",
+    "content_preview": "Control A.8.29: pruebas de seguridad en desarrollo y aceptación. Implementación según ISO 27001:2022. Requiere: document"
+  },
+  {
+    "clause_ref": "A.8.3",
+    "title": "Anexo A - A.8.3",
+    "content_preview": "Control A.8.3: restricción de acceso a la información. Implementación según ISO 27001:2022. Requiere: documentación form"
+  },
+  {
+    "clause_ref": "A.8.30",
+    "title": "Anexo A - A.8.30",
+    "content_preview": "Control A.8.30: desarrollo subcontratado. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimi"
+  },
+  {
+    "clause_ref": "A.8.31",
+    "title": "Anexo A - A.8.31",
+    "content_preview": "Control A.8.31: separación de entornos de desarrollo, prueba y producción. Implementación según ISO 27001:2022. Requiere"
+  },
+  {
+    "clause_ref": "A.8.32",
+    "title": "Anexo A - A.8.32",
+    "content_preview": "Control A.8.32: gestión de cambios. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos "
+  },
+  {
+    "clause_ref": "A.8.33",
+    "title": "Anexo A - A.8.33",
+    "content_preview": "Control A.8.33: información de prueba. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimient"
+  },
+  {
+    "clause_ref": "A.8.34",
+    "title": "Anexo A - A.8.34",
+    "content_preview": "Control A.8.34: protección de los sistemas de información durante las pruebas de auditoría. Implementación según ISO 270"
+  },
+  {
+    "clause_ref": "A.8.4",
+    "title": "Anexo A - A.8.4",
+    "content_preview": "Control A.8.4: acceso al código fuente. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimien"
+  },
+  {
+    "clause_ref": "A.8.5",
+    "title": "Anexo A - A.8.5",
+    "content_preview": "Control A.8.5: autenticación segura. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos"
+  },
+  {
+    "clause_ref": "A.8.6",
+    "title": "Anexo A - A.8.6",
+    "content_preview": "Control A.8.6: gestión de capacidad. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimientos"
+  },
+  {
+    "clause_ref": "A.8.7",
+    "title": "Anexo A - A.8.7",
+    "content_preview": "Control A.8.7: protección contra malware. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimi"
+  },
+  {
+    "clause_ref": "A.8.8",
+    "title": "Anexo A - A.8.8",
+    "content_preview": "Control A.8.8: gestión de vulnerabilidades técnicas. Implementación según ISO 27001:2022. Requiere: documentación formal"
+  },
+  {
+    "clause_ref": "A.8.9",
+    "title": "Anexo A - A.8.9",
+    "content_preview": "Control A.8.9: gestión de configuración. Implementación según ISO 27001:2022. Requiere: documentación formal, procedimie"
+  }
+]
