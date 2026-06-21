@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import os
+import re
 import sys
 import uuid
 from dataclasses import dataclass
@@ -61,14 +62,15 @@ def build_phase_chunks() -> list[ChunkSeed]:
 
 
 def build_annex_chunks() -> list[ChunkSeed]:
+    contents_by_ref = load_annex_a_control_contents()
     chunks: list[ChunkSeed] = []
-    for clause_ref, control_label, _is_critical in ANNEX_A_CONTROLS:
+    for clause_ref, _control_label, _is_critical in ANNEX_A_CONTROLS:
         title = f"Anexo A - {clause_ref}"
-        content = (
-            f"Control {clause_ref}: {control_label}. "
-            "Resumen operativo del control para fines de validación. "
-            "Adjunta política, procedimiento, registro o evidencia asociada."
+        generic_content = (
+            f"Anexo A - {clause_ref}. "
+            "Evidencia básica: documento o registro que demuestre su implementación."
         )
+        content = contents_by_ref.get(clause_ref, generic_content)
         chunks.append(ChunkSeed(clause_ref=clause_ref, title=title, content=content))
     return chunks
 
@@ -86,7 +88,31 @@ def embedding_to_literal(values: list[float]) -> str:
 
 
 def chunk_id(chunk: ChunkSeed) -> uuid.UUID:
-    return uuid.uuid5(UUID_NAMESPACE, f"iso-27001::{chunk.clause_ref}::{chunk.title}")
+    return uuid.uuid5(UUID_NAMESPACE, f"iso-27001::{chunk.clause_ref}")
+
+
+def load_annex_a_control_contents() -> dict[str, str]:
+    sql_path = Path(__file__).resolve().parent.parent.parent / "sql_updates_annex_a_93_fixed.sql"
+    if not sql_path.exists():
+        return {}
+
+    pattern = re.compile(
+        r"UPDATE\s+iso_27001_chunks\s+SET\s+content\s*=\s*'(?P<content>(?:[^']|'')*)'\s+WHERE\s+clause_ref\s*=\s*'(?P<ref>A\.\d+\.\d+)'\s+AND\s+section_type\s*=\s*'annex_a';",
+        re.IGNORECASE,
+    )
+
+    contents: dict[str, str] = {}
+    for line in sql_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip().upper().startswith("UPDATE"):
+            continue
+        match = pattern.match(line.strip())
+        if not match:
+            continue
+        content = match.group("content").replace("''", "'")
+        clause_ref = match.group("ref")
+        contents[clause_ref] = content
+
+    return contents
 
 
 async def seed_async() -> None:
@@ -103,47 +129,82 @@ async def seed_async() -> None:
 
         from sqlalchemy import text
 
-        existing_count = db.execute(text("SELECT COUNT(*) FROM iso_27001_chunks")).scalar_one()
-        if existing_count and not force_reseed:
-            print(
-                "Seed ISO omitido: iso_27001_chunks ya tiene datos "
-                f"(rows={existing_count}). Define FORCE_RESEED_ISO_CHUNKS=1 para regenerar embeddings."
+        existing_rows = db.execute(
+            text(
+                "SELECT clause_ref, id, title, content, embedding IS NOT NULL AS has_embedding "
+                "FROM iso_27001_chunks WHERE section_type = 'annex_a'"
             )
-            return
+        ).fetchall()
+        existing_by_clause_ref = {
+            row[0]: {
+                "id": str(row[1]),
+                "title": row[2],
+                "content": row[3],
+                "has_embedding": bool(row[4]),
+            }
+            for row in existing_rows
+        }
 
         insert_sql = text(
-            """
-            INSERT INTO iso_27001_chunks (id, clause_ref, title, content, embedding)
-            VALUES (:id, :clause_ref, :title, :content, CAST(:embedding AS vector))
-            ON CONFLICT (id) DO UPDATE SET
-                clause_ref = EXCLUDED.clause_ref,
-                title = EXCLUDED.title,
-                content = EXCLUDED.content,
-                embedding = EXCLUDED.embedding
-            """
+            "INSERT INTO iso_27001_chunks (id, clause_ref, title, content, section_type, embedding) "
+            "VALUES (:id, :clause_ref, :title, :content, :section_type, CAST(:embedding AS vector))"
+        )
+        update_sql = text(
+            "UPDATE iso_27001_chunks "
+            "SET title = :title, content = :content, embedding = CAST(:embedding AS vector) "
+            "WHERE clause_ref = :clause_ref AND section_type = 'annex_a'"
         )
 
         inserted = 0
+        updated = 0
+        skipped = 0
         for chunk in catalog:
             if not chunk.content.strip():
+                skipped += 1
                 continue
+
+            existing = existing_by_clause_ref.get(chunk.clause_ref)
+            if existing and not force_reseed:
+                if (
+                    existing["title"] == chunk.title
+                    and existing["content"] == chunk.content
+                    and existing["has_embedding"]
+                ):
+                    skipped += 1
+                    continue
 
             embedding = await generate_embedding(chunk.content)
             embedding_literal = embedding_to_literal(embedding)
-            db.execute(
-                insert_sql,
-                {
-                    "id": str(chunk_id(chunk)),
-                    "clause_ref": chunk.clause_ref,
-                    "title": chunk.title,
-                    "content": chunk.content,
-                    "embedding": embedding_literal,
-                },
-            )
-            inserted += 1
+
+            if existing:
+                db.execute(
+                    update_sql,
+                    {
+                        "clause_ref": chunk.clause_ref,
+                        "title": chunk.title,
+                        "content": chunk.content,
+                        "embedding": embedding_literal,
+                    },
+                )
+                updated += 1
+            else:
+                db.execute(
+                    insert_sql,
+                    {
+                        "id": str(chunk_id(chunk)),
+                        "clause_ref": chunk.clause_ref,
+                        "title": chunk.title,
+                        "content": chunk.content,
+                        "section_type": "annex_a",
+                        "embedding": embedding_literal,
+                    },
+                )
+                inserted += 1
 
         db.commit()
-        print(f"Seed ISO completado: chunks_guardados={inserted}")
+        print(
+            f"Seed ISO completado: insertados={inserted}, actualizados={updated}, omitidos={skipped}"
+        )
     except Exception:
         db.rollback()
         raise

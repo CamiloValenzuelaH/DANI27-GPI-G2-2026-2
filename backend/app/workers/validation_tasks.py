@@ -260,7 +260,11 @@ async def _validate_external_audit_async(
             from sqlalchemy import text
             for ref in clause_refs:
                 row = db.execute(
-                    text("SELECT id, clause_ref, title, content FROM iso_27001_chunks WHERE clause_ref = :ref LIMIT 1"),
+                    text(
+                        "SELECT id, clause_ref, title, content "
+                        "FROM iso_27001_chunks "
+                        "WHERE clause_ref = :ref AND section_type = 'annex_a' LIMIT 1"
+                    ),
                     {"ref": ref},
                 ).fetchone()
                 if not row:
