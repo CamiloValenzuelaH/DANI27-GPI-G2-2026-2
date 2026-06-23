@@ -17,6 +17,7 @@ from app.core.security import decode_access_token
 from app.core.redis import get_redis_client
 from app.db.database import get_db
 from app.models.user import User
+from app.models.external_validation_job import ExternalValidationJob
 from app.schemas.validation import (
     GenerateMissingRequest,
     GenerateMissingResponse,
@@ -229,8 +230,62 @@ async def create_external_validation_job(
     )
 
 
+@router.get("/external/history", response_model=list[ValidationReportResponse])
+async def list_external_validation_jobs(
+    limit: int = 50,
+    search: str | None = Query(None),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Lista trabajos de validación externos persistidos para la organización del usuario.
+    """
+    q = db.query(ExternalValidationJob).filter(
+        ExternalValidationJob.organization_id == str(current_user.organization_id)
+    )
+    if search:
+        # case-insensitive partial match on file_name
+        q = q.filter(ExternalValidationJob.file_name.ilike(f"%{search}%"))
+
+    rows = q.order_by(ExternalValidationJob.created_at.desc()).limit(limit).all()
+
+    results: list[ValidationReportResponse] = []
+    for job in rows:
+        findings = job.findings if job.findings is not None else []
+        results.append(
+            ValidationReportResponse(
+                job_id=job.job_id,
+                status=job.status,
+                progress=int(job.progress or 0),
+                message=job.message,
+                organization_id=job.organization_id,
+                user_id=job.user_id,
+                file_name=job.file_name,
+                file_path=job.file_path,
+                total_chunks=int(job.total_chunks or 0),
+                overall_score=int(job.overall_score) if job.overall_score not in (None, "") else None,
+                findings=findings,
+                summary=job.summary,
+                error=job.error,
+                created_at=job.created_at,
+                updated_at=job.updated_at,
+                created_date=job.created_date,
+            )
+        )
+
+    return results
+
+
 @router.get("/external/{job_id}", response_model=ValidationReportResponse)
 async def get_external_validation_job(job_id: str, current_user: User = Depends(get_current_user)):
+    report = await _read_job_state(job_id)
+    if report.organization_id and str(report.organization_id) != str(current_user.organization_id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Job fuera de alcance")
+    return report
+
+
+@router.get("/external/{job_id}/result", response_model=ValidationReportResponse)
+async def get_external_validation_result(job_id: str, current_user: User = Depends(get_current_user)):
     report = await _read_job_state(job_id)
     if report.organization_id and str(report.organization_id) != str(current_user.organization_id):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Job fuera de alcance")
