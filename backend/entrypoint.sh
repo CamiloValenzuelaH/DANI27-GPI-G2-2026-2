@@ -64,6 +64,13 @@ while [ "$attempt" -le "$MIGRATION_MAX_RETRIES" ]; do
   sleep "$MIGRATION_RETRY_SECONDS"
 done
 
+# ---> INICIO HACK RENDER: Inyección de datos obligatoria <---
+echo "[entrypoint] Ejecutando seeders base obligatorios..."
+python -m app.db.seed
+python /app/scripts/seed_demo.py
+python /app/scripts/seed_assessment_questions.py
+# ---> FIN HACK RENDER <---
+
 if is_true "$AUTO_SEED"; then
   echo "[entrypoint] Auto-seed ISO chunks habilitado (modo background)."
   (
