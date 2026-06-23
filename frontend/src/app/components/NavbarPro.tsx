@@ -3,19 +3,30 @@ import { useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { useLayout } from '../contexts/LayoutContext';
 import { useAuth } from '../contexts/AuthContext';
-import { Search, Bell, Menu, ChevronDown } from 'lucide-react';
+import { Search, Bell, Menu, ChevronDown, GraduationCap } from 'lucide-react';
 
 interface NavbarProps {
   darkMode: boolean;
   onProfileClick: () => void;
+  onTutorialClick: () => void;
+  onSearch?: (query: string) => void;
 }
 
-export default function NavbarPro({ darkMode, onProfileClick }: NavbarProps) {
+export default function NavbarPro({ darkMode, onProfileClick, onTutorialClick, onSearch }: NavbarProps) {
   const { toggleSidebar, userPlan } = useLayout();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const intl = useIntl();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
+  const handleSearchSubmit = () => {
+    const trimmed = searchText.trim();
+    if (!trimmed || !onSearch) {
+      return;
+    }
+    onSearch(trimmed);
+  };
 
   const planConfig = {
     free: { label: 'Free', color: 'text-gray-400' },
@@ -45,8 +56,8 @@ export default function NavbarPro({ darkMode, onProfileClick }: NavbarProps) {
       {/* Hamburger Menu - Mobile Only */}
       <button
         onClick={toggleSidebar}
-        className="lg:hidden p-2 hover:bg-white/10 rounded transition-colors"
-        aria-label="Toggle sidebar"
+        className="lg:hidden h-11 w-11 inline-flex items-center justify-center rounded-lg p-2.5 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+        aria-label={intl.formatMessage({ id: 'navbar.openSidebar', defaultMessage: 'Abrir menú de navegación' })}
       >
         <Menu className={`w-5 h-5 ${darkMode ? 'text-white' : 'text-gray-700'}`} />
       </button>
@@ -61,6 +72,9 @@ export default function NavbarPro({ darkMode, onProfileClick }: NavbarProps) {
           />
           <input
             type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
             placeholder={intl.formatMessage({ id: 'header.searchPlaceholder' })}
             className={`
               w-full pl-10 pr-4 py-2 rounded-lg text-[13px] transition-all
@@ -77,12 +91,29 @@ export default function NavbarPro({ darkMode, onProfileClick }: NavbarProps) {
 
       {/* Right Section */}
       <div className="flex items-center gap-3">
+        {/* Command Palette trigger */}
+        <button
+          onClick={() => window.dispatchEvent(new Event('open-command-palette'))}
+          aria-label="Open command palette"
+          className={`inline-flex h-11 px-3 items-center gap-2 rounded-lg hover:bg-white/10 transition-colors ${darkMode ? 'text-white' : 'text-gray-700'}`}
+        >
+          <Search className="w-4 h-4" />
+          <span className="hidden md:inline text-sm">Ctrl + K / ⌘K</span>
+        </button>
+        {/* Tutorial Icon */}
+        <button
+          type="button"
+          onClick={onTutorialClick}
+          aria-label={intl.formatMessage({ id: 'navbar.onboarding', defaultMessage: 'Abrir guía de inicio' })}
+          className={`inline-flex h-11 w-11 items-center justify-center rounded-lg border border-transparent bg-white/90 text-slate-900 shadow-sm transition hover:border-slate-200 hover:bg-slate-50 dark:bg-[#0D1118] dark:text-white dark:hover:border-slate-700 dark:hover:bg-slate-900`}
+        >
+          <GraduationCap className={`w-5 h-5 ${darkMode ? 'text-white' : 'text-slate-900'}`} />
+        </button>
+
         {/* Notification Bell */}
         <button
-          className={`
-            relative p-2 rounded-lg transition-colors
-            ${darkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}
-          `}
+          aria-label={intl.formatMessage({ id: 'navbar.notifications', defaultMessage: 'Notificaciones' })}
+          className={`relative h-11 w-11 p-2.5 rounded-lg transition-colors ${darkMode ? 'hover:bg-white/10' : 'hover:bg-gray-100'}`}
         >
           <Bell className={`w-5 h-5 ${darkMode ? 'text-white/70' : 'text-gray-600'}`} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#E5484D] rounded-full border-2 border-[#0A0D16]" />

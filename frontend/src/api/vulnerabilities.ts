@@ -6,6 +6,8 @@ export interface CreateVulnerabilityRequest {
   description?: string
   asset_id: string
   severity: string
+  likelihood?: number
+  impact?: number
 }
 
 export interface UpdateVulnerabilityRequest {
@@ -13,6 +15,8 @@ export interface UpdateVulnerabilityRequest {
   description?: string
   asset_id?: string
   severity?: string
+  likelihood?: number
+  impact?: number
 }
 
 export const vulnerabilitiesApi = {

@@ -5,13 +5,15 @@ import { getAuditChecklist, saveAuditChecklist, validateAudit } from '../../api/
 import {
   enqueueExternalValidation,
   generateMissingForChunk,
-  subscribeExternalValidationJob,
   type ChunkValidationResult,
   type GenerateMissingResponse,
   type ValidationReportResponse,
 } from '../../api/externalValidation';
+import { useValidationJob } from '../contexts/ValidationJobContext';
 import { usePreferences } from '../components/AppShell';
+import { formatDateTime } from '../lib/date';
 import { translations } from '../types';
+import ValidationHistory from '../components/ValidationHistory';
 
 interface ChatMessage {
   id: number;
@@ -22,7 +24,7 @@ interface ChatMessage {
 
 export default function AuditPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { language } = usePreferences();
+  const { language, dateFormat } = usePreferences();
   const intl = {
     formatMessage: ({ id, defaultMessage }: { id: string; defaultMessage?: string }) => {
       const messages = translations[language] as Record<string, string>;
@@ -52,7 +54,8 @@ export default function AuditPage() {
   const [missingGenerationLoadingByChunk, setMissingGenerationLoadingByChunk] = useState<Record<string, boolean>>({});
   const [missingGenerationErrorByChunk, setMissingGenerationErrorByChunk] = useState<Record<string, string>>({});
   const [missingGenerationResultByChunk, setMissingGenerationResultByChunk] = useState<Record<string, GenerateMissingResponse>>({});
-  const validationStreamRef = useRef<EventSource | null>(null);
+  const [isDragActive, setIsDragActive] = useState(false);
+  
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -81,13 +84,10 @@ export default function AuditPage() {
     if (checklistSaving) return t('audit.checklistSaving', 'Saving...');
     if (checklistDirty) return t('audit.checklistDirty', 'Pending changes');
     if (lastChecklistSavedAt) {
-      const dt = new Date(lastChecklistSavedAt);
-      if (!Number.isNaN(dt.getTime())) {
-        return `${t('audit.savedAt', 'Saved')} ${dt.toLocaleTimeString()}`;
-      }
+      return `${t('audit.savedAt', 'Saved')} ${formatDateTime(lastChecklistSavedAt, dateFormat, language)}`;
     }
     return t('audit.noChanges', 'No changes');
-  }, [checklistSaving, checklistDirty, lastChecklistSavedAt, intl]);
+  }, [checklistSaving, checklistDirty, lastChecklistSavedAt, t, dateFormat, language]);
 
   const getChecklistTitle = (item: AuditChecklistItem) => {
     return t(`audit.checklist.${item.control_code}`, item.title);
@@ -162,6 +162,30 @@ export default function AuditPage() {
     );
     setChecklistDirty(true);
   };
+
+  // validation SSE handled by ValidationJobContext
+  const { activeJob, subscribe } = useValidationJob();
+
+  useEffect(() => {
+    if (!activeJob) {
+      setExternalValidationJob(null);
+      setExternalValidationReport(null);
+      return;
+    }
+
+    const interim: ValidationReportResponse = {
+      job_id: activeJob.jobId,
+      status: activeJob.status,
+      progress: activeJob.progress,
+      message: (activeJob.result && (activeJob.result.message ?? undefined)) as any,
+      total_chunks: (activeJob.result && (activeJob.result.total_chunks ?? 0)) as any,
+      findings: (activeJob.result && (activeJob.result.findings ?? [])) as any,
+    } as ValidationReportResponse;
+
+    setExternalValidationJob(interim);
+    if (activeJob.result) setExternalValidationReport(activeJob.result as ValidationReportResponse);
+    else setExternalValidationReport(interim);
+  }, [activeJob]);
 
   const forceSaveChecklist = async () => {
     try {
@@ -259,8 +283,7 @@ export default function AuditPage() {
     setMissingGenerationLoadingByChunk({});
     setMissingGenerationErrorByChunk({});
     setMissingGenerationResultByChunk({});
-    validationStreamRef.current?.close();
-    validationStreamRef.current = null;
+    // event subscription now handled by ValidationJobContext
 
     try {
       const job = await enqueueExternalValidation(file);
@@ -276,19 +299,8 @@ export default function AuditPage() {
       setExternalValidationReport(queuedState);
 
       try {
-        validationStreamRef.current = await subscribeExternalValidationJob(job.job_id, {
-          onProgress: (payload) => {
-            setExternalValidationJob(payload);
-            setExternalValidationReport(payload);
-          },
-          onDone: (payload) => {
-            setExternalValidationJob(payload);
-            setExternalValidationReport(payload);
-          },
-          onError: (message) => {
-            setExternalValidationError(message);
-          },
-        });
+        // Use context to subscribe to SSE for this job
+        await subscribe(job.job_id);
       } catch (err) {
         const message = err instanceof Error ? err.message : t('audit.unknownError', 'Unknown error');
         setExternalValidationError(`${t('audit.granularValidationStartError', 'Could not start granular validation')}: ${message}`);
@@ -303,6 +315,36 @@ export default function AuditPage() {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(true);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      const file = droppedFiles[0];
+      onValidateFile(file);
     }
   };
 
@@ -369,11 +411,7 @@ export default function AuditPage() {
     return t('audit.statusUnknown', 'SIN ESTADO');
   };
 
-  useEffect(() => {
-    return () => {
-      validationStreamRef.current?.close();
-    };
-  }, []);
+  // Cleanup handled by ValidationJobContext
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0F1119] to-[#1A1D28] p-6">
@@ -406,11 +444,19 @@ export default function AuditPage() {
             />
             
             <div
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-[#4F6EF7] rounded-lg p-6 text-center cursor-pointer hover:bg-[#4F6EF7]/5 transition"
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+                isDragActive
+                  ? 'border-[#1DB954] bg-[#1DB954]/10 scale-105'
+                  : 'border-[#4F6EF7] hover:bg-[#4F6EF7]/5 hover:border-[#4F6EF7]/80'
+              }`}
             >
-              <Upload className="w-8 h-8 text-[#4F6EF7] mx-auto mb-2" />
-              <p className="text-white font-medium">{t('audit.dropHint', 'Click or drag a file')}</p>
+              <Upload className={`w-8 h-8 mx-auto mb-2 transition-colors ${isDragActive ? 'text-[#1DB954]' : 'text-[#4F6EF7]'}`} />
+              <p className="text-white font-medium">{isDragActive ? t('audit.dropNow', 'Drop your file here') : t('audit.dropHint', 'Click or drag a file')}</p>
               <p className="text-gray-400 text-sm mt-1">{t('audit.dropSubHint', 'PDF, Word, Excel, Text, Images (max 10MB)')}</p>
             </div>
 
@@ -614,6 +660,12 @@ export default function AuditPage() {
                 {externalValidationReport.error || t('audit.failed', 'Granular validation failed.')}
               </div>
             )}
+
+            {/* Historial de validaciones: debajo del resultado actual de la validación */}
+            <div className="mt-6">
+              <hr className="border-t border-[#2A2E3D] my-6" />
+              <ValidationHistory />
+            </div>
           </div>
 
           {/* Formulario */}

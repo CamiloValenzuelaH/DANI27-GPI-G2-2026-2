@@ -127,6 +127,9 @@ export interface Vulnerability {
   description: string | null
   asset_id: string
   severity: string
+  likelihood: number
+  impact: number
+  remediation_plan: string | null
   created_at: string
   updated_at: string
 }

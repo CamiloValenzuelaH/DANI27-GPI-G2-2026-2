@@ -80,8 +80,7 @@ export const streamDocumentGenerationEvents = async (
   onError: (error: Error) => void,
 ): Promise<void> => {
   const token = storage.getToken()
-  const apiUrl = import.meta.env.VITE_API_URL ?? '/api/v1'
-  const url = `${apiUrl}/documents/generate/full/${job_id}/events${token ? `?access_token=${token}` : ''}`
+  const url = `${client.defaults.baseURL ?? '/api/v1'}/documents/generate/full/${job_id}/events${token ? `?access_token=${token}` : ''}`
 
   try {
     const response = await fetch(url)

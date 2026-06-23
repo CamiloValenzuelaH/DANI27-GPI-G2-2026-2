@@ -26,12 +26,23 @@ export async function getPhaseQuestions(phaseId: string): Promise<QuestionDTO[]>
   return data
 }
 
-export async function postAnswer(payload: { question_id: number; answer: string; notes?: string }) {
+export async function postAnswer(payload: { question_id: string; answer: string; notes?: string }) {
+  console.debug('Posting assessment answer', payload)
   const { data } = await client.post('/assessment/answers', payload)
   return data
 }
 
 export async function getProgress() {
   const { data } = await client.get('/assessment/progress')
+  return data
+}
+
+export async function getGapsSummary() {
+  const { data } = await client.get('/assessment/gaps')
+  return data
+}
+
+export async function getGapActions(phaseId: string) {
+  const { data } = await client.get(`/assessment/gaps/phase/${phaseId}/actions`)
   return data
 }

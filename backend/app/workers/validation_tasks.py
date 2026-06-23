@@ -13,6 +13,7 @@ from app.workers.celery_app import celery_app
 from app.workers.file_extraction import extract_text_from_file
 from app.workers.gemini_service import generate_embedding, analyze_chunk_with_deepseek
 from app.core.config import settings
+from app.models.external_validation_job import ExternalValidationJob
 
 
 _FALLBACK_ISO_CHUNKS = [
@@ -127,7 +128,7 @@ async def get_top_iso_chunks(embedding: list[float], limit: int = 5) -> list[dic
         chunks = []
         for row in rows:
             chunks.append({
-                "id": row[0],
+                "id": str(row[0]),
                 "clause_ref": row[1],
                 "title": row[2],
                 "content": row[3],
@@ -142,20 +143,53 @@ async def get_top_iso_chunks(embedding: list[float], limit: int = 5) -> list[dic
 
 async def publish_progress(job_id: str, fields: dict) -> None:
     """Publica el progreso de un job en Redis."""
-    fields["updated_at"] = fields.get("updated_at") or datetime.utcnow().isoformat()
-    
-    # Convertir listas/dicts a JSON strings para Redis
-    for key, value in fields.items():
-        if isinstance(value, (list, dict)):
-            fields[key] = json.dumps(value)
+    now_iso = datetime.utcnow().isoformat()
+    now_date = datetime.utcnow().date().isoformat()
+    fields["updated_at"] = fields.get("updated_at") or now_iso
+    fields["updated_date"] = fields.get("updated_date") or now_date
+    # Preparar campos para Redis (serializar listas/dicts) y para BD (valores nativos)
+    redis_fields = {**fields}
+    db_fields = {k: v for k, v in fields.items()}
 
-    # Crear cliente Redis para esta operación
+    for key, value in redis_fields.items():
+        if isinstance(value, (list, dict)):
+            redis_fields[key] = json.dumps(value)
+
+    # Escribir en Redis siempre
     redis_client = Redis.from_url(settings.redis_url, decode_responses=True)
     try:
-        await redis_client.hset(f"validation:job:{job_id}", mapping=fields)
+        await redis_client.hset(f"validation:job:{job_id}", mapping=redis_fields)
         await redis_client.expire(f"validation:job:{job_id}", 7 * 24 * 60 * 60)
     finally:
         await redis_client.close()
+
+    # Persistir en BD solo al finalizar (completed | failed)
+    if str(db_fields.get("status", "")).lower() in ("completed", "failed"):
+        db = SessionLocal()
+        try:
+            job = db.query(ExternalValidationJob).filter(ExternalValidationJob.job_id == job_id).first()
+            if not job:
+                job = ExternalValidationJob(job_id=job_id)
+                db.add(job)
+
+            for key, value in db_fields.items():
+                # Skip computed/read-only date properties provided by TimestampMixin
+                if key in ("created_date", "updated_date"):
+                    continue
+                # Avoid setting read-only properties (like @property without setter)
+                cls_attr = getattr(type(job), key, None)
+                if isinstance(cls_attr, property) and getattr(cls_attr, 'fset', None) is None:
+                    continue
+                if hasattr(job, key):
+                    setattr(job, key, value)
+
+            print(f"[DB PERSIST] guardando job {job_id} status={db_fields.get('status')}")
+            db.commit()
+            print(f"[DB PERSIST] commit OK job {job_id}")
+        except SQLAlchemyError:
+            db.rollback()
+        finally:
+            db.close()
 
 
 @celery_app.task(bind=True, name="validate_external_audit")
@@ -167,6 +201,7 @@ def validate_external_audit(
     organization_id: str,
     user_id: str,
     content_type: str = "application/octet-stream",
+    clause_refs: list[str] | None = None,
 ):
     """Tarea principal de validación de auditoría externa."""
     
@@ -182,6 +217,7 @@ def validate_external_audit(
                 file_name=file_name,
                 organization_id=organization_id,
                 user_id=user_id,
+                clause_refs=clause_refs,
             )
         )
         return result
@@ -204,6 +240,7 @@ async def _validate_external_audit_async(
     file_name: str,
     organization_id: str,
     user_id: str,
+    clause_refs: list[str] | None = None,
 ) -> dict:
     """Lógica async de validación."""
     
@@ -246,10 +283,76 @@ async def _validate_external_audit_async(
         "message": "Buscando fragmentos ISO relevantes con pgvector",
     })
 
-    chunks = await get_top_iso_chunks(embedding, 5)
+    # If clause_refs provided by user, select those controls deterministically
+    if clause_refs:
+        selected_chunks: list[dict] = []
+        db = SessionLocal()
+        try:
+            from sqlalchemy import text
+            for ref in clause_refs:
+                row = db.execute(
+                    text(
+                        "SELECT id, clause_ref, title, content "
+                        "FROM iso_27001_chunks "
+                        "WHERE clause_ref = :ref AND section_type = 'annex_a' LIMIT 1"
+                    ),
+                    {"ref": ref},
+                ).fetchone()
+                if not row:
+                    continue
+                selected_chunks.append({
+                    "id": str(row[0]),
+                    "clause_ref": row[1],
+                    "title": row[2],
+                    "content": row[3],
+                    "relevance_score": None,
+                })
+        except SQLAlchemyError:
+            selected_chunks = []
+        finally:
+            db.close()
+
+        chunks = selected_chunks[:5]
+    else:
+        chunks = await get_top_iso_chunks(embedding, 5)
     findings = []
 
     # Paso 4: Analizar cada chunk
+    def build_document_context(normalized_text: str, clause_ref: str) -> str:
+        if not normalized_text:
+            return ""
+        if not clause_ref:
+            return normalized_text[:16000]
+
+        idx = normalized_text.find(clause_ref)
+        if clause_ref == "A.5.25":
+            print("[DEBUG A.5.25] indexOf result:", idx)
+            print("[DEBUG A.5.25] clause_ref:", repr(clause_ref))
+            print("[DEBUG A.5.25] normalized_text length:", len(normalized_text))
+            print("[DEBUG A.5.25] first 5000 chars search...")
+            first_idx = normalized_text[:min(20000, len(normalized_text))].find(clause_ref)
+            print("[DEBUG A.5.25] first 20k indexOf result:", first_idx)
+            if first_idx != -1:
+                snippet = normalized_text[max(0, first_idx - 50): min(len(normalized_text), first_idx + len(clause_ref) + 100)]
+                print("[DEBUG A.5.25] text around:", repr(snippet))
+            # Show content sample
+            search_pattern = "5.25"
+            if search_pattern in normalized_text:
+                pos = normalized_text.find(search_pattern)
+                print("[DEBUG A.5.25] found '5.25' at pos:", pos, "context:", repr(normalized_text[max(0, pos-100):pos+150]))
+
+        if idx == -1:
+            return normalized_text[:16000]
+
+        before = 3000
+        after = 3000
+        prefix = normalized_text[:2000]
+        start = max(0, idx - before)
+        end = min(len(normalized_text), idx + len(clause_ref) + after)
+        window = normalized_text[start:end]
+
+        return f"{prefix}\n\n{window}"
+
     for index, chunk in enumerate(chunks):
         progress = 30 + int(((index + 1) / max(len(chunks), 1)) * 60)
 
@@ -261,7 +364,7 @@ async def _validate_external_audit_async(
         })
 
         analysis = await analyze_chunk_with_deepseek(
-            normalized_text[:8000],
+            build_document_context(normalized_text, chunk["clause_ref"]),
             chunk,
             max_output_tokens=2048,
         )

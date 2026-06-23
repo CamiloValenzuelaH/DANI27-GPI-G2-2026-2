@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { I18nProvider } from './i18n';
 import { AuthProvider } from './contexts/AuthContext';
+import { ValidationJobProvider } from './contexts/ValidationJobContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 import LoginPage from './pages/LoginPage';
@@ -12,15 +12,18 @@ import AssetsPage from './pages/AssetsPage';
 import AuditPagePro from './pages/AuditPagePro';
 import AssessmentPage from './components/assessment/AssessmentPage';
 import RisksPage from './pages/RisksPage';
+import UnderstandPage from './pages/UnderstandPage';
 import SettingsPage from './pages/SettingsPage';
 import DocumentGeneratorPage from './pages/DocumentGeneratorPage';
+import EvidencePage from './pages/EvidencePage';
+import FindingsPage from './pages/FindingsPage';
 
 export default function AppPro() {
   return (
-    <I18nProvider locale="en">
-      <BrowserRouter>
+    <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <ValidationJobProvider>
+            <Routes>
             {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/two-factor" element={<TwoFactorPage />} />
@@ -31,11 +34,11 @@ export default function AppPro() {
               <Route element={<AppShell />}>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/understand" element={<PlaceholderPage title="Understand My Situation" />} />
+                <Route path="/understand" element={<UnderstandPage />} />
                 <Route path="/documents" element={<DocumentGeneratorPage />} />
                 <Route path="/risks" element={<RisksPage />} />
-                <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />
-                <Route path="/findings" element={<PlaceholderPage title="Manage Findings" />} />
+                <Route path="/evidence" element={<EvidencePage />} />
+                <Route path="/findings" element={<FindingsPage />} />
                 <Route path="/audit" element={<AuditPagePro />} />
                 <Route path="/assessment" element={<AssessmentPage />} />
                 <Route path="/integrity" element={<PlaceholderPage title="Compliance Integrity" />} />
@@ -52,10 +55,10 @@ export default function AppPro() {
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+            </Routes>
+          </ValidationJobProvider>
         </AuthProvider>
       </BrowserRouter>
-    </I18nProvider>
   );
 }
 

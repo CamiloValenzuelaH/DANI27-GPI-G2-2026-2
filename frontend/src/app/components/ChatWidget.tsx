@@ -356,20 +356,23 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
 
   return (
     <>
-      <button
-        onClick={toggleChat}
-        className="fixed bottom-6 right-7 w-[52px] h-[52px] rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform z-50"
-      >
-        <MessageCircle className="w-6 h-6" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
-            {unreadCount}
-          </span>
-        )}
-      </button>
+      {/* Chat button always visible */}
+      <div className="fixed bottom-6 right-28 z-50">
+        <button
+          onClick={toggleChat}
+          className="relative z-10 w-[52px] h-[52px] rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+        >
+          <MessageCircle className="w-6 h-6" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
 
       {showChat && (
-        <div className={`fixed bottom-[88px] right-7 w-[420px] min-h-[520px] rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden ${darkMode ? 'bg-[#1A1D28]' : 'bg-white'}`}>
+        <div className={`fixed bottom-[88px] right-24 w-[420px] min-h-[520px] rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden ${darkMode ? 'bg-[#1A1D28]' : 'bg-white'}`}>
           <div className="px-5 py-4 bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-sm">🤖</div>
             <div className="flex-1">

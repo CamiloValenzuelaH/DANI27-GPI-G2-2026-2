@@ -1,7 +1,9 @@
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import KpiChart from '../components/KpiChart';
 import HealthScoreChart from '../components/HealthScoreChart';
+import SearchBinder from '../components/SearchBinder';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { dashboardApi } from '../../api/dashboard';
 import type { DashboardMetricsResponse } from '../../api/types';
 import { usePreferences } from '../components/AppShell';
@@ -18,6 +20,8 @@ export default function DashboardPage() {
   const [metrics, setMetrics] = useState<DashboardMetricsResponse | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchParams] = useSearchParams()
+  const initialQuery = (searchParams.get('q') ?? '').trim()
 
   useEffect(() => {
     let mounted = true
@@ -130,6 +134,10 @@ export default function DashboardPage() {
           <KpiChart labels={chartLabels} data={chartValues} title={intl.formatMessage({ id: 'dashboard.healthScoreTrend' })} />
         )}
         {error && <div className="text-sm text-[#E5484D] mt-2">{error}</div>}
+      </div>
+
+      <div className="mb-8">
+        <SearchBinder initialQuery={initialQuery} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

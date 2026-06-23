@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   DocumentDetailResponse,
@@ -11,6 +11,15 @@ import {
   streamDocumentGenerationEvents,
   updateDocument,
 } from '../../api/documents'
+import {
+  generateReport,
+  getReportStatus,
+  getReportTemplates,
+  ReportFormat,
+  ReportStatusResponse,
+  ReportTemplate,
+  ReportTemplateResponse,
+} from '../../api/reports'
 import DocumentEditor from '../components/DocumentEditor'
 
 const staticDocuments = [
@@ -30,7 +39,7 @@ const staticDocuments = [
   },
 ]
 
-type EditorTab = 'view' | 'edit' | 'generate' | 'upload'
+type EditorTab = 'view' | 'edit' | 'generate' | 'report' | 'upload'
 
 export default function DocumentGeneratorPage() {
   const location = useLocation()
@@ -72,10 +81,27 @@ export default function DocumentGeneratorPage() {
   const [generatedDocumentText, setGeneratedDocumentText] = useState('')
   const [generatedDocumentTitle, setGeneratedDocumentTitle] = useState('')
 
+  const [reportTemplates, setReportTemplates] = useState<ReportTemplateResponse[]>([])
+  const [selectedReportTemplate, setSelectedReportTemplate] = useState<ReportTemplate>('soa')
+  const [reportFormat, setReportFormat] = useState<ReportFormat>('pdf')
+  const [reportTitle, setReportTitle] = useState('Reporte de cumplimiento')
+  const [reportDescription, setReportDescription] = useState('Resumen de estado y brechas de cumplimiento.')
+  const [reportJobId, setReportJobId] = useState<string | null>(null)
+  const [reportStatus, setReportStatus] = useState<ReportStatusResponse | null>(null)
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false)
+  const [reportError, setReportError] = useState<string | null>(null)
+  const [isReportPolling, setIsReportPolling] = useState(false)
+  const reportPollingRef = useRef<number | null>(null)
+
   // ── UI ───────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState<EditorTab>('view')
   // Contenido editable en el editor (independiente del original)
   const [editorContent, setEditorContent] = useState('')
+
+  // ── Exportación ──────────────────────────────────────────────────
+  const [exportTemplate, setExportTemplate] = useState('SOA')
+  const [exportFormat, setExportFormat] = useState('PDF')
+  const [isExporting, setIsExporting] = useState(false)
 
   // ── Computed ──────────────────────────────────────────────────────
   const allDocuments = useMemo(
@@ -156,6 +182,61 @@ export default function DocumentGeneratorPage() {
   useEffect(() => { loadDocumentList() }, [loadDocumentList])
   useEffect(() => { loadSelectedDocument() }, [loadSelectedDocument])
 
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        const response = await getReportTemplates()
+        setReportTemplates(response.templates)
+        if (response.templates.length > 0) {
+          setSelectedReportTemplate(response.templates[0].id)
+        }
+      } catch (error) {
+        console.error('Error loading report templates', error)
+      }
+    }
+
+    loadTemplates()
+  }, [])
+
+  useEffect(() => {
+    if (!reportJobId || !isReportPolling) return
+
+    const pollStatus = async () => {
+      try {
+        const status = await getReportStatus(reportJobId)
+        setReportStatus(status)
+        if (status.status === 'completed' || status.status === 'failed') {
+          setIsReportPolling(false)
+          setIsGeneratingReport(false)
+          if (reportPollingRef.current) {
+            window.clearInterval(reportPollingRef.current)
+            reportPollingRef.current = null
+          }
+        }
+      } catch (error) {
+        console.error('Error polling report status', error)
+        setReportError('No se pudo obtener el estado del reporte. Intenta de nuevo.')
+        setIsReportPolling(false)
+        setIsGeneratingReport(false)
+        if (reportPollingRef.current) {
+          window.clearInterval(reportPollingRef.current)
+          reportPollingRef.current = null
+        }
+      }
+    }
+
+    pollStatus()
+    const intervalId = window.setInterval(pollStatus, 3000)
+    reportPollingRef.current = intervalId
+
+    return () => {
+      if (reportPollingRef.current) {
+        window.clearInterval(reportPollingRef.current)
+        reportPollingRef.current = null
+      }
+    }
+  }, [reportJobId, isReportPolling])
+
   // ── Handlers ─────────────────────────────────────────────────────
   const handleDeleteDocument = async (docId: string) => {
     if (!window.confirm('¿Estás seguro de que deseas eliminar este documento?')) return;
@@ -177,6 +258,54 @@ export default function DocumentGeneratorPage() {
   const handleSelectDocument = (documentId: string) => {
     navigate(`/documents?docId=${documentId}`)
     setActiveTab('view')
+  }
+
+  const handleGenerateReport = async () => {
+    if (!selectedDocument?.documentId) {
+      setReportError('Por favor selecciona un documento de la barra lateral primero.');
+      return;
+    }
+
+    setReportError(null)
+    setIsGeneratingReport(true)
+    setReportStatus(null)
+    setReportJobId(null)
+
+    try {
+      const payload = {
+        documentId: selectedDocument.documentId,
+        documentText: editorContent || selectedDocument?.documentText || '', 
+        title: reportTitle.trim() || 'Reporte de cumplimiento',
+        description: reportDescription.trim(),
+        template: selectedReportTemplate,
+        format: reportFormat,
+      }
+
+      const job = await generateReport(payload)
+      setReportJobId(job.job_id)
+      setIsReportPolling(true)
+      setReportStatus({
+        job_id: job.job_id,
+        status: 'queued',
+        progress: 0,
+      })
+    } catch (error: any) {
+      console.error('Error generating report', error)
+      setReportError(error?.response?.data?.detail ?? 'No se pudo iniciar la generación del reporte.')
+      setIsGeneratingReport(false)
+    }
+  }
+
+  const handleDownloadReport = () => {
+    if (!reportStatus?.download_url) return
+    window.location.href = reportStatus.download_url
+  }
+
+  const handleGenerateAnotherReport = () => {
+    setReportJobId(null)
+    setReportStatus(null)
+    setReportError(null)
+    setIsGeneratingReport(false)
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -293,7 +422,7 @@ export default function DocumentGeneratorPage() {
       setGenerateError('No se pudo iniciar la generación. Revisa la configuración.')
       setIsGenerating(false)
     }
-  }
+  } 
 
   const handleUploadGenerated = async (title: string, content: string) => {
     try {
@@ -325,11 +454,12 @@ export default function DocumentGeneratorPage() {
     { id: 'view', label: 'Vista' },
     { id: 'edit', label: 'Editor' },
     { id: 'generate', label: 'Generar con IA' },
+    { id: 'report', label: 'Exportar reporte' },
     { id: 'upload', label: 'Subir' },
   ]
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="overflow-x-hidden px-3 py-6 sm:px-6 lg:px-8 max-w-full sm:max-w-7xl mx-auto space-y-6 pb-28 text-sm sm:text-base">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-semibold text-slate-900">Document Generator</h1>
@@ -338,9 +468,9 @@ export default function DocumentGeneratorPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
         {/* Sidebar — lista de documentos */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm self-start">
+        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm self-start">
           <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-3">
             Documentos
           </h2>
@@ -392,6 +522,13 @@ export default function DocumentGeneratorPage() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab('report')}
+            className="mt-2 w-full rounded-xl bg-slate-800 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-900 transition"
+          >
+            + Exportar reporte
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('upload')}
             className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
           >
@@ -402,13 +539,14 @@ export default function DocumentGeneratorPage() {
         {/* Panel principal con tabs */}
         <div className="space-y-4">
           {/* Tabs */}
-          <div className="flex gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1 w-fit">
+          <div className="flex gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1 w-full overflow-x-auto">
+            <div className="flex min-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`rounded-lg px-4 py-1.5 text-sm font-medium transition ${
+                className={`flex-shrink-0 rounded-lg px-4 py-1.5 text-sm font-medium transition ${
                   activeTab === tab.id
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
@@ -417,12 +555,13 @@ export default function DocumentGeneratorPage() {
                 {tab.label}
               </button>
             ))}
+            </div>
           </div>
 
           {/* Tab: Vista */}
           {activeTab === 'view' && (
             <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-100">
                 <div>
                   <h2 className="text-lg font-semibold text-slate-900">
                     {selectedDocument?.title ?? 'Sin documento'}
@@ -450,11 +589,11 @@ export default function DocumentGeneratorPage() {
                   </button>
                 </div>
               </div>
-              <div className="px-8 py-6 max-h-[600px] overflow-y-auto">
+              <div className="px-4 sm:px-8 py-6 overflow-y-auto lg:max-h-[600px]">
                 {isLoadingDocument ? (
                   <div className="text-sm text-slate-400">Cargando documento...</div>
                 ) : selectedDocument?.documentText ? (
-                  <div className="prose prose-sm max-w-none text-slate-700 whitespace-pre-line leading-7">
+                  <div className="prose prose-sm max-w-full text-slate-700 whitespace-pre-line leading-7">
                     {selectedDocument.documentText}
                   </div>
                 ) : (
@@ -557,18 +696,6 @@ export default function DocumentGeneratorPage() {
                     placeholder="Separadas por comas o saltos de línea"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Controles ISO <span className="text-slate-400">(opcional)</span>
-                  </label>
-                  <textarea
-                    value={generateControlRefs}
-                    onChange={(e) => setGenerateControlRefs(e.target.value)}
-                    rows={3}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ej. A.5.1, A.6.1.2"
-                  />
-                </div>
               </div>
 
               {/* Progreso */}
@@ -628,6 +755,137 @@ export default function DocumentGeneratorPage() {
                   </>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Tab: Exportar reporte */}
+          {activeTab === 'report' && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Exportar reporte</h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Genera un informe descargable basado en el documento seleccionado actualmente.
+                </p>
+              </div>
+
+              {/* NUEVO: Indicador del documento seleccionado */}
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 flex items-center gap-3">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-blue-900">Documento a exportar:</p>
+                  <p className="text-sm text-blue-700">
+                    {selectedDocument?.title || 'Ningún documento seleccionado en la barra lateral'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Título del reporte</label>
+                  <input
+                    value={reportTitle}
+                    onChange={(e) => setReportTitle(e.target.value)}
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-slate-50"
+                    placeholder="Título del reporte"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                  <input
+                    value={reportDescription}
+                    onChange={(e) => setReportDescription(e.target.value)}
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-slate-50"
+                    placeholder="Resumen del reporte"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Plantilla</label>
+                  <select
+                    value={selectedReportTemplate}
+                    onChange={(e) => setSelectedReportTemplate(e.target.value as ReportTemplate)}
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-slate-50"
+                  >
+                    {reportTemplates.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Formato</label>
+                  <select
+                    value={reportFormat}
+                    onChange={(e) => setReportFormat(e.target.value as ReportFormat)}
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-slate-50"
+                  >
+                    <option value="pdf">PDF</option>
+                    <option value="xlsx">XLSX</option>
+                    <option value="docx">DOCX</option>
+                    <option value="csv">CSV</option>
+                  </select>
+                </div>
+              </div>
+
+              {reportError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {reportError}
+                </div>
+              )}
+
+              {reportStatus && (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-slate-500">Estado del reporte</p>
+                      <p className="text-lg font-semibold text-slate-900">{reportStatus.status.replace('_', ' ').toUpperCase()}</p>
+                    </div>
+                    <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+                      {reportStatus.progress}%
+                    </span>
+                  </div>
+                  {reportStatus.message && (
+                    <p className="text-sm text-slate-600">{reportStatus.message}</p>
+                  )}
+                  <div className="h-2 w-full rounded-full bg-white shadow-inner overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-blue-600 transition-all duration-500"
+                      style={{ width: `${reportStatus.progress}%` }}
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    {reportStatus.download_url && (
+                      <button
+                        type="button"
+                        onClick={handleDownloadReport}
+                        className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
+                      >
+                        Descargar reporte
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleGenerateAnotherReport}
+                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                    >
+                      Generar otro
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Botón principal modificado para requerir documento */}
+              <button
+                type="button"
+                onClick={handleGenerateReport}
+                disabled={!selectedDocument || isGeneratingReport}
+                className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-950 transition disabled:opacity-50"
+              >
+                {isGeneratingReport ? 'Generando reporte...' : 'Iniciar exportación'}
+              </button>
             </div>
           )}
 

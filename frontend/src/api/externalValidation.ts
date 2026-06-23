@@ -1,7 +1,7 @@
 import { storage } from './client'
 import client from './client'
 
-const BASE_URL = import.meta.env.VITE_VALIDATION_API_URL ?? '/api/v1/validate'
+const BASE_URL = import.meta.env.VITE_VALIDATION_API_URL ?? '/api/validate'
 
 export interface ValidationObservation {
   severity: 'critical' | 'major' | 'minor'
@@ -107,6 +107,36 @@ export async function subscribeExternalValidationJob(
   }
 
   return source
+}
+
+export async function listExternalValidationJobs(limit = 50): Promise<ValidationReportResponse[]> {
+  const token = storage.getToken()
+  const headers = token ? { Authorization: `Bearer ${token}` } : undefined
+  const response = await fetch(`${BASE_URL}/external/history?limit=${encodeURIComponent(String(limit))}`, {
+    method: 'GET',
+    headers,
+  })
+
+  if (!response.ok) {
+    throw new Error(await response.text())
+  }
+
+  return response.json() as Promise<ValidationReportResponse[]>
+}
+
+export async function getExternalValidationResult(jobId: string): Promise<ValidationReportResponse> {
+  const token = storage.getToken()
+  const headers = token ? { Authorization: `Bearer ${token}` } : undefined
+  const response = await fetch(`${BASE_URL}/external/${jobId}/result`, {
+    method: 'GET',
+    headers,
+  })
+
+  if (!response.ok) {
+    throw new Error(await response.text())
+  }
+
+  return response.json() as Promise<ValidationReportResponse>
 }
 
 export async function generateMissingForChunk(

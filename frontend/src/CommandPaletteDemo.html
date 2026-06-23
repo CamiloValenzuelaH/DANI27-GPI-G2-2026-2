@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Palette Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #0F1119 0%, #1A1D28 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #888;
+    }
+
+    .demo-section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .demo-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #4F6EF7;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      background: #4F6EF7;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button:hover {
+      background: #3f5ad7;
+      transform: translateY(-2px);
+    }
+
+    button.secondary {
+      background: #2A2E3D;
+      color: #ccc;
+    }
+
+    button.secondary:hover {
+      background: #3A3E4D;
+    }
+
+    .info-box {
+      background: rgba(79, 110, 247, 0.1);
+      border-left: 4px solid #4F6EF7;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .info-box code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .test-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .test-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .test-list li:last-child {
+      border-bottom: none;
+    }
+
+    .status {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #888;
+    }
+
+    .status.pending {
+      background: #FFA500;
+    }
+
+    .status.pass {
+      background: #1DB954;
+    }
+
+    .status.fail {
+      background: #E91E63;
+    }
+
+    .keyboard-hint {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .keyboard-hint kbd {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      margin: 0 0.25rem;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 20vh;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1a1d28;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      height: 500px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-header input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      outline: none;
+      font-size: 1rem;
+    }
+
+    .modal-header input::placeholder {
+      color: #666;
+    }
+
+    .modal-results {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .command-category {
+      padding: 0.5rem 0;
+    }
+
+    .category-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #666;
+      padding: 0.5rem 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .command-item {
+      padding: 0.75rem;
+      margin: 0.1rem 0;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s;
+    }
+
+    .command-item:hover,
+    .command-item.selected {
+      background: #4F6EF7;
+    }
+
+    .command-item-left {
+      flex: 1;
+    }
+
+    .command-title {
+      font-weight: 500;
+    }
+
+    .command-description {
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin-top: 0.2rem;
+    }
+
+    .command-shortcut {
+      font-size: 0.75rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: nowrap;
+      margin-left: 0.5rem;
+    }
+
+    .modal-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      color: #888;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #666;
+    }
+
+    .empty-state p {
+      margin: 0.5rem 0;
+    }
+
+    .corner-hint {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #333;
+      border: 1px solid #444;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      z-index: 50;
+    }
+
+    .corner-hint:hover {
+      background: #444;
+      transform: translateY(-2px);
+    }
+
+    .test-result {
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 3px solid #4F6EF7;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .test-result.pass {
+      border-left-color: #1DB954;
+    }
+
+    .test-result.fail {
+      border-left-color: #E91E63;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎮 Command Palette Demo</h1>
+      <p class="subtitle">Prueba todas las funcionalidades del Command Palette</p>
+    </header>
+
+    <div class="demo-section">
+      <h2>📋 Controles</h2>
+      <div class="controls">
+        <button onclick="openPalette()">Abrir Palette (Ctrl+K)</button>
+        <button class="secondary" onclick="testFuzzySearch()">Probar búsqueda fuzzy</button>
+        <button class="secondary" onclick="testRoleFiltering()">Probar filtrado por rol</button>
+        <button class="secondary" onclick="clearResults()">Limpiar resultados</button>
+        <select id="roleSelector" style="background: #2A2E3D; color: #ccc; padding: 0.75rem 1.5rem; border-radius: 8px; border: none; font-size: 1rem; cursor: pointer;" onchange="changeRole(this.value)">
+          <option value="employee">👤 Employee</option>
+          <option value="auditor">🔍 Auditor</option>
+          <option value="manager" selected>👨‍💼 Manager</option>
+          <option value="admin">🔐 Admin</option>
+        </select>
+      </div>
+      <div class="info-box">
+        💡 O presiona <code>Ctrl+K</code> en cualquier momento para abrir el Command Palette
+      </div>
+    </div>
+
+    <div class="demo-section">
+      <h2>🧪 Pruebas de Funcionalidad</h2>
+      <ul class="test-list" id="testResults">
+        <li>
+          <span class="status pending"></span>
+          <span>Abre con Ctrl+K / Cmd+K</span>
+        </li>
+        <li>
+          <span class="status pending"></span>
+          <span>Búsqueda fuzzy instantánea</span>
+        </li>
+        <li>
+          <span class="status pending"></span>
+          <span>Navegación con arrow keys</span>
+        </li>
+        <li>
+          <span class="status pending"></span>
+          <span>Ejecutar con Enter</span>
+        </li>
+        <li>
+          <span class="status pending"></span>
+          <span>Cerrar con Escape</span>
+        </li>
+        <li>
+          <span class="status pending"></span>
+          <span>Categorías diferenciadas</span>
+        </li>
+        <li>
+          <span class="status pending"></span>
+          <span>Acciones filtradas por rol</span>
+        </li>
+        <li>
+          <span class="status pending"></span>
+          <span>Mensaje "Acceso Denegado"</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="demo-section">
+      <h2>📊 Resultados de Pruebas</h2>
+      <div id="resultsContainer" style="display: none;">
+        <div id="testOutput"></div>
+      </div>
+      <p style="color: #888; font-size: 0.9rem;">Los resultados aparecerán aquí cuando ejecutes las pruebas</p>
+    </div>
+
+    <div class="keyboard-hint">
+      <strong>Atajos de Teclado:</strong><br>
+      <kbd>Ctrl+K</kbd> o <kbd>Cmd+K</kbd> = Abrir/Cerrar<br>
+      <kbd>↑</kbd> <kbd>↓</kbd> = Navegar<br>
+      <kbd>Enter</kbd> = Ejecutar<br>
+      <kbd>Escape</kbd> = Cerrar
+    </div>
+  </div>
+
+  <!-- Command Palette Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span>🔍</span>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Buscar comandos..."
+          autofocus
+        />
+      </div>
+      <div class="modal-results" id="modalResults"></div>
+      <div class="modal-footer">
+        <div><kbd>↑↓</kbd> Navegar</div>
+        <div><kbd>⏎</kbd> Ejecutar</div>
+        <div><kbd>Esc</kbd> Cerrar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Corner Hint -->
+  <div class="corner-hint" onclick="openPalette()">
+    <span>🔍</span>
+    <span>⌘K</span>
+  </div>
+
+  <script>
+    // Command data
+    const COMMANDS = [
+      {
+        id: 'nav-dashboard',
+        title: 'Go to Dashboard',
+        description: 'Navigate to main dashboard',
+        category: 'Navigation',
+        shortcut: 'D',
+        requiredRoles: ['admin', 'manager', 'auditor', 'employee'],
+      },
+      {
+        id: 'nav-audit',
+        title: 'Go to Audit',
+        description: 'Navigate to audit page',
+        category: 'Navigation',
+        shortcut: 'A',
+        requiredRoles: ['admin', 'manager', 'auditor', 'employee'],
+      },
+      {
+        id: 'nav-assessment',
+        title: 'Go to Assessment',
+        description: 'Navigate to assessment page',
+        category: 'Navigation',
+        shortcut: 'T',
+        requiredRoles: ['admin', 'manager', 'auditor', 'employee'],
+      },
+      {
+        id: 'nav-risks',
+        title: 'Go to Risks',
+        description: 'Navigate to risks page',
+        category: 'Navigation',
+        shortcut: 'R',
+        requiredRoles: ['admin', 'manager', 'auditor', 'employee'],
+      },
+      {
+        id: 'nav-threats',
+        title: 'Go to Threats',
+        description: 'Navigate to threats page',
+        category: 'Navigation',
+        requiredRoles: ['admin', 'manager', 'auditor'],
+      },
+      {
+        id: 'nav-assets',
+        title: 'Go to Assets',
+        description: 'Navigate to assets page',
+        category: 'Navigation',
+        requiredRoles: ['admin', 'manager', 'auditor'],
+      },
+      {
+        id: 'action-export',
+        title: 'Export Report',
+        description: 'Export current data as PDF or Excel',
+        category: 'Actions',
+        shortcut: '⇧E',
+        requiredRoles: ['admin', 'manager', 'auditor'],
+      },
+      {
+        id: 'action-new-audit',
+        title: 'New Audit',
+        description: 'Start a new compliance audit',
+        category: 'Actions',
+        shortcut: '⇧A',
+        requiredRoles: ['admin', 'manager', 'auditor', 'employee'],
+      },
+      {
+        id: 'admin-users',
+        title: 'Manage Users',
+        description: 'Manage organization users and roles',
+        category: 'Settings',
+        requiredRoles: ['admin'],
+      },
+      {
+        id: 'admin-roles',
+        title: 'Manage Roles',
+        description: 'Configure user roles and permissions',
+        category: 'Settings',
+        requiredRoles: ['admin'],
+      },
+    ];
+
+    let selectedIndex = 0;
+    let currentRole = 'manager'; // Default role for demo
+    let searchValue = '';
+
+    // Keyboard event listener
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        openPalette();
+      }
+    });
+
+    function openPalette() {
+      const overlay = document.getElementById('modalOverlay');
+      overlay.classList.add('active');
+      document.getElementById('searchInput').focus();
+      selectedIndex = 0;
+      renderCommands();
+      updateTestStatus('Abre con Ctrl+K / Cmd+K', 'pass');
+    }
+
+    function closePalette() {
+      const overlay = document.getElementById('modalOverlay');
+      overlay.classList.remove('active');
+      searchValue = '';
+      document.getElementById('searchInput').value = '';
+    }
+
+    function fuzzySearch(query, commands) {
+      if (!query) return commands;
+
+      const searchQuery = query.toLowerCase();
+      return commands
+        .map(item => {
+          let score = 0;
+
+          if (item.title.toLowerCase() === searchQuery) score += 1000;
+          if (item.title.toLowerCase().startsWith(searchQuery)) score += 500;
+          if (item.title.toLowerCase().includes(searchQuery)) score += 300;
+          if (item.description?.toLowerCase().includes(searchQuery)) score += 100;
+          if (item.category.toLowerCase().includes(searchQuery)) score += 50;
+
+          return { item, score };
+        })
+        .filter(({ score }) => score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(({ item }) => item);
+    }
+
+    function filterByRole(commands, role) {
+      return commands.filter(cmd => cmd.requiredRoles.includes(role));
+    }
+
+    function renderCommands() {
+      const input = document.getElementById('searchInput');
+      searchValue = input.value;
+
+      const availableCommands = filterByRole(COMMANDS, currentRole);
+      const filteredCommands = fuzzySearch(searchValue, availableCommands);
+
+      if (searchValue && filteredCommands.length > 0) {
+        updateTestStatus('Búsqueda fuzzy instantánea', 'pass');
+      }
+
+      const grouped = {};
+      filteredCommands.forEach(cmd => {
+        if (!grouped[cmd.category]) grouped[cmd.category] = [];
+        grouped[cmd.category].push(cmd);
+      });
+
+      const resultsDiv = document.getElementById('modalResults');
+
+      if (filteredCommands.length === 0) {
+        resultsDiv.innerHTML = `
+          <div class="empty-state">
+            <p>❌ No commands found</p>
+            <p style="font-size: 0.9rem;">Try a different search term</p>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      let commandIndex = 0;
+
+      Object.entries(grouped).forEach(([category, commands]) => {
+        html += `<div class="command-category">`;
+        html += `<div class="category-label">${category}</div>`;
+
+        commands.forEach(cmd => {
+          const isSelected = commandIndex === selectedIndex;
+          html += `
+            <div class="command-item ${isSelected ? 'selected' : ''}" 
+                 onmouseover="selectedIndex = ${commandIndex}; renderCommands()"
+                 onclick="executeCommand('${cmd.id}')">
+              <div class="command-item-left">
+                <div class="command-title">${cmd.title}</div>
+                ${cmd.description ? `<div class="command-description">${cmd.description}</div>` : ''}
+              </div>
+              ${cmd.shortcut ? `<div class="command-shortcut">${cmd.shortcut}</div>` : ''}
+            </div>
+          `;
+          commandIndex++;
+        });
+
+        html += `</div>`;
+      });
+
+      if (Object.keys(grouped).length > 0) {
+        updateTestStatus('Categorías diferenciadas', 'pass');
+      }
+
+      resultsDiv.innerHTML = html;
+    }
+
+    function executeCommand(cmdId) {
+      const cmd = COMMANDS.find(c => c.id === cmdId);
+      if (!cmd) return;
+
+      if (!currentRole || !cmd.requiredRoles.includes(currentRole)) {
+        updateTestStatus('Mensaje "Acceso Denegado"', 'pass');
+        addResult(`❌ Access Denied: ${cmd.title} not available for ${currentRole}`);
+        return;
+      }
+
+      addResult(`✅ Executed: ${cmd.title}`);
+      closePalette();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      const overlay = document.getElementById('modalOverlay');
+      if (!overlay.classList.contains('active')) return;
+
+      const allCommands = document.querySelectorAll('.command-item').length;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          selectedIndex = (selectedIndex + 1) % (allCommands || 1);
+          updateTestStatus('Navegación con arrow keys', 'pass');
+          renderCommands();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          selectedIndex = (selectedIndex - 1 + (allCommands || 1)) % (allCommands || 1);
+          updateTestStatus('Navegación con arrow keys', 'pass');
+          renderCommands();
+          break;
+        case 'Enter':
+          e.preventDefault();
+          const selected = document.querySelector('.command-item.selected');
+          if (selected) {
+            updateTestStatus('Ejecutar con Enter', 'pass');
+            selected.click();
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          updateTestStatus('Cerrar con Escape', 'pass');
+          closePalette();
+          break;
+      }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', renderCommands);
+
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        closePalette();
+      }
+    });
+
+    function testFuzzySearch() {
+      addResult('🧪 Testing fuzzy search...');
+      const searches = ['audit', 'dash', 'export', 'admin'];
+      searches.forEach(query => {
+        const results = fuzzySearch(query, COMMANDS);
+        addResult(`  Search "${query}": ${results.length} results found`);
+      });
+    }
+
+    function testRoleFiltering() {
+      addResult('🧪 Testing role filtering...');
+      const roles = ['employee', 'auditor', 'manager', 'admin'];
+      roles.forEach(role => {
+        const filtered = filterByRole(COMMANDS, role);
+        addResult(`  ${role}: ${filtered.length} commands available`);
+        currentRole = role;
+      });
+      currentRole = 'manager';
+      updateTestStatus('Acciones filtradas por rol', 'pass');
+    }
+
+    function updateTestStatus(testName, status) {
+      const statusElements = document.querySelectorAll('.status');
+      const testItems = document.querySelectorAll('.test-list li');
+      testItems.forEach((item, idx) => {
+        if (item.textContent.includes(testName)) {
+          const statusEl = item.querySelector('.status');
+          statusEl.className = `status ${status}`;
+        }
+      });
+    }
+
+    function addResult(message) {
+      const output = document.getElementById('testOutput');
+      const container = document.getElementById('resultsContainer');
+      container.style.display = 'block';
+
+      const result = document.createElement('div');
+      result.className = 'test-result';
+      result.textContent = message;
+      output.appendChild(result);
+
+      // Auto-scroll to bottom
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearResults() {
+      document.getElementById('testOutput').innerHTML = '';
+      document.getElementById('resultsContainer').style.display = 'none';
+    }
+
+    function changeRole(role) {
+      currentRole = role;
+      addResult(`🔄 Cambiado a rol: ${role}`);
+      const filtered = filterByRole(COMMANDS, role);
+      addResult(`   ${role} puede ver ${filtered.length} comandos`);
+      if (document.getElementById('modalOverlay').classList.contains('active')) {
+        renderCommands();
+      }
+    }
+  </script>
+</body>
+</html>

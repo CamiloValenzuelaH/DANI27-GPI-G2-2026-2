@@ -1,10 +1,12 @@
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { I18nProvider } from '../i18n';
 import SidebarPro, { SidebarSkeleton } from './SidebarPro';
 import NavbarPro, { NavbarSkeleton } from './NavbarPro';
+import OnboardingTour from './OnboardingTour';
 import ChatWidget from './ChatWidget';
+import { CommandPalette } from './CommandPalette';
 import { DateFormat, Language, Profile } from '../types';
 import { translations } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -124,8 +126,20 @@ export default function AppShell({ children }: AppShellProps) {
   const [autoRunAnalysis, setAutoRunAnalysis] = useState(initialPreferences.autoRunAnalysis);
   const [scheduleFrequency, setScheduleFrequency] = useState(initialPreferences.scheduleFrequency);
   const [showProfileOverlay, setShowProfileOverlay] = useState(false);
+  const [showOnboardingTour, setShowOnboardingTour] = useState(false);
 
   const t = translations[language];
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (window.localStorage.getItem('dani_show_onboarding') === '1') {
+      setShowOnboardingTour(true);
+      window.localStorage.removeItem('dani_show_onboarding');
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -159,6 +173,8 @@ export default function AppShell({ children }: AppShellProps) {
       document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
     }
   }, [darkMode, language]);
+
+  const navigate = useNavigate()
 
   const preferencesValue = useMemo(
     () => ({
@@ -194,6 +210,13 @@ export default function AppShell({ children }: AppShellProps) {
     [darkMode, language, profile, dateFormat, timezone, notifications, autoSave, compactView, sidebarLabels, capaReminders, regulatoryUpdates, auditDeadlines, autoRunAnalysis, scheduleFrequency]
   );
 
+  const handleNavbarSearch = (query: string) => {
+    if (!query.trim()) {
+      return
+    }
+    navigate(`/dashboard?q=${encodeURIComponent(query.trim())}`)
+  }
+
   if (isLoading) {
     return (
       <div className={`flex h-screen ${darkMode ? 'bg-[#0A0D16]' : 'bg-[#F8F9FC]'}`}>
@@ -227,6 +250,8 @@ export default function AppShell({ children }: AppShellProps) {
               <NavbarPro
                 darkMode={darkMode}
                 onProfileClick={() => setShowProfileOverlay(true)}
+                onTutorialClick={() => setShowOnboardingTour(true)}
+                onSearch={handleNavbarSearch}
               />
 
               <main className={`flex-1 overflow-auto ${compactView ? 'p-4' : ''}`}>
@@ -235,6 +260,8 @@ export default function AppShell({ children }: AppShellProps) {
             </div>
 
             <ChatWidget darkMode={darkMode} t={t} />
+            <CommandPalette language={language} />
+            <OnboardingTour open={showOnboardingTour} setOpen={setShowOnboardingTour} />
 
             {showProfileOverlay && (
               <ProfileOverlay
@@ -292,47 +319,50 @@ function ProfileOverlay({ currentProfile, onSelect, onClose, darkMode }: Profile
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-50" onClick={onClose} />
-      <div
-        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] rounded-xl shadow-2xl z-50 ${
-          darkMode ? 'bg-[#1A1D28]' : 'bg-white'
-        }`}
-      >
-        <div className="p-6 border-b border-white/10">
-          <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Select Organization Profile
-          </h2>
-          <p className={`text-sm mt-1 ${darkMode ? 'text-white/60' : 'text-gray-600'}`}>
-            Choose the profile that best matches your compliance maturity
-          </p>
-        </div>
-        <div className="p-6 space-y-3">
-          {profiles.map((prof) => (
-            <button
-              key={prof.id}
-              onClick={() => onSelect(prof.id)}
-              className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                currentProfile === prof.id
-                  ? 'border-[#4F6EF7] bg-[#4F6EF7]/10'
-                  : darkMode
-                  ? 'border-[#2A2E3D] hover:border-[#4F6EF7]/50'
-                  : 'border-gray-200 hover:border-[#4F6EF7]/50'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-3 h-3 rounded-full ${prof.color}`} />
-                <div className="flex-1">
-                  <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {prof.label}
-                  </div>
-                  <div className={`text-xs ${darkMode ? 'text-white/60' : 'text-gray-600'}`}>
-                    {prof.description}
+      <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
+        <div
+          className={`w-full max-w-[480px] max-h-[calc(100vh-3.5rem)] overflow-y-auto rounded-t-3xl shadow-2xl sm:rounded-xl ${
+            darkMode ? 'bg-[#1A1D28]' : 'bg-white'
+          }`}
+        >
+          <div className="p-6 border-b border-white/10">
+            <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Select Organization Profile
+            </h2>
+            <p className={`text-sm mt-1 ${darkMode ? 'text-white/60' : 'text-gray-600'}`}>
+              Choose the profile that best matches your compliance maturity
+            </p>
+          </div>
+
+          <div className="p-6 space-y-3">
+            {profiles.map((prof) => (
+              <button
+                key={prof.id}
+                onClick={() => onSelect(prof.id)}
+                className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                  currentProfile === prof.id
+                    ? 'border-[#4F6EF7] bg-[#4F6EF7]/10'
+                    : darkMode
+                    ? 'border-[#2A2E3D] hover:border-[#4F6EF7]/50'
+                    : 'border-gray-200 hover:border-[#4F6EF7]/50'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-3 h-3 rounded-full ${prof.color}`} />
+                  <div className="flex-1">
+                    <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {prof.label}
+                    </div>
+                    <div className={`text-xs ${darkMode ? 'text-white/60' : 'text-gray-600'}`}>
+                      {prof.description}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </>
-  );
+  )
 }

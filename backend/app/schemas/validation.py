@@ -18,6 +18,22 @@ class ValidationJobResponse(BaseModel):
     stream_url: str
 
 
+class ValidationJobListItem(BaseModel):
+    job_id: str
+    status: JobState
+    progress: int = Field(ge=0, le=100)
+    message: str | None = None
+    organization_id: UUID | None = None
+    user_id: UUID | None = None
+    file_name: str | None = None
+    file_path: str | None = None
+    total_chunks: int = 0
+    overall_score: int | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    created_date: str | None = None
+
+
 class ValidationObservation(BaseModel):
     severity: SeverityLevel
     text: str
@@ -50,6 +66,7 @@ class ValidationReportResponse(BaseModel):
     error: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
+    created_date: str | None = None
 
 
 class ValidationSSEEnvelope(BaseModel):

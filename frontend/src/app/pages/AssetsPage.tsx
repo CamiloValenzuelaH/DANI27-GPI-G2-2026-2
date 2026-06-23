@@ -304,27 +304,28 @@ export default function AssetsPage() {
             className="fixed inset-0 bg-black/70 z-50 backdrop-blur-sm"
             onClick={() => setShowForm(false)}
           />
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[540px] max-h-[90vh] overflow-y-auto bg-[#13151F] border border-[#2A2E3D] rounded-2xl shadow-2xl z-50">
+          <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4">
+            <div className="w-full max-w-[540px] max-h-[calc(100vh-4rem)] overflow-y-auto bg-[#13151F] border border-[#2A2E3D] rounded-t-3xl shadow-2xl sm:rounded-2xl sm:mt-0">
 
-            {/* Modal header */}
-            <div className="px-6 py-4 border-b border-[#2A2E3D] flex items-center justify-between">
-              <div>
-                <h2 className="text-base font-semibold text-white">
-                  {editingAsset ? 'Edit asset' : 'New asset'}
-                </h2>
-                <p className="text-xs text-white/40 mt-0.5">
-                  {editingAsset ? 'Update classification and metadata' : 'Register a new information asset'}
-                </p>
+              {/* Modal header */}
+              <div className="px-6 py-4 border-b border-[#2A2E3D] flex items-center justify-between sticky top-0 bg-[#13151F]">
+                <div>
+                  <h2 className="text-base font-semibold text-white">
+                    {editingAsset ? 'Edit asset' : 'New asset'}
+                  </h2>
+                  <p className="text-xs text-white/40 mt-0.5">
+                    {editingAsset ? 'Update classification and metadata' : 'Register a new information asset'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="text-white/30 hover:text-white transition-colors text-lg leading-none"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                onClick={() => setShowForm(false)}
-                className="text-white/30 hover:text-white transition-colors text-lg leading-none"
-              >
-                ✕
-              </button>
-            </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
+              <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-5 space-y-5">
 
               {/* Name */}
               <div className="space-y-1.5">
@@ -450,6 +451,7 @@ export default function AssetsPage() {
               </div>
             </form>
           </div>
+        </div>
         </>
       )}
     </div>

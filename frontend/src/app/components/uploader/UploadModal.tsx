@@ -34,10 +34,21 @@ const ACCEPTED_LABEL = "PDF, DOCX, XLSX, PNG, JPG";
 
 const API_ROOT = import.meta.env.VITE_API_URL ?? "/api/v1";
 const API_BASE = API_ROOT.replace(/\/api\/v1\/?$/, "");
-const EVIDENCE_UPLOAD_URL = `${API_BASE}/api/v1/evidences`;
-const VALIDATION_EXTERNAL_URL = `${API_BASE}/api/v1/validate/external`;
+const EVIDENCE_UPLOAD_URL = `${API_BASE}/api/evidences`;
+const VALIDATION_EXTERNAL_URL = `${API_BASE}/api/validate/external`;
 
+const EVIDENCE_TYPES = ["POLICY", "PROCEDURE", "INSTRUCTION", "CONTROL", "RECORD"] as const;
+
+type EvidenceType = (typeof EVIDENCE_TYPES)[number];
 type UploadStatus = "queued" | "uploading" | "classifying" | "completed" | "failed";
+
+const normalizeEvidenceType = (value: string | undefined): string | undefined => {
+  const resolved = value?.trim().toUpperCase();
+  if (!resolved) {
+    return undefined;
+  }
+  return EVIDENCE_TYPES.includes(resolved as EvidenceType) ? resolved : undefined;
+};
 
 export interface EvidenceMetadata {
   name: string;
@@ -233,32 +244,7 @@ const deriveClauseFromControl = (controlId: string): string => {
   return match?.[0] ?? "";
 };
 
-const enqueueExternalValidationJob = async (file: File): Promise<unknown> => {
-  const token = storage.getToken();
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await fetch(VALIDATION_EXTERNAL_URL, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(await response.text());
-  }
-
-  const text = await response.text();
-  if (!text.trim()) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
-};
+// enqueueExternalValidationJob moved into UploadModal component
 
 const requestWithAuth = async (url: string, init: RequestInit): Promise<Response> => {
   const token = storage.getToken();
@@ -286,8 +272,15 @@ const uploadFile = (
 
     formData.append("file", item.file);
     formData.append("name", metadata.name || item.file.name);
-    if (metadata.type?.trim()) {
-      formData.append("type", metadata.type.trim().toUpperCase());
+
+    const normalizedType = normalizeEvidenceType(metadata.type);
+    if (metadata.type?.trim() && !normalizedType) {
+      reject(new Error(`Tipo inválido. Use uno de: ${EVIDENCE_TYPES.join(', ')}`));
+      return;
+    }
+
+    if (normalizedType) {
+      formData.append("type", normalizedType);
     }
     if (metadata.control_id?.trim()) {
       formData.append("control_id", metadata.control_id.trim());
@@ -575,12 +568,18 @@ function MetadataForm({ metadata, disabled = false, onChange }: MetadataFormProp
         <label className="space-y-1">
           <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Tipo</span>
           <Input
+            list="evidence-type-options"
             value={metadata.type}
             disabled={disabled}
             onChange={(event) => update({ type: event.target.value })}
             placeholder="POLICY, PROCEDURE, INSTRUCTION, CONTROL, RECORD"
             className="border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500"
           />
+          <datalist id="evidence-type-options">
+            {EVIDENCE_TYPES.map((option) => (
+              <option key={option} value={option} />
+            ))}
+          </datalist>
         </label>
         <label className="space-y-1">
           <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Fecha de validez</span>
@@ -661,6 +660,44 @@ function statusLabel(status: UploadStatus): string {
 
 export function UploadModal({ open, onOpenChange, onComplete, questionId }: UploadModalProps) {
   const [items, setItems] = React.useState<UploadItem[]>([]);
+
+  const enqueueExternalValidationJob = async (file: File): Promise<unknown> => {
+    const token = storage.getToken();
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Collect clause_refs from current items' metadata (allow comma-separated lists)
+    const clauseRefs = Array.from(new Set(
+      items.flatMap((it) => (it.metadata?.clause_ref || "").split(",").map((s) => s.trim()).filter(Boolean))
+    ));
+
+    const url = clauseRefs.length
+      ? `${VALIDATION_EXTERNAL_URL}?${clauseRefs.map((r) => `clause_refs=${encodeURIComponent(r)}`).join("&")}`
+      : VALIDATION_EXTERNAL_URL;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    const text = await response.text();
+    if (!text.trim()) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
+  };
+
+
   const [globalError, setGlobalError] = React.useState<string | null>(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
 
@@ -982,7 +1019,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden border-none bg-slate-950 p-0 text-slate-50 shadow-none !left-0 !top-0 !max-w-none !rounded-none !translate-x-0 !translate-y-0">
+      <DialogContent className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden border-none bg-slate-950 p-0 text-slate-50 shadow-none !left-0 !top-0 !max-w-none !rounded-none !translate-x-0 !translate-y-0 lg:!inset-auto lg:!top-[50%] lg:!left-[50%] lg:!translate-x-[-50%] lg:!translate-y-[-50%] lg:h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-2rem)] lg:w-[min(100vw-2rem,1120px)] lg:max-w-[1120px] lg:rounded-[32px] lg:shadow-2xl">
         <div className="border-b border-white/10 bg-[linear-gradient(135deg,rgba(14,165,233,0.12),rgba(15,23,42,0.4))] px-6 py-5">
           <DialogHeader className="text-left">
             <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-50">Upload Evidence</DialogTitle>
@@ -994,12 +1031,12 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
           <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
             <Badge variant="outline" className="border-white/10 text-slate-200">Máximo {MAX_FILES} archivos</Badge>
             <Badge variant="outline" className="border-white/10 text-slate-200">Formatos {ACCEPTED_LABEL}</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/v1/evidences</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/v1/validate/external</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/evidences</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/validate/external</Badge>
           </div>
         </div>
 
-        <div className="grid min-h-0 min-w-0 flex-1 gap-0 overflow-hidden lg:grid-cols-[360px_1fr]">
+        <div className="grid min-h-0 min-w-0 flex-1 gap-4 overflow-hidden lg:grid-cols-[360px_1fr]">
           <aside className="min-h-0 border-b border-white/10 bg-slate-950/95 p-6 lg:border-b-0 lg:border-r lg:overflow-hidden">
             <div className="flex h-full min-h-0 flex-col gap-4">
               <FileDropZone disabled={isProcessing} fileCount={items.length} onFilesSelected={addFiles} />

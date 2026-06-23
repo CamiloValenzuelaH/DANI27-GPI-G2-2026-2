@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.api.two_factor import router as two_factor_router
+from app.api.v1 import evidences, risks
 from app.api import validate
 from app.api.notifications import router as notifications_router
 from app.core.config import settings
@@ -25,9 +26,11 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
-app.include_router(two_factor_router, prefix="/api/v1")
-app.include_router(notifications_router, prefix="/api/v1")
-app.include_router(validate.router, prefix="/api/v1")
+app.include_router(two_factor_router, prefix="/api")
+app.include_router(notifications_router, prefix="/api")
+app.include_router(risks.router, prefix="/api")
+app.include_router(validate.router, prefix="/api")
+app.include_router(evidences.router, prefix="/api")
 
 # Registrar middleware de auditoría (registra cada petición en tabla separada)
 app.add_middleware(AuditMiddleware)

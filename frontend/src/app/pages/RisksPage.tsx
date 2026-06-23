@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useIntl } from 'react-intl'
 import { assetsApi } from '../../api/assets'
 import { parseFastApiError } from '../../api/errors'
 import { risksApi, LinkRiskThreatRequest } from '../../api/risks'
@@ -12,6 +13,12 @@ const SEVERITY_OPTIONS = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 const LIKELIHOOD_OPTIONS = [1, 2, 3, 4, 5]
 
 export default function RisksPage() {
+  const intl = useIntl()
+  
+  // Helper function to get translation value
+  const getT = (key: string, fallback: string): string => {
+    return intl.formatMessage({ id: key, defaultMessage: fallback })
+  }
   const [threats, setThreats] = useState<Threat[]>([])
   const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([])
   const [risks, setRisks] = useState<Risk[]>([])
@@ -73,7 +80,7 @@ export default function RisksPage() {
     try {
       await threatsApi.create(data)
       resetThreat({ category: 'TECHNICAL', likelihood: 1, impact: 1 })
-      setSuccessMessage('Amenaza creada correctamente')
+      setSuccessMessage(getT('risks.threatCreatedSuccess', 'Threat created successfully'))
       await loadData()
     } catch (err) {
       setFormError(parseFastApiError(err))
@@ -90,7 +97,7 @@ export default function RisksPage() {
     try {
       await vulnerabilitiesApi.create(data)
       resetVulnerability({ severity: 'LOW' })
-      setSuccessMessage('Vulnerabilidad creada correctamente')
+      setSuccessMessage(getT('risks.vulnerabilityCreatedSuccess', 'Vulnerability created successfully'))
       await loadData()
     } catch (err) {
       setFormError(parseFastApiError(err))
@@ -101,7 +108,7 @@ export default function RisksPage() {
 
   const onLinkThreat = async () => {
     if (!selectedRiskId || !selectedThreatId) {
-      setFormError('Seleccione un riesgo y una amenaza para vincular')
+      setFormError(getT('risks.linkSelectionRequired', 'Please select a risk and a threat to link'))
       return
     }
     setFormError(null)
@@ -110,7 +117,7 @@ export default function RisksPage() {
 
     try {
       await risksApi.linkThreat(selectedRiskId, { threat_id: selectedThreatId })
-      setSuccessMessage('Amenaza vinculada al riesgo satisfactoriamente')
+      setSuccessMessage(getT('risks.threatLinkedSuccess', 'Threat linked to risk successfully'))
       setSelectedRiskId('')
       setSelectedThreatId('')
       await loadData()
@@ -125,8 +132,8 @@ export default function RisksPage() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white">Gestión de riesgos</h1>
-          <p className="text-sm text-white/40 mt-0.5">Cree amenazas, vulnerabilidades y vincule amenazas a riesgos existentes.</p>
+          <h1 className="text-xl font-semibold text-white">{getT('risks.title', 'Risk Management')}</h1>
+          <p className="text-sm text-white/40 mt-0.5">{getT('risks.subtitle', 'Create threats, vulnerabilities, and link threats to existing risks.')}</p>
         </div>
       </div>
 
@@ -147,43 +154,43 @@ export default function RisksPage() {
           <section className="rounded-3xl border border-[#2A2E3D] bg-[#111318] p-6">
             <div className="flex items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-lg font-semibold text-white">Crear amenaza</h2>
-                <p className="text-sm text-white/40">Identifique amenazas vinculadas al programa de riesgos.</p>
+                <h2 className="text-lg font-semibold text-white">{getT('risks.createThreatTitle', 'Create Threat')}</h2>
+                <p className="text-sm text-white/40">{getT('risks.createThreatDescription', 'Identify threats linked to your risk program.')}</p>
               </div>
             </div>
 
             <form onSubmit={handleSubmitThreat(onCreateThreat)} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50">Nombre *</label>
+                <label className="text-xs font-medium text-white/50">{getT('risks.threatNameLabel', 'Name')} *</label>
                 <input
                   className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-[#4F6EF7] transition-colors"
-                  placeholder="e.g. Phishing interno"
-                  {...registerThreat('name', { required: 'Este campo es obligatorio' })}
+                  placeholder={getT('risks.threatNamePlaceholder', 'e.g. Internal phishing')}
+                  {...registerThreat('name', { required: getT('risks.fieldRequired', 'This field is required') })}
                 />
                 {threatErrors.name && <p className="text-xs text-[#E5484D]">{threatErrors.name.message}</p>}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50">Descripción</label>
+                <label className="text-xs font-medium text-white/50">{getT('risks.threatDescriptionLabel', 'Description')}</label>
                 <textarea
                   rows={3}
                   className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-[#4F6EF7] transition-colors resize-none"
-                  placeholder="Información adicional sobre la amenaza"
+                  placeholder={getT('risks.threatDescriptionPlaceholder', 'Additional information about the threat')}
                   {...registerThreat('description')}
                 />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-white/50">Categoría *</label>
+                  <label className="text-xs font-medium text-white/50">{getT('risks.threatCategoryLabel', 'Category')} *</label>
                   <select
                     className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
-                    {...registerThreat('category', { required: 'Este campo es obligatorio' })}
+                    {...registerThreat('category', { required: getT('risks.fieldRequired', 'This field is required') })}
                   >
-                    <option value="">Seleccione categoría</option>
+                    <option value="">{getT('risks.selectCategory', 'Select category')}</option>
                     {THREAT_CATEGORIES.map((category) => (
                       <option key={category} value={category} className="bg-[#1A1D28]">
-                        {category}
+                        {getT(`risks.category.${category.toLowerCase()}`, category)}
                       </option>
                     ))}
                   </select>
@@ -191,7 +198,7 @@ export default function RisksPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-white/50">Probabilidad *</label>
+                  <label className="text-xs font-medium text-white/50">{getT('risks.threatLikelihoodLabel', 'Likelihood')} *</label>
                   <select
                     className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
                     {...registerThreat('likelihood', { valueAsNumber: true })}
@@ -205,7 +212,7 @@ export default function RisksPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-white/50">Impacto *</label>
+                  <label className="text-xs font-medium text-white/50">{getT('risks.threatImpactLabel', 'Impact')} *</label>
                   <select
                     className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
                     {...registerThreat('impact', { valueAsNumber: true })}
@@ -224,46 +231,46 @@ export default function RisksPage() {
                 disabled={submittingThreat}
                 className="inline-flex items-center justify-center rounded-lg bg-[#4F6EF7] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4060E0] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submittingThreat ? 'Guardando...' : 'Crear amenaza'}
+                {submittingThreat ? getT('risks.saving', 'Saving...') : getT('risks.createThreatButton', 'Create Threat')}
               </button>
             </form>
           </section>
 
           <section className="rounded-3xl border border-[#2A2E3D] bg-[#111318] p-6">
             <div className="mb-6">
-              <h2 className="text-lg font-semibold text-white">Crear vulnerabilidad</h2>
-              <p className="text-sm text-white/40">Registre vulnerabilidades asociadas a activos críticos.</p>
+              <h2 className="text-lg font-semibold text-white">{getT('risks.createVulnerabilityTitle', 'Create Vulnerability')}</h2>
+              <p className="text-sm text-white/40">{getT('risks.createVulnerabilityDescription', 'Register vulnerabilities related to critical assets.')}</p>
             </div>
 
             <form onSubmit={handleSubmitVulnerability(onCreateVulnerability)} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50">Nombre *</label>
+                <label className="text-xs font-medium text-white/50">{getT('risks.vulnerabilityNameLabel', 'Name')} *</label>
                 <input
                   className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-[#4F6EF7] transition-colors"
-                  placeholder="e.g. Versión desactualizada"
-                  {...registerVulnerability('name', { required: 'Este campo es obligatorio' })}
+                  placeholder={getT('risks.vulnerabilityNamePlaceholder', 'e.g. Outdated version')}
+                  {...registerVulnerability('name', { required: getT('risks.fieldRequired', 'This field is required') })}
                 />
                 {vulnerabilityErrors.name && <p className="text-xs text-[#E5484D]">{vulnerabilityErrors.name.message}</p>}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50">Descripción</label>
+                <label className="text-xs font-medium text-white/50">{getT('risks.vulnerabilityDescriptionLabel', 'Description')}</label>
                 <textarea
                   rows={3}
                   className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-[#4F6EF7] transition-colors resize-none"
-                  placeholder="Detalles de la vulnerabilidad"
+                  placeholder={getT('risks.vulnerabilityDescriptionPlaceholder', 'Details of the vulnerability')}
                   {...registerVulnerability('description')}
                 />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-white/50">Activo afectado *</label>
+                  <label className="text-xs font-medium text-white/50">{getT('risks.vulnerabilityAssetLabel', 'Affected Asset')} *</label>
                   <select
                     className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
-                    {...registerVulnerability('asset_id', { required: 'Este campo es obligatorio' })}
+                    {...registerVulnerability('asset_id', { required: getT('risks.fieldRequired', 'This field is required') })}
                   >
-                    <option value="">Seleccione activo</option>
+                    <option value="">{getT('risks.selectAsset', 'Select asset')}</option>
                     {assets.map((asset) => (
                       <option key={asset.id} value={asset.id} className="bg-[#1A1D28]">
                         {asset.name}
@@ -274,15 +281,15 @@ export default function RisksPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-white/50">Severidad *</label>
+                  <label className="text-xs font-medium text-white/50">{getT('risks.vulnerabilitySeverityLabel', 'Severity')} *</label>
                   <select
                     className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
-                    {...registerVulnerability('severity', { required: 'Este campo es obligatorio' })}
+                    {...registerVulnerability('severity', { required: getT('risks.fieldRequired', 'This field is required') })}
                   >
-                    <option value="">Seleccione severidad</option>
+                    <option value="">{getT('risks.selectSeverity', 'Select severity')}</option>
                     {SEVERITY_OPTIONS.map((severity) => (
                       <option key={severity} value={severity} className="bg-[#1A1D28]">
-                        {severity}
+                        {getT(`risks.severity.${severity.toLowerCase()}`, severity)}
                       </option>
                     ))}
                   </select>
@@ -295,7 +302,7 @@ export default function RisksPage() {
                 disabled={submittingVulnerability}
                 className="inline-flex items-center justify-center rounded-lg bg-[#4F6EF7] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4060E0] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submittingVulnerability ? 'Guardando...' : 'Crear vulnerabilidad'}
+                {submittingVulnerability ? getT('risks.saving', 'Saving...') : getT('risks.createVulnerabilityButton', 'Create Vulnerability')}
               </button>
             </form>
           </section>
@@ -304,19 +311,19 @@ export default function RisksPage() {
         <aside className="space-y-6">
           <section className="rounded-3xl border border-[#2A2E3D] bg-[#111318] p-6">
             <div className="mb-6">
-              <h2 className="text-lg font-semibold text-white">Vincular amenaza a riesgo</h2>
-              <p className="text-sm text-white/40">Seleccione un riesgo y una amenaza existente.</p>
+              <h2 className="text-lg font-semibold text-white">{getT('risks.linkThreatTitle', 'Link Threat to Risk')}</h2>
+              <p className="text-sm text-white/40">{getT('risks.linkThreatDescription', 'Select a risk and an existing threat.')}</p>
             </div>
 
             <div className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50">Riesgo *</label>
+                <label className="text-xs font-medium text-white/50">{getT('risks.selectRiskLabel', 'Risk')} *</label>
                 <select
                   className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
                   value={selectedRiskId}
                   onChange={(event) => setSelectedRiskId(event.target.value)}
                 >
-                  <option value="">Seleccione riesgo</option>
+                  <option value="">{getT('risks.selectRiskPlaceholder', 'Select risk')}</option>
                   {risks.map((risk) => (
                     <option key={risk.id} value={risk.id} className="bg-[#1A1D28]">
                       {risk.name}
@@ -326,13 +333,13 @@ export default function RisksPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-white/50">Amenaza *</label>
+                <label className="text-xs font-medium text-white/50">{getT('risks.selectThreatLabel', 'Threat')} *</label>
                 <select
                   className="w-full bg-[#0A0D16] border border-[#2A2E3D] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#4F6EF7] transition-colors"
                   value={selectedThreatId}
                   onChange={(event) => setSelectedThreatId(event.target.value)}
                 >
-                  <option value="">Seleccione amenaza</option>
+                  <option value="">{getT('risks.selectThreatPlaceholder', 'Select threat')}</option>
                   {threats.map((threat) => (
                     <option key={threat.id} value={threat.id} className="bg-[#1A1D28]">
                       {threat.name}
@@ -347,17 +354,17 @@ export default function RisksPage() {
                 disabled={linkingThreat}
                 className="inline-flex items-center justify-center rounded-lg bg-[#4F6EF7] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4060E0] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {linkingThreat ? 'Vinculando...' : 'Vincular amenaza'}
+                {linkingThreat ? getT('risks.linking', 'Linking...') : getT('risks.linkThreatButton', 'Link Threat')}
               </button>
             </div>
           </section>
 
           <section className="rounded-3xl border border-[#2A2E3D] bg-[#111318] p-6">
-            <h3 className="text-base font-semibold text-white mb-4">Amenazas recientes</h3>
+            <h3 className="text-base font-semibold text-white mb-4">{getT('risks.recentThreatsTitle', 'Recent Threats')}</h3>
             {isLoading ? (
-              <div className="text-sm text-white/40">Cargando amenazas...</div>
+              <div className="text-sm text-white/40">{getT('risks.loadingThreats', 'Loading threats...')}</div>
             ) : threats.length === 0 ? (
-              <div className="text-sm text-white/40">No hay amenazas registradas.</div>
+              <div className="text-sm text-white/40">{getT('risks.noThreats', 'No threats registered.')}</div>
             ) : (
               <ul className="space-y-3">
                 {threats.slice(0, 4).map((threat) => (
@@ -378,11 +385,11 @@ export default function RisksPage() {
           </section>
 
           <section className="rounded-3xl border border-[#2A2E3D] bg-[#111318] p-6">
-            <h3 className="text-base font-semibold text-white mb-4">Vulnerabilidades recientes</h3>
+            <h3 className="text-base font-semibold text-white mb-4">{getT('risks.recentVulnerabilitiesTitle', 'Recent Vulnerabilities')}</h3>
             {isLoading ? (
-              <div className="text-sm text-white/40">Cargando vulnerabilidades...</div>
+              <div className="text-sm text-white/40">{getT('risks.loadingVulnerabilities', 'Loading vulnerabilities...')}</div>
             ) : vulnerabilities.length === 0 ? (
-              <div className="text-sm text-white/40">No hay vulnerabilidades registradas.</div>
+              <div className="text-sm text-white/40">{getT('risks.noVulnerabilities', 'No vulnerabilities registered.')}</div>
             ) : (
               <ul className="space-y-3">
                 {vulnerabilities.slice(0, 4).map((vuln) => (

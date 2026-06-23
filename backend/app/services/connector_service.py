@@ -490,7 +490,8 @@ def sync_aws(org_id: UUID, db: Session) -> dict:
             for user in page["Users"]:
                 iam_users.append({
                     "username": user["UserName"],
-                    "created_at": user["CreateDate"].isoformat(),
+                            "created_at": user["CreateDate"].isoformat(),
+                            "created_date": user["CreateDate"].date().isoformat(),
                     "has_mfa": _aws_user_has_mfa(iam, user["UserName"]),
                 })
         collected["iam_users"] = iam_users
@@ -502,6 +503,7 @@ def sync_aws(org_id: UUID, db: Session) -> dict:
             {
                 "name": b["Name"],
                 "created_at": b["CreationDate"].isoformat(),
+                "created_date": b["CreationDate"].date().isoformat(),
             }
             for b in buckets
         ]

@@ -2,6 +2,8 @@ import React, { useCallback, useRef, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import UploadModal from '../uploader/UploadModal';
 import type { UploadItem } from '../uploader/UploadModal';
+import { usePreferences } from '../AppShell';
+import { formatDateTime } from '../../lib/date';
 
 const DEFAULT_VISIBLE_ATTACHMENTS = 5;
 
@@ -42,6 +44,7 @@ export default function EvidenceAttachment({
   onUploadComplete?: (items: AssessmentAttachment[]) => void;
   onRemove: (id: string) => void;
 }) {
+  const { dateFormat, language } = usePreferences();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [showUploader, setShowUploader] = useState(false);
   const [showAllAttachments, setShowAllAttachments] = useState(false);
@@ -219,7 +222,7 @@ export default function EvidenceAttachment({
             {history.slice(0, 5).map((item) => (
               <li key={`${item.id}-${item.uploadedAt}`} className="rounded bg-gray-800 p-2 text-xs text-gray-200">
                 <div className="font-medium text-gray-100">{item.name}</div>
-                <div className="text-gray-400">{(item.size / 1024).toFixed(1)} KB · {new Date(item.uploadedAt).toLocaleTimeString()}</div>
+                <div className="text-gray-400">{(item.size / 1024).toFixed(1)} KB · {formatDateTime(item.uploadedAt, dateFormat, language)}</div>
                 {item.controlId && (
                   <div className="text-cyan-300">
                     {item.controlId}

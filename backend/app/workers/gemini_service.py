@@ -400,7 +400,7 @@ def _derive_document_status(score: int, relevance_score: float, observations: li
     has_critical = any(obs.get("severity") == "critical" for obs in observations)
     has_major = any(obs.get("severity") == "major" for obs in observations)
 
-    if score < 40 or relevance_score < 70:
+    if score < 20 or relevance_score < 50:
         return "INEXISTENTE"
     if score >= 85 and not has_critical:
         return "COMPLETO"

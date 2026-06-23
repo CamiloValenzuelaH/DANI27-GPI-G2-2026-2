@@ -25,12 +25,13 @@ const client: AxiosInstance = axios.create({
 // Adjunta el access token en cada request y maneja FormData correctamente
 client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = storage.getToken()
-  if (token && config.headers) {
+  config.headers = config.headers ?? {}
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
   
   // Si es FormData, no establecer Content-Type (dejar que el navegador lo haga)
-  if (!(config.data instanceof FormData)) {
+  if (config.data && !(config.data instanceof FormData)) {
     config.headers['Content-Type'] = 'application/json'
   }
   
