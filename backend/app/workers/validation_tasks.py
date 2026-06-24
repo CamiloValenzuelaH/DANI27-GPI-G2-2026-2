@@ -384,10 +384,11 @@ async def _validate_external_audit_async(
             "clause_ref": chunk["clause_ref"],
             "title": chunk["title"],
             "relevance_score": chunk["relevance_score"],
-            "compliance_score": safe_score, # <--- AHORA SÍ ES UN NÚMERO
-            "document_status": analysis.get("document_status", "INCOMPLETO"),
-            "observations": analysis["observations"],
-            "suggestions": analysis["suggestions"],
+            "compliance_score": safe_score,
+            "document_status": analysis.get("document_status") or "INCOMPLETO",
+            "missing_elements": analysis.get("missing_elements") or [],
+            "observations": analysis.get("observations") or [],
+            "suggestions": analysis.get("suggestions") or [],
         })
 
     # Paso 5: Calcular score general
