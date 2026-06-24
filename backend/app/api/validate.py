@@ -31,10 +31,11 @@ from app.workers.gemini_service import (
 )
 from app.workers.validation_tasks import validate_external_audit
 
-router = APIRouter(prefix="/validate", tags=["validation"])
+# Definimos el router sin prefijo aquí. El prefijo se gestionará en main.py
+router = APIRouter()
+
 JOB_KEY_PREFIX = "validation:job:"
 JOB_TTL_SECONDS = 60 * 60 * 24 * 7
-
 
 async def _save_upload(file: UploadFile, job_id: str) -> Path:
     target_dir = Path(settings.validation_jobs_dir)
