@@ -46,6 +46,21 @@ PY
   sleep "$DB_RETRY_SECONDS"
 done
 
+# ---> INICIO FIX POSTGRESQL ENUM <---
+echo "[entrypoint] Limpiando tipos ENUM huerfanos en PostgreSQL..."
+python - <<'PY'
+import os
+from sqlalchemy import create_engine, text
+try:
+    engine = create_engine(os.getenv("DATABASE_URL"))
+    with engine.begin() as conn:
+        conn.execute(text("DROP TYPE IF EXISTS notification_type CASCADE;"))
+        print("[entrypoint] Tipos limpiados correctamente.")
+except Exception as e:
+    print(f"[entrypoint] Error ignorado durante limpieza: {e}")
+PY
+# ---> FIN FIX <---
+
 echo "[entrypoint] Aplicando migraciones Alembic..."
 attempt=1
 while [ "$attempt" -le "$MIGRATION_MAX_RETRIES" ]; do
@@ -112,7 +127,7 @@ else
 fi
 
 if [ "$#" -eq 0 ]; then
-  set -- uvicorn main:app --host 0.0.0.0 --port 8000
+  set -- uvicorn main:app --host 0.0.0.0 --port 10000
 fi
 
 exec "$@"
