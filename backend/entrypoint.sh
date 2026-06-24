@@ -129,6 +129,10 @@ else
 fi
 
 if [ "$#" -eq 0 ]; then
+  echo "[entrypoint] Encendiendo el motor de Celery en segundo plano..."
+  celery -A app.workers.celery_app worker --loglevel=info --concurrency=2 &
+  
+  echo "[entrypoint] Encendiendo la API..."
   set -- uvicorn main:app --host 0.0.0.0 --port 10000
 fi
 
