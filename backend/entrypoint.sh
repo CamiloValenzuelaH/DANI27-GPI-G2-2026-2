@@ -49,7 +49,7 @@ done
 echo "[entrypoint] Aplicando migraciones Alembic..."
 attempt=1
 while [ "$attempt" -le "$MIGRATION_MAX_RETRIES" ]; do
-  if alembic upgrade head; then
+  if alembic upgrade heads; then
     echo "[entrypoint] Migraciones aplicadas correctamente."
     break
   fi
