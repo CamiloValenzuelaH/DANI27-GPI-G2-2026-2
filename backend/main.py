@@ -31,6 +31,7 @@ app.include_router(notifications_router, prefix="/api")
 app.include_router(risks.router, prefix="/api")
 app.include_router(validate.router, prefix="/api")
 app.include_router(evidences.router, prefix="/api")
+app.include_router(validate.router, prefix="/api/v1/validate", tags=["validate"])
 
 # Registrar middleware de auditoría (registra cada petición en tabla separada)
 app.add_middleware(AuditMiddleware)
