@@ -47,7 +47,7 @@ PY
 done
 
 # ---> INICIO FIX POSTGRESQL ENUM <---
-echo "[entrypoint] Limpiando tipos ENUM huerfanos en PostgreSQL..."
+echo "[entrypoint] Limpiando todos los tipos ENUM huerfanos en PostgreSQL..."
 python - <<'PY'
 import os
 from sqlalchemy import create_engine, text
@@ -55,6 +55,8 @@ try:
     engine = create_engine(os.getenv("DATABASE_URL"))
     with engine.begin() as conn:
         conn.execute(text("DROP TYPE IF EXISTS notification_type CASCADE;"))
+        conn.execute(text("DROP TYPE IF EXISTS notification_channel CASCADE;"))
+        conn.execute(text("DROP TYPE IF EXISTS notification_status CASCADE;"))
         print("[entrypoint] Tipos limpiados correctamente.")
 except Exception as e:
     print(f"[entrypoint] Error ignorado durante limpieza: {e}")
