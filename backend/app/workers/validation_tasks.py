@@ -315,6 +315,11 @@ async def _validate_external_audit_async(
         chunks = selected_chunks[:5]
     else:
         chunks = await get_top_iso_chunks(embedding, 5)
+        
+    # Si la base de datos está vacía, usamos los de respaldo
+    if not chunks:
+        chunks = _fallback_iso_chunks(5)
+
     findings = []
 
     # Paso 4: Analizar cada chunk
