@@ -84,8 +84,8 @@ done
 # ---> INICIO HACK RENDER: Inyección de datos obligatoria <---
 echo "[entrypoint] Ejecutando seeders base obligatorios..."
 python -m app.db.seed
-python /app/scripts/seed_demo.py
-python /app/scripts/seed_assessment_questions.py
+python scripts/seed_demo.py
+python scripts/seed_assessment_questions.py
 # ---> FIN HACK RENDER <---
 
 if is_true "$AUTO_SEED"; then
@@ -93,7 +93,7 @@ if is_true "$AUTO_SEED"; then
   (
     attempt=1
     while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
-      if python /app/scripts/seed_iso_chunks.py; then
+      if python scripts/seed_iso_chunks.py; then
         echo "[entrypoint] Seed ISO chunks finalizado."
         break
       fi
@@ -109,7 +109,7 @@ if is_true "$AUTO_SEED"; then
 
     attempt=1
     while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
-      if python /app/scripts/seed_iso_threat_catalog.py; then
+      if python scripts/seed_iso_threat_catalog.py; then
         echo "[entrypoint] Seed catálogo de amenazas ISO finalizado."
         exit 0
       fi
@@ -133,4 +133,3 @@ if [ "$#" -eq 0 ]; then
 fi
 
 exec "$@"
-# Forzando actualizacion para Render
