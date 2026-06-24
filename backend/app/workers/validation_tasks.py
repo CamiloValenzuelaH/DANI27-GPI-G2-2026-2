@@ -369,13 +369,18 @@ async def _validate_external_audit_async(
             max_output_tokens=2048,
         )
 
+       # Transformar a entero seguro antes de guardar
+        try:
+            safe_score = int(float(analysis.get("score", 0)))
+        except (ValueError, TypeError):
+            safe_score = 0
+
         findings.append({
             "clause_ref": chunk["clause_ref"],
             "title": chunk["title"],
             "relevance_score": chunk["relevance_score"],
-            "compliance_score": analysis["score"],
+            "compliance_score": safe_score, # <--- AHORA SÍ ES UN NÚMERO
             "document_status": analysis.get("document_status", "INCOMPLETO"),
-            "missing_elements": analysis.get("missing_elements", []),
             "observations": analysis["observations"],
             "suggestions": analysis["suggestions"],
         })
