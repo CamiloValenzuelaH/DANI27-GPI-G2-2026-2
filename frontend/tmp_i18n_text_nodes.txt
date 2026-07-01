@@ -1,0 +1,395 @@
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\assessment\AssessmentPage.tsx:329: <div className="text-gray-400">No hay preguntas en esta fase.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\assessment\EvidenceAttachment.tsx:178: <span className="text-sm text-gray-400">Archivo eliminado</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\assessment\ProgressSidebar.tsx:14: <h4 className="text-sm font-semibold mb-3">Progreso</h4>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\CommandPalette\CommandPalette.tsx:165: <p className="text-sm">No commands found</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\CommandPalette\CommandPalette.tsx:166: <p className="text-xs opacity-60">Try a different search term</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\CommandPalette\CommandPalette.tsx:229: <kbd className="px-1.5 py-0.5 bg-gray-800 rounded">Esc</kbd>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\CommandPalette\commands.ts:13: action: () => void | Promise<void>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\CommandPalette\examples.ts:165: action: () => void | Promise<void>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\common\ActionButton.tsx:9: onClick: () => Promise<void> | void
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorCard.tsx:112: <div className="text-xs uppercase tracking-[0.2em] text-slate-400">Última sincronización</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorCard.tsx:119: <div className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-400">Frecuencia</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorCard.tsx:125: <div className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-400">Descripción del conector</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorList.tsx:41: <h1 className="text-3xl font-semibold text-white">Integraciones</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorList.tsx:51: <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Conectores activos</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorList.tsx:53: <div className="mt-2 text-sm text-slate-400">Listos para sincronizar automáticamente.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorList.tsx:57: <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Total de integraciones</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorList.tsx:59: <div className="mt-2 text-sm text-slate-400">Conectores disponibles en este workspace.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorList.tsx:63: <div className="text-xs uppercase tracking-[0.24em] text-slate-500">Próximos lanzamientos</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorList.tsx:65: <div className="mt-2 text-sm text-slate-400">Integraciones que estarán disponibles próximamente.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorWizard.tsx:18: <p className="text-sm text-muted mt-2">Sigue los pasos para autorizar el acceso.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorWizard.tsx:20: <li>Inicia el flujo de autorización.</li>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorWizard.tsx:21: <li>Confirma permisos en la ventana del proveedor.</li>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorWizard.tsx:22: <li>Volverás automáticamente a la aplicación cuando finalice.</li>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorWizard.tsx:25: <button className="btn btn-ghost" onClick={onClose}>Cerrar</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\ConnectorWizard.tsx:26: <button className="btn btn-primary" onClick={start}>Iniciar autorización</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\OAuthCallback.tsx:49: <h1 className="text-2xl font-semibold text-white">OAuth</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\SyncScheduler.tsx:24: <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Frecuencia de sincronización</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\SyncScheduler.tsx:27: <button className="rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800" onClick={save} disabled={saving}>Guardar</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\SyncScheduler.tsx:37: <span className="text-xs text-slate-500">Horas</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\integrations\SyncScheduler.tsx:39: <p className="mt-3 text-sm text-slate-500">24 horas es la configuración estándar; úsalo para sincronizaciones diarias y evita consultas muy frecuentes si no necesitas datos en tiempo real.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\AuditCycleSection.tsx:118: <p className="text-base font-semibold text-slate-900 dark:text-white">Ciclo de auditoría</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\AuditCycleSection.tsx:128: <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Frecuencia actual</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\AuditCycleSection.tsx:160: <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Próxima auditoría</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\AuditCycleSection.tsx:169: {nextDate ? <DayPicker mode="single" selected={nextDate} /> : <div className="text-sm text-slate-500 dark:text-slate-400">Programa una auditoría para ver la fecha en el calendario.</div>}
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\AuditCycleSection.tsx:183: <p className="font-semibold text-slate-900 dark:text-white">Historial</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\AuditCycleSection.tsx:193: <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">Todavía no se ha registrado ninguna auditoría completada.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\PasswordSection.tsx:53: <p className="text-sm font-semibold text-slate-950 dark:text-white">Password</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\PasswordSection.tsx:60: <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Current password</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\PasswordSection.tsx:73: <label className="text-xs font-medium text-slate-700 dark:text-slate-300">New password</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\PasswordSection.tsx:86: <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Confirm new password</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\ThemeSection.tsx:22: <p className="text-xs text-slate-500 dark:text-slate-400">Toggle your app theme.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\ThemeSection.tsx:37: <p className="text-sm font-medium text-slate-900 dark:text-white">Compact view</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\ThemeSection.tsx:38: <p className="text-xs text-slate-500 dark:text-slate-400">Reduce spacing for a tighter layout.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\ThemeSection.tsx:53: <p className="text-sm font-medium text-slate-900 dark:text-white">Sidebar labels</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\ThemeSection.tsx:54: <p className="text-xs text-slate-500 dark:text-slate-400">Show labels next to sidebar icons.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\TwoFactorSection.tsx:51: <p className="text-sm font-semibold text-slate-950 dark:text-white">Two-factor authentication</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\settings\TwoFactorSection.tsx:81: <p className="text-sm font-medium text-slate-950 dark:text-white">Disable 2FA</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\alert.tsx:26: }: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\breadcrumb.tsx:96: <span className="sr-only">More</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\carousel.tsx:199: <span className="sr-only">Previous slide</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\carousel.tsx:229: <span className="sr-only">Next slide</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\dialog.tsx:70: <span className="sr-only">Close</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\form.tsx:23: TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\form.tsx:34: TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\pagination.tsx:80: <span className="hidden sm:block">Previous</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\pagination.tsx:96: <span className="hidden sm:block">Next</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\pagination.tsx:114: <span className="sr-only">More pages</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\sheet.tsx:77: <span className="sr-only">Close</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\sidebar.tsx:199: <SheetTitle>Sidebar</SheetTitle>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\sidebar.tsx:200: <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ui\sidebar.tsx:277: <span className="sr-only">Toggle Sidebar</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:338: const retryAsync = async <T,>(task: () => Promise<T>, attempts = MAX_RETRIES): Promise<T> => {
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:413: <p className="text-sm font-semibold tracking-wide uppercase text-cyan-200">Carga masiva</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:414: <h3 className="text-lg font-semibold">Arrastra los archivos o selecciónalos manualmente</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:455: <p className="text-sm font-semibold text-slate-100">Archivos seleccionados</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:456: <p className="text-xs text-slate-400">Nombre, tamaño y estado en tiempo real</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:465: <li className="px-4 py-5 text-sm text-slate-400">Todavía no has agregado archivos.</li>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:497: <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">Classification Preview</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:507: <span className="text-slate-400">Sugerencia ISO:</span>{" "}
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:512: <span className="text-slate-400">Detalle:</span> {classification.controlName}
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:517: <span className="text-slate-400">Confianza:</span> {Math.round(classification.confidence * 100)}%
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:536: <p className="text-sm font-semibold text-slate-100">Metadata editable</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:537: <p className="text-xs text-slate-400">Actualiza nombre, control_id, tipo y fecha de validez</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:546: <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Nombre</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:556: <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">control_id</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:566: <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">clause_ref</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:576: <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Tipo</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:592: <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Fecha de validez</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:615: <p className="text-sm font-semibold text-slate-100">Progreso</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1033: <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-50">Upload Evidence</DialogTitle>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1042: <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/v1/evidences</Badge>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1043: <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/validate/external</Badge>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1055: <p className="text-sm font-semibold text-slate-100">Estado general</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1056: <p className="text-xs text-slate-400">Resumen de la cola actual</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1065: <p className="text-xs text-slate-400">Pendientes</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1069: <p className="text-xs text-slate-400">Completados</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1096: <h3 className="mt-4 text-lg font-semibold text-slate-100">No hay archivos aún</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\uploader\UploadModal.tsx:1154: <span>Cada subida crea o actualiza la evidencia documental en la taxonomía ISO.</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:164: <h2 className="text-2xl font-bold text-white">Audit Room</h2>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:165: <p className="text-gray-400 mt-1">Explora carpetas de Anexo A y genera binders desde evidencias seleccionadas.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:180: <div className="text-sm uppercase tracking-[0.18em] text-[#7C3AED] font-semibold mb-3">Carpetas</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:182: <div className="py-10 text-center text-sm text-gray-400">Cargando carpetas...</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:209: <div className="text-sm uppercase tracking-[0.18em] text-[#7C3AED] font-semibold mb-3">Estado binder</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:211: <div>Estado: <span className="font-semibold text-white">{binderStatus ?? 'No iniciado'}</span></div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:230: <div className="text-gray-500">Será generado una vez finalice el proceso.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:243: <div className="text-sm uppercase tracking-[0.18em] text-[#7C3AED] font-semibold">Evidencias</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:244: <div className="text-xs text-gray-400">Selecciona una carpeta para ver los items.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:253: <div className="py-10 text-center text-sm text-gray-400">Cargando evidencias...</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:297: {isGeneratingBinder ? <><Loader2 className="h-4 w-4 animate-spin" /> Generando binder...</> : 'Generar binder'}
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\AuditRoomPanel.tsx:299: <p className="text-xs text-gray-400">Selecciona items para crear un binder PDF desde el Audit Room.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ChatWidget.tsx:379: <div className="font-semibold text-sm">Dani AI</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ChatWidget.tsx:380: <div className="text-[11px] opacity-75">Asistente ISO 27001</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ChatWidget.tsx:397: <span className="text-[11px] uppercase tracking-wide text-slate-500">Modo de chat</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ChatWidget.tsx:403: <option value="iso">ISO</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ChatWidget.tsx:404: <option value="document">Documento</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ChatWidget.tsx:405: <option value="both">Documento + ISO</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DaniLogo.tsx:23: <span className="text-lg font-semibold tracking-tight text-slate-900">DANI</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:60: .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:65: // Wrap consecutive <li> in <ul>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:66: .replace(/(<li>.*<\/li>\n?)+/gs, (match) => `<ul>${match}</ul>`)
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:67: // Wrap consecutive <oli> in <ol>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:69: `<ol>${match.replace(/<oli>/g, '<li>').replace(/<\/oli>/g, '</li>')}</ol>`,
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:403: <kbd className="rounded border border-[#2A2E3D] px-1 py-0.5 font-mono text-xs">Ctrl+B</kbd>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:404: <kbd className="rounded border border-[#2A2E3D] px-1 py-0.5 font-mono text-xs">Ctrl+I</kbd>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:405: <kbd className="rounded border border-[#2A2E3D] px-1 py-0.5 font-mono text-xs">Ctrl+S</kbd>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\DocumentEditor.tsx:444: <span className="text-white/60">ISO 27001 · DANI Platform</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ErrorBoundary.tsx:27: <h1 className="text-2xl font-bold">App error</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ErrorBoundary.tsx:28: <p className="mt-2 text-sm text-white/70">Se ha producido un error en la aplicación. Recarga la página.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\Header.tsx:36: <div className={`font-medium text-sm ${darkMode ? 'text-[#E4E7EE]' : 'text-[#1A1D26]'}`}>Diego Vera</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\NavbarPro.tsx:101: <span className="hidden md:inline text-sm">Ctrl + K / ?K</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\OnboardingTour.tsx:261: ?? <span className="font-semibold">Acción:</span> {currentSection.action}
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:325: <p className="text-xs uppercase tracking-[0.18em] text-[#4F6EF7] font-semibold">Resultados relevantes</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:326: <h2 className="text-lg font-semibold text-[#1A1D26] dark:text-white">Vista rápida de Anexo A</h2>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:371: <span className="flex items-center gap-1 rounded-full bg-[#F8FAFC] px-2 py-1 dark:bg-[#111827]">Preview inline</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:383: <p className="text-xs uppercase tracking-[0.18em] text-[#F97316] font-semibold">Binder</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:384: <h3 className="text-sm font-semibold text-[#0F1729] dark:text-white">Selección múltiple</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:389: >Limpiar</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:434: <div className="text-xs uppercase tracking-[0.18em] text-[#4F6EF7] font-semibold">Detalle del binder</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:441: >Cerrar</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:467: <span className="font-semibold text-[#0F1729] dark:text-white">Estado del binder</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:487: <p className="text-sm text-[#64748B]">Esperando generación del binder...</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SearchBinder.tsx:503: <p className="text-sm text-[#64748B] dark:text-[#94A3B8]">Aquí aparecerán tus últimas 50 acciones.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\Sidebar.tsx:35: <div className="text-[15px] font-semibold -tracking-[0.2px]">Dani Platform</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\Sidebar.tsx:36: <div className="text-[11px] text-white/45 mt-0.5">v4 — Compliance Intelligence</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\Sidebar.tsx:157: <div>Max Kellner</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\Sidebar.tsx:158: <div className="text-[11px] text-white/40">CISO · WellQ</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SidebarPro.tsx:164: <div>Max Kellner</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SidebarPro.tsx:165: <div className="text-[11px] text-white/40">CISO · WellQ</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SidebarPro.tsx:193: <div className="text-[15px] font-semibold tracking-tight text-white">DANI Platform</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SidebarPro.tsx:195: <span className="rounded-full bg-white/10 px-2 py-1">v4</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\SidebarPro.tsx:196: <span>Compliance Intelligence</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:109: <h3 className="text-lg font-semibold text-white">Historial de validaciones</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:126: <option value="7">Últimos 7 días</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:127: <option value="30">Últimos 30 días</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:128: <option value="all">Todos</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:137: <th className="px-4 py-3">Fecha</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:138: <th className="px-4 py-3">Archivo</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:139: <th className="px-4 py-3">Score</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:140: <th className="px-4 py-3">Estado</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:141: <th className="px-4 py-3">Acción</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:169: <td colSpan={5} className="px-4 py-8 text-center text-gray-500">No hay trabajos</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:195: {detailLoading && <div className="text-gray-400">Cargando detalle...</div>}
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:200: <p className="text-gray-400 text-sm mb-1">Archivo</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:206: <p className="text-gray-400 text-sm mb-1">Average compliance</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:212: <p className="text-gray-400 text-sm mb-1">Status</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:220: <p className="text-gray-400 text-sm mb-2">Summary</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:226: <p className="text-gray-400 text-sm mb-3">Findings by ISO chunk</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\components\ValidationHistory.tsx:248: <p className="text-rose-300 text-xs font-medium">Elementos faltantes:</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\contexts\AuthContext.tsx:16: login: (data: LoginRequest) => Promise<AuthLoginResponse>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\contexts\AuthContext.tsx:18: register: (data: RegisterRequest) => Promise<void>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\contexts\AuthContext.tsx:19: refreshUser: () => Promise<void>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\contexts\AuthContext.tsx:20: logout: () => Promise<void>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\contexts\ValidationJobContext.tsx:13: subscribe: (jobId: string) => Promise<void>;
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\hooks\useAutosave.ts:3: export default function useAutosave(callback: () => Promise<void> | void, delay = 2000, deps: any[] = []) {
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:124: <h1 className="text-xl font-semibold text-white">Asset Inventory</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:125: <p className="text-sm text-white/40 mt-0.5">ISO 27001 C-I-A classification</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:160: <div className="text-xs text-white/30 mt-0.5">assets</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:169: <span className="text-xs text-white/40">Filter by type:</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:194: <p className="text-white/40 text-sm">No assets found</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:210: i >= 2 && i <= 6 ? 'text-center' : i === 8 ? 'text-right' : 'text-left'
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:332: <label className="text-xs font-medium text-white/50">Name *</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:343: <label className="text-xs font-medium text-white/50">Description</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:355: <label className="text-xs font-medium text-white/50">Asset type *</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:360: <option value="">Select type...</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:370: <label className="text-xs font-medium text-white/50">Location</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:382: <label className="text-xs font-medium text-white/50">C-I-A Classification</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:383: <span className="text-[10px] text-white/25">1 = Low · 2 = Medium · 3 = High</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\AssetsPage.tsx:417: <label className="text-xs font-medium text-white/50">ISO clause reference</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DashboardPage.tsx:152: <div className="text-xs uppercase tracking-[0.3em] text-white/40">Ciclo</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DashboardPage.tsx:156: <div className="text-xs uppercase tracking-[0.3em] text-white/40">Estado</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:528: <h1 className="text-4xl font-semibold text-white tracking-tight">Document Generator</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:529: <p className="mt-3 max-w-2xl text-base text-slate-300">Crea, edita y gestiona documentos ISO 27001 con asistencia de IA en un flujo más claro y profesional.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:537: <h2 className="text-sm font-semibold text-white uppercase tracking-[0.24em]">Documentos</h2>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:538: <p className="text-xs text-slate-400 mt-1">Accede rápido a tus documentos guardados.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:543: <div className="text-sm text-slate-400">Cargando...</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:664: <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-400/80">Vista del documento</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:689: <div className="text-sm text-slate-400">Cargando documento...</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:693: <div className="text-sm text-slate-400">Selecciona un documento para ver su contenido.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:720: <h3 className="text-lg font-semibold text-white">Generar documento con IA</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:721: <p className="text-sm text-white/60 mt-1">El agente LLM generará un documento ISO 27001 completo sección por sección.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:726: <label className="block text-sm font-medium text-white/80 mb-1">Título</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:735: <label className="block text-sm font-medium text-white/80 mb-1">Descripción</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:744: <label className="block text-sm font-medium text-white/80 mb-1">Audiencia</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:754: <label className="block text-sm font-medium text-white/80 mb-1">Idioma</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:760: <option value="es">Español</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:761: <option value="en">Inglés</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:765: <label className="block text-sm font-medium text-white/80 mb-1">Tono</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:771: <option value="formal">Formal</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:772: <option value="informal">Informal</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:776: <label className="block text-sm font-medium text-white/80 mb-1">Tipo</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:782: <option value="policy">Política</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:783: <option value="report">Reporte</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:784: <option value="procedure">Procedimiento</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:785: <option value="general">General</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:790: <label className="block text-sm font-medium text-white/80 mb-1">Secciones <span className="text-white/60">(opcional)</span></label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:860: <h3 className="text-lg font-semibold text-white">Exportar reporte</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:861: <p className="text-sm text-white/60 mt-1">Genera un informe descargable basado en el documento seleccionado actualmente.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:866: <p className="text-sm font-semibold text-white">Documento a exportar:</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:873: <label className="block text-sm font-medium text-white/80 mb-1">Título del reporte</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:883: <label className="block text-sm font-medium text-white/80 mb-1">Descripción</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:891: <p className="mt-2 text-sm text-white/60">Este texto aparecerá como subtítulo en el encabezado del reporte generado.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:894: <label className="block text-sm font-medium text-white/80 mb-1">Plantilla</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:909: <label className="block text-sm font-medium text-white/80 mb-1">Formato</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:916: <option value="pdf">PDF</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:917: <option value="xlsx">XLSX</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:918: <option value="docx">DOCX</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:919: <option value="csv">CSV</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:932: <p className="text-sm text-white/60">Estado del reporte</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:943: <button type="button" onClick={handleDownloadReport} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition">Descargar reporte</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:945: <button type="button" onClick={handleGenerateAnotherReport} className="rounded-xl border border-[#2A2E3D] bg-[#111318] px-4 py-2 text-sm font-medium text-white hover:bg-[#0F1729] transition">Generar otro</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:952: <p className="text-sm font-medium text-white/60">Reportes recientes</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:967: <button type="button" onClick={() => window.open(entry.downloadUrl, '_blank', 'noopener')} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition">Descargar</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:983: <h3 className="text-lg font-semibold text-white">Subir documento</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:984: <p className="text-sm text-white/60 mt-1">Sube un archivo o pega el contenido directamente.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:988: <label className="block text-sm font-medium text-white/80 mb-1">Título</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:997: <label className="block text-sm font-medium text-white/80 mb-1">Descripción</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:1006: <label className="block text-sm font-medium text-white/80 mb-1">Archivo</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\DocumentGeneratorPage.tsx:1015: <label className="block text-sm font-medium text-white/80 mb-1">Contenido alternativo</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:100: onAcknowledge: () => Promise<void>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:110: <span>Portal de empleados</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:120: <span className="font-semibold text-white">Estado</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:134: <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">Resumen</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:135: <span className="text-xs text-slate-400">Resumen oficial</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:142: <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">Texto completo</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:143: <span className="text-xs text-slate-400">Lea con atención</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:154: <p className="font-medium">He leído esta política y reconozco la versión actual del documento.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:155: <p className="text-slate-400">Este reconocimiento será registrado para tu organización.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:162: <p className="text-sm text-emerald-300">La política ha sido reconocida correctamente.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:286: <h1 className="text-4xl font-semibold tracking-tight text-white">Reconocimientos de políticas</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:294: <span className="text-xs uppercase tracking-[0.28em] text-slate-400">Políticas publicadas</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:298: <span className="text-xs uppercase tracking-[0.28em] text-slate-400">Pendientes</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:306: <span className="font-semibold text-white">Estado</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EmployeePortalPage.tsx:307: <span className="ml-2 text-slate-400">Se actualiza automáticamente al reconocer las políticas.</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:113: <h1 className="text-2xl font-semibold text-white">Evidence Center</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:114: <p className="text-sm text-white/50 mt-1">Organiza tu evidencia por tipo y control ISO 27001.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:125: <div className="text-sm text-white/40 uppercase tracking-wide mb-2">Total evidence items</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:127: <div className="text-xs text-white/50 mt-2">Organized by evidence taxonomy</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:130: <div className="text-sm text-white/40 uppercase tracking-wide mb-2">Filtered items</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:132: <div className="text-xs text-white/50 mt-2">Search and type filters applied</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:135: <div className="text-sm text-white/40 uppercase tracking-wide mb-2">Evidence types</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:137: <div className="text-xs text-white/50 mt-2">Grouped by taxonomy</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\EvidencePage.tsx:154: <option value="all">All evidence types</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:236: <h1 className="text-2xl font-semibold text-white">CAPA Tracker</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:237: <p className="text-sm text-white/50 mt-1">Gestiona acciones correctivas, prioridades y fechas de cierre desde un solo tablero.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:244: <div className="text-xs uppercase tracking-[0.25em] text-[#94A3B8] mb-3">Total CAPAs</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:246: <div className="text-xs text-white/50 mt-2">Incluye todas las CAPAs registradas</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:250: <div className="text-xs uppercase tracking-[0.25em] text-[#94A3B8] mb-3">Open CAPAs</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:252: <div className="text-xs text-white/50 mt-2">Acciones todavía en curso</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:256: <div className="text-xs uppercase tracking-[0.25em] text-[#94A3B8] mb-3">Overdue</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:258: <div className="text-xs text-white/50 mt-2">CAPAs vencidas y pendientes</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:262: <div className="text-xs uppercase tracking-[0.25em] text-[#94A3B8] mb-3">Closed</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:264: <div className="text-xs text-white/50 mt-2">CAPAs completadas</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:273: <label className="block text-[11px] font-semibold mb-2 uppercase tracking-[0.24em] text-[#94A3B8]">Filtrar por estado</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:287: <label className="block text-[11px] font-semibold mb-2 uppercase tracking-[0.24em] text-[#94A3B8]">Filtrar por prioridad</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:310: <div className="text-sm text-[#94A3B8]">Cargando CAPAs...</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:314: <div className="text-sm text-[#94A3B8]">No hay CAPAs registradas aún. Crea una nueva CAPA para comenzar.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:316: <div className="text-sm text-[#94A3B8]">No hay CAPAs coincidentes. Ajusta los filtros para ver resultados.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:322: <th className="py-4 px-4">CAPA</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:323: <th className="py-4 px-4">Status</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:324: <th className="py-4 px-4">Priority</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:325: <th className="py-4 px-4">Due Date</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:326: <th className="py-4 px-4">Progress</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:327: <th className="py-4 px-4">Overdue</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:377: <div className="text-[11px] uppercase tracking-[0.2em] text-[#7B8DAF]">Descripción</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:381: <div className="text-[11px] uppercase tracking-[0.2em] text-[#7B8DAF]">Control / Responsable</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:385: <div className="text-[11px] uppercase tracking-[0.2em] text-[#7B8DAF]">Origen</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:389: <div className="text-[11px] uppercase tracking-[0.2em] text-[#7B8DAF]">Creado / Actualizado</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:407: <h3 className="text-sm font-semibold uppercase tracking-[0.24em] text-[#A6B0D2]">Crear nueva CAPA</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:408: <p className="mt-2 text-sm text-[#BFC9E0]">Registra rápidamente una acción correctiva y mantén los datos sincronizados.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:413: <label className="block text-xs font-semibold mb-2 text-[#A6B0D2]">Título</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:422: <label className="block text-xs font-semibold mb-2 text-[#A6B0D2]">Descripción</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:432: <label className="block text-xs font-semibold mb-2 text-[#A6B0D2]">Prioridad</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:438: <option value="critical">Critical</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:439: <option value="high">High</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:440: <option value="medium">Medium</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:441: <option value="low">Low</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:445: <label className="block text-xs font-semibold mb-2 text-[#A6B0D2]">Origen</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:451: <option value="internal_audit">Internal Audit</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:452: <option value="external_audit">External Audit</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:453: <option value="incident">Incident</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:454: <option value="management_review">Management Review</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:460: <label className="block text-xs font-semibold mb-2 text-[#A6B0D2]">Due Date</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:469: <label className="block text-xs font-semibold mb-2 text-[#A6B0D2]">Progress</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:481: <label className="block text-xs font-semibold mb-2 text-[#A6B0D2]">Control ID</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:515: <div className="text-sm text-[#94A3B8] uppercase tracking-wide mb-2">Gaps Totales</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:517: <div className="text-xs text-white/50 mt-2">Preguntas de gap analysis</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:520: <div className="text-sm text-[#94A3B8] uppercase tracking-wide mb-2">Sin responder</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:522: <div className="text-xs text-white/50 mt-2">Incluye brechas críticas</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:525: <div className="text-sm text-[#94A3B8] uppercase tracking-wide mb-2">Progreso</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:527: <div className="text-xs text-white/50 mt-2">Avance en gap analysis</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:544: <div className="text-sm text-[#94A3B8]">Cargando las brechas...</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:548: <div className="text-sm text-[#94A3B8]">No se encontraron brechas en este momento.</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:569: <div className="text-sm text-[#94A3B8]">Brechas críticas abiertas</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\FindingsPage.tsx:573: <div className="text-sm text-[#94A3B8]">Preguntas respondidas</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\RisksPage.tsx:581: <p className="text-xs text-white/40">{vuln.severity} · Activo: {assets.find((asset) => asset.id === vuln.asset_id)?.name ?? 'N/A'}</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SettingsPage.tsx:28: <TabsTrigger value="security">Security</TabsTrigger>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SettingsPage.tsx:29: <TabsTrigger value="preferences">Preferences</TabsTrigger>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SettingsPage.tsx:30: <TabsTrigger value="appearance">Appearance</TabsTrigger>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SettingsPage.tsx:31: <TabsTrigger value="audit">Audit Cycle</TabsTrigger>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:117: <h1 className="text-3xl font-semibold tracking-tight">Scan the QR code with your authenticator app</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:124: <div className="rounded-2xl border border-white/10 bg-white/5 p-4">QR generated server-side</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:125: <div className="rounded-2xl border border-white/10 bg-white/5 p-4">TOTP compatible</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:126: <div className="rounded-2xl border border-white/10 bg-white/5 p-4">10 backup codes</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:141: <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Backup code management</h2>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:142: <p className="text-sm text-slate-500">2FA is already active. Generate a fresh backup code set if needed.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:160: <h3 className="text-sm font-semibold text-amber-950">Backup codes</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:161: <p className="text-xs text-amber-800">Store these codes securely. They will not be shown again.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:185: <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Confirm your authenticator</h2>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:186: <p className="text-sm text-slate-500">Enter the 6-digit code generated by your app to finish activation.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:199: <label className="text-sm font-medium text-slate-700">Authenticator code</label>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:235: <h3 className="text-sm font-semibold text-amber-950">Backup codes</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:236: <p className="text-xs text-amber-800">Store these codes securely. They will not be shown again.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:261: <h3 className="text-sm font-semibold text-amber-950">Backup codes</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\SetupMFAPage.tsx:262: <p className="text-xs text-amber-800">Store these codes securely. They will not be shown again.</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\pages\UnderstandPage.tsx:92: <div className="text-sm text-white/60">Resumen del estado del framework</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1144: <div className="text-[15px] font-semibold -tracking-[0.2px]">Dani Platform</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1145: <div className="text-[11px] text-white/45 mt-0.5">v4 — Compliance Intelligence</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1163: <span className="ml-auto text-[11px] opacity-60">Change ›</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1283: <div>Max Kellner</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1284: <div className="text-[11px] text-white/40">CISO · WellQ</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1318: <div className={`font-medium text-sm ${darkMode ? 'text-[#E4E7EE]' : 'text-[#1A1D26]'}`}>Diego Vera</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1376: <div className="font-semibold text-sm">Dani AI</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1377: <div className="text-[11px] opacity-75">Online — Compliance Assistant</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1419: <h2 className="text-lg font-bold mb-2">Select Organization Profile</h2>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1550: {t.dashboard} <span className="font-normal text-[#5F6B7A] dark:text-[#9AA3B4] text-sm ml-2">· WellQ Security Program</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1567: <FrameworkChip active mandatory={false}>ISO 27001:2022</FrameworkChip>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1568: <FrameworkChip active mandatory>DORA</FrameworkChip>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1569: <FrameworkChip mandatory>GDPR</FrameworkChip>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1570: <FrameworkChip mandatory={false}>SOC 2 Type II</FrameworkChip>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1571: <FrameworkChip mandatory>NIS2</FrameworkChip>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1572: <FrameworkChip dashed>+ Add framework</FrameworkChip>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1938: <h1 className="text-xl font-bold">Evidence Center</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1949: <p className="text-sm text-[#5F6B7A]">Evidence tracking interface coming soon...</p>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1959: <h1 className="text-xl font-bold">CAPA Tracker</h1>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1996: <button className="px-3 py-1.5 bg-[#4F6EF7] text-white rounded text-xs font-medium hover:bg-[#3D5BE0] transition-colors">Schedule Tests</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:1997: <button className="px-3 py-1.5 border border-[#E2E5EB] dark:border-[#2A2E3D] rounded text-xs text-[#1A1D26] dark:text-[#E4E7EE] hover:bg-gray-100 dark:hover:bg-[#2A2E3D] transition-colors">Assign to Team</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2014: <button className="px-3 py-1.5 bg-[#4F6EF7] text-white rounded text-xs font-medium hover:bg-[#3D5BE0] transition-colors">Start Access Review</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2015: <button className="px-3 py-1.5 border border-[#E2E5EB] dark:border-[#2A2E3D] rounded text-xs text-[#1A1D26] dark:text-[#E4E7EE] hover:bg-gray-100 dark:hover:bg-[#2A2E3D] transition-colors">View Policy</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2031: <button className="px-3 py-1.5 bg-[#4F6EF7] text-white rounded text-xs font-medium hover:bg-[#3D5BE0] transition-colors">Plan Testing Sprint</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2196: <h2 className="text-lg font-semibold mb-4 text-[#1A1D26] dark:text-[#E4E7EE]">?? Gestión de Suscripción</h2>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2396: <option>UTC</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2397: <option>Europe/Madrid</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2398: <option>America/New_York</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2399: <option>America/Sao_Paulo</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2400: <option>Europe/Berlin</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2449: <option>PDF</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2450: <option>Excel (XLSX)</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2451: <option>CSV</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2452: <option>JSON</option>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2535: <h3 className="text-sm font-semibold text-[#E5484D] dark:text-[#F06669]">? Compliance Integrity Alerts</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2536: <button className="text-xs text-[#4F6EF7] dark:text-[#6B8AFF] font-medium hover:underline">View all 6 alerts ?</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2610: <h3 className="text-sm font-semibold text-[#1A1D26] dark:text-[#E4E7EE]">?? Regulatory Feed</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2611: <button className="text-xs text-[#4F6EF7] dark:text-[#6B8AFF] font-medium hover:underline">View all ?</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2672: <h3 className="text-sm font-semibold text-[#1A1D26] dark:text-[#E4E7EE]">?? Control Status — Cross-Framework View</h3>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2673: <button className="text-xs text-[#4F6EF7] dark:text-[#6B8AFF] font-medium hover:underline">View SOA ?</button>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2680: <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Control</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2681: <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Description</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2682: <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Documented</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2683: <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Implemented</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2684: <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Tested</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2685: <th className="text-left px-5 py-3 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Frameworks</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2827: <div className="text-[11px] uppercase tracking-wide text-[#9AA3B0] mb-2">Estimated Audit Readiness</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2831: <div className="text-xs text-[#5F6B7A] mt-1">3 high-risk non-conformity areas detected</div>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2860: <strong className="text-[11px] uppercase tracking-wide text-[#1A1D26] dark:text-[#E4E7EE]">Decision Level Legend:</strong>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2862: <span className="px-2 py-0.5 bg-[#E8F4FD] text-[#1B8BD1] rounded text-[10px] font-semibold">?? Auto</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2866: <span className="px-2 py-0.5 bg-[#FFF7E6] text-[#B47A14] rounded text-[10px] font-semibold">?? Review</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2870: <span className="px-2 py-0.5 bg-[#FEECEE] text-[#E5484D] rounded text-[10px] font-semibold">?? Human</span>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2892: <th className="text-left py-2.5 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">CAPA ID</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2893: <th className="text-left py-2.5 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Finding</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2894: <th className="text-left py-2.5 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Age</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2895: <th className="text-left py-2.5 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Priority</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2896: <th className="text-left py-2.5 text-[11px] uppercase tracking-wide text-[#5F6B7A] dark:text-[#9AA3B4] font-semibold">Status</th>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2901: <td className="py-2.5 font-semibold text-[#4F6EF7] dark:text-[#6B8AFF]">NC-2024-015</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2902: <td className="py-2.5 text-[#1A1D26] dark:text-[#E4E7EE]">Cloud config non-conformity (AWS S3)</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2903: <td className="py-2.5 font-semibold text-[#E5484D] dark:text-[#F06669]">45 days</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2904: <td className="py-2.5"><span className="px-2 py-0.5 bg-[#FEECEE] dark:bg-[#2A1214] text-[#E5484D] dark:text-[#F06669] rounded text-[10px] font-semibold">High</span></td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2908: <td className="py-2.5 font-semibold text-[#4F6EF7] dark:text-[#6B8AFF]">NC-2025-002</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2909: <td className="py-2.5 text-[#1A1D26] dark:text-[#E4E7EE]">Missing access review evidence Q4</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2910: <td className="py-2.5 font-semibold text-[#E5484D] dark:text-[#F06669]">38 days</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2911: <td className="py-2.5"><span className="px-2 py-0.5 bg-[#FEECEE] dark:bg-[#2A1214] text-[#E5484D] dark:text-[#F06669] rounded text-[10px] font-semibold">High</span></td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2915: <td className="py-2.5 font-semibold text-[#4F6EF7] dark:text-[#6B8AFF]">NC-2025-003</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2916: <td className="py-2.5 text-[#1A1D26] dark:text-[#E4E7EE]">BCP test not executed in 2025</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2917: <td className="py-2.5 font-medium text-[#F5A623] dark:text-[#F5B740]">22 days</td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\App.tsx:2918: <td className="py-2.5"><span className="px-2 py-0.5 bg-[#FFF7E6] dark:bg-[#2A2210] text-[#B47A14] dark:text-[#F5B740] rounded text-[10px] font-semibold">Medium</span></td>
+C:\Users\Camilo\Desktop\DANI27-GPI-G2-2026-2-develop\frontend\src\app\AppRefactored.tsx:65: <h2 className="text-lg font-bold mb-2">Select Organization Profile</h2>
