@@ -1,10 +1,10 @@
 export type Page = 'dashboard' | 'understand' | 'documents' | 'risks' | 'evidence' | 'findings' | 'audit' | 'integrity' | 'regfeed' | 'dora' | 'euai' | 'escalation' | 'integrations' | 'settings' | 'assets';
-export type Language = 'en' | 'es' | 'pt' | 'de' | 'fr';
+export type Language = 'en' | 'es' | 'pt' | 'de' | 'fr' | 'it';
 export type Profile = 'foundational' | 'established' | 'advanced' | 'mature';
 export type DateFormat = 'dmy' | 'mdy' | 'ymd';
 
 export const translations = {
-  en: {
+en: {
     // Navigation
     dashboard: 'Dashboard',
     understand: 'Understand My Situation',
@@ -24,6 +24,12 @@ export const translations = {
     evidenceCenter: 'Evidence Center',
     capaTracker: 'CAPA Tracker',
     auditRoom: 'Audit Room',
+    // Navbar / Sidebar
+    'navbar.openSidebar': 'Open sidebar',
+    'navbar.onboarding': 'Open onboarding',
+    'navbar.notifications': 'Notifications',
+    'sidebar.menu': 'Menu',
+    'sidebar.closeMenu': 'Close menu',
 
     // Gap Analysis labels
     totalGaps: 'Total Gaps Identified',
@@ -78,6 +84,22 @@ export const translations = {
     'risks.linkThreatButton': 'Link Threat',
     'risks.linkSelectionRequired': 'Please select a risk and a threat to link',
     'risks.threatLinkedSuccess': 'Threat linked to risk successfully',
+    'risks.threatCreatedSuccess': 'Threat created successfully',
+    'risks.vulnerabilityCreatedSuccess': 'Vulnerability created successfully',
+    'risks.addRiskButton': 'Add Risk',
+    'risks.createRiskTitle': 'Create Risk',
+    'risks.createRiskDescription': 'Register a new risk into the risk register.',
+    'risks.riskNameLabel': 'Name',
+    'risks.riskNamePlaceholder': 'e.g. Insufficient access control',
+    'risks.riskDescriptionLabel': 'Description',
+    'risks.riskDescriptionPlaceholder': 'Optional additional context',
+    'risks.riskAssetLabel': 'Asset',
+    'risks.probabilityLabel': 'Probability',
+    'risks.impactLabel': 'Impact',
+    'risks.cancelButton': 'Cancel',
+    'risks.creating': 'Creating...',
+    'risks.createRiskButton': 'Create Risk',
+    'risks.riskCreatedSuccess': 'Risk created successfully',
     'risks.recentThreatsTitle': 'Recent Threats',
     'risks.loadingThreats': 'Loading threats...',
     'risks.noThreats': 'No threats registered.',
@@ -90,6 +112,23 @@ export const translations = {
     administrator: 'Administrator',
     chatPlaceholder: 'Type a message...',
     send: 'Send',
+    'understand.gapAnalysis': 'Gap Analysis',
+    'understand.loading': 'Loading...',
+    'understand.empty': 'No gaps to show.',
+    'understand.actionHint': 'Click "Create documentation" to start a guided flow where AI generates the recommended document to close these gaps.',
+    'understand.createDocumentation': 'Create documentation',
+    'understand.modifyDocumentation': 'Modify documentation',
+    'understand.criticalIntro': 'What you still need in critical gaps:',
+    'understand.missing': 'Missing:',
+    'understand.suggestedEvidence': 'Suggested evidence:',
+    'understand.linkedEvidence': 'Linked evidence detected',
+    'understand.reason.no': 'Answered NO',
+    'understand.reason.partial': 'Answered PARTIAL',
+    'understand.reason.unanswered': 'Unanswered',
+    'understand.annexALabel': 'Annex A ISO 27001 Controls',
+    'understand.controlLabel': 'Control {value}',
+    'understand.clauseLabel': 'Clause {value}',
+    'app.placeholder.comingSoon': 'This page is coming soon...',
 
     // Header
     'header.searchPlaceholder': 'Search controls or evidence...',
@@ -97,36 +136,448 @@ export const translations = {
     'header.viewProfile': 'View Profile',
     'header.settings': 'Settings',
     'header.signOut': 'Sign Out',
-    'navbar.onboarding': 'Abrir guía de inicio',
-    'navbar.onboardingLabel': 'Empezar tutorial',
-    'tutorial.title': 'Hola, soy Dani27',
-    'tutorial.subtitle': 'Tu asistente virtual te guía por la plataforma paso a paso.',
-    'tutorial.progressLabel': 'Paso',
-    'tutorial.stepHint': 'Mini explicación de la sección actual',
-    'tutorial.previous': 'Anterior',
-    'tutorial.next': 'Siguiente',
-    'tutorial.finish': 'Finalizar',
-    'tutorial.startPromptKnown': 'Presiona iniciar para comenzar el tutorial desde el panel principal.',
-    'tutorial.startPromptUnknown': 'Estás en otra sección. Inicia el recorrido para regresar al inicio y seguir el flujo correcto.',
-    'tutorial.startButton': 'Iniciar tutorial',
-    'tutorial.dismissButton': 'Cerrar',
-    'tutorial.routeHint': 'El tutorial va marcando cada ruta, sigue las flechas para avanzar.',
-    'tutorial.step1.title': 'Bienvenida profesional',
-    'tutorial.step1.description': 'Comienza tu viaje de cumplimiento con una visión clara de cada módulo, desde el tablero hasta la auditoría y la evidencia.',
-    'tutorial.step2.title': 'Navegación inteligente',
-    'tutorial.step2.description': 'Usa el menú de procesos o el panel de módulos para acceder a riesgos, evidencia, auditoría y controles en cualquier momento.',
-    'tutorial.step3.title': 'Perfil y ajustes',
-    'tutorial.step3.description': 'Personaliza tu perfil de cumplimiento en cualquier momento y revisa el estado de tu plan, notificaciones y preferencias.',
-    'tutorial.step4.title': 'Recursos clave',
-    'tutorial.step4.description': 'Comprende cada opción: identifica riesgos, añade evidencia y prepara informes con instrucciones claras y soporte integrado.',
-    'tutorial.step5.title': 'Preparar Auditoría',
-    'tutorial.step5.description': 'Valida tu evidencia, revisa hallazgos y mantén la preparación para auditoría bajo control.',
-    'tutorial.step6.title': 'Autoevaluación',
-    'tutorial.step6.description': 'Mide tu cumplimiento con una evaluación rápida y identifica oportunidades de mejora inmediata.',
-    'tutorial.step7.title': 'Configuración',
-    'tutorial.step7.description': 'Ajusta tus preferencias, idiomas y notificaciones para que el sistema funcione a tu manera.',
-    'tutorial.note': 'Este recorrido está disponible siempre con el icono superior.',
-    'tutorial.close': 'Cerrar guía',
+    'navbar.onboardingLabel': 'Start tutorial',
+    'tutorial.title': 'Hi, I am Dani27',
+    'tutorial.subtitle': 'Your virtual assistant guides you through the platform step by step.',
+    'tutorial.progressLabel': 'Step',
+    'tutorial.stepHint': 'Quick explanation of the current section',
+    'tutorial.previous': 'Previous',
+    'tutorial.next': 'Next',
+    'tutorial.finish': 'Finish',
+    'tutorial.startPromptKnown': 'Press start to begin the tutorial from the main dashboard.',
+    'tutorial.startPromptUnknown': 'You are in another section. Start the tour to return to the beginning and follow the correct flow.',
+    'tutorial.startButton': 'Start tutorial',
+    'tutorial.dismissButton': 'Close',
+    'tutorial.routeHint': 'The tutorial highlights each route, follow the arrows to continue.',
+    'tutorial.step1.title': 'Professional welcome',
+    'tutorial.step1.description': 'Begin your compliance journey with a clear view of each module, from dashboard to audit and evidence.',
+    'tutorial.step2.title': 'Smart navigation',
+    'tutorial.step2.description': 'Use the process menu or module panel to access risks, evidence, audit, and controls anytime.',
+    'tutorial.step3.title': 'Profile and settings',
+    'tutorial.step3.description': 'Customize your compliance profile at any time and review your plan status, notifications, and preferences.',
+    'tutorial.step4.title': 'Key resources',
+    'tutorial.step4.description': 'Understand each option: identify risks, add evidence, and prepare reports with clear guidance and built-in support.',
+    'tutorial.step5.title': 'Prepare audit',
+    'tutorial.step5.description': 'Validate your evidence, review findings, and keep audit readiness under control.',
+    'tutorial.step6.title': 'Self-assessment',
+    'tutorial.step6.description': 'Measure your compliance with a quick assessment and identify immediate improvement opportunities.',
+    'tutorial.step7.title': 'Configuration',
+    'tutorial.step7.description': 'Adjust your preferences, languages, and notifications so the system works your way.',
+    'tutorial.note': 'This tour is always available from the top icon.',
+    'tutorial.close': 'Close guide',
+    'tutorial.steps.dashboard.title': 'Control Center',
+    'tutorial.steps.dashboard.description': 'See status, alerts, and progress at a glance.',
+    'tutorial.steps.dashboard.sections.intro.title': 'What you will see here',
+    'tutorial.steps.dashboard.sections.intro.content': `This dashboard summarizes the current state of your program:
+- Documentation, implementation, and effectiveness KPIs
+- Health score and trend
+- Recent activity
+- Upcoming tasks
+
+It is built for quick prioritization, not bulk editing.`,
+    'tutorial.steps.dashboard.sections.intro.action': 'Explore the dashboard',
+    'tutorial.steps.dashboard.sections.kpis.title': 'KPIs and score',
+    'tutorial.steps.dashboard.sections.kpis.content': `The cards show current percentages and recent change.
+
+Use them to spot whether you are improving or slipping. In this version, these cards are informational and do not open details on click.`,
+    'tutorial.steps.dashboard.sections.kpis.action': 'Check values and trends',
+    'tutorial.steps.dashboard.sections.activity-tasks.title': 'Activity and upcoming tasks',
+    'tutorial.steps.dashboard.sections.activity-tasks.content': `You will find two useful areas below:
+- Recent activity: changes made in the system
+- Upcoming tasks: items with priority and due date
+
+They help you decide what to handle first.`,
+    'tutorial.steps.dashboard.sections.activity-tasks.action': 'Compare activity and tasks',
+    'tutorial.steps.dashboard.sections.scope.title': 'Scope of this step',
+    'tutorial.steps.dashboard.sections.scope.content': `This area helps you:
+- show overall status and trend
+- show activity and suggested tasks
+
+Tip:
+- use it to prioritize in minutes
+- then go deeper into each module to take action`,
+    'tutorial.steps.dashboard.sections.scope.action': 'Use it as a monitoring view',
+    'tutorial.steps.dashboard.sections.conclusion.title': 'Next step',
+    'tutorial.steps.dashboard.sections.conclusion.content': `When you spot priorities in the dashboard, move to gap analysis to understand why the status looks that way and what to fix first.`,
+    'tutorial.steps.dashboard.sections.conclusion.action': 'Go to Gap Analysis',
+    'tutorial.steps.understand.title': 'Gap Analysis',
+    'tutorial.steps.understand.description': 'Identify exactly what is missing between the current state and the requirements.',
+    'tutorial.steps.understand.sections.intro.title': 'Gap Analysis',
+    'tutorial.steps.understand.sections.intro.content': `We are in the most important part: Gap Analysis.
+
+Here you will:
+1. Answer questions about your organization
+2. The system analyzes your answers
+3. You see exactly what is missing
+4. You get a plan to close the gaps
+
+This is the heart of compliance. Take your time here.`,
+    'tutorial.steps.understand.sections.intro.action': 'Read the introduction',
+    'tutorial.steps.understand.sections.framework.title': 'Which framework do you need to meet?',
+    'tutorial.steps.understand.sections.framework.content': `You can work with one or more frameworks:
+- ISO 27001 (information security)
+- ISO 27002 (security controls)
+- GDPR (data protection - Europe)
+- HIPAA (healthcare - USA)
+- NIST (national security - USA)
+- SOC 2 (service audit)
+
+Select the one that applies to your business.
+Tip: many organizations use ISO 27001 as a base.`,
+    'tutorial.steps.understand.sections.framework.action': 'Select the applicable framework',
+    'tutorial.steps.understand.sections.questionnaire.title': 'Answer honestly',
+    'tutorial.steps.understand.sections.questionnaire.content': `You will see questions like:
+'Do you have a documented security policy?'
+'Do you run annual security training?'
+'Do you have an incident response plan?'
+
+Answer YES/NO/PARTIAL (this is confidential)
+
+There are no right answers. Honesty is better.
+Based on that, we will calculate your gaps.`,
+    'tutorial.steps.understand.sections.questionnaire.action': 'Start answering the questions',
+    'tutorial.steps.understand.sections.analysis.title': 'The system analyzes...',
+    'tutorial.steps.understand.sections.analysis.content': `Give us a moment to process your answers.
+
+We are:
+✓ comparing your state with standards
+✓ calculating compliance percentage
+✓ prioritizing gaps by risk
+✓ recommending actions
+
+This may take 10-30 seconds...`,
+    'tutorial.steps.understand.sections.analysis.action': 'Wait while analysis runs',
+    'tutorial.steps.understand.sections.results.title': 'Here are your gaps',
+    'tutorial.steps.understand.sections.results.content': `You will see 3 things:
+
+1. CRITICAL GAP (red)
+   - high impact if not closed
+   - handle this first
+
+2. MAJOR GAP (orange)
+   - important but not urgent
+   - plan for the next months
+
+3. MINOR GAP (yellow)
+   - low impact
+   - useful, but not critical
+
+Compliance percentage is shown at the top.
+If it is <70%, there is still work to do.`,
+    'tutorial.steps.understand.sections.results.action': 'Review gaps and priorities',
+    'tutorial.steps.understand.sections.action-plan.title': 'Create your closing plan',
+    'tutorial.steps.understand.sections.action-plan.content': `For each gap:
+1. Click it
+2. Assign an owner
+3. Set a due date
+4. Describe what you will do to close it
+
+The system tracks your progress.
+Every closed gap = higher compliance percentage
+
+Example:
+"Gap: 'We do not have MFA enabled'
+Owner: Juan Pérez (CISO)
+Due date: March 30
+Action: roll out Okta MFA for all access"`,
+    'tutorial.steps.understand.sections.action-plan.action': 'Create an action plan',
+    'tutorial.steps.understand.sections.conclusion.title': 'Analysis complete!',
+    'tutorial.steps.understand.sections.conclusion.content': `Great, you now know what is missing.
+
+The rest is implementation:
+- Step 3: document your ASSETS (what you protect)
+- Step 4: upload policies and DOCUMENTS
+- Step 5: identify specific RISKS
+- Step 6: collect EVIDENCE
+- Step 7: compile FINDINGS for audit
+
+Next up: Assets (inventory)`,
+    'tutorial.steps.understand.sections.conclusion.action': 'Click Next',
+    'tutorial.steps.assets.title': 'Asset inventory',
+    'tutorial.steps.assets.description': 'Document all assets (systems, data, people) that need protection.',
+    'tutorial.steps.assets.sections.intro.title': 'What this module does',
+    'tutorial.steps.assets.sections.intro.content': `Here you register assets in a structured way for risk management.
+
+You can create, edit, and delete assets, and classify them by type and CIA impact (confidentiality, integrity, availability).`,
+    'tutorial.steps.assets.sections.intro.action': 'Review the table and + New asset',
+    'tutorial.steps.assets.sections.create.title': 'Create and classify',
+    'tutorial.steps.assets.sections.create.content': `When you create an asset, you define name, type, location, and CIA values.
+
+With those values, the system calculates criticality to help you prioritize.`,
+    'tutorial.steps.assets.sections.create.action': 'Create an asset and fill CIA',
+    'tutorial.steps.assets.sections.filters.title': 'Filter and review',
+    'tutorial.steps.assets.sections.filters.content': `You can filter by type and criticality level to quickly see which assets need more attention.
+
+You can also open an existing asset to edit its data or delete it.`,
+    'tutorial.steps.assets.sections.filters.action': 'Try the filters by type and level',
+    'tutorial.steps.assets.sections.scope.title': 'Module focus',
+    'tutorial.steps.assets.sections.scope.content': `The goal of this step is to keep a clear, actionable inventory.
+
+When assets are well classified and prioritized, risk analysis and control implementation move much faster.`,
+    'tutorial.steps.assets.sections.scope.action': 'Use it as an inventory',
+    'tutorial.steps.assets.sections.conclusion.title': 'Next step',
+    'tutorial.steps.assets.sections.conclusion.content': `Once the base inventory is ready, the next step is to centralize documents to support evidence and reporting.`,
+    'tutorial.steps.assets.sections.conclusion.action': 'Click Next',
+    'tutorial.steps.documents.title': 'Document management',
+    'tutorial.steps.documents.description': 'Centralize, organize, and version all policies and procedures.',
+    'tutorial.steps.documents.sections.intro.title': 'What this module does',
+    'tutorial.steps.documents.sections.intro.content': `This module groups document work into five tabs:
+- View documents
+- Edit content
+- Generate a document with AI
+- Export a report
+- Upload a document`,
+    'tutorial.steps.documents.sections.intro.action': 'Identify the available tabs',
+    'tutorial.steps.documents.sections.upload.title': 'Upload and view',
+    'tutorial.steps.documents.sections.upload.content': `You can upload files or text content, list them, and open one to view or edit it.
+
+You can also delete uploaded documents when needed.`,
+    'tutorial.steps.documents.sections.upload.action': 'Upload and open a document',
+    'tutorial.steps.documents.sections.ai-generation.title': 'AI generation',
+    'tutorial.steps.documents.sections.ai-generation.content': `The generation tab creates document drafts that you can then upload to the repository.
+
+It is useful to quickly start a policy or base procedure.`,
+    'tutorial.steps.documents.sections.ai-generation.action': 'Generate and review a draft',
+    'tutorial.steps.documents.sections.reports.title': 'Export reports',
+    'tutorial.steps.documents.sections.reports.content': `In the reports tab you can start a generation, see its status, and download the result once it is ready.
+
+The available formats depend on configuration/API, but the generation and download flow is implemented.`,
+    'tutorial.steps.documents.sections.reports.action': 'Generate a report and check status',
+    'tutorial.steps.documents.sections.conclusion.title': 'End of this step',
+    'tutorial.steps.documents.sections.conclusion.content': `With this flow you can centralize key documents, iterate on them, and use them as support for your compliance program.
+
+The next step connects these inputs with risk management.`,
+    'tutorial.steps.documents.sections.conclusion.action': 'Click Next',
+    'tutorial.steps.risks.title': 'Risk management',
+    'tutorial.steps.risks.description': 'Identify, assess, and mitigate compliance risks with a clear method.',
+    'tutorial.steps.risks.sections.intro.title': 'Risk analysis',
+    'tutorial.steps.risks.sections.intro.content': `Risk is the likelihood that something bad happens.
+
+Risk management answers:
+1. What could go wrong?
+2. How likely is it?
+3. How severe would it be?
+4. What do we do about it?
+
+This is what auditors check very closely.`,
+    'tutorial.steps.risks.sections.intro.action': 'Understand risk analysis',
+    'tutorial.steps.risks.sections.matrix.title': 'How risk is measured',
+    'tutorial.steps.risks.sections.matrix.content': `RISK = LIKELIHOOD × IMPACT
+
+         LIKELIHOOD
+         Low Medium High
+IMPACT High  3     6     9
+       Medium2     4     6
+       Low   1     2     3
+
+Colors:
+- Red (9): critical - act now
+- Orange (6): high - in the next weeks
+- Yellow (4): medium - in the next months
+- Green (2-1): low - monitor
+
+The system calculates it automatically.`,
+    'tutorial.steps.risks.sections.matrix.action': 'View the risk matrix',
+    'tutorial.steps.risks.sections.create.title': 'Register a risk',
+    'tutorial.steps.risks.sections.create.content': `Click '+ New risk'
+
+Form:
+NAME: 'Data loss by ransomware'
+DESCRIPTION: 'A ransomware attack could encrypt our DB'
+CATEGORY: Cybersecurity / Operational / Compliance / Reputation
+LIKELIHOOD: Low/Medium/High
+IMPACT: Low/Medium/High
+OWNER: Juan Pérez
+AFFECTED ASSETS: select
+EXISTING CONTROLS: 'We have daily backups'
+
+Save = risk registered + automatic score`,
+    'tutorial.steps.risks.sections.create.action': 'Create your first risk',
+    'tutorial.steps.risks.sections.evaluate.title': 'View your risk matrix',
+    'tutorial.steps.risks.sections.evaluate.content': `The risk dashboard shows:
+
+VISUAL MATRIX:
+- Each risk is a point
+- Red in the corner = critical
+- Green in the corner = manageable
+- Click a point for details
+
+SORTED LIST:
+- By risk (highest first)
+- Name, owner, status
+
+METRICS:
+- Total risks: 24
+- Critical: 3 (immediate action)
+- High: 7
+- Medium: 10
+- Low: 4`,
+    'tutorial.steps.risks.sections.evaluate.action': 'Examine the risk matrix',
+    'tutorial.steps.risks.sections.mitigation.title': 'Create an action plan',
+    'tutorial.steps.risks.sections.mitigation.content': `For each risk, choose:
+
+OPTION 1: ACCEPT
+- The risk is acceptable
+- Document why
+
+OPTION 2: AVOID
+- Change the process to remove the risk
+
+OPTION 3: MITIGATE
+- Reduce likelihood OR impact
+
+OPTION 4: TRANSFER
+- Insure it (cyber insurance)
+
+CAPA plan:
+- Specific action
+- Owner
+- Due date
+- Success metrics`,
+    'tutorial.steps.risks.sections.mitigation.action': 'Create a mitigation plan',
+    'tutorial.steps.risks.sections.controls.title': 'Implement controls',
+    'tutorial.steps.risks.sections.controls.content': `Controls = concrete measures
+
+Example risk: Data loss
+Controls:
+✓ Control A: daily automated backups
+✓ Control B: encryption at rest
+✓ Control C: MFA for data access
+✓ Control D: 24/7 monitoring
+
+For each control:
+- Assign an owner
+- Set an implementation date
+- Mark as 'In progress' → 'Implemented' → 'Tested'
+- Attach evidence
+
+The system notifies you when they are due.`,
+    'tutorial.steps.risks.sections.controls.action': 'Assign controls',
+    'tutorial.steps.risks.sections.monitoring.title': 'Risks never sleep',
+    'tutorial.steps.risks.sections.monitoring.content': `Monthly:
+1. Review each risk
+2. Did likelihood change?
+3. Did impact change?
+4. Are controls working?
+5. Update score if needed
+
+Yearly:
+- Full risk analysis
+- Evaluate new risks
+- Remove resolved risks
+
+The system keeps history:
+- Risk X was 'High' in January
+- Now it is 'Medium' in March
+- Proof of improvement = happy auditor`,
+    'tutorial.steps.risks.sections.monitoring.action': 'Monitor and update risks',
+    'tutorial.steps.risks.sections.conclusion.title': 'Risk register complete',
+    'tutorial.steps.risks.sections.conclusion.content': `Now you have a complete risk register!
+
+The system includes:
+✓ What is missing (gaps)
+✓ What you protect (assets)
+✓ Your rules (documents)
+✓ Which risks you have (risks)
+
+Next: EVIDENCE
+How do we prove we did it? Step 6: Evidence`,
+    'tutorial.steps.risks.sections.conclusion.action': 'Click Next',
+    'tutorial.steps.evidence.title': 'Evidence collection',
+    'tutorial.steps.evidence.description': 'Centralize and organize every proof that your controls work.',
+    'tutorial.steps.evidence.sections.intro.title': 'What this page does',
+    'tutorial.steps.evidence.sections.intro.content': `Here you can:
+- Upload evidence
+- Search by text (name/control/clause)
+- Filter by type
+- See freshness status (fresh, expiring, expired)
+- Delete evidence`,
+    'tutorial.steps.evidence.sections.intro.action': 'Find search, filters, and upload',
+    'tutorial.steps.evidence.sections.upload.title': 'Upload evidence',
+    'tutorial.steps.evidence.sections.upload.content': `Upload happens through the system uploader, then the item appears in its group.
+
+After that you can check its validity and keep only current evidence.`,
+    'tutorial.steps.evidence.sections.upload.action': 'Upload your first evidence',
+    'tutorial.steps.evidence.sections.organize.title': 'Focus of this step',
+    'tutorial.steps.evidence.sections.organize.content': `The goal is to keep evidence current, searchable, and review-ready.
+
+With search, filters, and freshness status, you can maintain evidence quality across the full cycle.`,
+    'tutorial.steps.evidence.sections.organize.action': 'Upload, filter, and maintain evidence',
+    'tutorial.steps.evidence.sections.conclusion.title': 'Next step',
+    'tutorial.steps.evidence.sections.conclusion.content': `With evidence uploaded and classified, move to CAPA/Findings to manage corrective actions and priorities.`,
+    'tutorial.steps.evidence.sections.conclusion.action': 'Click Next',
+    'tutorial.steps.findings.title': 'Findings / CAPA Tracker',
+    'tutorial.steps.findings.description': 'Manage corrective actions, priorities, and due dates in one place.',
+    'tutorial.steps.findings.sections.intro.title': 'What you really find here',
+    'tutorial.steps.findings.sections.intro.content': `This page currently works as a CAPA tracker.
+
+You can see corrective actions, their status, priority, due date, and progress.`,
+    'tutorial.steps.findings.sections.intro.action': 'Review KPIs and the CAPA table',
+    'tutorial.steps.findings.sections.create.title': 'Create a CAPA',
+    'tutorial.steps.findings.sections.create.content': `You can create a CAPA with title, priority, source, due date, progress, and linked control.
+
+It will then appear in the main table for tracking.`,
+    'tutorial.steps.findings.sections.create.action': 'Create a sample CAPA',
+    'tutorial.steps.findings.sections.filters.title': 'Tracking and filters',
+    'tutorial.steps.findings.sections.filters.content': `You can filter by status and priority, and open each row to see details (description, control/owner, source, and dates).
+
+You will also see KPIs for open, overdue, and closed items.`,
+    'tutorial.steps.findings.sections.filters.action': 'Apply filters and expand a row',
+    'tutorial.steps.findings.sections.conclusion.title': 'End of this step',
+    'tutorial.steps.findings.sections.conclusion.content': `With well-defined and monitored CAPAs, you turn gaps into an executable plan with owners and due dates.
+
+That gets you better prepared for the audit.`,
+    'tutorial.steps.findings.sections.conclusion.action': 'Click Next',
+    'tutorial.steps.audit.title': 'Audit preparation',
+    'tutorial.steps.audit.description': 'Prepare and run the external compliance review with certified partners.',
+    'tutorial.steps.audit.sections.intro.title': 'What this module really does',
+    'tutorial.steps.audit.sections.intro.content': `Here you have three main capabilities:
+- Text-based evidence validation
+- Granular file validation
+- Pre-audit checklist with auto-save`,
+    'tutorial.steps.audit.sections.intro.action': 'Locate the validator, checklist, and Audit Room',
+    'tutorial.steps.audit.sections.validation.title': 'Content and file validation',
+    'tutorial.steps.audit.sections.validation.content': `You can paste text evidence or upload a file so the system analyzes findings and compliance status.
+
+The result shows progress, severities, and observations.`,
+    'tutorial.steps.audit.sections.validation.action': 'Run a sample validation',
+    'tutorial.steps.audit.sections.readiness.title': 'Checklist and Audit Room',
+    'tutorial.steps.audit.sections.readiness.content': `The checklist is saved automatically and helps you track open items before the audit.
+
+In the Audit Room you can select evidence and generate a PDF binder for download.`,
+    'tutorial.steps.audit.sections.readiness.action': 'Fill the checklist and generate the binder',
+    'tutorial.steps.audit.sections.conclusion.title': 'End of this step',
+    'tutorial.steps.audit.sections.conclusion.content': `With validation, checklist, and PDF binder, you get to the review with better organized evidence.
+
+The next step is to keep that level with regular self-assessment.`,
+    'tutorial.steps.audit.sections.conclusion.action': 'Click Next',
+    'tutorial.steps.self-assessment.title': 'Continuous self-assessment',
+    'tutorial.steps.self-assessment.description': 'Run regular internal assessments to stay compliant between audits.',
+    'tutorial.steps.self-assessment.sections.intro.title': 'What this module does',
+    'tutorial.steps.self-assessment.sections.intro.content': `The current self-assessment is a questionnaire split into phases.
+
+You answer each question and the system saves progress so you can continue later.`,
+    'tutorial.steps.self-assessment.sections.intro.action': 'Identify phases and side progress',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.title': 'Available answers',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.content': `The answer options are: Yes, Partial, No, and N/A.
+
+You can answer question by question and move to the next phase from the side selector.`,
+    'tutorial.steps.self-assessment.sections.self-assessment-form.action': 'Answer at least one question per phase',
+    'tutorial.steps.self-assessment.sections.evidence-review.title': 'Evidence per question',
+    'tutorial.steps.self-assessment.sections.evidence-review.content': `Each question allows evidence to be attached.
+
+Important rule: if a critical question is marked "Yes", you must attach evidence to validate it correctly.`,
+    'tutorial.steps.self-assessment.sections.evidence-review.action': 'Attach evidence to a critical question',
+    'tutorial.steps.self-assessment.sections.persistence.title': 'Save and continue',
+    'tutorial.steps.self-assessment.sections.persistence.content': `Progress is saved automatically (local + backend), so you do not lose answers when changing phases or reloading.
+
+You also see phase progress and global answered progress.`,
+    'tutorial.steps.self-assessment.sections.persistence.action': 'Change phases and verify save',
+    'tutorial.steps.self-assessment.sections.conclusion.title': 'End of this step',
+    'tutorial.steps.self-assessment.sections.conclusion.content': `With answers, evidence, and continuous phase-based saving, you can reliably track compliance between formal reviews.
+
+That discipline improves traceability and reduces surprises in audit cycles.`,
+    'tutorial.steps.self-assessment.sections.conclusion.action': 'Celebrate your progress',
 
     // Sidebar
     'sidebar.orgProfile': 'Organization Profile',
@@ -150,6 +601,7 @@ export const translations = {
     'menu.audit': 'Audit',
     'menu.integrity': 'Integrity',
     'menu.regfeed': 'Regulatory Feed',
+    'menu.portal': 'Portal',
     'menu.gapAnalysis': 'Gap Analysis',
     'menu.documentGenerator': 'Document Generator',
     'menu.riskMap': 'Risk Map',
@@ -161,6 +613,13 @@ export const translations = {
     'menu.euai': 'EU AI Act',
     'menu.escalation': 'Escalation Rules',
     'menu.integrations': 'Integrations',
+    'integrations.connected': 'Connected',
+    'integrations.disconnected': 'Disconnected',
+    'integrations.upcoming': 'Próximamente',
+    'integrations.lastSync': 'Last sync',
+    'integrations.connect': 'Connect',
+    'integrations.disconnect': 'Disconnect',
+    'integrations.frequency': 'Sync frequency',
     'menu.settings': 'Settings',
     'menu.assets': 'Asset Inventory',
 
@@ -183,11 +642,22 @@ export const translations = {
     controlsUnverified: 'controls unverified',
     controlsUntested: 'controls untested',
     'dashboard.overview': 'Overview of your compliance health and progress',
+    'dashboard.overviewLabel': 'Dashboard',
     'dashboard.kpiLoadError': 'Unable to load KPIs',
     'dashboard.loadingKpis': 'Loading KPIs...',
+    'dashboard.loading': 'Loading...',
+    'dashboard.noRecentActivity': 'No recent activity available',
+    'dashboard.noUpcomingTasks': 'No upcoming tasks found',
+    'dashboard.nextAuditTitle': 'Next audit',
+    'dashboard.daysLeft': 'days left',
+    'dashboard.targetDate': 'Target date',
     'dashboard.healthScoreTrend': 'Health Score Trend',
     'dashboard.recentActivity': 'Recent Activity',
     'dashboard.upcomingTasks': 'Upcoming Tasks',
+    'dashboard.lastAudit': 'Last audit',
+    'dashboard.today': 'From today',
+    'dashboard.cycleLabel': 'Cycle',
+    'dashboard.statusLabel': 'Status',
     'kpi.noData': 'No data available',
     'kpi.compliance': 'Compliance',
     'healthScore.subtitle': 'Backend-calculated compliance readiness',
@@ -215,10 +685,41 @@ export const translations = {
     'dashboard.priority.high': 'HIGH',
     'dashboard.priority.medium': 'MEDIUM',
     'dashboard.priority.low': 'LOW',
+    'searchBinder.error.enterTerm': 'Enter a term to search.',
+    'searchBinder.log.search': 'Search: "{term}" ({count} results)',
+    'searchBinder.log.searchError': 'Search error: "{term}"',
+    'searchBinder.deselected': 'Deselected',
+    'searchBinder.selected': 'Selected',
+    'searchBinder.log.removed': 'Removed from binder: {id}',
+    'searchBinder.log.cleared': 'Binder cleared',
+    'searchBinder.selectedItemsCount': '{count} selected item(s)',
+    'searchBinder.error.selectOne': 'Select at least one item to generate a binder.',
+    'searchBinder.binderTitle': 'Audit binder',
+    'searchBinder.binderDescription': 'Binder generated from dashboard',
+    'searchBinder.error.generateBinder': 'Could not generate binder. Please try again.',
+    'searchBinder.searchPlaceholder': 'Search in natural language: e.g. access policies, audit evidences',
+    'searchBinder.search': 'Search',
+    'searchBinder.relevantResults': 'Relevant results',
+    'searchBinder.quickView': 'Annex A quick view',
+    'searchBinder.resultsCount': '{count} results',
+    'searchBinder.loadingResults': 'Loading results...',
+    'searchBinder.emptyHint': 'Run a search to view Annex A fragments.',
+    'searchBinder.addedToBinder': 'Added to binder',
+    'searchBinder.addToBinder': 'Add to binder',
+    'searchBinder.relevance': 'Relevance {score}%',
+    'searchBinder.inlinePreview': 'Inline preview',
+    'searchBinder.binder': 'Binder',
+    'searchBinder.multiSelection': 'Multi-selection',
+    'searchBinder.noneSelected': 'No selected items. Add items from the list.',
+    'searchBinder.generateBinderPdf': 'Generate binder PDF',
+    'searchBinder.waitingGeneration': 'Waiting for binder generation...',
+    'searchBinder.actionLog': 'Action log',
+    'searchBinder.emptyLog': 'Your latest 50 actions will appear here.',
     'audit.title': 'Compliance Audit',
     'audit.subtitle': 'Validate your evidence against ISO 27001 standards',
     'audit.fileValidatorTitle': 'Validate File with Agent',
     'audit.dropHint': 'Click or drag a file',
+    'audit.dropNow': 'Drop your file here',
     'audit.dropSubHint': 'PDF, Word, Excel, Text, Images (max 10MB)',
     'audit.processing': 'Processing granular validation...',
     'audit.jobId': 'Job ID',
@@ -286,6 +787,24 @@ export const translations = {
     'audit.jobQueued': 'Job queued',
     'audit.validationError': 'Validation error',
     'audit.validationUnknownError': 'Unknown validation error',
+    'audit.statusCompliant': 'Compliant',
+    'audit.statusNonCompliant': 'Non-compliant',
+    'audit.statusNeedsReview': 'Needs review',
+    'audit.findingsLabel': 'Findings',
+    'audit.detectedFindings': 'Detected Findings',
+    'audit.severity': 'Severity',
+    'audit.recommendation': 'Recommendation',
+    'audit.impact': 'Impact',
+    'audit.agentNotes': 'Agent Notes',
+    'audit.noChanges': 'No changes',
+    'preAuditCard.title': 'Pre-Audit Self-Assessment',
+    'preAuditCard.readinessLabel': 'Estimated Audit Readiness',
+    'preAuditCard.readinessSubtitle': '3 high-risk non-conformity areas detected',
+    'preAuditCard.findingsTitle': 'Likely Audit Findings',
+    'preAuditCard.finding.accessManagement': 'Access management — evidence expired',
+    'preAuditCard.finding.businessContinuity': 'Business continuity — no recovery test in 2025',
+    'preAuditCard.finding.incidentManagement': 'Incident management — CAPA open 45+ days',
+    'preAuditCard.finding.cryptographyPolicy': 'Cryptography policy — draft not yet approved',
 
     'settings.title': 'Settings',
     'settings.subtitle': 'Tune language, appearance, notifications, and automation for your workspace.',
@@ -322,6 +841,7 @@ export const translations = {
     'settings.regulatoryUpdatesHelp': 'Alert on new regulatory changes',
     'settings.auditDeadlines': 'Audit deadlines',
     'settings.auditDeadlinesHelp': 'Notify before key audit dates',
+    'settings.auditCycleHelp': 'Define the frequency of scheduled audits for your organization.',
     'settings.automationScheduling': 'Automation & Scheduling',
     'settings.autoSave': 'Auto-save',
     'settings.autoSaveHelp': 'Save changes automatically when possible',
@@ -338,8 +858,586 @@ export const translations = {
     'phase.2': 'Planning & Risk',
     'phase.3': 'Support & Operations',
     'phase.4': 'Annex A Controls',
-  },
-  es: {
+    // Assessment & Evidence
+    'assessment.responded': 'Responded',
+    'assessment.loadingQuestions': 'Loading questions...',
+    'assessment.noQuestions': 'No questions in this phase.',
+    'assessment.viewByPhase': 'View by phase: answer all questions in this column to avoid losing context.',
+    'assessment.questionLabel': 'Question',
+    'assessment.criticalNoEvidenceToast': 'Critical questions answered as Yes require attaching evidence',
+    'assessment.criticalWarning': '⚠️ Critical questions answered as "YES" require attaching evidence documentation.',
+    'assessment.criticalBadge': 'CRITICAL',
+    'answer.yes': 'Yes',
+    'answer.partial': 'Partial',
+    'answer.no': 'No',
+    'answer.na': 'N/A',
+    'evidence.dragDropHint': 'Drag and drop evidence here, or',
+    'evidence.quickSelect': 'Select (quick)',
+    'evidence.advancedUploader': 'Advanced uploader',
+    'evidence.recentUploads': 'Recent uploads',
+    'assessment.save.savedPrefix': 'Saved:',
+    'assessment.save.notSaved': 'Not saved yet',
+    'evidence.title': 'Evidence Center',
+    'evidence.subtitle': 'Organize your evidence by type and ISO 27001 control.',
+    'evidence.uploadAction': '+ Upload Evidence',
+    'evidence.kpi.totalItems': 'Total evidence items',
+    'evidence.kpi.totalItemsHelp': 'Organized by evidence taxonomy',
+    'evidence.kpi.filteredItems': 'Filtered items',
+    'evidence.kpi.filteredItemsHelp': 'Search and type filters applied',
+    'evidence.kpi.types': 'Evidence types',
+    'evidence.kpi.typesHelp': 'Grouped by taxonomy',
+    'evidence.searchPlaceholder': 'Search evidence, control, clause...',
+    'evidence.allTypes': 'All evidence types',
+    'evidence.showing': 'Showing {matched} of {total} evidence items',
+    'evidence.loading': 'Loading evidence...',
+    'evidence.empty': 'No evidence matches your filters.',
+    'evidence.validityDays': '{days} days',
+    'evidence.deleting': 'Deleting...',
+    'evidence.delete': 'Delete',
+    'evidence.loadError': 'Could not load evidence. Please try again.',
+    'evidence.deleteError': 'Could not delete evidence. Please try again.',
+    'evidence.confirmDelete': 'Delete evidence "{name}"? This action cannot be undone.',
+    'evidence.type.policy': 'Policy',
+    'evidence.type.procedure': 'Procedure',
+    'evidence.type.instruction': 'Instruction',
+    'evidence.type.control': 'Control',
+    'evidence.type.record': 'Record',
+    'evidence.freshness.fresh': 'Fresh',
+    'evidence.freshness.expiring': 'Expiring Soon',
+    'evidence.freshness.expired': 'Expired',
+    'mfa.setupBadge': 'Setup MFA',
+    'mfa.title': 'Scan the QR code with your authenticator app',
+    'mfa.subtitle': 'Use Google Authenticator, Authy, or 1Password. The QR code is generated by the server and the shared secret is never exposed directly.',
+    'mfa.feature.serverQr': 'QR generated server-side',
+    'mfa.feature.totp': 'TOTP compatible',
+    'mfa.feature.backupCodes': '10 backup codes',
+    'mfa.backupManagementTitle': 'Backup code management',
+    'mfa.backupManagementSubtitle': '2FA is already active. Generate a fresh backup code set if needed.',
+    'mfa.generating': 'Generating...',
+    'mfa.generateBackupCodes': 'Generate backup codes',
+    'mfa.backupCodesHelp': 'Store these codes securely. They will not be shown again.',
+    'mfa.copied': 'Copied',
+    'mfa.copyAll': 'Copy all',
+    'mfa.confirmTitle': 'Confirm your authenticator',
+    'mfa.confirmSubtitle': 'Enter the 6-digit code generated by your app to finish activation.',
+    'mfa.qrAlt': 'MFA QR code',
+    'mfa.authenticatorCode': 'Authenticator code',
+    'mfa.verifying': 'Verifying...',
+    'mfa.enable': 'Enable 2FA',
+    'mfa.backToSettings': 'Back to settings',
+    'mfa.backupGenerated': 'Backup codes generated. Save them now; they are shown only once.',
+    'mfa.enabledSuccess': 'Two-factor authentication is enabled. Save these backup codes now; they are shown only once.',
+    'settings.tab.security': 'Security',
+    'settings.tab.preferences': 'Preferences',
+    'settings.tab.appearance': 'Appearance',
+    'settings.tab.auditCycle': 'Audit Cycle',
+    'settings.themeToggleHelp': 'Toggle your app theme.',
+    'settings.theme.dark': 'Dark',
+    'settings.theme.light': 'Light',
+    'settings.switch.on': 'On',
+    'settings.switch.off': 'Off',
+    'settings.2fa.title': 'Two-factor authentication',
+    'settings.2fa.enabledHelp': 'Your account is protected with TOTP plus backup codes.',
+    'settings.2fa.disabledHelp': 'Protect your account with Google Authenticator, Authy, or 1Password.',
+    'settings.2fa.enabled': 'Enabled',
+    'settings.2fa.disabled': 'Disabled',
+    'settings.2fa.setupHelp': 'Set up 2FA to generate a scannable QR code and receive one-time backup codes.',
+    'settings.2fa.enableAction': 'Enable 2FA',
+    'settings.2fa.disableTitle': 'Disable 2FA',
+    'settings.2fa.disableHelp': 'Enter your password to disable 2FA. This revokes the current secret and every backup code.',
+    'settings.2fa.backupCodes': 'Backup codes',
+    'settings.2fa.confirmPassword': 'Confirm your password',
+    'settings.2fa.disabling': 'Disabling...',
+    'settings.2fa.disableAction': 'Disable 2FA',
+    'settings.2fa.disabledSuccess': 'Two-factor authentication has been disabled and all backup codes were revoked.',
+    'settings.2fa.passwordValidation': 'Enter your password to disable 2FA',
+    'settings.auditCycle.title': 'Audit cycle',
+    'settings.auditCycle.currentFrequency': 'Current frequency',
+    'settings.auditCycle.nextAudit': 'Next audit',
+    'settings.auditCycle.notScheduled': 'Not scheduled',
+    'settings.auditCycle.scheduled': 'Scheduled',
+    'settings.auditCycle.noDate': 'No date',
+    'settings.auditCycle.emptyCalendar': 'Schedule an audit to display its date in the calendar.',
+    'settings.auditCycle.markCompleted': 'Mark audit as completed',
+    'settings.auditCycle.history': 'History',
+    'settings.auditCycle.historyEmpty': 'No completed audits have been registered yet.',
+    'settings.auditCycle.monthly': 'Monthly',
+    'settings.auditCycle.quarterly': 'Quarterly',
+    'settings.auditCycle.annual': 'Annual',
+    'settings.auditCycle.toastUpdated': 'Frequency updated',
+    'settings.auditCycle.toastPermissionDenied': 'Insufficient permissions to update frequency',
+    'settings.auditCycle.toastUpdateError': 'Error updating frequency',
+    'settings.auditCycle.toastCompleted': 'Audit marked as completed',
+    'settings.auditCycle.toastCompleteError': 'Error marking audit as completed',
+    'understand.frameworkSummary': 'Framework status summary',
+    'understand.phaseFallback': 'Phase {index}',
+    'understand.phaseGapsSummary': '{unanswered} unanswered gaps — {critical} critical',
+    'understand.auditFinding': 'Audit finding',
+    'understand.toast.noOpenGaps': 'There are no unanswered gaps in this phase, but you can still create documentation.',
+    'understand.toast.navigationError': 'Navigation error',
+    'findings.title': 'CAPA Tracker',
+    'findings.subtitle': 'Manage corrective actions, priorities, and due dates from one workspace.',
+    'findings.kpi.total': 'Total CAPAs',
+    'findings.kpi.totalHelp': 'Includes all registered CAPAs',
+    'findings.kpi.open': 'Open CAPAs',
+    'findings.kpi.openHelp': 'Actions currently in progress',
+    'findings.kpi.overdue': 'Overdue',
+    'findings.kpi.overdueHelp': 'Past due CAPAs pending completion',
+    'findings.kpi.closed': 'Closed',
+    'findings.kpi.closedHelp': 'Completed CAPAs',
+    'findings.filter.status': 'Filter by status',
+    'findings.filter.priority': 'Filter by priority',
+    'findings.filter.allStatuses': 'All statuses',
+    'findings.filter.allPriorities': 'All priorities',
+    'findings.showing': 'Showing {shown} of {total} CAPAs',
+    'findings.openCorrectiveActions': 'Open Corrective Actions',
+    'findings.loadingCapas': 'Loading CAPAs...',
+    'findings.emptyCapas': 'No CAPAs registered yet. Create a new CAPA to begin.',
+    'findings.emptyFiltered': 'No matching CAPAs. Adjust filters to see results.',
+    'findings.table.status': 'Status',
+    'findings.table.priority': 'Priority',
+    'findings.table.dueDate': 'Due Date',
+    'findings.table.progress': 'Progress',
+    'findings.table.overdue': 'Overdue',
+    'findings.onTime': 'On time',
+    'findings.overdue': 'Overdue',
+    'findings.description': 'Description',
+    'findings.noDescription': 'No description available.',
+    'findings.controlOwner': 'Control / Owner',
+    'findings.unassigned': 'Unassigned',
+    'findings.noOwner': 'No owner',
+    'findings.source': 'Source',
+    'findings.createdUpdated': 'Created / Updated',
+    'findings.create.title': 'Create new CAPA',
+    'findings.create.subtitle': 'Quickly register a corrective action and keep data synchronized.',
+    'findings.create.fieldTitle': 'Title',
+    'findings.create.fieldDescription': 'Description',
+    'findings.create.fieldPriority': 'Priority',
+    'findings.create.fieldSource': 'Source',
+    'findings.create.fieldDueDate': 'Due Date',
+    'findings.create.fieldProgress': 'Progress',
+    'findings.create.fieldControlId': 'Control ID',
+    'findings.create.titlePlaceholder': 'e.g. Review access control evidence',
+    'findings.create.descriptionPlaceholder': 'Describe the required corrective action',
+    'findings.optional': 'Optional',
+    'findings.creating': 'Creating...',
+    'findings.createAction': 'Create CAPA',
+    'findings.priorityBreakdown': 'Priority Breakdown',
+    'findings.gapFindings': 'Gap Analysis Findings',
+    'findings.totalGaps': 'Total gaps',
+    'findings.totalGapsHelp': 'Gap analysis questions',
+    'findings.unanswered': 'Unanswered',
+    'findings.unansweredHelp': 'Includes critical gaps',
+    'findings.progress': 'Progress',
+    'findings.progressHelp': 'Gap analysis completion',
+    'findings.validationFindings': 'Validation findings',
+    'findings.validationFindingsHelp': 'Review findings generated by granular document validation in recent history.',
+    'findings.criticalGaps': 'Critical gaps',
+    'findings.loadingGaps': 'Loading gaps...',
+    'findings.noGaps': 'No gaps found at this moment.',
+    'findings.phaseSummary': '{unanswered} unanswered gaps · {critical} critical',
+    'findings.indicators': 'Findings indicators',
+    'findings.openCriticalGaps': 'Open critical gaps',
+    'findings.answeredQuestions': 'Answered questions',
+    'findings.capaLoadError': 'Could not load CAPA data. Please try again.',
+    'findings.gapsLoadError': 'Could not load findings data. Please try again.',
+    'findings.phaseFallback': 'Phase {index}',
+    'findings.createTitleRequired': 'Title is required to create a CAPA.',
+    'findings.createError': 'Could not create CAPA. Please review the fields and try again.',
+    'findings.priority.critical': 'Critical',
+    'findings.priority.high': 'High',
+    'findings.priority.medium': 'Medium',
+    'findings.priority.low': 'Low',
+    'findings.status.open': 'Open',
+    'findings.status.inProgress': 'In Progress',
+    'findings.status.resolved': 'Resolved',
+    'findings.status.closed': 'Closed',
+    'findings.source.internalAudit': 'Internal Audit',
+    'findings.source.externalAudit': 'External Audit',
+    'findings.source.incident': 'Incident',
+    'findings.source.managementReview': 'Management Review',
+    'common.save': 'Save',
+    'common.saving': 'Saving...',
+    'common.close': 'Close',
+    'common.hours': 'Hours',
+    'common.refresh': 'Refresh',
+    'common.refreshing': 'Refreshing',
+    'common.viewMore': 'View more',
+    'common.viewLess': 'View less',
+    'common.edit': 'Edit',
+    'validation.historyTitle': 'Validation history',
+    'validation.jobsCount': '{count} jobs',
+    'validation.searchPlaceholder': 'Search by file name...',
+    'validation.last7Days': 'Last 7 days',
+    'validation.last30Days': 'Last 30 days',
+    'validation.all': 'All',
+    'validation.table.file': 'File',
+    'validation.table.score': 'Score',
+    'validation.table.status': 'Status',
+    'validation.table.action': 'Action',
+    'validation.viewDetail': 'View detail',
+    'validation.noJobs': 'No jobs found',
+    'validation.detailUnavailable': 'This result is not available. Only jobs completed after the latest update can be viewed in detail.',
+    'validation.loadingDetail': 'Loading detail...',
+    'validation.avgCompliance': 'Average compliance',
+    'validation.completed': 'Validation completed',
+    'validation.summary': 'Summary',
+    'validation.findingsByChunk': 'Findings by ISO chunk',
+    'validation.scoreRelevance': 'Score: {score}% · Relevance: {relevance}%',
+    'validation.missingElements': 'Missing elements:',
+    'validation.status.completed': 'Completed',
+    'validation.status.processing': 'Processing',
+    'validation.status.queued': 'Queued',
+    'validation.status.failed': 'Failed',
+    'integrations.hub': 'Integrations Hub',
+    'integrations.subtitle': 'Centralize service connections, automate synchronization, and reduce manual work.',
+    'integrations.activeConnectors': 'Active connectors',
+    'integrations.activeConnectorsHelp': 'Ready to sync automatically.',
+    'integrations.totalIntegrations': 'Total integrations',
+    'integrations.totalIntegrationsHelp': 'Connectors available in this workspace.',
+    'integrations.upcomingReleases': 'Upcoming releases',
+    'integrations.upcomingReleasesHelp': 'Integrations that will be available soon.',
+    'integrations.loading': 'Loading connectors...',
+    'integrations.popupRequired': 'Please allow popups to start OAuth',
+    'integrations.status.connected': 'Connected',
+    'integrations.status.disconnected': 'Disconnected',
+    'integrations.status.syncing': 'Syncing',
+    'integrations.status.error': 'Error',
+    'integrations.status.upcoming': 'Upcoming',
+    'integrations.lastSyncLabel': 'Last sync',
+    'integrations.noHistory': 'No history',
+    'integrations.everyHours': 'Every {hours} hours',
+    'integrations.connectorDescription': 'Connector description',
+    'integrations.connectorDescriptionHelp': 'Your credentials are kept secure and syncing runs in the background to keep data updated.',
+    'integrations.processing': 'Processing...',
+    'integrations.reconnectHint': 'If you need to refresh permissions, reconnect this connector from here.',
+    'integrations.wizard.connect': 'Connect {name}',
+    'integrations.wizard.subtitle': 'Follow the steps to authorize access.',
+    'integrations.wizard.step1': 'Start the authorization flow.',
+    'integrations.wizard.step2': 'Confirm permissions in the provider window.',
+    'integrations.wizard.step3': 'You will be redirected back to the app when finished.',
+    'integrations.wizard.startAuth': 'Start authorization',
+    'integrations.syncFrequency': 'Sync frequency',
+    'integrations.syncEveryHours': 'Automatically updates every {hours} hours',
+    'integrations.syncHelp': '24 hours is the standard setting; use it for daily syncs and avoid very frequent calls unless you need real-time data.',
+    'settings.password.title': 'Password',
+    'settings.password.subtitle': 'Update your password and revoke active refresh sessions.',
+    'settings.password.current': 'Current password',
+    'settings.password.new': 'New password',
+    'settings.password.confirm': 'Confirm new password',
+    'settings.password.hint': 'Use strong passwords with uppercase letters, numbers and symbols.',
+    'settings.password.saving': 'Saving...',
+    'settings.password.updateAction': 'Update password',
+    'settings.password.updated': 'Your password has been updated successfully.',
+    'portal.mandatory': 'Mandatory',
+    'portal.optional': 'Optional',
+    'portal.acknowledged': 'Acknowledged',
+    'portal.pending': 'Pending',
+    'portal.viewPolicy': 'View policy',
+    'portal.versionLine': 'Version {version} · {kind} · Published {date}',
+    'portal.officialSummary': 'Official summary',
+    'portal.noSummary': 'No summary available.',
+    'portal.notAvailable': 'N/A',
+    'portal.versionPrefix': 'v',
+    'portal.fullText': 'Full text',
+    'portal.readCarefully': 'Read carefully',
+    'portal.ackCheckboxText': 'I have read this policy and acknowledge the current document version.',
+    'portal.ackCheckboxHelp': 'This acknowledgment will be recorded for your organization.',
+    'portal.ackSuccess': 'Policy acknowledged successfully.',
+    'portal.pageTitle': 'Policy acknowledgments',
+    'portal.pageSubtitle': 'Review policies published by your organization and confirm the ones you have read.',
+    'portal.publishedPolicies': 'Published policies',
+    'portal.statusAutoUpdate': 'Updates automatically as policies are acknowledged.',
+    'portal.loadingPolicies': 'Loading policies...',
+    'assets.confirmDelete': 'Delete this asset?',
+    'assets.subtitle': 'ISO 27001 C-I-A classification',
+    'assets.newAsset': '+ New asset',
+    'assets.assetsLabel': 'assets',
+    'assets.filterByType': 'Filter by type:',
+    'assets.allTypes': 'All types',
+    'assets.noneFound': 'No assets found',
+    'assets.addFirst': 'Add your first asset',
+    'assets.table.asset': 'Asset',
+    'assets.table.type': 'Type',
+    'assets.table.score': 'Score',
+    'assets.table.level': 'Level',
+    'assets.table.status': 'Status',
+    'assets.countSummary': '{filtered} of {total} assets',
+    'assets.editAsset': 'Edit asset',
+    'assets.newAssetTitle': 'New asset',
+    'assets.editSubtitle': 'Update classification and metadata',
+    'assets.newSubtitle': 'Register a new information asset',
+    'assets.field.name': 'Name *',
+    'assets.field.description': 'Description',
+    'assets.field.type': 'Asset type *',
+    'assets.field.location': 'Location',
+    'assets.field.cia': 'C-I-A Classification',
+    'assets.field.isoClause': 'ISO clause reference',
+    'assets.placeholder.name': 'e.g. Production database server',
+    'assets.placeholder.description': 'Brief description of this asset...',
+    'assets.placeholder.location': 'e.g. AWS us-east-1',
+    'assets.placeholder.isoClause': 'e.g. A.8.1.1',
+    'assets.selectType': 'Select type...',
+    'assets.ciaScale': '1 = Low · 2 = Medium · 3 = High',
+    'assets.cia.low': '1 — Low',
+    'assets.cia.medium': '2 — Medium',
+    'assets.cia.high': '3 — High',
+    'assets.cia.confidentiality': 'Confidentiality',
+    'assets.cia.integrity': 'Integrity',
+    'assets.cia.availability': 'Availability',
+    'assets.validation.nameRequired': 'Name is required',
+    'assets.validation.typeRequired': 'Type is required',
+    'assets.ciaScoreHint': 'Score = C×0.4 + I×0.35 + A×0.25 — calculated automatically',
+    'assets.type.hardware': 'Hardware',
+    'assets.type.software': 'Software',
+    'assets.type.data': 'Data',
+    'assets.type.service': 'Service',
+    'assets.type.people': 'People',
+    'assets.type.facility': 'Facility',
+    'assets.level.low': 'Low',
+    'assets.level.medium': 'Medium',
+    'assets.level.high': 'High',
+    'assets.level.critical': 'Critical',
+    'assets.status.active': 'Active',
+    'assets.status.inactive': 'Inactive',
+    'assets.status.disposed': 'Disposed',
+    'assets.saveChanges': 'Save changes',
+    'assets.createAsset': 'Create asset',
+    'auditRoom.error.loadFolders': 'Could not load Audit Room folders.',
+    'auditRoom.error.loadEvidences': 'Could not load folder evidences.',
+    'auditRoom.error.selectEvidence': 'Select at least one evidence to generate the binder.',
+    'auditRoom.error.startBinder': 'Could not start binder generation.',
+    'auditRoom.error.statusBinder': 'Error fetching binder status.',
+    'auditRoom.error.downloadBinder': 'Could not download binder. Please try again.',
+    'auditRoom.binderQueued': 'Binder queued',
+    'auditRoom.binderTitle': 'Audit Room Binder',
+    'auditRoom.binderDescriptionFolder': 'Generated from folder {folder}',
+    'auditRoom.binderDescription': 'Binder generated from Audit Room',
+    'auditRoom.subtitle': 'Explore Annex A folders and generate binders from selected evidences.',
+    'auditRoom.selectedCount': '{count} selected evidence(s)',
+    'auditRoom.folders': 'Folders',
+    'auditRoom.loadingFolders': 'Loading folders...',
+    'auditRoom.folderEvidenceCount': '{count} evidences',
+    'auditRoom.binderStatus': 'Binder status',
+    'auditRoom.statusLabel': 'Status:',
+    'auditRoom.notStarted': 'Not started',
+    'auditRoom.progressLabel': 'Progress:',
+    'auditRoom.downloading': 'Downloading...',
+    'auditRoom.downloadPdf': 'Download binder PDF',
+    'auditRoom.generatedWhenFinished': 'It will be generated once the process finishes.',
+    'auditRoom.selectFolderHint': 'Select a folder to view items.',
+    'auditRoom.noFolderSelected': 'No folder selected',
+    'auditRoom.loadingEvidences': 'Loading evidences...',
+    'auditRoom.noEvidencesInFolder': 'No evidences available in this folder.',
+    'auditRoom.selectFolderToView': 'Select a folder to view evidences.',
+    'auditRoom.generatingBinder': 'Generating binder...',
+    'auditRoom.generateBinder': 'Generate binder',
+    'auditRoom.createBinderHint': 'Select items to create a binder PDF from Audit Room.',
+    'errorBoundary.title': 'App error',
+    'errorBoundary.message': 'An application error occurred. Reload the page.',
+    'searchBinder.error.search': 'Search failed. Please try again.',
+    'searchBinder.binderDetail': 'Binder detail',
+    'common.clear': 'Clear',
+    'documents.generate.defaultTitle': 'New ISO 27001 document',
+    'documents.generate.defaultDescription': 'Generate a mandatory ISO 27001 document with AI support.',
+    'documents.generate.defaultAudience': 'Security team',
+    'documents.report.defaultTitle': 'Compliance report',
+    'documents.report.defaultDescription': 'Status summary and compliance gaps.',
+    'documents.error.loadList': 'Could not load documents. Try reloading the page.',
+    'documents.error.loadSelected': 'Could not load the selected document.',
+    'documents.report.error.timeout': 'Report generation took too long. Please try again.',
+    'documents.report.error.status': 'Could not retrieve report status. Please try again.',
+    'documents.confirmDelete': 'Are you sure you want to delete this document?',
+    'documents.error.delete': 'Could not delete document.',
+    'documents.report.error.selectFirst': 'Please select a document from the sidebar first.',
+    'documents.report.error.start': 'Could not start report generation.',
+    'documents.upload.error.missingInput': 'You must select a file or enter content.',
+    'documents.upload.defaultTitle': 'Uploaded document',
+    'documents.upload.success': 'Document uploaded successfully.',
+    'documents.upload.defaultDescription': 'Uploaded document',
+    'documents.upload.error.generic': 'Error uploading document. Please try again.',
+    'documents.generate.starting': 'Starting generation...',
+    'documents.generate.fallbackTitle': 'ISO 27001 document',
+    'documents.generate.completed': 'Generation completed',
+    'documents.generate.errorStatus': 'Generation error',
+    'documents.generate.errorStart': 'Could not start generation. Check configuration.',
+    'documents.generate.defaultUploadedDescription': 'AI-generated document',
+    'documents.generate.uploadError': 'Error uploading generated document.',
+    'documents.tab.view': 'View',
+    'documents.tab.edit': 'Editor',
+    'documents.tab.generate': 'Generate with AI',
+    'documents.tab.report': 'Export report',
+    'documents.tab.upload': 'Upload',
+    'documents.hero.subtitle': 'Create, edit, and manage ISO 27001 documents with AI assistance in a clearer professional flow.',
+    'documents.sidebar.quickAccess': 'Quick access to your saved documents.',
+    'documents.sidebar.searchPlaceholder': 'Search documents',
+    'documents.deleteDocument': 'Delete document',
+    'documents.viewLess': 'View less',
+    'documents.viewMoreCount': 'View more ({count} more)',
+    'documents.action.generateAi': '+ Generate with AI',
+    'documents.action.exportReport': '+ Export report',
+    'documents.action.uploadDocument': '+ Upload document',
+    'documents.noDocumentSelected': 'No document selected',
+    'documents.openAssistant': 'Open assistant',
+    'documents.loadingDocument': 'Loading document...',
+    'documents.selectToView': 'Select a document to view its content.',
+    'documents.untitled': 'Untitled document',
+    'documents.generate.title': 'Generate document with AI',
+    'documents.generate.subtitle': 'The LLM agent will generate a full ISO 27001 document section by section.',
+    'documents.field.title': 'Title',
+    'documents.field.description': 'Description',
+    'documents.field.audience': 'Audience',
+    'documents.field.language': 'Language',
+    'documents.field.tone': 'Tone',
+    'documents.field.type': 'Type',
+    'documents.field.sections': 'Sections',
+    'documents.placeholder.title': 'Document title',
+    'documents.placeholder.context': 'Document context',
+    'documents.placeholder.audience': 'Target team',
+    'documents.placeholder.sections': 'Separated by commas or line breaks',
+    'documents.tone.formal': 'Formal',
+    'documents.tone.informal': 'Informal',
+    'documents.type.policy': 'Policy',
+    'documents.type.report': 'Report',
+    'documents.type.procedure': 'Procedure',
+    'documents.type.general': 'General',
+    'documents.jobId': 'Job ID:',
+    'documents.generate.generating': 'Generating...',
+    'documents.generate.button': 'Generate document',
+    'documents.openInEditor': 'Open in editor',
+    'documents.uploadGenerated': 'Upload generated document',
+    'documents.report.title': 'Export report',
+    'documents.report.subtitle': 'Generate a downloadable report based on the currently selected document.',
+    'documents.report.documentToExport': 'Document to export:',
+    'documents.report.noneSelected': 'No document selected in the sidebar',
+    'documents.report.fieldTitle': 'Report title',
+    'documents.report.placeholderDescription': 'E.g. Executive summary of ISO control status for management review',
+    'documents.report.descriptionHint': 'This text will appear as subtitle in the generated report header.',
+    'documents.report.template': 'Template',
+    'documents.report.format': 'Format',
+    'documents.report.status': 'Report status',
+    'documents.report.download': 'Download report',
+    'documents.report.generateAnother': 'Generate another',
+    'documents.report.recent': 'Recent reports',
+    'documents.report.generating': 'Generating report...',
+    'documents.report.startExport': 'Start export',
+    'documents.upload.title': 'Upload document',
+    'documents.upload.subtitle': 'Upload a file or paste content directly.',
+    'documents.upload.placeholderSummary': 'Short summary',
+    'documents.upload.file': 'File',
+    'documents.upload.altContent': 'Alternative content',
+    'documents.upload.altPlaceholder': 'Paste content here if you do not upload a file',
+    'documents.upload.uploading': 'Uploading...',
+    'documents.upload.button': 'Upload document',
+    'language.es': 'Spanish',
+    'language.en': 'English',
+    'common.optional': 'optional',
+    'documents.title': 'Document Generator',
+    'documents.viewLabel': 'Document view',
+    'documentEditor.titlePlaceholder': 'Document title',
+    'documentEditor.stats': '{words} words · {chars} characters',
+    'documentEditor.saved': '✓ Saved',
+    'documentEditor.unsaved': '○ Unsaved',
+    'documentEditor.copyAsText': 'Copy as text',
+    'documentEditor.copied': '✓ Copied',
+    'documentEditor.copy': 'Copy',
+    'documentEditor.upload': 'Upload',
+    'documentEditor.save': 'Save',
+    'documentEditor.exitFullscreen': 'Exit fullscreen',
+    'documentEditor.fullscreen': 'Fullscreen',
+    'documentEditor.placeholder': 'Start typing or generate a document with AI...',
+    'documentEditor.footerBrand': 'ISO 27001 · DANI Platform',
+    'documentEditor.mobileWords': '{count} words',
+    'documentEditor.toolbar.heading1': 'Heading 1',
+    'documentEditor.toolbar.heading2': 'Heading 2',
+    'documentEditor.toolbar.heading3': 'Heading 3',
+    'documentEditor.toolbar.bold': 'Bold',
+    'documentEditor.toolbar.italic': 'Italic',
+    'documentEditor.toolbar.underline': 'Underline',
+    'documentEditor.toolbar.bulletList': 'Unordered list',
+    'documentEditor.toolbar.orderedList': 'Ordered list',
+    'documentEditor.toolbar.blockquote': 'Quote',
+    'assessment.progressTitle': 'Progress',
+    'assessment.phaseLabel': 'Phase {order}',
+    'evidence.attachmentDeleted': 'File deleted',
+    'evidence.replace': 'Replace',
+    'evidence.deleteFile': 'Delete file',
+    'evidence.viewLess': 'View less',
+    'evidence.viewMoreCount': 'View {count} more',
+    'auditRoom.title': 'Audit Room',
+    'auditRoom.evidencesLabel': 'Evidences',
+    'navbar.openCommandPalette': 'Open command palette',
+    'navbar.cmdShortcut': 'Ctrl + K / ⌘K',
+    'integrations.oauth.title': 'OAuth',
+    'integrations.oauth.processing': 'Processing...',
+    'integrations.oauth.invalidParams': 'Invalid parameters',
+    'integrations.oauth.completed': 'Connection completed',
+    'integrations.oauth.timeout': 'Timeout reached. Check the connection in Integrations.',
+    'upload.field.controlId': 'control_id',
+    'upload.field.clauseRef': 'clause_ref',
+    'upload.placeholder.controlId': 'ISO 27001 A.5.1',
+    'upload.placeholder.clauseRef': 'A.5.1',
+    'upload.dialogTitle': 'Upload Evidence',
+    'upload.api.primary': 'POST /api/v1/evidences',
+    'upload.api.secondary': 'POST /api/validate/external',
+    'upload.massUpload': 'Bulk upload',
+    'upload.dragOrSelect': 'Drag files or select them manually',
+    'upload.acceptsUpTo': 'Accepts up to {max} files at once. Allowed formats: {formats}.',
+    'upload.quickSelectTitle': 'Quick select: open file picker for fast upload without editing metadata',
+    'upload.quickSelectAria': 'Quick file select',
+    'upload.selectQuick': 'Select (quick)',
+    'upload.loadedCount': '{count}/{max} loaded',
+    'upload.selectedFiles': 'Selected files',
+    'upload.selectedFilesHint': 'Name, size and status in real time',
+    'upload.filesCount': '{count} file(s)',
+    'upload.noFilesYet': 'You have not added files yet.',
+    'upload.classificationPreview': 'Classification preview',
+    'upload.status.classified': 'Classified',
+    'upload.status.classifying': 'Classifying',
+    'upload.status.pending': 'Pending',
+    'upload.isoSuggestion': 'ISO suggestion:',
+    'upload.waitingBackend': 'Waiting backend response',
+    'upload.detail': 'Detail:',
+    'upload.confidence': 'Confidence:',
+    'upload.editableMetadata': 'Editable metadata',
+    'upload.editableMetadataHint': 'Update name, control_id, type, and validity date',
+    'upload.field.name': 'Name',
+    'upload.placeholder.fileName': 'File name',
+    'upload.field.type': 'Type',
+    'upload.placeholder.type': 'POLICY, PROCEDURE, INSTRUCTION, CONTROL, RECORD',
+    'upload.field.validUntil': 'Valid until',
+    'upload.progress': 'Progress',
+    'upload.attempt': 'attempt',
+    'upload.retry': 'Retry',
+    'upload.progressCompleted': '{progress}% completed',
+    'upload.processingFinished': 'Processing finished',
+    'upload.waiting': 'Waiting',
+    'upload.unexpectedError': 'Unexpected error',
+    'upload.status.queued': 'Queued',
+    'upload.status.uploading': 'Uploading',
+    'upload.status.completed': 'Completed',
+    'upload.status.failed': 'Failed',
+    'upload.onlyAccepted': 'Only {formats} files are accepted.',
+    'upload.error.couldNotComplete': 'Could not complete upload',
+    'upload.error.retryFile': 'Could not retry file',
+    'upload.flowDescription': 'DANI-FE-022 flow: file upload in ISO taxonomy with inline metadata editing.',
+    'upload.maxFilesBadge': 'Maximum {max} files',
+    'upload.formatsBadge': 'Formats {formats}',
+    'upload.overallStatus': 'Overall status',
+    'upload.queueSummary': 'Current queue summary',
+    'upload.readyCount': '{done}/{total} ready',
+    'upload.pending': 'Pending',
+    'upload.completed': 'Completed',
+    'upload.noFilesYetTitle': 'No files yet',
+    'upload.noFilesYetHint': 'Add up to {max} files and then run upload to get ISO control suggestions.',
+    'upload.unknownMime': 'unknown mime',
+    'upload.footerNote': 'Each upload creates or updates documentary evidence in the ISO taxonomy.',
+    'upload.processing': 'Processing',
+    'upload.uploadNFiles': 'Upload {count} file(s)',
+    'upload.noPendingFiles': 'No pending files',
+    'upload.inline': 'Inline',
+    },
+es: {
     // Navigation
     dashboard: 'Panel de Control',
     understand: 'Entender Mi Situación',
@@ -359,6 +1457,19 @@ export const translations = {
     evidenceCenter: 'Centro de Evidencias',
     capaTracker: 'Seguimiento de CAPA',
     auditRoom: 'Sala de Auditoría',
+
+    // Login
+    'login.welcome': 'Bienvenido a Dani27001',
+    'login.subtitle': 'Inicia sesión en tu cuenta',
+    'login.email': 'Correo electrónico',
+    'login.emailPlaceholder': 'tú@empresa.com',
+    'login.emailRequired': 'El correo es obligatorio',
+    'login.password': 'Contraseña',
+    'login.passwordRequired': 'La contraseña es obligatoria',
+    'login.signIn': 'Iniciar sesión',
+    'login.signingIn': 'Iniciando sesión...',
+    'login.noAccount': '¿No tienes cuenta?',
+    'login.register': 'Registrarse',
 
     // Gap Analysis labels
     totalGaps: 'Total de Brechas Identificadas',
@@ -419,12 +1530,45 @@ export const translations = {
     'risks.recentVulnerabilitiesTitle': 'Vulnerabilidades recientes',
     'risks.loadingVulnerabilities': 'Cargando vulnerabilidades...',
     'risks.noVulnerabilities': 'No hay vulnerabilidades registradas.',
+    'risks.threatCreatedSuccess': 'Amenaza creada exitosamente',
+    'risks.vulnerabilityCreatedSuccess': 'Vulnerabilidad creada exitosamente',
+    'risks.addRiskButton': 'Agregar riesgo',
+    'risks.createRiskTitle': 'Crear riesgo',
+    'risks.createRiskDescription': 'Registra un nuevo riesgo en el registro de riesgos.',
+    'risks.riskNameLabel': 'Nombre',
+    'risks.riskNamePlaceholder': 'ej. Control de acceso insuficiente',
+    'risks.riskDescriptionLabel': 'Descripción',
+    'risks.riskDescriptionPlaceholder': 'Contexto adicional opcional',
+    'risks.riskAssetLabel': 'Activo',
+    'risks.probabilityLabel': 'Probabilidad',
+    'risks.impactLabel': 'Impacto',
+    'risks.cancelButton': 'Cancelar',
+    'risks.creating': 'Creando...',
+    'risks.createRiskButton': 'Crear riesgo',
+    'risks.riskCreatedSuccess': 'Riesgo creado exitosamente',
 
     // Common
     searchPlaceholder: 'Buscar controles o evidencia...',
     administrator: 'Administrador',
     chatPlaceholder: 'Escribe un mensaje...',
     send: 'Enviar',
+    'understand.gapAnalysis': 'Análisis de Brechas',
+    'understand.loading': 'Cargando...',
+    'understand.empty': 'No hay brechas para mostrar.',
+    'understand.actionHint': 'Al pulsar "Crear documentación" se inicia un proceso guiado donde la IA genera el documento recomendado para cerrar estas brechas.',
+    'understand.createDocumentation': 'Crear documentación',
+    'understand.modifyDocumentation': 'Modificar documentación',
+    'understand.criticalIntro': 'Qué te falta en brechas críticas:',
+    'understand.missing': 'Falta:',
+    'understand.suggestedEvidence': 'Evidencia sugerida:',
+    'understand.linkedEvidence': 'Evidencia vinculada detectada',
+    'understand.reason.no': 'Respondida como NO',
+    'understand.reason.partial': 'Respondida como PARCIAL',
+    'understand.reason.unanswered': 'Sin responder',
+    'understand.annexALabel': 'Controles Anexo A ISO 27001',
+    'understand.controlLabel': 'Control {value}',
+    'understand.clauseLabel': 'Cláusula {value}',
+    'app.placeholder.comingSoon': 'Esta página estará disponible pronto...',
 
     // Header
     'header.searchPlaceholder': 'Buscar controles o evidencia...',
@@ -432,6 +1576,8 @@ export const translations = {
     'header.viewProfile': 'Ver Perfil',
     'header.settings': 'Configuración',
     'header.signOut': 'Cerrar Sesión',
+    'navbar.openSidebar': 'Abrir menú de navegación',
+    'navbar.notifications': 'Notificaciones',
     'navbar.onboarding': 'Abrir guía de inicio',
     'tutorial.title': 'Guía profesional de inicio',
     'tutorial.subtitle': 'Descubre cada función clave del sistema para acelerar tu primera implementación.',
@@ -445,10 +1591,16 @@ export const translations = {
     'tutorial.step4.description': 'Entiende cada opción: gestión de riesgos, recopilación de evidencia, informes y preparación de auditoría.',
     'tutorial.step5.title': 'Siempre disponible',
     'tutorial.step5.description': 'El icono de la guía permanece visible en el encabezado para que puedas revisarlo cuando quieras.',
+    'tutorial.step6.title': 'Autoevaluación',
+    'tutorial.step6.description': 'Completa tu autoevaluación para medir tu nivel de cumplimiento y ver recomendaciones inmediatas.',
+    'tutorial.step7.title': 'Configuración',
+    'tutorial.step7.description': 'Ajusta tus preferencias, idioma y notificaciones para que el programa se adapte a tu equipo.',
     'tutorial.note': 'Este recorrido está disponible siempre con el icono superior.',
     'tutorial.close': 'Cerrar guía',
 
     // Sidebar
+    'sidebar.menu': 'Menú',
+    'sidebar.closeMenu': 'Cerrar menú',
     'sidebar.orgProfile': 'Perfil de Organización',
     'sidebar.change': 'Cambiar',
     'sidebar.byProcess': 'Por Proceso',
@@ -460,6 +1612,31 @@ export const translations = {
     'sidebar.settings': 'Configuración',
     'sidebar.availableInPlan': 'Disponible en Plan {plan}',
 
+    // Phases
+    'phase.1': 'Contexto & Liderazgo',
+    'phase.2': 'Planificación & Riesgo',
+    'phase.3': 'Soporte & Operaciones',
+    'phase.4': 'Controles Anexo A',
+    // Assessment & Evidence
+    'assessment.responded': 'Respondido',
+    'assessment.loadingQuestions': 'Cargando preguntas...',
+    'assessment.noQuestions': 'No hay preguntas en esta fase.',
+    'assessment.viewByPhase': 'Vista por fase: responde todas las preguntas en esta columna para evitar perder el contexto.',
+    'assessment.questionLabel': 'Pregunta',
+    'assessment.criticalNoEvidenceToast': 'Preguntas críticas respondidas como Sí requieren adjuntar evidencia',
+    'assessment.criticalWarning': '⚠️ Preguntas críticas respondidas como "SÍ" requieren adjuntar documentación de evidencia.',
+    'assessment.criticalBadge': 'CRÍTICO',
+    'answer.yes': 'Sí',
+    'answer.partial': 'Parcial',
+    'answer.no': 'No',
+    'answer.na': 'N/A',
+    'evidence.dragDropHint': 'Arrastra y suelta evidencias aquí, o',
+    'evidence.quickSelect': 'Seleccionar (rápido)',
+    'evidence.advancedUploader': 'Uploader avanzado',
+    'evidence.recentUploads': 'Últimas cargas',
+    'assessment.save.savedPrefix': 'Guardado:',
+    'assessment.save.notSaved': 'Sin guardar aún',
+
     // Menu Items
     'menu.dashboard': 'Panel de Control',
     'menu.understand': 'Entender',
@@ -470,6 +1647,7 @@ export const translations = {
     'menu.audit': 'Auditoría',
     'menu.integrity': 'Integridad',
     'menu.regfeed': 'Noticias Regulatorias',
+    'menu.portal': 'Portal',
     'menu.gapAnalysis': 'Análisis de Brechas',
     'menu.documentGenerator': 'Generador de Documentos',
     'menu.riskMap': 'Mapa de Riesgos',
@@ -503,11 +1681,22 @@ export const translations = {
     controlsUnverified: 'controles sin verificar',
     controlsUntested: 'controles sin probar',
     'dashboard.overview': 'Resumen de la salud de cumplimiento y progreso',
+    'dashboard.overviewLabel': 'Panel de Control',
     'dashboard.kpiLoadError': 'No se pudieron cargar los KPIs',
     'dashboard.loadingKpis': 'Cargando KPIs...',
+    'dashboard.loading': 'Cargando...',
+    'dashboard.noRecentActivity': 'No hay actividad reciente disponible',
+    'dashboard.noUpcomingTasks': 'No se encontraron tareas próximas',
+    'dashboard.nextAuditTitle': 'Próxima auditoría',
+    'dashboard.daysLeft': 'días restantes',
+    'dashboard.targetDate': 'Fecha objetivo',
     'dashboard.healthScoreTrend': 'Tendencia del score de salud',
     'dashboard.recentActivity': 'Actividad reciente',
     'dashboard.upcomingTasks': 'Próximas tareas',
+    'dashboard.lastAudit': 'Última auditoría',
+    'dashboard.today': 'Desde hoy',
+    'dashboard.cycleLabel': 'Ciclo',
+    'dashboard.statusLabel': 'Estado',
     'kpi.noData': 'No hay datos disponibles',
     'kpi.compliance': 'Cumplimiento',
     'healthScore.subtitle': 'Preparación de cumplimiento calculada por el backend',
@@ -535,11 +1724,42 @@ export const translations = {
     'dashboard.priority.high': 'ALTA',
     'dashboard.priority.medium': 'MEDIA',
     'dashboard.priority.low': 'BAJA',
+    'searchBinder.error.enterTerm': 'Ingrese un término para buscar.',
+    'searchBinder.log.search': 'Búsqueda: "{term}" ({count} resultados)',
+    'searchBinder.log.searchError': 'Error de búsqueda: "{term}"',
+    'searchBinder.deselected': 'Deseleccionado',
+    'searchBinder.selected': 'Seleccionado',
+    'searchBinder.log.removed': 'Eliminado del binder: {id}',
+    'searchBinder.log.cleared': 'Binder limpiado',
+    'searchBinder.selectedItemsCount': '{count} elemento(s) seleccionado(s)',
+    'searchBinder.error.selectOne': 'Seleccione al menos un elemento para generar un binder.',
+    'searchBinder.binderTitle': 'Binder de auditoría',
+    'searchBinder.binderDescription': 'Binder generado desde el dashboard',
+    'searchBinder.error.generateBinder': 'No se pudo generar el binder. Inténtelo de nuevo.',
+    'searchBinder.searchPlaceholder': 'Busque en lenguaje natural: por ejemplo, políticas de acceso, evidencias de auditoría',
+    'searchBinder.search': 'Buscar',
+    'searchBinder.relevantResults': 'Resultados relevantes',
+    'searchBinder.quickView': 'Vista rápida del Anexo A',
+    'searchBinder.resultsCount': '{count} resultados',
+    'searchBinder.loadingResults': 'Cargando resultados...',
+    'searchBinder.emptyHint': 'Ejecute una búsqueda para ver fragmentos del Anexo A.',
+    'searchBinder.addedToBinder': 'Agregado al binder',
+    'searchBinder.addToBinder': 'Agregar al binder',
+    'searchBinder.relevance': 'Relevancia {score}%',
+    'searchBinder.inlinePreview': 'Vista previa en línea',
+    'searchBinder.binder': 'Binder',
+    'searchBinder.multiSelection': 'Selección múltiple',
+    'searchBinder.noneSelected': 'No hay elementos seleccionados. Agregue elementos desde la lista.',
+    'searchBinder.generateBinderPdf': 'Generar PDF del binder',
+    'searchBinder.waitingGeneration': 'Esperando la generación del binder...',
+    'searchBinder.actionLog': 'Registro de acciones',
+    'searchBinder.emptyLog': 'Sus últimas 50 acciones aparecerán aquí.',
 
     'audit.title': 'Auditoría de Cumplimiento',
     'audit.subtitle': 'Valida tu evidencia de conformidad con estándares ISO 27001',
     'audit.fileValidatorTitle': 'Validar Archivo con Agente',
     'audit.dropHint': 'Haz clic o arrastra un archivo',
+    'audit.dropNow': 'Suelta tu archivo aquí',
     'audit.dropSubHint': 'PDF, Word, Excel, Texto, Imágenes (máx 10MB)',
     'audit.processing': 'Procesando validación granular...',
     'audit.jobId': 'Job ID',
@@ -607,6 +1827,24 @@ export const translations = {
     'audit.jobQueued': 'Job encolado',
     'audit.validationError': 'Error en la validación',
     'audit.validationUnknownError': 'Error desconocido en la validación',
+    'audit.statusCompliant': 'Cumple',
+    'audit.statusNonCompliant': 'No cumple',
+    'audit.statusNeedsReview': 'Requiere revisión',
+    'audit.findingsLabel': 'Hallazgos',
+    'audit.detectedFindings': 'Hallazgos detectados',
+    'audit.severity': 'Severidad',
+    'audit.recommendation': 'Recomendación',
+    'audit.impact': 'Impacto',
+    'audit.agentNotes': 'Notas del agente',
+    'audit.noChanges': 'Sin cambios',
+    'preAuditCard.title': 'Autoevaluación previa a auditoría',
+    'preAuditCard.readinessLabel': 'Preparación estimada para auditoría',
+    'preAuditCard.readinessSubtitle': '3 áreas de no conformidad de alto riesgo detectadas',
+    'preAuditCard.findingsTitle': 'Hallazgos probables de auditoría',
+    'preAuditCard.finding.accessManagement': 'Gestión de accesos — evidencia vencida',
+    'preAuditCard.finding.businessContinuity': 'Continuidad del negocio — no hay prueba de recuperación en 2025',
+    'preAuditCard.finding.incidentManagement': 'Gestión de incidentes — CAPA abierta 45+ días',
+    'preAuditCard.finding.cryptographyPolicy': 'Política de criptografía — borrador aún no aprobado',
     'settings.title': 'Configuración',
     'settings.subtitle': 'Ajusta idioma, apariencia, notificaciones y automatización del espacio.',
     'settings.organizationProfile': 'Perfil de Organización',
@@ -642,6 +1880,7 @@ export const translations = {
     'settings.regulatoryUpdatesHelp': 'Avísame cuando haya cambios regulatorios',
     'settings.auditDeadlines': 'Fechas de auditoría',
     'settings.auditDeadlinesHelp': 'Notifica antes de fechas clave',
+    'settings.auditCycleHelp': 'Define la frecuencia de las auditorías programadas para tu organización',
     'settings.automationScheduling': 'Automatización y programación',
     'settings.autoSave': 'Guardado automático',
     'settings.autoSaveHelp': 'Guarda cambios automáticamente cuando sea posible',
@@ -652,8 +1891,568 @@ export const translations = {
     'settings.userManagement': 'Gestión de usuarios',
     'settings.activeUser': 'Usuario activo',
     'settings.inviteTeamMember': 'Invitar miembro del equipo',
-  },
-  pt: {
+    'evidence.title': 'Centro de Evidencia',
+    'evidence.subtitle': 'Organiza tu evidencia por tipo y control ISO 27001.',
+    'evidence.uploadAction': '+ Subir evidencia',
+    'evidence.kpi.totalItems': 'Total de evidencias',
+    'evidence.kpi.totalItemsHelp': 'Organizadas por taxonomía de evidencia',
+    'evidence.kpi.filteredItems': 'Elementos filtrados',
+    'evidence.kpi.filteredItemsHelp': 'Se aplicaron filtros de búsqueda y tipo',
+    'evidence.kpi.types': 'Tipos de evidencia',
+    'evidence.kpi.typesHelp': 'Agrupadas por taxonomía',
+    'evidence.searchPlaceholder': 'Buscar evidencia, control, cláusula...',
+    'evidence.allTypes': 'Todos los tipos de evidencia',
+    'evidence.showing': 'Mostrando {matched} de {total} evidencias',
+    'evidence.loading': 'Cargando evidencias...',
+    'evidence.empty': 'Ninguna evidencia coincide con tus filtros.',
+    'evidence.validityDays': '{days} días',
+    'evidence.deleting': 'Eliminando...',
+    'evidence.delete': 'Eliminar',
+    'evidence.loadError': 'No se pudo cargar la evidencia. Intenta nuevamente.',
+    'evidence.deleteError': 'No se pudo eliminar la evidencia. Intenta nuevamente.',
+    'evidence.confirmDelete': '¿Eliminar la evidencia "{name}"? Esta acción no se puede deshacer.',
+    'evidence.type.policy': 'Política',
+    'evidence.type.procedure': 'Procedimiento',
+    'evidence.type.instruction': 'Instrucción',
+    'evidence.type.control': 'Control',
+    'evidence.type.record': 'Registro',
+    'evidence.freshness.fresh': 'Vigente',
+    'evidence.freshness.expiring': 'Por vencer',
+    'evidence.freshness.expired': 'Vencida',
+    'mfa.setupBadge': 'Configurar MFA',
+    'mfa.title': 'Escanea el código QR con tu app autenticadora',
+    'mfa.subtitle': 'Usa Google Authenticator, Authy o 1Password. El código QR se genera en el servidor y el secreto compartido nunca se expone directamente.',
+    'mfa.feature.serverQr': 'QR generado en servidor',
+    'mfa.feature.totp': 'Compatible con TOTP',
+    'mfa.feature.backupCodes': '10 códigos de respaldo',
+    'mfa.backupManagementTitle': 'Gestión de códigos de respaldo',
+    'mfa.backupManagementSubtitle': '2FA ya está activo. Genera un nuevo conjunto de códigos si lo necesitas.',
+    'mfa.generating': 'Generando...',
+    'mfa.generateBackupCodes': 'Generar códigos de respaldo',
+    'mfa.backupCodesHelp': 'Guarda estos códigos de forma segura. No se volverán a mostrar.',
+    'mfa.copied': 'Copiado',
+    'mfa.copyAll': 'Copiar todo',
+    'mfa.confirmTitle': 'Confirma tu autenticador',
+    'mfa.confirmSubtitle': 'Ingresa el código de 6 dígitos generado por tu app para finalizar la activación.',
+    'mfa.qrAlt': 'Código QR MFA',
+    'mfa.authenticatorCode': 'Código autenticador',
+    'mfa.verifying': 'Verificando...',
+    'mfa.enable': 'Activar 2FA',
+    'mfa.backToSettings': 'Volver a configuración',
+    'mfa.backupGenerated': 'Códigos de respaldo generados. Guárdalos ahora; solo se muestran una vez.',
+    'mfa.enabledSuccess': 'La autenticación en dos pasos está activa. Guarda estos códigos de respaldo ahora; solo se muestran una vez.',
+    'settings.tab.security': 'Seguridad',
+    'settings.tab.preferences': 'Preferencias',
+    'settings.tab.appearance': 'Apariencia',
+    'settings.tab.auditCycle': 'Ciclo de auditoría',
+    'settings.themeToggleHelp': 'Alterna el tema de la aplicación.',
+    'settings.theme.dark': 'Oscuro',
+    'settings.theme.light': 'Claro',
+    'settings.switch.on': 'Activo',
+    'settings.switch.off': 'Inactivo',
+    'settings.2fa.title': 'Autenticación de dos factores',
+    'settings.2fa.enabledHelp': 'Tu cuenta está protegida con TOTP y códigos de respaldo.',
+    'settings.2fa.disabledHelp': 'Protege tu cuenta con Google Authenticator, Authy o 1Password.',
+    'settings.2fa.enabled': 'Activado',
+    'settings.2fa.disabled': 'Desactivado',
+    'settings.2fa.setupHelp': 'Configura 2FA para generar un código QR escaneable y recibir códigos de respaldo de un solo uso.',
+    'settings.2fa.enableAction': 'Activar 2FA',
+    'settings.2fa.disableTitle': 'Desactivar 2FA',
+    'settings.2fa.disableHelp': 'Ingresa tu contraseña para desactivar 2FA. Esto revoca el secreto actual y todos los códigos de respaldo.',
+    'settings.2fa.backupCodes': 'Códigos de respaldo',
+    'settings.2fa.confirmPassword': 'Confirma tu contraseña',
+    'settings.2fa.disabling': 'Desactivando...',
+    'settings.2fa.disableAction': 'Desactivar 2FA',
+    'settings.2fa.disabledSuccess': 'La autenticación de dos factores se desactivó y todos los códigos de respaldo fueron revocados.',
+    'settings.2fa.passwordValidation': 'Ingresa tu contraseña para desactivar 2FA',
+    'settings.auditCycle.title': 'Ciclo de auditoría',
+    'settings.auditCycle.currentFrequency': 'Frecuencia actual',
+    'settings.auditCycle.nextAudit': 'Próxima auditoría',
+    'settings.auditCycle.notScheduled': 'No programada',
+    'settings.auditCycle.scheduled': 'Agendada',
+    'settings.auditCycle.noDate': 'Sin fecha',
+    'settings.auditCycle.emptyCalendar': 'Programa una auditoría para ver su fecha en el calendario.',
+    'settings.auditCycle.markCompleted': 'Marcar auditoría como completada',
+    'settings.auditCycle.history': 'Historial',
+    'settings.auditCycle.historyEmpty': 'Todavía no se ha registrado ninguna auditoría completada.',
+    'settings.auditCycle.monthly': 'Mensual',
+    'settings.auditCycle.quarterly': 'Trimestral',
+    'settings.auditCycle.annual': 'Anual',
+    'settings.auditCycle.toastUpdated': 'Frecuencia actualizada',
+    'settings.auditCycle.toastPermissionDenied': 'Permisos insuficientes para actualizar la frecuencia',
+    'settings.auditCycle.toastUpdateError': 'Error al actualizar la frecuencia',
+    'settings.auditCycle.toastCompleted': 'Auditoría marcada como completada',
+    'settings.auditCycle.toastCompleteError': 'Error al marcar la auditoría como completada',
+    'understand.frameworkSummary': 'Resumen del estado del framework',
+    'understand.phaseFallback': 'Fase {index}',
+    'understand.phaseGapsSummary': '{unanswered} brechas sin responder — {critical} críticas',
+    'understand.auditFinding': 'Auditar hallazgo',
+    'understand.toast.noOpenGaps': 'No hay brechas sin responder en esta fase, pero igualmente puedes crear documentación.',
+    'understand.toast.navigationError': 'Error al navegar',
+    'findings.title': 'Seguimiento CAPA',
+    'findings.subtitle': 'Gestiona acciones correctivas, prioridades y fechas de cierre desde un solo espacio.',
+    'findings.kpi.total': 'Total CAPAs',
+    'findings.kpi.totalHelp': 'Incluye todas las CAPAs registradas',
+    'findings.kpi.open': 'CAPAs abiertas',
+    'findings.kpi.openHelp': 'Acciones actualmente en curso',
+    'findings.kpi.overdue': 'Vencidas',
+    'findings.kpi.overdueHelp': 'CAPAs fuera de plazo pendientes',
+    'findings.kpi.closed': 'Cerradas',
+    'findings.kpi.closedHelp': 'CAPAs completadas',
+    'findings.filter.status': 'Filtrar por estado',
+    'findings.filter.priority': 'Filtrar por prioridad',
+    'findings.filter.allStatuses': 'Todos los estados',
+    'findings.filter.allPriorities': 'Todas las prioridades',
+    'findings.showing': 'Mostrando {shown} de {total} CAPAs',
+    'findings.openCorrectiveActions': 'Acciones correctivas abiertas',
+    'findings.loadingCapas': 'Cargando CAPAs...',
+    'findings.emptyCapas': 'Aún no hay CAPAs registradas. Crea una nueva para comenzar.',
+    'findings.emptyFiltered': 'No hay CAPAs coincidentes. Ajusta los filtros para ver resultados.',
+    'findings.table.status': 'Estado',
+    'findings.table.priority': 'Prioridad',
+    'findings.table.dueDate': 'Fecha límite',
+    'findings.table.progress': 'Progreso',
+    'findings.table.overdue': 'Vencimiento',
+    'findings.onTime': 'En tiempo',
+    'findings.overdue': 'Vencida',
+    'findings.description': 'Descripción',
+    'findings.noDescription': 'Sin descripción disponible.',
+    'findings.controlOwner': 'Control / Responsable',
+    'findings.unassigned': 'No asignado',
+    'findings.noOwner': 'Sin responsable',
+    'findings.source': 'Origen',
+    'findings.createdUpdated': 'Creado / Actualizado',
+    'findings.create.title': 'Crear nueva CAPA',
+    'findings.create.subtitle': 'Registra rápidamente una acción correctiva y mantén los datos sincronizados.',
+    'findings.create.fieldTitle': 'Título',
+    'findings.create.fieldDescription': 'Descripción',
+    'findings.create.fieldPriority': 'Prioridad',
+    'findings.create.fieldSource': 'Origen',
+    'findings.create.fieldDueDate': 'Fecha límite',
+    'findings.create.fieldProgress': 'Progreso',
+    'findings.create.fieldControlId': 'Control ID',
+    'findings.create.titlePlaceholder': 'ej. Revisar evidencia de control de acceso',
+    'findings.create.descriptionPlaceholder': 'Describe la acción correctiva requerida',
+    'findings.optional': 'Opcional',
+    'findings.creating': 'Creando...',
+    'findings.createAction': 'Crear CAPA',
+    'findings.priorityBreakdown': 'Desglose por prioridad',
+    'findings.gapFindings': 'Hallazgos de Gap Analysis',
+    'findings.totalGaps': 'Brechas totales',
+    'findings.totalGapsHelp': 'Preguntas del gap analysis',
+    'findings.unanswered': 'Sin responder',
+    'findings.unansweredHelp': 'Incluye brechas críticas',
+    'findings.progress': 'Progreso',
+    'findings.progressHelp': 'Avance del gap analysis',
+    'findings.validationFindings': 'Hallazgos de validación',
+    'findings.validationFindingsHelp': 'Revisa los hallazgos generados por la validación granular de documentos en el historial reciente.',
+    'findings.criticalGaps': 'Brechas críticas',
+    'findings.loadingGaps': 'Cargando brechas...',
+    'findings.noGaps': 'No se encontraron brechas en este momento.',
+    'findings.phaseSummary': '{unanswered} brechas sin responder · {critical} críticas',
+    'findings.indicators': 'Indicadores de hallazgos',
+    'findings.openCriticalGaps': 'Brechas críticas abiertas',
+    'findings.answeredQuestions': 'Preguntas respondidas',
+    'findings.capaLoadError': 'No se pudieron cargar los datos de CAPA. Vuelve a intentarlo.',
+    'findings.gapsLoadError': 'No se pudieron cargar los datos de hallazgos. Vuelve a intentarlo.',
+    'findings.phaseFallback': 'Fase {index}',
+    'findings.createTitleRequired': 'El título es obligatorio para crear una CAPA.',
+    'findings.createError': 'No se pudo crear la CAPA. Por favor revisa los campos y vuelve a intentar.',
+    'findings.priority.critical': 'Crítica',
+    'findings.priority.high': 'Alta',
+    'findings.priority.medium': 'Media',
+    'findings.priority.low': 'Baja',
+    'findings.status.open': 'Abierta',
+    'findings.status.inProgress': 'En progreso',
+    'findings.status.resolved': 'Resuelta',
+    'findings.status.closed': 'Cerrada',
+    'findings.source.internalAudit': 'Auditoría interna',
+    'findings.source.externalAudit': 'Auditoría externa',
+    'findings.source.incident': 'Incidente',
+    'findings.source.managementReview': 'Revisión de dirección',
+    'common.save': 'Guardar',
+    'common.saving': 'Guardando...',
+    'common.close': 'Cerrar',
+    'common.hours': 'Horas',
+    'common.refresh': 'Actualizar',
+    'common.refreshing': 'Actualizando',
+    'common.viewMore': 'Ver más',
+    'common.viewLess': 'Ver menos',
+    'common.edit': 'Editar',
+
+    'validation.historyTitle': 'Historial de validaciones',
+    'validation.jobsCount': '{count} trabajos',
+    'validation.searchPlaceholder': 'Buscar por nombre de archivo...',
+    'validation.last7Days': 'Últimos 7 días',
+    'validation.last30Days': 'Últimos 30 días',
+    'validation.all': 'Todos',
+    'validation.table.file': 'Archivo',
+    'validation.table.score': 'Score',
+    'validation.table.status': 'Estado',
+    'validation.table.action': 'Acción',
+    'validation.viewDetail': 'Ver detalle',
+    'validation.noJobs': 'No hay trabajos',
+    'validation.detailUnavailable': 'Este resultado no está disponible. Solo los trabajos completados después de la última actualización pueden verse en detalle.',
+    'validation.loadingDetail': 'Cargando detalle...',
+    'validation.avgCompliance': 'Cumplimiento promedio',
+    'validation.completed': 'Validación completada',
+    'validation.summary': 'Resumen',
+    'validation.findingsByChunk': 'Hallazgos por fragmento ISO',
+    'validation.scoreRelevance': 'Score: {score}% · Relevancia: {relevance}%',
+    'validation.missingElements': 'Elementos faltantes:',
+    'validation.status.completed': 'Completado',
+    'validation.status.processing': 'Procesando',
+    'validation.status.queued': 'En cola',
+    'validation.status.failed': 'Fallido',
+    'integrations.hub': 'Hub de integraciones',
+    'integrations.subtitle': 'Centraliza conexiones de servicios, automatiza la sincronización y reduce trabajo manual.',
+    'integrations.activeConnectors': 'Conectores activos',
+    'integrations.activeConnectorsHelp': 'Listos para sincronizar automáticamente.',
+    'integrations.totalIntegrations': 'Total de integraciones',
+    'integrations.totalIntegrationsHelp': 'Conectores disponibles en este workspace.',
+    'integrations.upcomingReleases': 'Próximos lanzamientos',
+    'integrations.upcomingReleasesHelp': 'Integraciones que estarán disponibles próximamente.',
+    'integrations.loading': 'Cargando conectores...',
+    'integrations.popupRequired': 'Debes permitir ventanas emergentes para iniciar OAuth',
+    'integrations.status.connected': 'Conectado',
+    'integrations.status.disconnected': 'Desconectado',
+    'integrations.status.syncing': 'Sincronizando',
+    'integrations.status.error': 'Error',
+    'integrations.status.upcoming': 'Próximamente',
+    'integrations.lastSyncLabel': 'Última sincronización',
+    'integrations.noHistory': 'Sin historial',
+    'integrations.everyHours': 'Cada {hours} horas',
+    'integrations.connectorDescription': 'Descripción del conector',
+    'integrations.connectorDescriptionHelp': 'Tus credenciales se mantienen seguras y la sincronización corre en segundo plano para mantener datos actualizados.',
+    'integrations.processing': 'Procesando...',
+    'integrations.reconnectHint': 'Si necesitas actualizar permisos, vuelve a conectar este conector desde aquí.',
+    'integrations.wizard.connect': 'Conectar {name}',
+    'integrations.wizard.subtitle': 'Sigue los pasos para autorizar el acceso.',
+    'integrations.wizard.step1': 'Inicia el flujo de autorización.',
+    'integrations.wizard.step2': 'Confirma permisos en la ventana del proveedor.',
+    'integrations.wizard.step3': 'Volverás automáticamente a la aplicación cuando finalice.',
+    'integrations.wizard.startAuth': 'Iniciar autorización',
+    'integrations.syncFrequency': 'Frecuencia de sincronización',
+    'integrations.syncEveryHours': 'Actualiza automáticamente cada {hours} horas',
+    'integrations.syncHelp': '24 horas es la configuración estándar; úsala para sincronizaciones diarias y evita consultas muy frecuentes si no necesitas datos en tiempo real.',
+    'settings.password.title': 'Contraseña',
+    'settings.password.subtitle': 'Actualiza tu contraseña y revoca sesiones de refresco activas.',
+    'settings.password.current': 'Contraseña actual',
+    'settings.password.new': 'Nueva contraseña',
+    'settings.password.confirm': 'Confirmar nueva contraseña',
+    'settings.password.hint': 'Usa contraseñas fuertes con mayúsculas, números y símbolos.',
+    'settings.password.saving': 'Guardando...',
+    'settings.password.updateAction': 'Actualizar contraseña',
+    'settings.password.updated': 'Tu contraseña se actualizó correctamente.',
+    'portal.mandatory': 'Obligatoria',
+    'portal.optional': 'Opcional',
+    'portal.acknowledged': 'Reconocida',
+    'portal.pending': 'Pendiente',
+    'portal.viewPolicy': 'Ver política',
+    'portal.versionLine': 'Versión {version} · {kind} · Publicada {date}',
+    'portal.officialSummary': 'Resumen oficial',
+    'portal.noSummary': 'No hay resumen disponible.',
+    'portal.notAvailable': 'N/A',
+    'portal.versionPrefix': 'v',
+    'portal.fullText': 'Texto completo',
+    'portal.readCarefully': 'Lea con atención',
+    'portal.ackCheckboxText': 'He leído esta política y reconozco la versión actual del documento.',
+    'portal.ackCheckboxHelp': 'Este reconocimiento será registrado para tu organización.',
+    'portal.ackSuccess': 'La política ha sido reconocida correctamente.',
+    'portal.pageTitle': 'Reconocimientos de políticas',
+    'portal.pageSubtitle': 'Visualiza las políticas publicadas por tu organización y confirma las que ya leíste.',
+    'portal.publishedPolicies': 'Políticas publicadas',
+    'portal.statusAutoUpdate': 'Se actualiza automáticamente al reconocer las políticas.',
+    'portal.loadingPolicies': 'Cargando políticas...',
+    'assets.confirmDelete': '¿Eliminar este activo?',
+    'assets.subtitle': 'Clasificación C-I-A ISO 27001',
+    'assets.newAsset': '+ Nuevo activo',
+    'assets.assetsLabel': 'activos',
+    'assets.filterByType': 'Filtrar por tipo:',
+    'assets.allTypes': 'Todos los tipos',
+    'assets.noneFound': 'No se encontraron activos',
+    'assets.addFirst': 'Agrega tu primer activo',
+    'assets.table.asset': 'Activo',
+    'assets.table.type': 'Tipo',
+    'assets.table.score': 'Score',
+    'assets.table.level': 'Nivel',
+    'assets.table.status': 'Estado',
+    'assets.countSummary': '{filtered} de {total} activos',
+    'assets.editAsset': 'Editar activo',
+    'assets.newAssetTitle': 'Nuevo activo',
+    'assets.editSubtitle': 'Actualiza clasificación y metadatos',
+    'assets.newSubtitle': 'Registra un nuevo activo de información',
+    'assets.field.name': 'Nombre *',
+    'assets.field.description': 'Descripción',
+    'assets.field.type': 'Tipo de activo *',
+    'assets.field.location': 'Ubicación',
+    'assets.field.cia': 'Clasificación C-I-A',
+    'assets.field.isoClause': 'Referencia de cláusula ISO',
+    'assets.placeholder.name': 'ej. Servidor de base de datos de producción',
+    'assets.placeholder.description': 'Descripción breve de este activo...',
+    'assets.placeholder.location': 'ej. AWS us-east-1',
+    'assets.placeholder.isoClause': 'ej. A.8.1.1',
+    'assets.selectType': 'Selecciona tipo...',
+    'assets.ciaScale': '1 = Bajo · 2 = Medio · 3 = Alto',
+    'assets.cia.low': '1 — Bajo',
+    'assets.cia.medium': '2 — Medio',
+    'assets.cia.high': '3 — Alto',
+    'assets.cia.confidentiality': 'Confidencialidad',
+    'assets.cia.integrity': 'Integridad',
+    'assets.cia.availability': 'Disponibilidad',
+    'assets.validation.nameRequired': 'El nombre es obligatorio',
+    'assets.validation.typeRequired': 'El tipo es obligatorio',
+    'assets.ciaScoreHint': 'Score = C×0.4 + I×0.35 + A×0.25 — calculado automáticamente',
+    'assets.type.hardware': 'Hardware',
+    'assets.type.software': 'Software',
+    'assets.type.data': 'Datos',
+    'assets.type.service': 'Servicio',
+    'assets.type.people': 'Personas',
+    'assets.type.facility': 'Instalación',
+    'assets.level.low': 'Bajo',
+    'assets.level.medium': 'Medio',
+    'assets.level.high': 'Alto',
+    'assets.level.critical': 'Crítico',
+    'assets.status.active': 'Activo',
+    'assets.status.inactive': 'Inactivo',
+    'assets.status.disposed': 'Desechado',
+    'assets.saveChanges': 'Guardar cambios',
+    'assets.createAsset': 'Crear activo',
+    'auditRoom.error.loadFolders': 'No se pudieron cargar las carpetas de Audit Room.',
+    'auditRoom.error.loadEvidences': 'No se pudieron cargar las evidencias de la carpeta.',
+    'auditRoom.error.selectEvidence': 'Selecciona al menos una evidencia para generar el binder.',
+    'auditRoom.error.startBinder': 'No se pudo iniciar la generación del binder.',
+    'auditRoom.error.statusBinder': 'Error obteniendo el estado del binder.',
+    'auditRoom.error.downloadBinder': 'No se pudo descargar el binder. Intenta nuevamente.',
+    'auditRoom.binderQueued': 'Binder encolado',
+    'auditRoom.binderTitle': 'Binder de Audit Room',
+    'auditRoom.binderDescriptionFolder': 'Generado desde la carpeta {folder}',
+    'auditRoom.binderDescription': 'Binder generado desde Audit Room',
+    'auditRoom.subtitle': 'Explora carpetas de Anexo A y genera binders desde evidencias seleccionadas.',
+    'auditRoom.selectedCount': '{count} evidencia(s) seleccionada(s)',
+    'auditRoom.folders': 'Carpetas',
+    'auditRoom.loadingFolders': 'Cargando carpetas...',
+    'auditRoom.folderEvidenceCount': '{count} evidencias',
+    'auditRoom.binderStatus': 'Estado binder',
+    'auditRoom.statusLabel': 'Estado:',
+    'auditRoom.notStarted': 'No iniciado',
+    'auditRoom.progressLabel': 'Progreso:',
+    'auditRoom.downloading': 'Descargando...',
+    'auditRoom.downloadPdf': 'Descargar binder PDF',
+    'auditRoom.generatedWhenFinished': 'Será generado una vez finalice el proceso.',
+    'auditRoom.selectFolderHint': 'Selecciona una carpeta para ver los items.',
+    'auditRoom.noFolderSelected': 'Ninguna carpeta seleccionada',
+    'auditRoom.loadingEvidences': 'Cargando evidencias...',
+    'auditRoom.noEvidencesInFolder': 'No hay evidencias disponibles en esta carpeta.',
+    'auditRoom.selectFolderToView': 'Selecciona una carpeta para ver evidencias.',
+    'auditRoom.generatingBinder': 'Generando binder...',
+    'auditRoom.generateBinder': 'Generar binder',
+    'auditRoom.createBinderHint': 'Selecciona items para crear un binder PDF desde el Audit Room.',
+    'errorBoundary.title': 'Error de la aplicación',
+    'errorBoundary.message': 'Se ha producido un error en la aplicación. Recarga la página.',
+    'searchBinder.error.search': 'Error al buscar. Intente de nuevo.',
+    'searchBinder.binderDetail': 'Detalle del binder',
+    'common.clear': 'Limpiar',
+    'documents.generate.defaultTitle': 'Nuevo documento ISO 27001',
+    'documents.generate.defaultDescription': 'Genera un documento obligatorio de ISO 27001 con soporte de IA.',
+    'documents.generate.defaultAudience': 'Equipo de seguridad',
+    'documents.report.defaultTitle': 'Reporte de cumplimiento',
+    'documents.report.defaultDescription': 'Resumen de estado y brechas de cumplimiento.',
+    'documents.error.loadList': 'No se pudieron cargar los documentos. Intenta recargar la página.',
+    'documents.error.loadSelected': 'No se pudo cargar el documento seleccionado.',
+    'documents.report.error.timeout': 'La generación del reporte tardó demasiado. Por favor intenta nuevamente.',
+    'documents.report.error.status': 'No se pudo obtener el estado del reporte. Intenta de nuevo.',
+    'documents.confirmDelete': '¿Estás seguro de que deseas eliminar este documento?',
+    'documents.error.delete': 'No se pudo eliminar el documento.',
+    'documents.report.error.selectFirst': 'Por favor selecciona un documento de la barra lateral primero.',
+    'documents.report.error.start': 'No se pudo iniciar la generación del reporte.',
+    'documents.upload.error.missingInput': 'Debes seleccionar un archivo o escribir el contenido.',
+    'documents.upload.defaultTitle': 'Documento cargado',
+    'documents.upload.success': 'Documento subido correctamente.',
+    'documents.upload.defaultDescription': 'Documento cargado',
+    'documents.upload.error.generic': 'Error al subir el documento. Intenta de nuevo.',
+    'documents.generate.starting': 'Iniciando generación...',
+    'documents.generate.fallbackTitle': 'Documento ISO 27001',
+    'documents.generate.completed': 'Generación completada',
+    'documents.generate.errorStatus': 'Error en la generación',
+    'documents.generate.errorStart': 'No se pudo iniciar la generación. Revisa la configuración.',
+    'documents.generate.defaultUploadedDescription': 'Documento generado con IA',
+    'documents.generate.uploadError': 'Error al subir el documento generado.',
+    'documents.tab.view': 'Vista',
+    'documents.tab.edit': 'Editor',
+    'documents.tab.generate': 'Generar con IA',
+    'documents.tab.report': 'Exportar reporte',
+    'documents.tab.upload': 'Subir',
+    'documents.hero.subtitle': 'Crea, edita y gestiona documentos ISO 27001 con asistencia de IA en un flujo más claro y profesional.',
+    'documents.sidebar.quickAccess': 'Accede rápido a tus documentos guardados.',
+    'documents.sidebar.searchPlaceholder': 'Buscar documentos',
+    'documents.deleteDocument': 'Eliminar documento',
+    'documents.viewLess': 'Ver menos',
+    'documents.viewMoreCount': 'Ver más ({count} más)',
+    'documents.action.generateAi': '+ Generar con IA',
+    'documents.action.exportReport': '+ Exportar reporte',
+    'documents.action.uploadDocument': '+ Subir documento',
+    'documents.noDocumentSelected': 'Sin documento seleccionado',
+    'documents.openAssistant': 'Abrir asistente',
+    'documents.loadingDocument': 'Cargando documento...',
+    'documents.selectToView': 'Selecciona un documento para ver su contenido.',
+    'documents.untitled': 'Documento sin título',
+    'documents.generate.title': 'Generar documento con IA',
+    'documents.generate.subtitle': 'El agente LLM generará un documento ISO 27001 completo sección por sección.',
+    'documents.field.title': 'Título',
+    'documents.field.description': 'Descripción',
+    'documents.field.audience': 'Audiencia',
+    'documents.field.language': 'Idioma',
+    'documents.field.tone': 'Tono',
+    'documents.field.type': 'Tipo',
+    'documents.field.sections': 'Secciones',
+    'documents.placeholder.title': 'Título del documento',
+    'documents.placeholder.context': 'Contexto del documento',
+    'documents.placeholder.audience': 'Equipo destinatario',
+    'documents.placeholder.sections': 'Separadas por comas o saltos de línea',
+    'documents.tone.formal': 'Formal',
+    'documents.tone.informal': 'Informal',
+    'documents.type.policy': 'Política',
+    'documents.type.report': 'Reporte',
+    'documents.type.procedure': 'Procedimiento',
+    'documents.type.general': 'General',
+    'documents.jobId': 'Job ID:',
+    'documents.generate.generating': 'Generando...',
+    'documents.generate.button': 'Generar documento',
+    'documents.openInEditor': 'Abrir en editor',
+    'documents.uploadGenerated': 'Subir documento generado',
+    'documents.report.title': 'Exportar reporte',
+    'documents.report.subtitle': 'Genera un informe descargable basado en el documento seleccionado actualmente.',
+    'documents.report.documentToExport': 'Documento a exportar:',
+    'documents.report.noneSelected': 'Ningún documento seleccionado en la barra lateral',
+    'documents.report.fieldTitle': 'Título del reporte',
+    'documents.report.placeholderDescription': 'Ej: Resumen ejecutivo del estado de controles ISO para revisión de dirección',
+    'documents.report.descriptionHint': 'Este texto aparecerá como subtítulo en el encabezado del reporte generado.',
+    'documents.report.template': 'Plantilla',
+    'documents.report.format': 'Formato',
+    'documents.report.status': 'Estado del reporte',
+    'documents.report.download': 'Descargar reporte',
+    'documents.report.generateAnother': 'Generar otro',
+    'documents.report.recent': 'Reportes recientes',
+    'documents.report.generating': 'Generando reporte...',
+    'documents.report.startExport': 'Iniciar exportación',
+    'documents.upload.title': 'Subir documento',
+    'documents.upload.subtitle': 'Sube un archivo o pega el contenido directamente.',
+    'documents.upload.placeholderSummary': 'Resumen breve',
+    'documents.upload.file': 'Archivo',
+    'documents.upload.altContent': 'Contenido alternativo',
+    'documents.upload.altPlaceholder': 'Pega aquí el contenido si no subes un archivo',
+    'documents.upload.uploading': 'Subiendo...',
+    'documents.upload.button': 'Subir documento',
+    'language.es': 'Español',
+    'language.en': 'Inglés',
+    'common.optional': 'opcional',
+    'documents.title': 'Generador de documentos',
+    'documents.viewLabel': 'Vista del documento',
+    'documentEditor.titlePlaceholder': 'Título del documento',
+    'documentEditor.stats': '{words} palabras · {chars} caracteres',
+    'documentEditor.saved': '✓ Guardado',
+    'documentEditor.unsaved': '○ Sin guardar',
+    'documentEditor.copyAsText': 'Copiar como texto',
+    'documentEditor.copied': '✓ Copiado',
+    'documentEditor.copy': 'Copiar',
+    'documentEditor.upload': 'Subir',
+    'documentEditor.save': 'Guardar',
+    'documentEditor.exitFullscreen': 'Salir de pantalla completa',
+    'documentEditor.fullscreen': 'Pantalla completa',
+    'documentEditor.placeholder': 'Empieza a escribir o genera un documento con IA...',
+    'documentEditor.footerBrand': 'ISO 27001 · DANI Platform',
+    'documentEditor.mobileWords': '{count} palabras',
+    'documentEditor.toolbar.heading1': 'Título 1',
+    'documentEditor.toolbar.heading2': 'Título 2',
+    'documentEditor.toolbar.heading3': 'Título 3',
+    'documentEditor.toolbar.bold': 'Negrita',
+    'documentEditor.toolbar.italic': 'Cursiva',
+    'documentEditor.toolbar.underline': 'Subrayado',
+    'documentEditor.toolbar.bulletList': 'Lista sin orden',
+    'documentEditor.toolbar.orderedList': 'Lista ordenada',
+    'documentEditor.toolbar.blockquote': 'Cita',
+    'assessment.progressTitle': 'Progreso',
+    'assessment.phaseLabel': 'Fase {order}',
+    'evidence.attachmentDeleted': 'Archivo eliminado',
+    'evidence.replace': 'Reemplazar',
+    'evidence.deleteFile': 'Eliminar archivo',
+    'evidence.viewLess': 'Ver menos',
+    'evidence.viewMoreCount': 'Ver {count} más',
+    'auditRoom.title': 'Audit Room',
+    'auditRoom.evidencesLabel': 'Evidencias',
+    'navbar.openCommandPalette': 'Abrir paleta de comandos',
+    'navbar.cmdShortcut': 'Ctrl + K / ⌘K',
+    'integrations.oauth.title': 'OAuth',
+    'integrations.oauth.processing': 'Procesando...',
+    'integrations.oauth.invalidParams': 'Parámetros inválidos',
+    'integrations.oauth.completed': 'Conexión completada',
+    'integrations.oauth.timeout': 'Tiempo de espera agotado. Revisa la conexión en Integraciones.',
+    'upload.field.controlId': 'control_id',
+    'upload.field.clauseRef': 'clause_ref',
+    'upload.placeholder.controlId': 'ISO 27001 A.5.1',
+    'upload.placeholder.clauseRef': 'A.5.1',
+    'upload.dialogTitle': 'Subir evidencia',
+    'upload.api.primary': 'POST /api/v1/evidences',
+    'upload.api.secondary': 'POST /api/validate/external',
+    'upload.massUpload': 'Carga masiva',
+    'upload.dragOrSelect': 'Arrastra los archivos o selecciónalos manualmente',
+    'upload.acceptsUpTo': 'Acepta hasta {max} archivos simultáneos. Formatos permitidos: {formats}.',
+    'upload.quickSelectTitle': 'Seleccionar rápido: abre el selector de archivos para una carga rápida sin editar metadatos',
+    'upload.quickSelectAria': 'Seleccionar archivos rápido',
+    'upload.selectQuick': 'Seleccionar (rápido)',
+    'upload.loadedCount': '{count}/{max} cargados',
+    'upload.selectedFiles': 'Archivos seleccionados',
+    'upload.selectedFilesHint': 'Nombre, tamaño y estado en tiempo real',
+    'upload.filesCount': '{count} archivo(s)',
+    'upload.noFilesYet': 'Todavía no has agregado archivos.',
+    'upload.classificationPreview': 'Vista previa de clasificación',
+    'upload.status.classified': 'Clasificado',
+    'upload.status.classifying': 'Clasificando',
+    'upload.status.pending': 'Pendiente',
+    'upload.isoSuggestion': 'Sugerencia ISO:',
+    'upload.waitingBackend': 'Esperando respuesta del backend',
+    'upload.detail': 'Detalle:',
+    'upload.confidence': 'Confianza:',
+    'upload.editableMetadata': 'Metadata editable',
+    'upload.editableMetadataHint': 'Actualiza nombre, control_id, tipo y fecha de validez',
+    'upload.field.name': 'Nombre',
+    'upload.placeholder.fileName': 'Nombre del archivo',
+    'upload.field.type': 'Tipo',
+    'upload.placeholder.type': 'POLICY, PROCEDURE, INSTRUCTION, CONTROL, RECORD',
+    'upload.field.validUntil': 'Fecha de validez',
+    'upload.progress': 'Progreso',
+    'upload.attempt': 'intento',
+    'upload.retry': 'Reintentar',
+    'upload.progressCompleted': '{progress}% completado',
+    'upload.processingFinished': 'Procesamiento finalizado',
+    'upload.waiting': 'En espera',
+    'upload.unexpectedError': 'Error inesperado',
+    'upload.status.queued': 'En cola',
+    'upload.status.uploading': 'Subiendo',
+    'upload.status.completed': 'Completado',
+    'upload.status.failed': 'Fallido',
+    'upload.onlyAccepted': 'Solo se admiten archivos {formats}.',
+    'upload.error.couldNotComplete': 'No se pudo completar la carga',
+    'upload.error.retryFile': 'No se pudo reintentar el archivo',
+    'upload.flowDescription': 'Flujo DANI-FE-022: carga por archivo en taxonomía ISO y edición inline de metadata.',
+    'upload.maxFilesBadge': 'Máximo {max} archivos',
+    'upload.formatsBadge': 'Formatos {formats}',
+    'upload.overallStatus': 'Estado general',
+    'upload.queueSummary': 'Resumen de la cola actual',
+    'upload.readyCount': '{done}/{total} listos',
+    'upload.pending': 'Pendientes',
+    'upload.completed': 'Completados',
+    'upload.noFilesYetTitle': 'No hay archivos aún',
+    'upload.noFilesYetHint': 'Agrega hasta {max} archivos y luego ejecuta la carga para obtener la sugerencia de control ISO.',
+    'upload.unknownMime': 'mime desconocido',
+    'upload.footerNote': 'Cada subida crea o actualiza la evidencia documental en la taxonomía ISO.',
+    'upload.processing': 'Procesando',
+    'upload.uploadNFiles': 'Subir {count} archivo(s)',
+    'upload.noPendingFiles': 'Sin archivos pendientes',
+    'upload.inline': 'Inline',
+    },
+pt: {
     dashboard: 'Painel',
     understand: 'Entender Minha Situação',
     documents: 'Controles de Documentos',
@@ -672,6 +2471,87 @@ export const translations = {
     evidenceCenter: 'Centro de Evidências',
     capaTracker: 'Rastreador de CAPA',
     auditRoom: 'Sala de Auditoria',
+    'findings.answeredQuestions': 'Perguntas respondidas',
+    'findings.capaLoadError': 'Não foi possível carregar os dados de CAPA. Tente novamente.',
+    'findings.controlOwner': 'Controle / Responsável',
+    'findings.create.descriptionPlaceholder': 'Descreva a ação corretiva necessária',
+    'findings.create.fieldControlId': 'Control ID',
+    'findings.create.fieldDescription': 'Descrição',
+    'findings.create.fieldDueDate': 'Prazo',
+    'findings.create.fieldPriority': 'Prioridade',
+    'findings.create.fieldProgress': 'Progresso',
+    'findings.create.fieldSource': 'Origem',
+    'findings.create.fieldTitle': 'Título',
+    'findings.create.subtitle': 'Registre rapidamente uma ação corretiva e mantenha os dados sincronizados.',
+    'findings.create.title': 'Criar nova CAPA',
+    'findings.create.titlePlaceholder': 'ex. Revisar evidências de controle de acesso',
+    'findings.createAction': 'Criar CAPA',
+    'findings.createError': 'Não foi possível criar a CAPA. Verifique os campos e tente novamente.',
+    'findings.createTitleRequired': 'O título é obrigatório para criar uma CAPA.',
+    'findings.createdUpdated': 'Criado / Atualizado',
+    'findings.creating': 'Criando...',
+    'findings.criticalGaps': 'Lacunas críticas',
+    'findings.description': 'Descrição',
+    'findings.emptyCapas': 'Ainda não há CAPAs registradas. Crie uma nova para começar.',
+    'findings.emptyFiltered': 'Nenhuma CAPA corresponde aos filtros. Ajuste os filtros para ver resultados.',
+    'findings.filter.allPriorities': 'Todas as prioridades',
+    'findings.filter.allStatuses': 'Todos os status',
+    'findings.filter.priority': 'Filtrar por prioridade',
+    'findings.filter.status': 'Filtrar por status',
+    'findings.gapFindings': 'Resultados da análise de lacunas',
+    'findings.gapsLoadError': 'Não foi possível carregar os resultados. Tente novamente.',
+    'findings.indicators': 'Indicadores de achados',
+    'findings.kpi.closed': 'Fechadas',
+    'findings.kpi.closedHelp': 'CAPAs concluídas',
+    'findings.kpi.open': 'CAPAs abertas',
+    'findings.kpi.openHelp': 'Ações atualmente em andamento',
+    'findings.kpi.overdue': 'Atrasada',
+    'findings.kpi.overdueHelp': 'CAPAs vencidas pendentes de conclusão',
+    'findings.kpi.total': 'Total CAPAs',
+    'findings.kpi.totalHelp': 'Inclui todas as CAPAs registradas',
+    'findings.loadingCapas': 'Carregando CAPAs...',
+    'findings.loadingGaps': 'Carregando lacunas...',
+    'findings.noDescription': 'Nenhuma descrição disponível.',
+    'findings.noGaps': 'Nenhuma lacuna encontrada no momento.',
+    'findings.noOwner': 'Sem responsável',
+    'findings.onTime': 'No prazo',
+    'findings.openCorrectiveActions': 'Ações corretivas em aberto',
+    'findings.openCriticalGaps': 'Lacunas críticas abertas',
+    'findings.optional': 'Opcional',
+    'findings.overdue': 'Atrasada',
+    'findings.phaseFallback': 'Fase {index}',
+    'findings.phaseSummary': '{unanswered} lacunas sem resposta · {critical} críticas',
+    'findings.priority.critical': 'Crítica',
+    'findings.priority.high': 'Alta',
+    'findings.priority.low': 'Baixa',
+    'findings.priority.medium': 'Média',
+    'findings.priorityBreakdown': 'Detalhamento por prioridade',
+    'findings.progress': 'Progresso',
+    'findings.progressHelp': 'Avanço do gap analysis',
+    'findings.showing': 'Mostrando {shown} de {total} CAPAs',
+    'findings.source': 'Origem',
+    'findings.source.externalAudit': 'Auditoria externa',
+    'findings.source.incident': 'Incidente',
+    'findings.source.internalAudit': 'Auditoria interna',
+    'findings.source.managementReview': 'Revisão da direção',
+    'findings.status.closed': 'Fechada',
+    'findings.status.inProgress': 'Em andamento',
+    'findings.status.open': 'Aberta',
+    'findings.status.resolved': 'Resolvida',
+    'findings.subtitle': 'Gerencie ações corretivas, prioridades e prazos a partir de um único espaço.',
+    'findings.table.dueDate': 'Prazo',
+    'findings.table.overdue': 'Vencimento',
+    'findings.table.priority': 'Prioridade',
+    'findings.table.progress': 'Progresso',
+    'findings.table.status': 'Estado',
+    'findings.title': 'Rastreador CAPA',
+    'findings.totalGaps': 'Lacunas totais',
+    'findings.totalGapsHelp': 'Perguntas do gap analysis',
+    'findings.unanswered': 'Sem resposta',
+    'findings.unansweredHelp': 'Inclui lacunas críticas',
+    'findings.unassigned': 'Não atribuído',
+    'findings.validationFindings': 'Resultados de validação',
+    'findings.validationFindingsHelp': 'Revise os achados gerados pela validação granular de documentos no histórico recente.',
     
     // Gap Analysis labels
     totalGaps: 'Total de Lacunas Identificadas',
@@ -726,17 +2606,675 @@ export const translations = {
     'risks.linkThreatButton': 'Vincular ameaça',
     'risks.linkSelectionRequired': 'Selecione um risco e uma ameaça para vincular',
     'risks.threatLinkedSuccess': 'Ameaça vinculada ao risco com sucesso',
+    'risks.threatCreatedSuccess': 'Ameaça criada com sucesso',
+    'risks.vulnerabilityCreatedSuccess': 'Vulnerabilidade criada com sucesso',
+    'risks.addRiskButton': 'Adicionar risco',
+    'risks.createRiskTitle': 'Criar risco',
+    'risks.createRiskDescription': 'Registre um novo risco no registro de riscos.',
+    'risks.riskNameLabel': 'Nome',
+    'risks.riskNamePlaceholder': 'ex. Controle de acesso insuficiente',
+    'risks.riskDescriptionLabel': 'Descrição',
+    'risks.riskDescriptionPlaceholder': 'Contexto adicional opcional',
+    'risks.riskAssetLabel': 'Ativo',
+    'risks.probabilityLabel': 'Probabilidade',
+    'risks.impactLabel': 'Impacto',
+    'risks.cancelButton': 'Cancelar',
+    'risks.creating': 'Criando...',
+    'risks.createRiskButton': 'Criar risco',
+    'risks.riskCreatedSuccess': 'Risco criado com sucesso',
     'risks.recentThreatsTitle': 'Ameaças recentes',
     'risks.loadingThreats': 'Carregando ameaças...',
     'risks.noThreats': 'Nenhuma ameaça registrada.',
     'risks.recentVulnerabilitiesTitle': 'Vulnerabilidades recentes',
     'risks.loadingVulnerabilities': 'Carregando vulnerabilidades...',
     'risks.noVulnerabilities': 'Nenhuma vulnerabilidade registrada.',
+    'tutorial.title': 'Olá, sou Dani27',
+    'tutorial.subtitle': 'Seu assistente virtual guia você pela plataforma passo a passo.',
+    'tutorial.progressLabel': 'Passo',
+    'tutorial.stepHint': 'Mini explicação da seção atual',
+    'tutorial.previous': 'Anterior',
+    'tutorial.next': 'Próximo',
+    'tutorial.finish': 'Finalizar',
+    'tutorial.startPromptKnown': 'Pressione iniciar para começar o tutorial a partir do painel principal.',
+    'tutorial.startPromptUnknown': 'Você está em outra seção. Inicie o percurso para voltar ao início e seguir o fluxo correto.',
+    'tutorial.startButton': 'Iniciar tutorial',
+    'tutorial.dismissButton': 'Fechar',
+    'tutorial.routeHint': 'O tutorial indica cada rota, siga as setas para avançar.',
+    'tutorial.step1.title': 'Boas-vindas profissionais',
+    'tutorial.step1.description': 'Comece sua jornada de conformidade com uma visão clara de cada módulo, do painel até a auditoria e evidências.',
+    'tutorial.step2.title': 'Navegação inteligente',
+    'tutorial.step2.description': 'Use o menu de processos ou o painel de módulos para acessar riscos, evidências, auditoria e controles a qualquer momento.',
+    'tutorial.step3.title': 'Perfil e configurações',
+    'tutorial.step3.description': 'Personalize seu perfil de conformidade a qualquer momento e revise o status do seu plano, notificações e preferências.',
+    'tutorial.step4.title': 'Recursos chave',
+    'tutorial.step4.description': 'Analise os riscos identificados, revise sua criticidade e controle os planos de tratamento.',
+    'tutorial.step5.title': 'Preparar auditoria',
+    'tutorial.step5.description': 'Valide sua evidência, consulte achados e avance na preparação para a auditoria com clareza.',
+    'tutorial.step6.title': 'Autoavaliação',
+    'tutorial.step6.description': 'Complete sua autoavaliação para medir seu nível de conformidade e ver recomendações imediatas.',
+    'tutorial.step7.title': 'Configurações',
+    'tutorial.step7.description': 'Ajuste suas preferências, idioma e notificações para que o programa se adapte à sua equipe.',
+    'tutorial.note': 'Este percurso está sempre disponível com o ícone superior.',
+    'tutorial.close': 'Fechar guia',
+    'tutorial.steps.dashboard.title': 'Central de Controle',
+    'tutorial.steps.dashboard.description': 'Veja status, alertas e progresso em um relance.',
+    'tutorial.steps.dashboard.sections.intro.title': 'O que você verá aqui',
+    'tutorial.steps.dashboard.sections.intro.content': `Este painel resume o estado atual do seu programa:
+- KPIs de documentação, implementação e eficácia
+- Score de saúde e tendência
+- Atividade recente
+- Tarefas futuras
+
+Ele foi feito para priorização rápida, não para edição em massa.`,
+    'tutorial.steps.dashboard.sections.intro.action': 'Explorar o painel',
+    'tutorial.steps.dashboard.sections.kpis.title': 'KPIs e score',
+    'tutorial.steps.dashboard.sections.kpis.content': `Os cartões mostram as porcentagens atuais e a variação recente.
+
+Use-os para perceber se você está melhorando ou retrocedendo. Nesta versão, os cartões são informativos e não abrem detalhes ao clicar.`,
+    'tutorial.steps.dashboard.sections.kpis.action': 'Conferir valores e tendências',
+    'tutorial.steps.dashboard.sections.activity-tasks.title': 'Atividade e tarefas futuras',
+    'tutorial.steps.dashboard.sections.activity-tasks.content': `Você encontrará duas áreas úteis abaixo:
+- Atividade recente: mudanças feitas no sistema
+- Tarefas futuras: itens com prioridade e prazo
+
+Elas ajudam você a decidir o que tratar primeiro.`,
+    'tutorial.steps.dashboard.sections.activity-tasks.action': 'Comparar atividade e tarefas',
+    'tutorial.steps.dashboard.sections.scope.title': 'Escopo desta etapa',
+    'tutorial.steps.dashboard.sections.scope.content': `Esta área ajuda a:
+- mostrar o status geral e a tendência
+- mostrar atividade e tarefas sugeridas
+
+Dica:
+- use isso para priorizar em minutos
+- depois aprofunde em cada módulo para agir`,
+    'tutorial.steps.dashboard.sections.scope.action': 'Usar como visão de monitoramento',
+    'tutorial.steps.dashboard.sections.conclusion.title': 'Próxima etapa',
+    'tutorial.steps.dashboard.sections.conclusion.content': `Quando você identificar prioridades no painel, vá para a análise de lacunas para entender por que o status está assim e o que corrigir primeiro.`,
+    'tutorial.steps.dashboard.sections.conclusion.action': 'Ir para Gap Analysis',
+    'tutorial.steps.understand.title': 'Análise de lacunas',
+    'tutorial.steps.understand.description': 'Identifique exatamente o que falta entre o estado atual e os requisitos.',
+    'tutorial.steps.understand.sections.intro.title': 'Análise de lacunas (Gap Analysis)',
+    'tutorial.steps.understand.sections.intro.content': `Estamos na parte mais importante: Gap Analysis.
+
+Aqui você vai:
+1. Responder perguntas sobre sua organização
+2. O sistema analisa suas respostas
+3. Você vê exatamente o que está faltando
+4. Recebe um plano para fechar as lacunas
+
+Esse é o coração da conformidade. Vale dedicar tempo aqui.`,
+    'tutorial.steps.understand.sections.intro.action': 'Ler a introdução',
+    'tutorial.steps.understand.sections.framework.title': 'Qual norma você precisa cumprir?',
+    'tutorial.steps.understand.sections.framework.content': `Você pode trabalhar com um ou mais frameworks:
+- ISO 27001 (segurança da informação)
+- ISO 27002 (controles de segurança)
+- GDPR (proteção de dados - Europa)
+- HIPAA (saúde - EUA)
+- NIST (segurança nacional - EUA)
+- SOC 2 (auditoria de serviço)
+
+Selecione o que se aplica ao seu negócio.
+Dica: muitas organizações usam ISO 27001 como base.`,
+    'tutorial.steps.understand.sections.framework.action': 'Selecionar o framework aplicável',
+    'tutorial.steps.understand.sections.questionnaire.title': 'Responda com honestidade',
+    'tutorial.steps.understand.sections.questionnaire.content': `Você verá perguntas como:
+'Você tem uma política de segurança documentada?'
+'Você realiza treinamento anual de segurança?'
+'Você tem um plano de resposta a incidentes?'
+
+Responda SIM/NÃO/PARCIALMENTE (isso é confidencial)
+
+Não há respostas certas. A honestidade é melhor.
+Com base nisso, calcularemos suas lacunas.`,
+    'tutorial.steps.understand.sections.questionnaire.action': 'Começar a responder',
+    'tutorial.steps.understand.sections.analysis.title': 'O sistema está analisando...',
+    'tutorial.steps.understand.sections.analysis.content': `Nos dê um momento para processar suas respostas.
+
+Estamos:
+✓ comparando seu estado com as normas
+✓ calculando o percentual de conformidade
+✓ priorizando lacunas por risco
+✓ recomendando ações
+
+Isso pode levar de 10 a 30 segundos...`,
+    'tutorial.steps.understand.sections.analysis.action': 'Aguardar a análise',
+    'tutorial.steps.understand.sections.results.title': 'Aqui estão suas lacunas',
+    'tutorial.steps.understand.sections.results.content': `Você verá 3 coisas:
+
+1. LACUNA CRÍTICA (vermelho)
+   - alto impacto se não fechar
+   - trate isso primeiro
+
+2. LACUNA MAIOR (laranja)
+   - importante, mas não urgente
+   - planeje para os próximos meses
+
+3. LACUNA MENOR (amarelo)
+   - baixo impacto
+   - útil, mas não crítica
+
+O percentual de conformidade aparece no topo.
+Se estiver <70%, ainda há trabalho a fazer.`,
+    'tutorial.steps.understand.sections.results.action': 'Revisar lacunas e prioridades',
+    'tutorial.steps.understand.sections.action-plan.title': 'Crie seu plano de fechamento',
+    'tutorial.steps.understand.sections.action-plan.content': `Para cada lacuna:
+1. Clique nela
+2. Atribua um responsável
+3. Defina uma data limite
+4. Descreva o que será feito para fechá-la
+
+O sistema acompanha seu progresso.
+Cada lacuna fechada = percentual de conformidade maior
+
+Exemplo:
+"Lacuna: 'Não temos MFA habilitado'
+Responsável: Juan Pérez (CISO)
+Prazo: 30 de março
+Ação: implementar MFA da Okta para todos os acessos"`,
+    'tutorial.steps.understand.sections.action-plan.action': 'Criar um plano de ação',
+    'tutorial.steps.understand.sections.conclusion.title': 'Análise concluída!',
+    'tutorial.steps.understand.sections.conclusion.content': `Ótimo, agora você sabe o que está faltando.
+
+O restante é implementação:
+- Etapa 3: documentar seus ATIVOS (o que você protege)
+- Etapa 4: subir políticas e DOCUMENTOS
+- Etapa 5: identificar RISCOS específicos
+- Etapa 6: coletar EVIDÊNCIAS
+- Etapa 7: compilar ACHADOS para auditoria
+
+Vamos em frente. Próximo: Assets (inventário)`,
+    'tutorial.steps.understand.sections.conclusion.action': 'Clicar em Próximo',
+    'tutorial.steps.assets.title': 'Inventário de ativos',
+    'tutorial.steps.assets.description': 'Documente todos os ativos (sistemas, dados, pessoas) que precisam de proteção.',
+    'tutorial.steps.assets.sections.intro.title': 'O que este módulo faz',
+    'tutorial.steps.assets.sections.intro.content': `Aqui você registra ativos de forma estruturada para sua gestão de riscos.
+
+Você pode criar, editar e excluir ativos e classificá-los por tipo e impacto CIA (confidencialidade, integridade e disponibilidade).`,
+    'tutorial.steps.assets.sections.intro.action': 'Ver a tabela e + Novo asset',
+    'tutorial.steps.assets.sections.create.title': 'Criar e classificar',
+    'tutorial.steps.assets.sections.create.content': `Ao criar um ativo, você define nome, tipo, localização e valores CIA.
+
+Com esses valores, o sistema calcula a criticidade para ajudar na priorização.`,
+    'tutorial.steps.assets.sections.create.action': 'Criar um ativo e preencher o CIA',
+    'tutorial.steps.assets.sections.filters.title': 'Filtrar e revisar',
+    'tutorial.steps.assets.sections.filters.content': `Você pode filtrar por tipo e nível de criticidade para ver rapidamente quais ativos precisam de mais atenção.
+
+Você também pode abrir um ativo existente para editar seus dados ou excluí-lo.`,
+    'tutorial.steps.assets.sections.filters.action': 'Testar filtros por tipo e nível',
+    'tutorial.steps.assets.sections.scope.title': 'Foco do módulo',
+    'tutorial.steps.assets.sections.scope.content': `O objetivo desta etapa é manter um inventário claro e acionável.
+
+Quando os ativos estão bem classificados e priorizados, a análise de riscos e a implementação de controles ficam muito mais rápidas.`,
+    'tutorial.steps.assets.sections.scope.action': 'Usar como inventário',
+    'tutorial.steps.assets.sections.conclusion.title': 'Próxima etapa',
+    'tutorial.steps.assets.sections.conclusion.content': `Quando o inventário base estiver pronto, a próxima etapa é centralizar documentos para apoiar evidências e relatórios.`,
+    'tutorial.steps.assets.sections.conclusion.action': 'Clicar em Próximo',
+    'tutorial.steps.documents.title': 'Gestão de documentos',
+    'tutorial.steps.documents.description': 'Centralize, organize e versiona todas as políticas e procedimentos.',
+    'tutorial.steps.documents.sections.intro.title': 'O que este módulo faz',
+    'tutorial.steps.documents.sections.intro.content': `Este módulo reúne o trabalho documental em cinco abas:
+- Ver documentos
+- Editar conteúdo
+- Gerar documento com IA
+- Exportar relatório
+- Enviar documento`,
+    'tutorial.steps.documents.sections.intro.action': 'Identificar as abas disponíveis',
+    'tutorial.steps.documents.sections.upload.title': 'Enviar e consultar',
+    'tutorial.steps.documents.sections.upload.content': `Você pode enviar arquivos ou conteúdo textual, listá-los e abrir um para ver ou editar.
+
+Também é possível excluir documentos enviados quando necessário.`,
+    'tutorial.steps.documents.sections.upload.action': 'Enviar e abrir um documento',
+    'tutorial.steps.documents.sections.ai-generation.title': 'Geração com IA',
+    'tutorial.steps.documents.sections.ai-generation.content': `A aba de geração cria rascunhos de documentos que depois podem ser enviados ao repositório.
+
+É útil para iniciar rapidamente uma política ou procedimento base.`,
+    'tutorial.steps.documents.sections.ai-generation.action': 'Gerar e revisar um rascunho',
+    'tutorial.steps.documents.sections.reports.title': 'Exportar relatórios',
+    'tutorial.steps.documents.sections.reports.content': `Na aba de relatórios você pode iniciar uma geração, ver o status e baixar o resultado quando estiver pronto.
+
+Os formatos disponíveis dependem da configuração/API, mas o fluxo de geração e download está implementado.`,
+    'tutorial.steps.documents.sections.reports.action': 'Gerar um relatório e verificar o status',
+    'tutorial.steps.documents.sections.conclusion.title': 'Fim desta etapa',
+    'tutorial.steps.documents.sections.conclusion.content': `Com este fluxo você pode centralizar documentos-chave, iterá-los e usá-los como suporte para o programa de conformidade.
+
+A próxima etapa conecta esses insumos à gestão de riscos.`,
+    'tutorial.steps.documents.sections.conclusion.action': 'Clicar em Próximo',
+    'tutorial.steps.risks.title': 'Gestão de riscos',
+    'tutorial.steps.risks.description': 'Identifique, avalie e mitigue riscos de conformidade com um método claro.',
+    'tutorial.steps.risks.sections.intro.title': 'Análise de riscos',
+    'tutorial.steps.risks.sections.intro.content': `Risco é a probabilidade de algo ruim acontecer.
+
+Gestão de riscos responde:
+1. O que pode dar errado?
+2. Quão provável é?
+3. Quão grave seria?
+4. O que faremos sobre isso?
+
+É isso que os auditores verificam com atenção.`,
+    'tutorial.steps.risks.sections.intro.action': 'Entender a análise de riscos',
+    'tutorial.steps.risks.sections.matrix.title': 'Como medimos o risco',
+    'tutorial.steps.risks.sections.matrix.content': `RISCO = PROBABILIDADE × IMPACTO
+
+         PROBABILIDADE
+         Baixa Média Alta
+IMPACTO Alta   3     6     9
+        Média  2     4     6
+        Baixa  1     2     3
+
+Cores:
+- Vermelho (9): crítico - agir agora
+- Laranja (6): alto - nas próximas semanas
+- Amarelo (4): médio - nos próximos meses
+- Verde (2-1): baixo - monitorar
+
+O sistema calcula automaticamente.`,
+    'tutorial.steps.risks.sections.matrix.action': 'Ver a matriz de riscos',
+    'tutorial.steps.risks.sections.create.title': 'Registrar um risco',
+    'tutorial.steps.risks.sections.create.content': `Clique em '+ Novo risco'
+
+Formulário:
+NOME: 'Perda de dados por ransomware'
+DESCRIÇÃO: 'Um ataque de ransomware pode criptografar nosso banco'
+CATEGORIA: Cibersegurança / Operacional / Conformidade / Reputação
+PROBABILIDADE: Baixa/Média/Alta
+IMPACTO: Baixo/Médio/Alto
+RESPONSÁVEL: Juan Pérez
+ATIVOS AFETADOS: selecione
+CONTROLES EXISTENTES: 'Temos backups diários'
+
+Salvar = risco registrado + score automático`,
+    'tutorial.steps.risks.sections.create.action': 'Criar seu primeiro risco',
+    'tutorial.steps.risks.sections.evaluate.title': 'Ver a matriz de riscos',
+    'tutorial.steps.risks.sections.evaluate.content': `O painel de riscos mostra:
+
+MATRIZ VISUAL:
+- Cada risco é um ponto
+- Vermelho no canto = crítico
+- Verde no canto = controlável
+- Clique em um ponto para detalhes
+
+LISTA ORDENADA:
+- Por risco (maior primeiro)
+- Nome, responsável, status
+
+MÉTRICAS:
+- Total de riscos: 24
+- Críticos: 3 (ação imediata)
+- Altos: 7
+- Médios: 10
+- Baixos: 4`,
+    'tutorial.steps.risks.sections.evaluate.action': 'Examinar a matriz de riscos',
+    'tutorial.steps.risks.sections.mitigation.title': 'Criar um plano de ação',
+    'tutorial.steps.risks.sections.mitigation.content': `Para cada risco, escolha:
+
+OPÇÃO 1: ACEITAR
+- O risco é aceitável
+- Documente por quê
+
+OPÇÃO 2: EVITAR
+- Mude o processo para remover o risco
+
+OPÇÃO 3: MITIGAR
+- Reduza probabilidade OU impacto
+
+OPÇÃO 4: TRANSFERIR
+- Segurar o risco (seguro cibernético)
+
+Plano CAPA:
+- Ação específica
+- Responsável
+- Data limite
+- Indicadores de sucesso`,
+    'tutorial.steps.risks.sections.mitigation.action': 'Criar um plano de mitigação',
+    'tutorial.steps.risks.sections.controls.title': 'Implementar controles',
+    'tutorial.steps.risks.sections.controls.content': `Controles = medidas concretas
+
+Exemplo de risco: perda de dados
+Controles:
+✓ Controle A: backup automático diário
+✓ Controle B: criptografia em repouso
+✓ Controle C: MFA para acesso aos dados
+✓ Controle D: monitoramento 24/7
+
+Para cada controle:
+- Atribua um responsável
+- Defina uma data de implementação
+- Marque como 'Em andamento' → 'Implementado' → 'Testado'
+- Anexe evidências
+
+O sistema avisa quando estiverem vencendo.`,
+    'tutorial.steps.risks.sections.controls.action': 'Atribuir controles',
+    'tutorial.steps.risks.sections.monitoring.title': 'Riscos nunca dormem',
+    'tutorial.steps.risks.sections.monitoring.content': `Mensalmente:
+1. Revise cada risco
+2. A probabilidade mudou?
+3. O impacto mudou?
+4. Os controles funcionam?
+5. Atualize o score se necessário
+
+Anualmente:
+- Análise completa de riscos
+- Avaliar novos riscos
+- Remover riscos resolvidos
+
+O sistema guarda histórico:
+- O risco X estava 'Alto' em janeiro
+- Agora está 'Médio' em março
+- Prova de melhoria = auditor satisfeito`,
+    'tutorial.steps.risks.sections.monitoring.action': 'Monitorar e atualizar riscos',
+    'tutorial.steps.risks.sections.conclusion.title': 'Registro de riscos completo',
+    'tutorial.steps.risks.sections.conclusion.content': `Agora você tem um registro de riscos completo!
+
+O sistema contém:
+✓ O que falta (lacunas)
+✓ O que você protege (ativos)
+✓ Suas regras (documentos)
+✓ Quais riscos você tem (risks)
+
+Depois: EVIDÊNCIAS
+Como provamos que fizemos isso? Etapa 6: Evidence`,
+    'tutorial.steps.risks.sections.conclusion.action': 'Clicar em Próximo',
+    'tutorial.steps.evidence.title': 'Coleta de evidências',
+    'tutorial.steps.evidence.description': 'Centralize e organize todas as provas de que seus controles funcionam.',
+    'tutorial.steps.evidence.sections.intro.title': 'O que esta página permite',
+    'tutorial.steps.evidence.sections.intro.content': `Aqui você pode:
+- Enviar evidências
+- Buscar por texto (nome/controle/cláusula)
+- Filtrar por tipo
+- Ver o status de frescor (fresh, expiring, expired)
+- Excluir evidências`,
+    'tutorial.steps.evidence.sections.intro.action': 'Encontrar busca, filtros e upload',
+    'tutorial.steps.evidence.sections.upload.title': 'Enviar evidências',
+    'tutorial.steps.evidence.sections.upload.content': `O envio acontece pelo uploader do sistema, e então o item aparece em seu grupo.
+
+Depois disso você pode verificar a validade e manter só as evidências atuais.`,
+    'tutorial.steps.evidence.sections.upload.action': 'Enviar sua primeira evidência',
+    'tutorial.steps.evidence.sections.organize.title': 'Foco desta etapa',
+    'tutorial.steps.evidence.sections.organize.content': `O objetivo é manter as evidências atuais, localizáveis e prontas para revisão.
+
+Com busca, filtros e status de frescor, você mantém a qualidade da evidência durante todo o ciclo.`,
+    'tutorial.steps.evidence.sections.organize.action': 'Enviar, filtrar e manter evidências',
+    'tutorial.steps.evidence.sections.conclusion.title': 'Próxima etapa',
+    'tutorial.steps.evidence.sections.conclusion.content': `Com evidências enviadas e classificadas, vá para CAPA/Findings para gerenciar ações corretivas e prioridades.`,
+    'tutorial.steps.evidence.sections.conclusion.action': 'Clicar em Próximo',
+    'tutorial.steps.findings.title': 'Achados / CAPA Tracker',
+    'tutorial.steps.findings.description': 'Gerencie ações corretivas, prioridades e prazos em um só lugar.',
+    'tutorial.steps.findings.sections.intro.title': 'O que você realmente encontra aqui',
+    'tutorial.steps.findings.sections.intro.content': `Esta página hoje funciona como um CAPA Tracker.
+
+Você vê ações corretivas, status, prioridade, prazo e progresso.`,
+    'tutorial.steps.findings.sections.intro.action': 'Revisar KPIs e a tabela CAPA',
+    'tutorial.steps.findings.sections.create.title': 'Criar uma CAPA',
+    'tutorial.steps.findings.sections.create.content': `Você pode criar uma CAPA com título, prioridade, origem, prazo, progresso e controle relacionado.
+
+Depois ela aparecerá na tabela principal para acompanhamento.`,
+    'tutorial.steps.findings.sections.create.action': 'Criar uma CAPA de exemplo',
+    'tutorial.steps.findings.sections.filters.title': 'Acompanhamento e filtros',
+    'tutorial.steps.findings.sections.filters.content': `Você pode filtrar por status e prioridade e abrir cada linha para ver detalhes (descrição, controle/responsável, origem e datas).
+
+Você também verá KPIs de itens abertos, vencidos e fechados.`,
+    'tutorial.steps.findings.sections.filters.action': 'Aplicar filtros e expandir uma linha',
+    'tutorial.steps.findings.sections.conclusion.title': 'Fim desta etapa',
+    'tutorial.steps.findings.sections.conclusion.content': `Com CAPAs bem definidas e monitoradas, você transforma lacunas em um plano executável com responsáveis e prazos.
+
+Isso te deixa melhor preparado para a auditoria.`,
+    'tutorial.steps.findings.sections.conclusion.action': 'Clicar em Próximo',
+    'tutorial.steps.audit.title': 'Preparação para auditoria',
+    'tutorial.steps.audit.description': 'Prepare e execute a revisão externa de conformidade com parceiros certificados.',
+    'tutorial.steps.audit.sections.intro.title': 'O que este módulo realmente faz',
+    'tutorial.steps.audit.sections.intro.content': `Aqui você tem três capacidades principais:
+- Validação de evidências por texto
+- Validação granular de arquivos
+- Checklist pré-auditoria com salvamento automático`,
+    'tutorial.steps.audit.sections.intro.action': 'Localizar o validador, checklist e Audit Room',
+    'tutorial.steps.audit.sections.validation.title': 'Validação de conteúdo e arquivo',
+    'tutorial.steps.audit.sections.validation.content': `Você pode colar evidência textual ou enviar um arquivo para o sistema analisar achados e status de conformidade.
+
+O resultado mostra progresso, severidades e observações.`,
+    'tutorial.steps.audit.sections.validation.action': 'Executar uma validação de exemplo',
+    'tutorial.steps.audit.sections.readiness.title': 'Checklist e Audit Room',
+    'tutorial.steps.audit.sections.readiness.content': `O checklist é salvo automaticamente e ajuda você a acompanhar os itens abertos antes da auditoria.
+
+No Audit Room você pode selecionar evidências e gerar um binder em PDF para download.`,
+    'tutorial.steps.audit.sections.readiness.action': 'Preencher a checklist e gerar o binder',
+    'tutorial.steps.audit.sections.conclusion.title': 'Fim desta etapa',
+    'tutorial.steps.audit.sections.conclusion.content': `Com validação, checklist e binder em PDF, você chega à revisão com evidências melhor organizadas.
+
+A próxima etapa é manter esse nível com autoavaliação regular.`,
+    'tutorial.steps.audit.sections.conclusion.action': 'Clicar em Próximo',
+    'tutorial.steps.self-assessment.title': 'Autoavaliação contínua',
+    'tutorial.steps.self-assessment.description': 'Faça avaliações internas regulares para permanecer em conformidade entre auditorias.',
+    'tutorial.steps.self-assessment.sections.intro.title': 'O que este módulo faz',
+    'tutorial.steps.self-assessment.sections.intro.content': `A autoavaliação atual é um questionário dividido por fases.
+
+Você responde cada pergunta e o sistema salva o progresso para você continuar depois.`,
+    'tutorial.steps.self-assessment.sections.intro.action': 'Identificar fases e progresso lateral',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.title': 'Respostas disponíveis',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.content': `As opções de resposta são: Yes, Partial, No e N/A.
+
+Você pode responder pergunta por pergunta e avançar de fase pelo seletor lateral.`,
+    'tutorial.steps.self-assessment.sections.self-assessment-form.action': 'Responder ao menos uma pergunta por fase',
+    'tutorial.steps.self-assessment.sections.evidence-review.title': 'Evidência por pergunta',
+    'tutorial.steps.self-assessment.sections.evidence-review.content': `Cada pergunta permite anexar evidências.
+
+Regra importante: se uma pergunta crítica for marcada como "Yes", você deve anexar evidência para validá-la corretamente.`,
+    'tutorial.steps.self-assessment.sections.evidence-review.action': 'Anexar evidência a uma pergunta crítica',
+    'tutorial.steps.self-assessment.sections.persistence.title': 'Salvamento e continuidade',
+    'tutorial.steps.self-assessment.sections.persistence.content': `O progresso é salvo automaticamente (local + backend), então você não perde respostas ao mudar de fase ou recarregar.
+
+Você também vê o progresso por fase e o progresso global respondido.`,
+    'tutorial.steps.self-assessment.sections.persistence.action': 'Trocar de fase e verificar o salvamento',
+    'tutorial.steps.self-assessment.sections.conclusion.title': 'Fim desta etapa',
+    'tutorial.steps.self-assessment.sections.conclusion.content': `Com respostas, evidências e salvamento contínuo por fase, você pode acompanhar o nível de conformidade de forma estável entre revisões formais.
+
+Essa disciplina melhora a rastreabilidade e reduz surpresas nos ciclos de auditoria.`,
+    'tutorial.steps.self-assessment.sections.conclusion.action': 'Celebrar seu progresso',
     'menu.preAuditAssessment': 'Autoavaliação Pré-Auditoria',
     searchPlaceholder: 'Pesquisar controles ou evidências...',
     administrator: 'Administrador',
     chatPlaceholder: 'Digite uma mensagem...',
     send: 'Enviar',
+    'documents.generate.defaultTitle': 'Novo documento ISO 27001',
+    'documents.generate.defaultDescription': 'Gere um documento obrigatório da ISO 27001 com suporte de IA.',
+    'documents.generate.defaultAudience': 'Equipe de segurança',
+    'documents.report.defaultTitle': 'Relatório de conformidade',
+    'documents.report.defaultDescription': 'Resumo de status e lacunas de conformidade.',
+    'documents.error.loadList': 'Não foi possível carregar os documentos. Tente recarregar a página.',
+    'documents.error.loadSelected': 'Não foi possível carregar o documento selecionado.',
+    'documents.report.error.timeout': 'A geração do relatório demorou demais. Tente novamente.',
+    'documents.report.error.status': 'Não foi possível obter o status do relatório. Tente novamente.',
+    'documents.confirmDelete': 'Tem certeza de que deseja excluir este documento?',
+    'documents.error.delete': 'Não foi possível excluir o documento.',
+    'documents.report.error.selectFirst': 'Selecione primeiro um documento na barra lateral.',
+    'documents.report.error.start': 'Não foi possível iniciar a geração do relatório.',
+    'documents.upload.error.missingInput': 'Você deve selecionar um arquivo ou inserir conteúdo.',
+    'documents.upload.defaultTitle': 'Documento enviado',
+    'documents.upload.success': 'Documento enviado com sucesso.',
+    'documents.upload.defaultDescription': 'Documento enviado',
+    'documents.upload.error.generic': 'Erro ao enviar o documento. Tente novamente.',
+    'documents.generate.starting': 'Iniciando geração...',
+    'documents.generate.fallbackTitle': 'Documento ISO 27001',
+    'documents.generate.completed': 'Geração concluída',
+    'documents.generate.errorStatus': 'Erro na geração',
+    'documents.generate.errorStart': 'Não foi possível iniciar a geração. Verifique a configuração.',
+    'documents.generate.defaultUploadedDescription': 'Documento gerado por IA',
+    'documents.generate.uploadError': 'Erro ao enviar o documento gerado.',
+    'documents.tab.view': 'Visualizar',
+    'documents.tab.edit': 'Editor',
+    'documents.tab.generate': 'Gerar com IA',
+    'documents.tab.report': 'Exportar relatório',
+    'documents.tab.upload': 'Enviar',
+    'documents.hero.subtitle': 'Crie, edite e gerencie documentos ISO 27001 com assistência de IA em um fluxo mais claro e profissional.',
+    'documents.sidebar.quickAccess': 'Acesso rápido aos seus documentos salvos.',
+    'documents.sidebar.searchPlaceholder': 'Pesquisar documentos',
+    'documents.deleteDocument': 'Excluir documento',
+    'documents.viewLess': 'Ver menos',
+    'documents.viewMoreCount': 'Ver mais ({count} a mais)',
+    'documents.action.generateAi': '+ Gerar com IA',
+    'documents.action.exportReport': '+ Exportar relatório',
+    'documents.action.uploadDocument': '+ Enviar documento',
+    'documents.noDocumentSelected': 'Nenhum documento selecionado',
+    'documents.openAssistant': 'Abrir assistente',
+    'documents.loadingDocument': 'Carregando documento...',
+    'documents.selectToView': 'Selecione um documento para visualizar seu conteúdo.',
+    'documents.untitled': 'Documento sem título',
+    'documents.generate.title': 'Gerar documento com IA',
+    'documents.generate.subtitle': 'O agente LLM irá gerar um documento ISO 27001 completo seção por seção.',
+    'documents.field.title': 'Título',
+    'documents.field.description': 'Descrição',
+    'documents.field.audience': 'Público',
+    'documents.field.language': 'Idioma',
+    'documents.field.tone': 'Tom',
+    'documents.field.type': 'Tipo',
+    'documents.field.sections': 'Seções',
+    'documents.placeholder.title': 'Título do documento',
+    'documents.placeholder.context': 'Contexto do documento',
+    'documents.placeholder.audience': 'Equipe alvo',
+    'documents.placeholder.sections': 'Separadas por vírgulas ou quebras de linha',
+    'documents.tone.formal': 'Formal',
+    'documents.tone.informal': 'Informal',
+    'documents.type.policy': 'Política',
+    'documents.type.report': 'Relatório',
+    'documents.type.procedure': 'Procedimento',
+    'documents.type.general': 'Geral',
+    'documents.jobId': 'ID do Job:',
+    'documents.generate.generating': 'Gerando...',
+    'documents.generate.button': 'Gerar documento',
+    'documents.openInEditor': 'Abrir no editor',
+    'documents.uploadGenerated': 'Enviar documento gerado',
+    'documents.report.title': 'Exportar relatório',
+    'documents.report.subtitle': 'Gere um relatório para download com base no documento atualmente selecionado.',
+    'documents.report.documentToExport': 'Documento para exportar:',
+    'documents.report.noneSelected': 'Nenhum documento selecionado na barra lateral',
+    'documents.report.fieldTitle': 'Título do relatório',
+    'documents.report.placeholderDescription': 'Ex.: Resumo executivo do status dos controles ISO para revisão da gestão',
+    'documents.report.descriptionHint': 'Este texto aparecerá como subtítulo no cabeçalho do relatório gerado.',
+    'documents.report.template': 'Modelo',
+    'documents.report.format': 'Formato',
+    'documents.report.status': 'Status do relatório',
+    'documents.report.download': 'Baixar relatório',
+    'documents.report.generateAnother': 'Gerar outro',
+    'documents.report.recent': 'Relatórios recentes',
+    'documents.report.generating': 'Gerando relatório...',
+    'documents.report.startExport': 'Iniciar exportação',
+    'documents.upload.title': 'Enviar documento',
+    'documents.upload.subtitle': 'Envie um arquivo ou cole o conteúdo diretamente.',
+    'documents.upload.placeholderSummary': 'Resumo curto',
+    'documents.upload.file': 'Arquivo',
+    'documents.upload.altContent': 'Conteúdo alternativo',
+    'documents.upload.altPlaceholder': 'Cole o conteúdo aqui se não enviar um arquivo',
+    'documents.upload.uploading': 'Enviando...',
+    'documents.upload.button': 'Enviar documento',
+    'language.es': 'Espanhol',
+    'language.en': 'Inglês',
+    'common.optional': 'opcional',
+    'documents.title': 'Gerador de documentos',
+    'documents.viewLabel': 'Visualização do documento',
+    'documentEditor.titlePlaceholder': 'Título do documento',
+    'documentEditor.stats': '{words} palavras · {chars} caracteres',
+    'documentEditor.saved': '✓ Salvo',
+    'documentEditor.unsaved': '○ Não salvo',
+    'documentEditor.copyAsText': 'Copiar como texto',
+    'documentEditor.copied': '✓ Copiado',
+    'documentEditor.copy': 'Copiar',
+    'documentEditor.upload': 'Enviar',
+    'documentEditor.save': 'Salvar',
+    'documentEditor.exitFullscreen': 'Sair da tela cheia',
+    'documentEditor.fullscreen': 'Tela cheia',
+    'documentEditor.placeholder': 'Comece a escrever ou gere um documento com IA...',
+    'documentEditor.footerBrand': 'ISO 27001 · DANI Platform',
+    'documentEditor.mobileWords': '{count} palavras',
+    'documentEditor.toolbar.heading1': 'Título 1',
+    'documentEditor.toolbar.heading2': 'Título 2',
+    'documentEditor.toolbar.heading3': 'Título 3',
+    'documentEditor.toolbar.bold': 'Negrito',
+    'documentEditor.toolbar.italic': 'Itálico',
+    'documentEditor.toolbar.underline': 'Sublinhado',
+    'documentEditor.toolbar.bulletList': 'Lista sem ordem',
+    'documentEditor.toolbar.orderedList': 'Lista ordenada',
+    'documentEditor.toolbar.blockquote': 'Citação',
+    'assessment.progressTitle': 'Progresso',
+    'assessment.phaseLabel': 'Fase {order}',
+    'evidence.title': 'Centro de Evidências',
+    'evidence.subtitle': 'Organize sua evidência por tipo e controle ISO 27001.',
+    'evidence.uploadAction': '+ Enviar evidência',
+    'evidence.kpi.totalItems': 'Total de evidências',
+    'evidence.kpi.totalItemsHelp': 'Organizadas por taxonomia de evidência',
+    'evidence.kpi.filteredItems': 'Elementos filtrados',
+    'evidence.kpi.filteredItemsHelp': '',
+    'evidence.kpi.types': '',
+    'evidence.kpi.typesHelp': '',
+    'evidence.searchPlaceholder': 'Pesquisar evidências, controle, cláusula...',
+    'evidence.allTypes': 'Todos os tipos de evidência',
+    'evidence.showing': 'Mostrando {matched} de {total} evidências',
+    'evidence.loading': 'Carregando evidências...',
+    'evidence.empty': 'Não há evidências que correspondam aos seus filtros.',
+    'evidence.validityDays': '{days} dias',
+    'evidence.deleting': 'Excluindo...',
+    'evidence.delete': 'Excluir',
+    'evidence.loadError': 'Não foi possível carregar as evidências. Tente novamente.',
+    'evidence.deleteError': 'Não foi possível excluir as evidências. Tente novamente.',
+    'evidence.confirmDelete': 'Excluir evidência "{name}"? Esta ação não pode ser desfeita.',
+    'evidence.type.policy': 'Política',
+    'evidence.type.procedure': 'Procedimento',
+    'evidence.type.instruction': 'Instrução',
+    'evidence.type.control': 'Controle',
+    'evidence.type.record': 'Registro',
+    'evidence.freshness.fresh': 'Vigente',
+    'evidence.freshness.expiring': 'Por vencer',
+    'evidence.freshness.expired': 'Vencida',
+    'evidence.attachmentDeleted': 'Arquivo removido',
+    'evidence.replace': 'Substituir',
+    'evidence.deleteFile': 'Excluir arquivo',
+    'evidence.viewLess': 'Ver menos',
+    'evidence.viewMoreCount': 'Ver mais {count}',
+    'auditRoom.title': 'Sala de Auditoria',
+    'auditRoom.evidencesLabel': 'Evidências',
+    'navbar.openCommandPalette': 'Abrir paleta de comandos',
+    'navbar.cmdShortcut': 'Ctrl + K / ⌘K',
+    'integrations.oauth.title': 'OAuth',
+    'integrations.oauth.processing': 'Processando...',
+    'integrations.oauth.invalidParams': 'Parâmetros inválidos',
+    'integrations.oauth.completed': 'Conexão concluída',
+    'integrations.oauth.timeout': 'Tempo esgotado. Verifique a conexão em Integrações.',
+    'upload.field.controlId': 'control_id',
+    'upload.field.clauseRef': 'clause_ref',
+    'upload.placeholder.controlId': 'ISO 27001 A.5.1',
+    'upload.placeholder.clauseRef': 'A.5.1',
+    'upload.dialogTitle': 'Enviar evidência',
+    'upload.api.primary': 'POST /api/v1/evidences',
+    'upload.api.secondary': 'POST /api/validate/external',
+    'upload.massUpload': 'Carregamento em massa',
+    'upload.status.queued': 'Em fila',
+    'upload.status.uploading': 'Enviando',
+    'upload.status.classifying': 'Classificando',
+    'upload.status.classified': 'Classificado',
+    'upload.status.pending': 'Pendente',
+    'upload.status.completed': 'Concluído',
+    'upload.status.failed': 'Falhou',
+    'understand.gapAnalysis': 'Análise de Lacunas',
+    'understand.loading': 'Carregando...',
+    'understand.empty': 'Não há lacunas para mostrar.',
+    'understand.actionHint': 'Ao clicar em "Criar documentação", inicia-se um fluxo guiado em que a IA gera o documento recomendado para fechar estas lacunas.',
+    'understand.createDocumentation': 'Criar documentação',
+    'understand.modifyDocumentation': 'Modificar documentação',
+    'understand.criticalIntro': 'O que ainda falta nas lacunas críticas:',
+    'understand.missing': 'Falta:',
+    'understand.suggestedEvidence': 'Evidência sugerida:',
+    'understand.linkedEvidence': 'Evidência vinculada detectada',
+    'understand.annexALabel': 'Controles do Anexo A ISO 27001',
+    'understand.controlLabel': 'Controle {value}',
+    'understand.clauseLabel': 'Cláusula {value}',
+    'understand.auditFinding': 'Achado de auditoria',
+    'understand.reason.no': 'Respondida como NÃO',
+    'understand.reason.partial': 'Respondida como PARCIAL',
+    'understand.reason.unanswered': 'Sem resposta',
+    'understand.frameworkSummary': 'Resumo do estado do framework',
+    'understand.phaseGapsSummary': '{unanswered} lacunas sem resposta — {critical} críticas',
+    'understand.phaseFallback': 'Fase {index}',
+    'understand.toast.noOpenGaps': 'Não há lacunas sem resposta nesta fase, mas você ainda pode criar documentação.',
+    'understand.toast.navigationError': 'Erro de navegação',
+    'app.placeholder.comingSoon': 'Esta página estará disponível em breve...',
 
     // Header
     'header.searchPlaceholder': 'Pesquisar controles ou evidências...',
@@ -757,6 +3295,31 @@ export const translations = {
     'sidebar.settings': 'Configurações',
     'sidebar.availableInPlan': 'Disponível no Plano {plan}',
 
+    // Phases
+    'phase.1': 'Contexto e Liderança',
+    'phase.2': 'Planejamento e Risco',
+    'phase.3': 'Suporte e Operações',
+    'phase.4': 'Controles do Anexo A',
+    // Assessment & Evidence
+    'assessment.responded': 'Respondido',
+    'assessment.loadingQuestions': 'Carregando perguntas...',
+    'assessment.noQuestions': 'Não há perguntas nesta fase.',
+    'assessment.viewByPhase': 'Visualização por fase: responda todas as perguntas desta coluna para não perder o contexto.',
+    'assessment.questionLabel': 'Pergunta',
+    'assessment.criticalNoEvidenceToast': 'Perguntas críticas respondidas como Sim requerem anexar evidências',
+    'assessment.criticalWarning': '⚠️ Perguntas críticas respondidas como "SIM" requerem anexar documentação de evidência.',
+    'assessment.criticalBadge': 'CRÍTICO',
+    'answer.yes': 'Sim',
+    'answer.partial': 'Parcial',
+    'answer.no': 'Não',
+    'answer.na': 'N/A',
+    'evidence.dragDropHint': 'Arraste e solte evidências aqui, ou',
+    'evidence.quickSelect': 'Selecionar (rápido)',
+    'evidence.advancedUploader': 'Uploader avançado',
+    'evidence.recentUploads': 'Últimos envios',
+    'assessment.save.savedPrefix': 'Salvo:',
+    'assessment.save.notSaved': 'Non salvato',
+
     // Menu Items
     'menu.dashboard': 'Painel',
     'menu.understand': 'Entender',
@@ -767,6 +3330,7 @@ export const translations = {
     'menu.audit': 'Auditoria',
     'menu.integrity': 'Integridade',
     'menu.regfeed': 'Feed Regulatório',
+    'menu.portal': 'Portal',
     'menu.gapAnalysis': 'Análise de Lacunas',
     'menu.documentGenerator': 'Gerador de Documentos',
     'menu.riskMap': 'Mapa de Riscos',
@@ -779,6 +3343,60 @@ export const translations = {
     'menu.integrations': 'Integrações',
     'menu.settings': 'Configurações',
     'menu.assets': 'Inventário de Ativos',
+    'assets.confirmDelete': 'Excluir este ativo?',
+    'assets.subtitle': 'Classificação C-I-A ISO 27001',
+    'assets.newAsset': '+ Novo ativo',
+    'assets.assetsLabel': 'ativos',
+    'assets.filterByType': 'Filtrar por tipo:',
+    'assets.allTypes': 'Todos os tipos',
+    'assets.noneFound': 'Nenhum ativo encontrado',
+    'assets.addFirst': 'Adicione seu primeiro ativo',
+    'assets.table.asset': 'Ativo',
+    'assets.table.type': 'Tipo',
+    'assets.table.score': 'Score',
+    'assets.table.level': 'Nível',
+    'assets.table.status': 'Status',
+    'assets.countSummary': '{filtered} de {total} ativos',
+    'assets.editAsset': 'Editar ativo',
+    'assets.newAssetTitle': 'Novo ativo',
+    'assets.editSubtitle': 'Atualizar classificação e metadados',
+    'assets.newSubtitle': 'Registrar um novo ativo de informação',
+    'assets.field.name': 'Nome *',
+    'assets.field.description': 'Descrição',
+    'assets.field.type': 'Tipo de ativo *',
+    'assets.field.location': 'Localização',
+    'assets.field.cia': 'Classificação C-I-A',
+    'assets.field.isoClause': 'Referência de cláusula ISO',
+    'assets.placeholder.name': 'ex. Servidor de banco de dados de produção',
+    'assets.placeholder.description': 'Breve descrição deste ativo...',
+    'assets.placeholder.location': 'ex. AWS us-east-1',
+    'assets.placeholder.isoClause': 'ex. A.8.1.1',
+    'assets.selectType': 'Selecionar tipo...',
+    'assets.ciaScale': '1 = Baixo · 2 = Médio · 3 = Alto',
+    'assets.cia.low': '1 — Baixo',
+    'assets.cia.medium': '2 — Médio',
+    'assets.cia.high': '3 — Alto',
+    'assets.cia.confidentiality': 'Confidencialidade',
+    'assets.cia.integrity': 'Integridade',
+    'assets.cia.availability': 'Disponibilidade',
+    'assets.validation.nameRequired': 'O nome é obrigatório',
+    'assets.validation.typeRequired': 'O tipo é obrigatório',
+    'assets.ciaScoreHint': 'Score = C×0,4 + I×0,35 + A×0,25 — calculado automaticamente',
+    'assets.type.hardware': 'Hardware',
+    'assets.type.software': 'Software',
+    'assets.type.data': 'Dados',
+    'assets.type.service': 'Serviço',
+    'assets.type.people': 'Pessoas',
+    'assets.type.facility': 'Instalação',
+    'assets.level.low': 'Baixo',
+    'assets.level.medium': 'Médio',
+    'assets.level.high': 'Alto',
+    'assets.level.critical': 'Crítico',
+    'assets.status.active': 'Ativo',
+    'assets.status.inactive': 'Inativo',
+    'assets.status.disposed': 'Descartado',
+    'assets.saveChanges': 'Salvar alterações',
+    'assets.createAsset': 'Criar ativo',
 
     profile: 'Perfil',
     exportReport: 'Exportar Relatório',
@@ -797,12 +3415,79 @@ export const translations = {
     docsPending: 'docs pendentes de revisão',
     controlsUnverified: 'controles não verificados',
     controlsUntested: 'controles não testados',
+    'common.clear': 'Limpar',
+    'common.close': 'Fechar',
+    'common.refresh': 'Atualizar',
+    'common.refreshing': 'Atualizando',
+    'validation.table.status': 'Status',
+    'validation.summary': 'Resumo',
+    'portal.mandatory': 'Obrigatória',
+    'portal.optional': 'Opcional',
+    'portal.acknowledged': 'Reconhecida',
+    'portal.pending': 'Pendente',
+    'portal.viewPolicy': 'Ver política',
+    'portal.versionLine': 'Versão {version} · {kind} · Publicada {date}',
+    'portal.officialSummary': 'Resumo oficial',
+    'portal.noSummary': 'Nenhum resumo disponível.',
+    'portal.notAvailable': 'N/A',
+    'portal.versionPrefix': 'v',
+    'portal.fullText': 'Texto completo',
+    'portal.readCarefully': 'Leia com atenção',
+    'portal.ackCheckboxText': 'Li esta política e reconheço a versão atual do documento.',
+    'portal.ackCheckboxHelp': 'Este reconhecimento será registrado para sua organização.',
+    'portal.ackSuccess': 'Política reconhecida com sucesso.',
+    'portal.pageTitle': 'Reconhecimento de políticas',
+    'portal.pageSubtitle': 'Revise as políticas publicadas pela sua organização e confirme as que você já leu.',
+    'portal.publishedPolicies': 'Políticas publicadas',
+    'portal.statusAutoUpdate': 'Atualiza automaticamente à medida que as políticas são reconhecidas.',
+    'portal.loadingPolicies': 'Carregando políticas...',
+    'auditRoom.binderQueued': 'Binder enfileirado',
+    'auditRoom.error.statusBinder': 'Erro ao buscar o status do binder.',
+    'auditRoom.error.downloadBinder': 'Não foi possível baixar o binder. Tente novamente.',
+    'auditRoom.generatingBinder': 'Gerando binder...',
+    'auditRoom.binderStatus': 'Status do binder',
+    'auditRoom.progressLabel': 'Progresso:',
+    'auditRoom.downloading': 'Baixando...',
+    'auditRoom.downloadPdf': 'Baixar PDF do binder',
+    'auditRoom.error.loadFolders': 'Não foi possível carregar as pastas da Audit Room.',
+    'auditRoom.error.loadEvidences': 'Não foi possível carregar as evidências da pasta.',
+    'auditRoom.error.selectEvidence': 'Selecione pelo menos uma evidência para gerar o binder.',
+    'auditRoom.error.startBinder': 'Não foi possível iniciar a geração do binder.',
+    'auditRoom.binderTitle': 'Binder da Audit Room',
+    'auditRoom.binderDescriptionFolder': 'Gerado a partir da pasta {folder}',
+    'auditRoom.binderDescription': 'Binder gerado a partir da Audit Room',
+    'auditRoom.subtitle': 'Explore pastas do Anexo A e gere binders a partir de evidências selecionadas.',
+    'auditRoom.selectedCount': '{count} evidência(s) selecionada(s)',
+    'auditRoom.folders': 'Pastas',
+    'auditRoom.loadingFolders': 'Carregando pastas...',
+    'auditRoom.folderEvidenceCount': '{count} evidências',
+    'auditRoom.statusLabel': 'Status:',
+    'auditRoom.notStarted': 'Não iniciado',
+    'auditRoom.generatedWhenFinished': 'Será gerado quando o processo terminar.',
+    'auditRoom.selectFolderHint': 'Selecione uma pasta para ver os itens.',
+    'auditRoom.noFolderSelected': 'Nenhuma pasta selecionada',
+    'auditRoom.loadingEvidences': 'Carregando evidências...',
+    'auditRoom.noEvidencesInFolder': 'Nenhuma evidência disponível nesta pasta.',
+    'auditRoom.selectFolderToView': 'Selecione uma pasta para ver as evidências.',
+    'auditRoom.generateBinder': 'Gerar binder',
+    'auditRoom.createBinderHint': 'Selecione itens para criar um PDF de binder a partir da Audit Room.',
     'dashboard.overview': 'Visão geral da saúde de conformidade e do progresso',
+    'dashboard.overviewLabel': 'Painel de Controle',
     'dashboard.kpiLoadError': 'Não foi possível carregar os KPIs',
     'dashboard.loadingKpis': 'Carregando KPIs...',
+    'dashboard.loading': 'Carregando...',
+    'dashboard.noRecentActivity': 'Nenhuma atividade recente disponível',
+    'dashboard.noUpcomingTasks': 'Não foram encontradas próximas tarefas',
+    'dashboard.nextAuditTitle': 'Próxima auditoria',
+    'dashboard.daysLeft': 'dias restantes',
+    'dashboard.targetDate': 'Data-alvo',
     'dashboard.healthScoreTrend': 'Tendência da pontuação de saúde',
     'dashboard.recentActivity': 'Atividade recente',
     'dashboard.upcomingTasks': 'Próximas tarefas',
+    'dashboard.lastAudit': 'Última auditoria',
+    'dashboard.today': 'A partir de hoje',
+    'dashboard.cycleLabel': 'Ciclo',
+    'dashboard.statusLabel': 'Status',
     'kpi.noData': 'Não há dados disponíveis',
     'kpi.compliance': 'Conformidade',
     'healthScore.subtitle': 'Prontidão de conformidade calculada pelo backend',
@@ -830,11 +3515,44 @@ export const translations = {
     'dashboard.priority.high': 'ALTA',
     'dashboard.priority.medium': 'MÉDIA',
     'dashboard.priority.low': 'BAIXA',
+    'searchBinder.error.enterTerm': 'Digite um termo para pesquisar.',
+    'searchBinder.log.search': 'Pesquisa: "{term}" ({count} resultados)',
+    'searchBinder.log.searchError': 'Erro na pesquisa: "{term}"',
+    'searchBinder.deselected': 'Desmarcado',
+    'searchBinder.selected': 'Selecionado',
+    'searchBinder.log.removed': 'Removido do binder: {id}',
+    'searchBinder.log.cleared': 'Binder limpo',
+    'searchBinder.selectedItemsCount': '{count} item(ns) selecionado(s)',
+    'searchBinder.error.selectOne': 'Selecione pelo menos um item para gerar um binder.',
+    'searchBinder.binderTitle': 'Binder de auditoria',
+    'searchBinder.binderDescription': 'Binder gerado a partir do dashboard',
+    'searchBinder.error.generateBinder': 'Não foi possível gerar o binder. Tente novamente.',
+    'searchBinder.error.search': 'Falha na pesquisa. Tente novamente.',
+    'searchBinder.binderDetail': 'Detalhe do binder',
+    'searchBinder.searchPlaceholder': 'Pesquise em linguagem natural: por exemplo, políticas de acesso, evidências de auditoria',
+    'searchBinder.search': 'Pesquisar',
+    'searchBinder.relevantResults': 'Resultados relevantes',
+    'searchBinder.quickView': 'Visão rápida do Anexo A',
+    'searchBinder.resultsCount': '{count} resultados',
+    'searchBinder.loadingResults': 'Carregando resultados...',
+    'searchBinder.emptyHint': 'Execute uma pesquisa para ver fragmentos do Anexo A.',
+    'searchBinder.addedToBinder': 'Adicionado ao binder',
+    'searchBinder.addToBinder': 'Adicionar ao binder',
+    'searchBinder.relevance': 'Relevância {score}%',
+    'searchBinder.inlinePreview': 'Pré-visualização inline',
+    'searchBinder.binder': 'Binder',
+    'searchBinder.multiSelection': 'Seleção múltipla',
+    'searchBinder.noneSelected': 'Nenhum item selecionado. Adicione itens na lista.',
+    'searchBinder.generateBinderPdf': 'Gerar PDF do binder',
+    'searchBinder.waitingGeneration': 'Aguardando a geração do binder...',
+    'searchBinder.actionLog': 'Registro de ações',
+    'searchBinder.emptyLog': 'Suas últimas 50 ações aparecerão aqui.',
 
     'audit.title': 'Auditoria de Conformidade',
     'audit.subtitle': 'Valide sua evidência de conformidade com os padrões ISO 27001',
     'audit.fileValidatorTitle': 'Validar arquivo com agente',
     'audit.dropHint': 'Clique ou arraste um arquivo',
+    'audit.dropNow': 'Solte seu arquivo aqui',
     'audit.dropSubHint': 'PDF, Word, Excel, Texto, Imagens (máx. 10MB)',
     'audit.processing': 'Processando validação granular...',
     'audit.jobId': 'ID do trabalho',
@@ -902,6 +3620,24 @@ export const translations = {
     'audit.jobQueued': 'Trabalho enfileirado',
     'audit.validationError': 'Erro de validação',
     'audit.validationUnknownError': 'Erro de validação desconhecido',
+    'audit.statusCompliant': 'Em conformidade',
+    'audit.statusNonCompliant': 'Não conforme',
+    'audit.statusNeedsReview': 'Requer revisão',
+    'audit.findingsLabel': 'Achados',
+    'audit.detectedFindings': 'Achados detectados',
+    'audit.severity': 'Severidade',
+    'audit.recommendation': 'Recomendação',
+    'audit.impact': 'Impacto',
+    'audit.agentNotes': 'Notas do agente',
+    'audit.noChanges': 'Sem alterações',
+    'preAuditCard.title': 'Autoavaliação pré-auditoria',
+    'preAuditCard.readinessLabel': 'Prontidão estimada para auditoria',
+    'preAuditCard.readinessSubtitle': '3 áreas de não conformidade de alto risco detectadas',
+    'preAuditCard.findingsTitle': 'Achados prováveis de auditoria',
+    'preAuditCard.finding.accessManagement': 'Gestão de acessos — evidência expirada',
+    'preAuditCard.finding.businessContinuity': 'Continuidade do negócio — sem teste de recuperação em 2025',
+    'preAuditCard.finding.incidentManagement': 'Gestão de incidentes — CAPA aberta por 45+ dias',
+    'preAuditCard.finding.cryptographyPolicy': 'Política de criptografia — rascunho ainda não aprovado',
     'settings.title': 'Configurações',
     'settings.subtitle': 'Ajuste idioma, aparência, notificações e automação do seu espaço.',
     'settings.organizationProfile': 'Perfil da Organização',
@@ -947,8 +3683,62 @@ export const translations = {
     'settings.userManagement': 'Gestão de usuários',
     'settings.activeUser': 'Usuário ativo',
     'settings.inviteTeamMember': 'Convidar membro da equipe',
-  },
-  de: {
+    'settings.2fa.backupCodes': 'Códigos de backup',
+    'settings.2fa.confirmPassword': 'Confirme sua senha',
+    'settings.2fa.disableAction': 'Desativar 2FA',
+    'settings.2fa.disableHelp': 'Digite sua senha para desativar a 2FA. Isso revoga o segredo atual e todos os códigos de backup.',
+    'settings.2fa.disableTitle': 'Desativar 2FA',
+    'settings.2fa.disabled': 'Desativado',
+    'settings.2fa.disabledHelp': 'Proteja sua conta com Google Authenticator, Authy ou 1Password.',
+    'settings.2fa.disabledSuccess': 'A autenticação de dois fatores foi desativada e todos os códigos de backup foram revogados.',
+    'settings.2fa.disabling': 'Desativando...',
+    'settings.2fa.enableAction': 'Ativar 2FA',
+    'settings.2fa.enabled': 'Ativado',
+    'settings.2fa.enabledHelp': 'Sua conta está protegida com TOTP e códigos de backup.',
+    'settings.2fa.passwordValidation': 'Digite sua senha para desativar a 2FA',
+    'settings.2fa.setupHelp': 'Configure a 2FA para gerar um QR code escaneável e receber códigos de backup.',
+    'settings.2fa.title': 'Autenticação de dois fatores',
+    'settings.auditCycle.annual': 'Anual',
+    'settings.auditCycle.currentFrequency': 'Frequência atual',
+    'settings.auditCycle.emptyCalendar': 'Agende uma auditoria para exibir sua data no calendário.',
+    'settings.auditCycle.history': 'Histórico',
+    'settings.auditCycle.historyEmpty': 'Nenhuma auditoria concluída foi registrada ainda.',
+    'settings.auditCycle.markCompleted': 'Marcar auditoria como concluída',
+    'settings.auditCycle.monthly': 'Mensal',
+    'settings.auditCycle.nextAudit': 'Próxima auditoria',
+    'settings.auditCycle.noDate': 'Sem data',
+    'settings.auditCycle.notScheduled': 'Não agendado',
+    'settings.auditCycle.quarterly': 'Trimestral',
+    'settings.auditCycle.scheduled': 'Agendado',
+    'settings.auditCycle.title': 'Ciclo de auditoria',
+    'settings.auditCycle.toastCompleteError': 'Erro ao marcar a auditoria como concluída',
+    'settings.auditCycle.toastCompleted': 'Auditoria marcada como concluída',
+    'settings.auditCycle.toastPermissionDenied': 'Permissões insuficientes para atualizar a frequência',
+    'settings.auditCycle.toastUpdateError': 'Erro ao atualizar a frequência',
+    'settings.auditCycle.toastUpdated': 'Frequência atualizada',
+    'settings.auditCycleHelp': 'Defina a frequência das auditorias programadas para sua organização.',
+    'settings.password.confirm': 'Confirmar nova senha',
+    'settings.password.current': 'Senha atual',
+    'settings.password.hint': 'Use senhas fortes com letras maiúsculas, números e símbolos.',
+    'settings.password.new': 'Nova senha',
+    'settings.password.saving': 'Salvando...',
+    'settings.password.subtitle': 'Atualize sua senha e revogue sessões de refresh ativas.',
+    'settings.password.title': 'Senha',
+    'settings.password.updateAction': 'Atualizar senha',
+    'settings.password.updated': 'Sua senha foi atualizada com sucesso.',
+    'settings.switch.off': 'Desligado',
+    'settings.switch.on': 'Ligado',
+    'settings.tab.appearance': 'Aparência',
+    'settings.tab.auditCycle': 'Ciclo de auditoria',
+    'settings.tab.preferences': 'Preferências',
+    'settings.tab.security': 'Segurança',
+    'settings.theme.dark': 'Escuro',
+    'settings.theme.light': 'Claro',
+    'settings.themeToggleHelp': 'Altere o tema do aplicativo.',
+    'common.edit': 'Editar',
+    'common.saving': 'Salvando...',
+    },
+de: {
     dashboard: 'Dashboard',
     understand: 'Meine Situation Verstehen',
     documents: 'Dokumentenkontrollen',
@@ -967,6 +3757,540 @@ export const translations = {
     evidenceCenter: 'Beweiszentrum',
     capaTracker: 'CAPA-Tracker',
     auditRoom: 'Auditraum',
+    'tutorial.title': 'Hallo, ich bin Dani27',
+    'tutorial.subtitle': 'Dein virtueller Assistent führt dich Schritt für Schritt durch die Plattform.',
+    'tutorial.progressLabel': 'Schritt',
+    'tutorial.stepHint': 'Kurze Erklärung des aktuellen Abschnitts',
+    'tutorial.previous': 'Zurück',
+    'tutorial.next': 'Weiter',
+    'tutorial.finish': 'Fertigstellen',
+    'tutorial.startPromptKnown': 'Drücke Start, um das Tutorial im Haupt-Dashboard zu beginnen.',
+    'tutorial.startPromptUnknown': 'Du bist in einem anderen Bereich. Starte die Tour, um zum Anfang zurückzukehren und dem richtigen Ablauf zu folgen.',
+    'tutorial.startButton': 'Tutorial starten',
+    'tutorial.dismissButton': 'Schließen',
+    'tutorial.routeHint': 'Das Tutorial markiert jede Route. Folge den Pfeilen, um fortzufahren.',
+    'tutorial.step1.title': 'Professionelle Begrüßung',
+    'tutorial.step1.description': 'Beginne deine Compliance-Reise mit einer klaren Übersicht aller Module, vom Dashboard bis zu Audit und Nachweisen.',
+    'tutorial.step2.title': 'Intelligente Navigation',
+    'tutorial.step2.description': 'Nutze das Prozessmenü oder das Modulpanel, um jederzeit auf Risiken, Nachweise, Audit und Kontrollen zuzugreifen.',
+    'tutorial.step3.title': 'Profil und Einstellungen',
+    'tutorial.step3.description': 'Passe dein Compliance-Profil jederzeit an und überprüfe den Status von Plan, Benachrichtigungen und Präferenzen.',
+    'tutorial.step4.title': 'Wichtige Ressourcen',
+    'tutorial.step4.description': 'Verstehe jede Option: Risiken identifizieren, Nachweise hinzufügen und Berichte mit klarer Anleitung und integrierter Unterstützung vorbereiten.',
+    'tutorial.step5.title': 'Audit vorbereiten',
+    'tutorial.step5.description': 'Validiere deine Nachweise, prüfe Befunde und behalte die Audit-Bereitschaft unter Kontrolle.',
+    'tutorial.step6.title': 'Selbstbewertung',
+    'tutorial.step6.description': 'Messe deinen Compliance-Stand mit einer schnellen Bewertung und erkenne sofortige Verbesserungsmöglichkeiten.',
+    'tutorial.step7.title': 'Konfiguration',
+    'tutorial.step7.description': 'Passe Präferenzen, Sprache und Benachrichtigungen so an, dass das System zu deinem Team passt.',
+    'tutorial.note': 'Diese Tour ist jederzeit über das obere Symbol verfügbar.',
+    'tutorial.close': 'Anleitung schließen',
+    'tutorial.steps.dashboard.title': 'Kontrollzentrum',
+    'tutorial.steps.dashboard.description': 'Sieh Status, Warnungen und Fortschritt auf einen Blick.',
+    'tutorial.steps.dashboard.sections.intro.title': 'Das siehst du hier',
+    'tutorial.steps.dashboard.sections.intro.content': `Dieses Dashboard zeigt den aktuellen Stand deines Programms:
+- KPIs für Dokumentation, Umsetzung und Wirksamkeit
+- Gesundheitswert und Trend
+- Letzte Aktivitäten
+- Anstehende Aufgaben
+
+Es ist für schnelle Priorisierung gedacht, nicht für Massenbearbeitung.`,
+    'tutorial.steps.dashboard.sections.intro.action': 'Überblick verschaffen',
+    'tutorial.steps.dashboard.sections.kpis.title': 'KPIs und Score',
+    'tutorial.steps.dashboard.sections.kpis.content': `Die Karten zeigen aktuelle Prozentwerte und die jüngste Veränderung.
+
+Nutze sie, um Fortschritt oder Rückschritt zu erkennen. In dieser Version sind die Karten informativ und öffnen keine Detailansicht.`,
+    'tutorial.steps.dashboard.sections.kpis.action': 'Werte und Trends prüfen',
+    'tutorial.steps.dashboard.sections.activity-tasks.title': 'Aktivitäten und anstehende Aufgaben',
+    'tutorial.steps.dashboard.sections.activity-tasks.content': `Unten findest du zwei nützliche Bereiche:
+- Letzte Aktivitäten: Änderungen im System
+- Anstehende Aufgaben: Elemente mit Priorität und Frist
+
+So erkennst du schnell, was zuerst zu tun ist.`,
+    'tutorial.steps.dashboard.sections.activity-tasks.action': 'Aktivitäten mit Aufgaben vergleichen',
+    'tutorial.steps.dashboard.sections.scope.title': 'Umfang dieses Schritts',
+    'tutorial.steps.dashboard.sections.scope.content': `Das macht dieser Bereich:
+- Gesamtstatus und Trend anzeigen
+- Aktivitäten und vorgeschlagene Aufgaben zeigen
+
+Empfehlung:
+- Nutze ihn, um in Minuten zu priorisieren
+- Arbeite danach im jeweiligen Modul weiter`,
+    'tutorial.steps.dashboard.sections.scope.action': 'Als Monitoring nutzen',
+    'tutorial.steps.dashboard.sections.conclusion.title': 'Nächster Schritt',
+    'tutorial.steps.dashboard.sections.conclusion.content': `Wenn du Prioritäten im Dashboard erkennst, wechsle zur Lückenanalyse, um zu verstehen, warum der Status so ist und was zuerst zu korrigieren ist.`,
+    'tutorial.steps.dashboard.sections.conclusion.action': 'Weiter zu Gap Analysis',
+    'tutorial.steps.understand.title': 'Lückenanalyse',
+    'tutorial.steps.understand.description': 'Erkenne genau, welche Lücken zwischen Ist-Zustand und Anforderungen bestehen.',
+    'tutorial.steps.understand.sections.intro.title': 'Lückenanalyse (Gap Analysis)',
+    'tutorial.steps.understand.sections.intro.content': `Wir sind im wichtigsten Bereich: Gap Analysis.
+
+Hier wirst du:
+1. Fragen zu deiner Organisation beantworten
+2. Das System analysiert deine Antworten
+3. Du siehst GENAU, was fehlt
+4. Du erhältst einen Plan zum Schließen der Lücken
+
+Das ist das Herzstück von Compliance. Nimm dir Zeit.`,
+    'tutorial.steps.understand.sections.intro.action': 'Einführung lesen',
+    'tutorial.steps.understand.sections.framework.title': 'Welche Norm musst du erfüllen?',
+    'tutorial.steps.understand.sections.framework.content': `Du kannst mit einem oder mehreren Rahmenwerken arbeiten:
+- ISO 27001 (Informationssicherheit)
+- ISO 27002 (Sicherheitskontrollen)
+- GDPR (Datenschutz - Europa)
+- HIPAA (Gesundheit - USA)
+- NIST (National Security - USA)
+- SOC 2 (Service-Audit)
+
+Wähle das für dein Unternehmen passende.
+Tipp: Viele Organisationen nutzen ISO 27001 als Basis.`,
+    'tutorial.steps.understand.sections.framework.action': 'Passendes Framework auswählen',
+    'tutorial.steps.understand.sections.questionnaire.title': 'Antworte ehrlich',
+    'tutorial.steps.understand.sections.questionnaire.content': `Du wirst Fragen sehen wie:
+'Hast du eine dokumentierte Sicherheitsrichtlinie?'
+'Machst du jährliche Schulungen zur Sicherheit?'
+'Hast du einen Incident-Response-Plan?'
+
+Antworte JA/NEIN/TEILWEISE (vertraulich)
+
+Es gibt keine „richtigen“ Antworten. Ehrlichkeit ist besser.
+Darauf basierend berechnen wir deine Lücken.`,
+    'tutorial.steps.understand.sections.questionnaire.action': 'Mit den Fragen beginnen',
+    'tutorial.steps.understand.sections.analysis.title': 'Das System analysiert...',
+    'tutorial.steps.understand.sections.analysis.content': `Gib uns einen Moment, um deine Antworten zu verarbeiten.
+
+Wir:
+✓ Vergleichen deinen Status mit Normen
+✓ Berechnen den Erfüllungsgrad
+✓ Priorisieren Lücken nach Risiko
+✓ Empfehlen Maßnahmen
+
+Das kann 10-30 Sekunden dauern...`,
+    'tutorial.steps.understand.sections.analysis.action': 'Während der Analyse warten',
+    'tutorial.steps.understand.sections.results.title': 'Hier sind deine Lücken',
+    'tutorial.steps.understand.sections.results.content': `Du siehst 3 Dinge:
+
+1. KRITISCHE LÜCKE (Rot)
+   - Hohe Auswirkung, wenn du sie nicht schließt
+   - Das musst du ZUERST tun
+
+2. GRÖSSERE LÜCKE (Orange)
+   - Wichtig, aber nicht dringend
+   - Für die nächsten Monate planen
+
+3. KLEINERE LÜCKE (Gelb)
+   - Geringe Auswirkung
+   - Nützlich, aber nicht kritisch
+
+Der Erfüllungsgrad steht oben.
+Wenn er <70% ist, gibt es noch Arbeit.`,
+    'tutorial.steps.understand.sections.results.action': 'Lücken und Prioritäten prüfen',
+    'tutorial.steps.understand.sections.action-plan.title': 'Erstelle deinen Schließungsplan',
+    'tutorial.steps.understand.sections.action-plan.content': `Für jede Lücke:
+1. Klicke darauf
+2. Weise eine verantwortliche Person zu
+3. Setze eine Frist
+4. Beschreibe, wie du sie schließen wirst
+
+Das System verfolgt deinen Fortschritt.
+Jede geschlossene Lücke = höherer Erfüllungsgrad
+
+Beispiel:
+"Lücke: 'Wir haben kein MFA aktiviert'
+Verantwortlich: Juan Pérez (CISO)
+Frist: 30. März
+Maßnahme: Okta MFA für alle Zugriffe einführen"`,
+    'tutorial.steps.understand.sections.action-plan.action': 'Aktionsplan erstellen',
+    'tutorial.steps.understand.sections.conclusion.title': 'Analyse abgeschlossen!',
+    'tutorial.steps.understand.sections.conclusion.content': `Glückwunsch, du weißt jetzt, was fehlt.
+
+Der Rest ist Umsetzung:
+- Schritt 3: Deine ASSETS dokumentieren (was du schützt)
+- Schritt 4: Richtlinien und DOKUMENTE hochladen
+- Schritt 5: Spezifische RISIKEN identifizieren
+- Schritt 6: NACHWEISE sammeln
+- Schritt 7: BEFUNDE für das Audit zusammenstellen
+
+Weiter geht's. Als Nächstes: Assets (Inventar)`,
+    'tutorial.steps.understand.sections.conclusion.action': 'Weiter klicken',
+    'tutorial.steps.assets.title': 'Asset-Inventar',
+    'tutorial.steps.assets.description': 'Dokumentiere alle Assets (Systeme, Daten, Personen), die Schutz brauchen.',
+    'tutorial.steps.assets.sections.intro.title': 'Was dieses Modul macht',
+    'tutorial.steps.assets.sections.intro.content': `Hier erfasst du Assets strukturiert für dein Risikomanagement.
+
+Du kannst Assets erstellen, bearbeiten und löschen und sie nach Typ und nach CIA-Auswirkung klassifizieren (Vertraulichkeit, Integrität, Verfügbarkeit).`,
+    'tutorial.steps.assets.sections.intro.action': 'Tabelle und + Neues Asset prüfen',
+    'tutorial.steps.assets.sections.create.title': 'Erstellen und klassifizieren',
+    'tutorial.steps.assets.sections.create.content': `Beim Erstellen eines Assets definierst du Name, Typ, Standort und CIA-Werte.
+
+Mit diesen Werten berechnet das System die Kritikalität und hilft bei der Priorisierung.`,
+    'tutorial.steps.assets.sections.create.action': 'Asset anlegen und CIA ausfüllen',
+    'tutorial.steps.assets.sections.filters.title': 'Filtern und prüfen',
+    'tutorial.steps.assets.sections.filters.content': `Du kannst nach Typ und Kritikalität filtern, um schnell zu sehen, welche Assets mehr Aufmerksamkeit brauchen.
+
+Du kannst auch ein bestehendes Asset öffnen, um Daten zu bearbeiten oder es zu löschen.`,
+    'tutorial.steps.assets.sections.filters.action': 'Filter nach Typ und Stufe testen',
+    'tutorial.steps.assets.sections.scope.title': 'Fokus des Moduls',
+    'tutorial.steps.assets.sections.scope.content': `Ziel dieses Schritts ist ein klarer, handlungsfähiger Inventarbestand.
+
+Wenn Assets gut klassifiziert und priorisiert sind, gehen Risikoanalyse und Kontrollumsetzung deutlich schneller.`,
+    'tutorial.steps.assets.sections.scope.action': 'Als Inventar nutzen',
+    'tutorial.steps.assets.sections.conclusion.title': 'Nächster Schritt',
+    'tutorial.steps.assets.sections.conclusion.content': `Wenn das Basisinventar steht, zentralisierst du im nächsten Schritt Dokumente, um Nachweise und Berichte zu unterstützen.`,
+    'tutorial.steps.assets.sections.conclusion.action': 'Weiter klicken',
+    'tutorial.steps.documents.title': 'Dokumentenverwaltung',
+    'tutorial.steps.documents.description': 'Sammle, organisiere und versioniere alle Richtlinien und Verfahren.',
+    'tutorial.steps.documents.sections.intro.title': 'Was dieses Modul macht',
+    'tutorial.steps.documents.sections.intro.content': `Dieses Modul bündelt die Dokumentenarbeit in fünf Tabs:
+- Dokumente anzeigen
+- Inhalte bearbeiten
+- Dokument mit KI erzeugen
+- Bericht exportieren
+- Dokument hochladen`,
+    'tutorial.steps.documents.sections.intro.action': 'Verfügbare Tabs erkennen',
+    'tutorial.steps.documents.sections.upload.title': 'Hochladen und ansehen',
+    'tutorial.steps.documents.sections.upload.content': `Du kannst Dateien oder Textinhalte hochladen, auflisten und öffnen, um sie anzusehen oder zu bearbeiten.
+
+Geladene Dokumente kannst du auch bei Bedarf löschen.`,
+    'tutorial.steps.documents.sections.upload.action': 'Ein Dokument hochladen und öffnen',
+    'tutorial.steps.documents.sections.ai-generation.title': 'KI-Generierung',
+    'tutorial.steps.documents.sections.ai-generation.content': `Der Generierungs-Tab erstellt Entwürfe von Dokumenten, die du anschließend ins Repository hochladen kannst.
+
+Praktisch, um eine Richtlinie oder ein Verfahren schnell als Grundlage zu starten.`,
+    'tutorial.steps.documents.sections.ai-generation.action': 'Entwurf erzeugen und prüfen',
+    'tutorial.steps.documents.sections.reports.title': 'Berichte exportieren',
+    'tutorial.steps.documents.sections.reports.content': `Im Berichte-Tab kannst du eine Generierung starten, den Status sehen und das Ergebnis herunterladen, sobald es bereit ist.
+
+Die verfügbaren Formate hängen von der Konfiguration/API ab, der Ablauf zum Erstellen und Herunterladen ist implementiert.`,
+    'tutorial.steps.documents.sections.reports.action': 'Bericht erzeugen und Status prüfen',
+    'tutorial.steps.documents.sections.conclusion.title': 'Abschluss dieses Schritts',
+    'tutorial.steps.documents.sections.conclusion.content': `Mit diesem Ablauf kannst du wichtige Dokumente zentralisieren, iterieren und als Grundlage für dein Compliance-Programm nutzen.
+
+Der nächste Schritt verbindet diese Inhalte mit dem Risikomanagement.`,
+    'tutorial.steps.documents.sections.conclusion.action': 'Weiter klicken',
+    'tutorial.steps.risks.title': 'Risikomanagement',
+    'tutorial.steps.risks.description': 'Identifiziere, bewerte und mindere Compliance-Risiken mit einer klaren Methode.',
+    'tutorial.steps.risks.sections.intro.title': 'Risikoanalyse',
+    'tutorial.steps.risks.sections.intro.content': `Risiko ist die Wahrscheinlichkeit, dass etwas Negatives passiert.
+
+Risk Management beantwortet:
+1. Was könnte schiefgehen?
+2. Wie wahrscheinlich ist es?
+3. Wie gravierend wäre es?
+4. Was tun wir dagegen?
+
+Genau das prüfen Auditoren besonders.`,
+    'tutorial.steps.risks.sections.intro.action': 'Risikobewertung verstehen',
+    'tutorial.steps.risks.sections.matrix.title': 'Wie wir Risiko messen',
+    'tutorial.steps.risks.sections.matrix.content': `RISIKO = WAHRSCHEINLICHKEIT × AUSWIRKUNG
+
+         WAHRSCHEINLICHKEIT
+         Niedrig Mittel Hoch
+AUSW. Hoch  3     6     9
+      Mittel 2     4     6
+      Niedrig1     2     3
+
+Farben:
+- Rot (9): kritisch - sofort handeln
+- Orange (6): hoch - in den nächsten Wochen
+- Gelb (4): mittel - in den nächsten Monaten
+- Grün (2-1): niedrig - beobachten
+
+Das System berechnet automatisch.`,
+    'tutorial.steps.risks.sections.matrix.action': 'Risikomatrix ansehen',
+    'tutorial.steps.risks.sections.create.title': 'Ein Risiko erfassen',
+    'tutorial.steps.risks.sections.create.content': `Klicke auf '+ Neues Risiko'
+
+Formular:
+NAME: 'Datenverlust durch Ransomware'
+BESCHREIBUNG: 'Ein Ransomware-Angriff könnte unsere DB verschlüsseln'
+KATEGORIE: Cybersecurity / Operativ / Compliance / Reputation
+WAHRSCHEINLICHKEIT: Niedrig/Mittel/Hoch
+AUSWIRKUNG: Niedrig/Mittel/Hoch
+VERANTWORTLICH: Juan Pérez
+BETROFFENE ASSETS: auswählen
+VORHANDENE KONTROLLEN: 'Wir haben tägliche Backups'
+
+Speichern = Risiko erfasst + automatischer Score`,
+    'tutorial.steps.risks.sections.create.action': 'Erstes Risiko anlegen',
+    'tutorial.steps.risks.sections.evaluate.title': 'Deine Risikomatrix ansehen',
+    'tutorial.steps.risks.sections.evaluate.content': `Das Risiko-Dashboard zeigt:
+
+VISUELLE MATRIX:
+- Jedes Risiko ist ein Punkt
+- Rot in der Ecke = kritisch
+- Grün in der Ecke = beherrschbar
+- Klicke auf einen Punkt für Details
+
+SORTIERTE LISTE:
+- Nach Risiko (höchstes zuerst)
+- Name, Verantwortlicher, Status
+
+KENNZAHLEN:
+- Gesamtrisiken: 24
+- Kritische: 3 (sofort handeln)
+- Hohe: 7
+- Mittlere: 10
+- Niedrige: 4`,
+    'tutorial.steps.risks.sections.evaluate.action': 'Risikomatrix prüfen',
+    'tutorial.steps.risks.sections.mitigation.title': 'Aktionsplan erstellen',
+    'tutorial.steps.risks.sections.mitigation.content': `Für jedes Risiko wählst du:
+
+OPTION 1: AKZEPTIEREN
+- Das Risiko ist vertretbar
+- Begründe es dokumentiert
+
+OPTION 2: VERMEIDEN
+- Prozess ändern, um das Risiko zu entfernen
+
+OPTION 3: MINDERN
+- Wahrscheinlichkeit ODER Auswirkung senken
+
+OPTION 4: ÜBERTRAGEN
+- Absichern (z. B. Cyber-Versicherung)
+
+CAPA-Plan:
+- Konkrete Maßnahme
+- Verantwortliche Person
+- Frist
+- Erfolgskennzahlen`,
+    'tutorial.steps.risks.sections.mitigation.action': 'Minderungsplan erstellen',
+    'tutorial.steps.risks.sections.controls.title': 'Kontrollen umsetzen',
+    'tutorial.steps.risks.sections.controls.content': `Kontrollen = konkrete Maßnahmen
+
+Beispiel Risiko: Datenverlust
+Kontrollen:
+✓ Kontrolle A: tägliche automatische Backups
+✓ Kontrolle B: Verschlüsselung im Ruhezustand
+✓ Kontrolle C: MFA für Datenzugriff
+✓ Kontrolle D: 24/7-Monitoring
+
+Für jede Kontrolle:
+- Verantwortliche Person zuweisen
+- Umsetzungsdatum festlegen
+- Als 'In Arbeit' → 'Implementiert' → 'Getestet' markieren
+- Nachweise anhängen
+
+Das System benachrichtigt dich bei Fälligkeit.`,
+    'tutorial.steps.risks.sections.controls.action': 'Kontrollen zuweisen',
+    'tutorial.steps.risks.sections.monitoring.title': 'Risiken schlafen nie',
+    'tutorial.steps.risks.sections.monitoring.content': `Monatlich:
+1. Jedes Risiko prüfen
+2. Hat sich die Wahrscheinlichkeit geändert?
+3. Hat sich die Auswirkung geändert?
+4. Funktionieren die Kontrollen?
+5. Score bei Bedarf aktualisieren
+
+Jährlich:
+- Vollständige Risikoanalyse
+- Neue Risiken bewerten
+- Behobene Risiken entfernen
+
+Das System speichert die Historie:
+- Risiko X war im Januar 'Hoch'
+- Jetzt ist es im März 'Mittel'
+- Verbesserungsnachweis = Auditor zufrieden`,
+    'tutorial.steps.risks.sections.monitoring.action': 'Risiken überwachen und aktualisieren',
+    'tutorial.steps.risks.sections.conclusion.title': 'Risiko-Register vollständig',
+    'tutorial.steps.risks.sections.conclusion.content': `Jetzt hast du ein vollständiges Risiko-Register!
+
+Das System enthält:
+✓ Was fehlt (Gaps)
+✓ Was du schützt (Assets)
+✓ Deine Regeln (Dokumente)
+✓ Welche Risiken du hast (Risks)
+
+Als Nächstes: NACHWEISE
+Wie beweisen wir, dass wir es getan haben? Schritt 6: Evidence`,
+    'tutorial.steps.risks.sections.conclusion.action': 'Weiter klicken',
+    'tutorial.steps.evidence.title': 'Nachweis-Sammlung',
+    'tutorial.steps.evidence.description': 'Bündle und organisiere alle Belege dafür, dass deine Kontrollen funktionieren.',
+    'tutorial.steps.evidence.sections.intro.title': 'Was diese Seite kann',
+    'tutorial.steps.evidence.sections.intro.content': `Hier kannst du:
+- Nachweise hochladen
+- Nach Text suchen (Name/Kontrolle/Klausel)
+- Nach Typ filtern
+- Frischestatus sehen (fresh, expiring, expired)
+- Nachweise löschen`,
+    'tutorial.steps.evidence.sections.intro.action': 'Suche, Filter und Upload-Schaltfläche finden',
+    'tutorial.steps.evidence.sections.upload.title': 'Nachweise hochladen',
+    'tutorial.steps.evidence.sections.upload.content': `Der Upload erfolgt über den System-Uploader, danach erscheint das Element innerhalb seiner Gruppe.
+
+Anschließend kannst du die Gültigkeit prüfen und nur aktuelle Nachweise behalten.`,
+    'tutorial.steps.evidence.sections.upload.action': 'Ersten Nachweis hochladen',
+    'tutorial.steps.evidence.sections.organize.title': 'Fokus des Schritts',
+    'tutorial.steps.evidence.sections.organize.content': `Ziel ist, Nachweise aktuell, auffindbar und prüfbereit zu halten.
+
+Mit Suche, Filtern und Frische-Status kannst du die Nachweisqualität über den gesamten Zyklus sichern.`,
+    'tutorial.steps.evidence.sections.organize.action': 'Nachweise hochladen, filtern und pflegen',
+    'tutorial.steps.evidence.sections.conclusion.title': 'Nächster Schritt',
+    'tutorial.steps.evidence.sections.conclusion.content': `Mit geladenen und klassifizierten Nachweisen wechselst du zu CAPA/Findings, um Korrekturmaßnahmen und Prioritäten zu steuern.`,
+    'tutorial.steps.evidence.sections.conclusion.action': 'Weiter klicken',
+    'tutorial.steps.findings.title': 'Befunde / CAPA-Tracker',
+    'tutorial.steps.findings.description': 'Verwalte Korrekturmaßnahmen, Prioritäten und Fristen an einem Ort.',
+    'tutorial.steps.findings.sections.intro.title': 'Was du hier wirklich findest',
+    'tutorial.steps.findings.sections.intro.content': `Diese Seite funktioniert derzeit als CAPA-Tracker.
+
+Hier siehst du Korrekturmaßnahmen, ihren Status, ihre Priorität, das Fälligkeitsdatum und den Fortschritt.`,
+    'tutorial.steps.findings.sections.intro.action': 'KPIs und CAPA-Tabelle prüfen',
+    'tutorial.steps.findings.sections.create.title': 'CAPA anlegen',
+    'tutorial.steps.findings.sections.create.content': `Du kannst eine CAPA mit Titel, Priorität, Quelle, Fälligkeitsdatum, Fortschritt und zugehöriger Kontrolle anlegen.
+
+Danach erscheint sie in der Haupttabelle zur Nachverfolgung.`,
+    'tutorial.steps.findings.sections.create.action': 'Beispiel-CAPA anlegen',
+    'tutorial.steps.findings.sections.filters.title': 'Nachverfolgung und Filter',
+    'tutorial.steps.findings.sections.filters.content': `Du kannst nach Status und Priorität filtern und jede Zeile öffnen, um Details zu sehen (Beschreibung, Kontrolle/Verantwortliche, Quelle und Termine).
+
+Du siehst außerdem KPIs für offene, überfällige und geschlossene Einträge.`,
+    'tutorial.steps.findings.sections.filters.action': 'Filter anwenden und Zeile aufklappen',
+    'tutorial.steps.findings.sections.conclusion.title': 'Abschluss dieses Schritts',
+    'tutorial.steps.findings.sections.conclusion.content': `Mit klar definierten und überwachten CAPAs verwandelst du Lücken in einen umsetzbaren Plan mit Verantwortlichen und Fristen.
+
+Das bereitet dich besser auf das Audit vor.`,
+    'tutorial.steps.findings.sections.conclusion.action': 'Weiter klicken',
+    'tutorial.steps.audit.title': 'Audit-Vorbereitung',
+    'tutorial.steps.audit.description': 'Bereite die externe Compliance-Prüfung mit zertifizierten Partnern vor und führe sie durch.',
+    'tutorial.steps.audit.sections.intro.title': 'Was dieses Modul wirklich macht',
+    'tutorial.steps.audit.sections.intro.content': `Hier gibt es drei Hauptfunktionen:
+- Textbasierte Nachweisprüfung
+- Granulare Dateiprüfung
+- Pre-Audit-Checkliste mit Auto-Speicherung`,
+    'tutorial.steps.audit.sections.intro.action': 'Prüfer, Checkliste und Audit Room finden',
+    'tutorial.steps.audit.sections.validation.title': 'Text- und Dateiprüfung',
+    'tutorial.steps.audit.sections.validation.content': `Du kannst textliche Nachweise einfügen oder eine Datei hochladen, damit das System Befunde und den Compliance-Status analysiert.
+
+Das Ergebnis zeigt Fortschritt, Schweregrade und Beobachtungen.`,
+    'tutorial.steps.audit.sections.validation.action': 'Beispielprüfung ausführen',
+    'tutorial.steps.audit.sections.readiness.title': 'Checkliste und Audit Room',
+    'tutorial.steps.audit.sections.readiness.content': `Die Checkliste wird automatisch gespeichert und hilft dir, offene Punkte vor dem Audit zu verfolgen.
+
+Im Audit Room kannst du Nachweise auswählen und ein PDF-Binder zum Download erzeugen.`,
+    'tutorial.steps.audit.sections.readiness.action': 'Checkliste ausfüllen und Binder erzeugen',
+    'tutorial.steps.audit.sections.conclusion.title': 'Abschluss dieses Schritts',
+    'tutorial.steps.audit.sections.conclusion.content': `Mit Validierung, Checkliste und PDF-Binder kommst du mit gut geordneten Nachweisen zur Prüfung.
+
+Der nächste Schritt ist, dieses Niveau mit regelmäßiger Selbstbewertung zu halten.`,
+    'tutorial.steps.audit.sections.conclusion.action': 'Weiter klicken',
+    'tutorial.steps.self-assessment.title': 'Kontinuierliche Selbstbewertung',
+    'tutorial.steps.self-assessment.description': 'Führe regelmäßige interne Bewertungen durch, um zwischen Audits compliant zu bleiben.',
+    'tutorial.steps.self-assessment.sections.intro.title': 'Was dieses Modul macht',
+    'tutorial.steps.self-assessment.sections.intro.content': `Die aktuelle Selbstbewertung ist ein Fragebogen in Phasen.
+
+Du beantwortest jede Frage und das System speichert den Fortschritt, damit du später weitermachen kannst.`,
+    'tutorial.steps.self-assessment.sections.intro.action': 'Phasen und seitlichen Fortschritt erkennen',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.title': 'Verfügbare Antworten',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.content': `Die Antwortoptionen sind: Yes, Partial, No und N/A.
+
+Du kannst pro Frage antworten und über den seitlichen Filter zur nächsten Phase wechseln.`,
+    'tutorial.steps.self-assessment.sections.self-assessment-form.action': 'Mindestens eine Frage je Phase beantworten',
+    'tutorial.steps.self-assessment.sections.evidence-review.title': 'Nachweis pro Frage',
+    'tutorial.steps.self-assessment.sections.evidence-review.content': `Zu jeder Frage kannst du Nachweise anhängen.
+
+Wichtig: Wenn eine kritische Frage mit "Yes" beantwortet wird, musst du einen Nachweis anhängen, damit sie korrekt validiert wird.`,
+    'tutorial.steps.self-assessment.sections.evidence-review.action': 'Bei einer kritischen Frage Nachweis anhängen',
+    'tutorial.steps.self-assessment.sections.persistence.title': 'Speicherung und Fortsetzung',
+    'tutorial.steps.self-assessment.sections.persistence.content': `Der Fortschritt wird automatisch gespeichert (lokal + Backend), damit du beim Phasenwechsel oder beim Neuladen keine Antworten verlierst.
+
+Außerdem siehst du den Phasenfortschritt und den globalen Antwortfortschritt.`,
+    'tutorial.steps.self-assessment.sections.persistence.action': 'Phase wechseln und Speicherung prüfen',
+    'tutorial.steps.self-assessment.sections.conclusion.title': 'Abschluss dieses Schritts',
+    'tutorial.steps.self-assessment.sections.conclusion.content': `Mit Antworten, Nachweisen und kontinuierlicher Speicherung über Phasen hinweg kannst du den Compliance-Status verlässlich zwischen formalen Prüfungen nachverfolgen.
+
+Diese Disziplin verbessert die Rückverfolgbarkeit und reduziert Überraschungen in Audit-Zyklen.`,
+    'tutorial.steps.self-assessment.sections.conclusion.action': 'Erfolg feiern',
+    'findings.answeredQuestions': 'Fragen beantwortet',
+    'findings.capaLoadError': 'CAPA-Daten konnten nicht geladen werden. Bitte versuche es erneut.',
+    'findings.controlOwner': 'Kontrolle / Verantwortlicher',
+    'findings.create.descriptionPlaceholder': 'Beschreibe die erforderliche Korrekturmaßnahme',
+    'findings.create.fieldControlId': 'Control ID',
+    'findings.create.fieldDescription': 'Beschreibung',
+    'findings.create.fieldDueDate': 'Fälligkeitsdatum',
+    'findings.create.fieldPriority': 'Priorität',
+    'findings.create.fieldProgress': 'Fortschritt',
+    'findings.create.fieldSource': 'Quelle',
+    'findings.create.fieldTitle': 'Titel',
+    'findings.create.subtitle': 'Erfasse schnell eine Korrekturmaßnahme und halte die Daten synchron.',
+    'findings.create.title': 'Neue CAPA erstellen',
+    'findings.create.titlePlaceholder': 'z. B. Zugriffskontrollnachweise prüfen',
+    'findings.createAction': 'CAPA erstellen',
+    'findings.createError': 'Konnte die CAPA nicht erstellen. Bitte überprüfe die Felder und versuche es erneut.',
+    'findings.createTitleRequired': 'Ein Titel ist erforderlich, um eine CAPA zu erstellen.',
+    'findings.createdUpdated': 'Erstellt / Aktualisiert',
+    'findings.creating': 'Erstelle...',
+    'findings.criticalGaps': 'Kritische Lücken',
+    'findings.description': 'Beschreibung',
+    'findings.emptyCapas': 'Es sind noch keine CAPAs registriert. Erstelle eine neue, um zu beginnen.',
+    'findings.emptyFiltered': 'Keine passende CAPA gefunden. Passe die Filter an, um Ergebnisse zu sehen.',
+    'findings.filter.allPriorities': 'Alle Prioritäten',
+    'findings.filter.allStatuses': 'Alle Stati',
+    'findings.filter.priority': 'Nach Priorität filtern',
+    'findings.filter.status': 'Nach Status filtern',
+    'findings.gapFindings': 'Ergebnisse der Lückenanalyse',
+    'findings.gapsLoadError': 'Ergebnisse konnten nicht geladen werden. Bitte versuche es erneut.',
+    'findings.indicators': 'Kennzahlen zu Befunden',
+    'findings.kpi.closed': 'Geschlossen',
+    'findings.kpi.closedHelp': 'Abgeschlossene CAPAs',
+    'findings.kpi.open': 'Offene CAPAs',
+    'findings.kpi.openHelp': 'Aktionen, die derzeit laufen',
+    'findings.kpi.overdue': 'Überfällig',
+    'findings.kpi.overdueHelp': 'Überfällige CAPAs, die auf Abschluss warten',
+    'findings.kpi.total': 'Total CAPAs',
+    'findings.kpi.totalHelp': 'Beinhaltet alle registrierten CAPAs',
+    'findings.loadingCapas': 'Lade CAPAs...',
+    'findings.loadingGaps': 'Lücken werden geladen...',
+    'findings.noDescription': 'Keine Beschreibung verfügbar.',
+    'findings.noGaps': 'Im Moment wurden keine Lücken gefunden.',
+    'findings.noOwner': 'Kein Verantwortlicher',
+    'findings.onTime': 'Rechtzeitig',
+    'findings.openCorrectiveActions': 'Offene Korrekturmaßnahmen',
+    'findings.openCriticalGaps': 'Offene kritische Lücken',
+    'findings.optional': 'Optional',
+    'findings.overdue': 'Überfällig',
+    'findings.phaseFallback': 'Phase {index}',
+    'findings.phaseSummary': '{unanswered} unbeantwortete Lücken · {critical} kritisch',
+    'findings.priority.critical': 'Kritisch',
+    'findings.priority.high': 'Hoch',
+    'findings.priority.low': 'Niedrig',
+    'findings.priority.medium': 'Mittel',
+    'findings.priorityBreakdown': 'Aufschlüsselung nach Priorität',
+    'findings.progress': 'Fortschritt',
+    'findings.progressHelp': 'Fortschritt der Lückenanalyse',
+    'findings.showing': 'Zeige {shown} von {total} CAPAs',
+    'findings.source': 'Quelle',
+    'findings.source.externalAudit': 'Externes Audit',
+    'findings.source.incident': 'Vorfall',
+    'findings.source.internalAudit': 'Interne Revision',
+    'findings.source.managementReview': 'Management Review',
+    'findings.status.closed': 'Geschlossen',
+    'findings.status.inProgress': 'In Bearbeitung',
+    'findings.status.open': 'Offen',
+    'findings.status.resolved': 'Gelöst',
+    'findings.subtitle': 'Verwalte Korrekturmaßnahmen, Prioritäten und Fälligkeitsdaten an einem Ort.',
+    'findings.table.dueDate': 'Fälligkeitsdatum',
+    'findings.table.overdue': 'Überfällig',
+    'findings.table.priority': 'Priorität',
+    'findings.table.progress': 'Fortschritt',
+    'findings.table.status': 'Status',
+    'findings.title': 'CAPA-Tracker',
+    'findings.totalGaps': 'Gesamte Lücken',
+    'findings.totalGapsHelp': 'Fragen der Lückenanalyse',
+    'findings.unanswered': 'Unbeantwortet',
+    'findings.unansweredHelp': 'Beinhaltet kritische Lücken',
+    'findings.unassigned': 'Nicht zugewiesen',
+    'findings.validationFindings': 'Validierungsergebnisse',
+    'findings.validationFindingsHelp': 'Überprüfe die Befunde, die durch die granulare Dokumentvalidierung in der jüngsten Historie erzeugt wurden.',
+    // Login
+    'login.welcome': 'Willkommen bei Dani27001',
+    'login.subtitle': 'Melden Sie sich in Ihrem Konto an',
+    'login.email': 'E-Mail',
+    'login.emailPlaceholder': 'du@firma.com',
+    'login.emailRequired': 'Die E-Mail ist erforderlich',
+    'login.password': 'Passwort',
+    'login.passwordRequired': 'Passwort ist erforderlich',
+    'login.signIn': 'Anmelden',
+    'login.signingIn': 'Anmeldung...',
+    'login.noAccount': 'Noch kein Konto?',
+    'login.register': 'Registrieren',
 
     // Gap Analysis labels
     totalGaps: 'Gesamtzahl der Lücken',
@@ -979,6 +4303,171 @@ export const translations = {
     administrator: 'Administrator',
     chatPlaceholder: 'Nachricht eingeben...',
     send: 'Senden',
+    'documents.generate.defaultTitle': 'Neues ISO 27001-Dokument',
+    'documents.generate.defaultDescription': 'Erstelle ein verpflichtendes ISO 27001-Dokument mit KI-Unterstützung.',
+    'documents.generate.defaultAudience': 'Sicherheitsteam',
+    'documents.report.defaultTitle': 'Compliance-Bericht',
+    'documents.report.defaultDescription': 'Statusübersicht und Compliance-Lücken.',
+    'documents.error.loadList': 'Dokumente konnten nicht geladen werden. Bitte lade die Seite neu.',
+    'documents.error.loadSelected': 'Das ausgewählte Dokument konnte nicht geladen werden.',
+    'documents.report.error.timeout': 'Die Berichtserstellung hat zu lange gedauert. Bitte versuche es erneut.',
+    'documents.report.error.status': 'Der Berichtsstatus konnte nicht abgerufen werden. Bitte versuche es erneut.',
+    'documents.confirmDelete': 'Möchtest du dieses Dokument wirklich löschen?',
+    'documents.error.delete': 'Dokument konnte nicht gelöscht werden.',
+    'documents.report.error.selectFirst': 'Bitte wähle zuerst ein Dokument in der Seitenleiste aus.',
+    'documents.report.error.start': 'Die Berichtserstellung konnte nicht gestartet werden.',
+    'documents.upload.error.missingInput': 'Du musst eine Datei auswählen oder Inhalt eingeben.',
+    'documents.upload.defaultTitle': 'Hochgeladenes Dokument',
+    'documents.upload.success': 'Dokument erfolgreich hochgeladen.',
+    'documents.upload.defaultDescription': 'Hochgeladenes Dokument',
+    'documents.upload.error.generic': 'Fehler beim Hochladen des Dokuments. Bitte versuche es erneut.',
+    'documents.generate.starting': 'Generierung wird gestartet...',
+    'documents.generate.fallbackTitle': 'ISO 27001-Dokument',
+    'documents.generate.completed': 'Generierung abgeschlossen',
+    'documents.generate.errorStatus': 'Generierungsfehler',
+    'documents.generate.errorStart': 'Generierung konnte nicht gestartet werden. Konfiguration prüfen.',
+    'documents.generate.defaultUploadedDescription': 'KI-generiertes Dokument',
+    'documents.generate.uploadError': 'Fehler beim Hochladen des generierten Dokuments.',
+    'documents.tab.view': 'Ansicht',
+    'documents.tab.edit': 'Editor',
+    'documents.tab.generate': 'Mit KI generieren',
+    'documents.tab.report': 'Bericht exportieren',
+    'documents.tab.upload': 'Hochladen',
+    'documents.hero.subtitle': 'Erstelle, bearbeite und verwalte ISO 27001-Dokumente mit KI-Unterstützung in einem klareren professionellen Ablauf.',
+    'documents.sidebar.quickAccess': 'Schnellzugriff auf deine gespeicherten Dokumente.',
+    'documents.sidebar.searchPlaceholder': 'Dokumente suchen',
+    'documents.deleteDocument': 'Dokument löschen',
+    'documents.viewLess': 'Weniger anzeigen',
+    'documents.viewMoreCount': 'Mehr anzeigen ({count} mehr)',
+    'documents.action.generateAi': '+ Mit KI generieren',
+    'documents.action.exportReport': '+ Bericht exportieren',
+    'documents.action.uploadDocument': '+ Dokument hochladen',
+    'documents.noDocumentSelected': 'Kein Dokument ausgewählt',
+    'documents.openAssistant': 'Assistent öffnen',
+    'documents.loadingDocument': 'Dokument wird geladen...',
+    'documents.selectToView': 'Wähle ein Dokument aus, um den Inhalt anzuzeigen.',
+    'documents.untitled': 'Unbenanntes Dokument',
+    'documents.generate.title': 'Dokument mit KI generieren',
+    'documents.generate.subtitle': 'Der LLM-Agent erstellt ein vollständiges ISO 27001-Dokument Abschnitt für Abschnitt.',
+    'documents.field.title': 'Titel',
+    'documents.field.description': 'Beschreibung',
+    'documents.field.audience': 'Zielgruppe',
+    'documents.field.language': 'Sprache',
+    'documents.field.tone': 'Ton',
+    'documents.field.type': 'Typ',
+    'documents.field.sections': 'Abschnitte',
+    'documents.placeholder.title': 'Dokumenttitel',
+    'documents.placeholder.context': 'Dokumentkontext',
+    'documents.placeholder.audience': 'Zielteam',
+    'documents.placeholder.sections': 'Durch Kommas oder Zeilenumbrüche getrennt',
+    'documents.tone.formal': 'Formal',
+    'documents.tone.informal': 'Informell',
+    'documents.type.policy': 'Richtlinie',
+    'documents.type.report': 'Bericht',
+    'documents.type.procedure': 'Verfahren',
+    'documents.type.general': 'Allgemein',
+    'documents.jobId': 'Job-ID:',
+    'documents.generate.generating': 'Wird generiert...',
+    'documents.generate.button': 'Dokument generieren',
+    'documents.openInEditor': 'Im Editor öffnen',
+    'documents.uploadGenerated': 'Generiertes Dokument hochladen',
+    'documents.report.title': 'Bericht exportieren',
+    'documents.report.subtitle': 'Erstelle einen herunterladbaren Bericht auf Basis des aktuell ausgewählten Dokuments.',
+    'documents.report.documentToExport': 'Zu exportierendes Dokument:',
+    'documents.report.noneSelected': 'Kein Dokument in der Seitenleiste ausgewählt',
+    'documents.report.fieldTitle': 'Berichtstitel',
+    'documents.report.placeholderDescription': 'Z. B. Executive Summary zum Status der ISO-Kontrollen für die Managementbewertung',
+    'documents.report.descriptionHint': 'Dieser Text erscheint als Untertitel im Header des generierten Berichts.',
+    'documents.report.template': 'Vorlage',
+    'documents.report.format': 'Format',
+    'documents.report.status': 'Berichtsstatus',
+    'documents.report.download': 'Bericht herunterladen',
+    'documents.report.generateAnother': 'Weiteren Bericht erstellen',
+    'documents.report.recent': 'Aktuelle Berichte',
+    'documents.report.generating': 'Bericht wird generiert...',
+    'documents.report.startExport': 'Export starten',
+    'documents.upload.title': 'Dokument hochladen',
+    'documents.upload.subtitle': 'Lade eine Datei hoch oder füge Inhalt direkt ein.',
+    'documents.upload.placeholderSummary': 'Kurze Zusammenfassung',
+    'documents.upload.file': 'Datei',
+    'documents.upload.altContent': 'Alternativer Inhalt',
+    'documents.upload.altPlaceholder': 'Inhalt hier einfügen, wenn keine Datei hochgeladen wird',
+    'documents.upload.uploading': 'Wird hochgeladen...',
+    'documents.upload.button': 'Dokument hochladen',
+    'language.es': 'Spanisch',
+    'language.en': 'Englisch',
+    'common.optional': 'optional',
+    'documents.title': 'Dokumentgenerator',
+    'documents.viewLabel': 'Dokumentansicht',
+    'documentEditor.titlePlaceholder': 'Dokumenttitel',
+    'documentEditor.stats': '{words} Wörter · {chars} Zeichen',
+    'documentEditor.saved': '✓ Gespeichert',
+    'documentEditor.unsaved': '○ Nicht gespeichert',
+    'documentEditor.copyAsText': 'Als Text kopieren',
+    'documentEditor.copied': '✓ Kopiert',
+    'documentEditor.copy': 'Kopieren',
+    'documentEditor.upload': 'Hochladen',
+    'documentEditor.save': 'Speichern',
+    'documentEditor.exitFullscreen': 'Vollbild verlassen',
+    'documentEditor.fullscreen': 'Vollbild',
+    'documentEditor.placeholder': 'Beginne zu schreiben oder generiere ein Dokument mit KI...',
+    'documentEditor.footerBrand': 'ISO 27001 · DANI Platform',
+    'documentEditor.mobileWords': '{count} Wörter',
+    'documentEditor.toolbar.heading1': 'Überschrift 1',
+    'documentEditor.toolbar.heading2': 'Überschrift 2',
+    'documentEditor.toolbar.heading3': 'Überschrift 3',
+    'documentEditor.toolbar.bold': 'Fett',
+    'documentEditor.toolbar.italic': 'Kursiv',
+    'documentEditor.toolbar.underline': 'Unterstrichen',
+    'documentEditor.toolbar.bulletList': 'Aufzählungsliste',
+    'documentEditor.toolbar.orderedList': 'Nummerierte Liste',
+    'documentEditor.toolbar.blockquote': 'Zitat',
+    'assessment.progressTitle': 'Fortschritt',
+    'assessment.phaseLabel': 'Phase {order}',
+    'evidence.attachmentDeleted': 'Datei gelöscht',
+    'evidence.replace': 'Ersetzen',
+    'evidence.deleteFile': 'Datei löschen',
+    'evidence.viewLess': 'Weniger anzeigen',
+    'evidence.viewMoreCount': '{count} mehr anzeigen',
+    'auditRoom.title': 'Audit Room',
+    'auditRoom.evidencesLabel': 'Nachweise',
+    'navbar.openCommandPalette': 'Befehlspalette öffnen',
+    'navbar.cmdShortcut': 'Strg + K / ⌘K',
+    'integrations.oauth.title': 'OAuth',
+    'integrations.oauth.processing': 'Wird verarbeitet...',
+    'integrations.oauth.invalidParams': 'Ungültige Parameter',
+    'integrations.oauth.completed': 'Verbindung hergestellt',
+    'integrations.oauth.timeout': 'Zeitüberschreitung. Prüfe die Verbindung unter Integrationen.',
+    'upload.field.controlId': 'control_id',
+    'upload.field.clauseRef': 'clause_ref',
+    'upload.placeholder.controlId': 'ISO 27001 A.5.1',
+    'upload.placeholder.clauseRef': 'A.5.1',
+    'upload.dialogTitle': 'Nachweis hochladen',
+    'upload.api.primary': 'POST /api/v1/evidences',
+    'upload.api.secondary': 'POST /api/validate/external',
+    'understand.gapAnalysis': 'Lückenanalyse',
+    'understand.loading': 'Wird geladen...',
+    'understand.empty': 'Keine Lücken vorhanden.',
+    'understand.actionHint': 'Mit "Dokumentation erstellen" startest du einen geführten Ablauf, in dem die KI das empfohlene Dokument zum Schließen dieser Lücken erzeugt.',
+    'understand.createDocumentation': 'Dokumentation erstellen',
+    'understand.modifyDocumentation': 'Dokumentation bearbeiten',
+    'understand.criticalIntro': 'Was dir bei kritischen Lücken noch fehlt:',
+    'understand.missing': 'Fehlt:',
+    'understand.suggestedEvidence': 'Vorgeschlagene Nachweise:',
+    'understand.annexALabel': 'Anhang A ISO 27001 Kontrollen',
+    'understand.auditFinding': 'Auditbefund',
+    'understand.clauseLabel': 'Klausel {value}',
+    'understand.controlLabel': 'Kontrolle {value}',
+    'understand.frameworkSummary': 'Framework-Statusübersicht',
+    'understand.phaseFallback': 'Phase {index}',
+    'understand.phaseGapsSummary': '{unanswered} unbeantwortete Lücken — {critical} kritisch',
+    'understand.toast.navigationError': 'Navigationsfehler',
+    'understand.toast.noOpenGaps': 'In dieser Phase gibt es keine unbeantworteten Lücken, aber du kannst trotzdem Dokumentation erstellen.',
+    'understand.linkedEvidence': 'Verknüpfter Nachweis erkannt',
+    'understand.reason.no': 'Als NEIN beantwortet',
+    'understand.reason.partial': 'Als TEILWEISE beantwortet',
+    'understand.reason.unanswered': 'Unbeantwortet',
+    'app.placeholder.comingSoon': 'Diese Seite ist bald verfügbar...',
 
     // Header
     'header.searchPlaceholder': 'Kontrollen oder Beweise suchen...',
@@ -986,8 +4475,12 @@ export const translations = {
     'header.viewProfile': 'Profil Anzeigen',
     'header.settings': 'Einstellungen',
     'header.signOut': 'Abmelden',
+    'navbar.openSidebar': 'Seitenleiste öffnen',
+    'navbar.notifications': 'Benachrichtigungen',
+    'navbar.onboarding': 'Einführung öffnen',
 
     // Sidebar
+    'sidebar.menu': 'Menü',
     'sidebar.orgProfile': 'Organisationsprofil',
     'sidebar.change': 'Ändern',
     'sidebar.byProcess': 'Nach Prozess',
@@ -998,6 +4491,60 @@ export const translations = {
     'sidebar.regulatoryModules': 'Regulatorische Module',
     'sidebar.settings': 'Einstellungen',
     'sidebar.availableInPlan': 'Verfügbar im {plan}-Plan',
+    'sidebar.closeMenu': 'Menü schließen',
+
+    // Phases
+    'phase.1': 'Kontext & Führung',
+    'phase.2': 'Planung & Risiko',
+    'phase.3': 'Support & Betrieb',
+    'phase.4': 'Anhang A Kontrollen',
+    // Assessment & Evidence
+    'assessment.responded': 'Beantwortet',
+    'assessment.loadingQuestions': 'Fragen werden geladen...',
+    'assessment.noQuestions': 'Keine Fragen in dieser Phase.',
+    'assessment.viewByPhase': 'Ansicht nach Phase: Beantworte alle Fragen in dieser Spalte, um Kontextverlust zu vermeiden.',
+    'assessment.questionLabel': 'Frage',
+    'assessment.criticalNoEvidenceToast': 'Kritische Fragen, die mit Ja beantwortet wurden, erfordern das Anhängen von Nachweisen',
+    'assessment.criticalWarning': '⚠️ Kritische Fragen, die mit "JA" beantwortet wurden, erfordern das Anhängen von Nachweisdokumenten.',
+    'assessment.criticalBadge': 'KRITISCH',
+    'answer.yes': 'Ja',
+    'answer.partial': 'Teilweise',
+    'answer.no': 'Nein',
+    'answer.na': 'N/A',
+    'evidence.dragDropHint': 'Ziehen Sie Beweise hierher oder',
+    'evidence.quickSelect': 'Auswählen (schnell)',
+    'evidence.advancedUploader': 'Erweiterter Uploader',
+    'evidence.recentUploads': 'Letzte Uploads',
+    'evidence.title': 'Nachweismaterial-Zentrum',
+    'evidence.subtitle': 'Organisieren Sie Ihre Nachweise nach Typ und ISO 27001-Kontrolle.',
+    'evidence.uploadAction': '+ Nachweis hochladen',
+    'evidence.kpi.totalItems': 'Gesamtanzahl Nachweis-Elemente',
+    'evidence.kpi.totalItemsHelp': 'Organisiert nach Nachweismaterial-Taxonomie',
+    'evidence.kpi.filteredItems': 'Gefilterte Elemente',
+    'evidence.kpi.filteredItemsHelp': 'Angewendete Such- und Typfilter',
+    'evidence.kpi.types': 'Nachweismaterial-Typen',
+    'evidence.kpi.typesHelp': 'Gruppiert nach Taxonomie',
+    'evidence.searchPlaceholder': 'Nachweis, Kontrolle, Klausel suchen...',
+    'evidence.allTypes': 'Alle Nachweis-Typen',
+    'evidence.showing': 'Zeige {matched} von {total} Nachweis-Elementen',
+    'evidence.loading': 'Nachweise werden geladen...',
+    'evidence.empty': 'Keine Nachweise entsprechen Ihren Filtern.',
+    'evidence.validityDays': '{days} Tage',
+    'evidence.deleting': 'Löschen...',
+    'evidence.delete': 'Löschen',
+    'evidence.loadError': 'Nachweise konnten nicht geladen werden. Bitte versuchen Sie es erneut.',
+    'evidence.deleteError': 'Nachweis konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.',
+    'evidence.confirmDelete': 'Nachweis "{name}" löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+    'evidence.type.policy': 'Policy',
+    'evidence.type.procedure': 'Procedure',
+    'evidence.type.instruction': 'Instruction',
+    'evidence.type.control': 'Control',
+    'evidence.type.record': 'Record',
+    'evidence.freshness.fresh': 'Aktuell',
+    'evidence.freshness.expiring': 'Bald ablaufend',
+    'evidence.freshness.expired': 'Abgelaufen',
+    'assessment.save.savedPrefix': 'Gespeichert:',
+    'assessment.save.notSaved': 'Noch nicht gespeichert',
 
     // Menu Items
     'menu.dashboard': 'Dashboard',
@@ -1009,6 +4556,7 @@ export const translations = {
     'menu.audit': 'Audit',
     'menu.integrity': 'Integrität',
     'menu.regfeed': 'Regulatorischer Feed',
+    'menu.portal': 'Portal',
     'menu.gapAnalysis': 'Lückenanalyse',
     'menu.documentGenerator': 'Dokumentengenerator',
     'menu.riskMap': 'Risikokarte',
@@ -1022,6 +4570,60 @@ export const translations = {
     'menu.integrations': 'Integrationen',
     'menu.settings': 'Einstellungen',
     'menu.assets': 'Asset-Inventar',
+    'assets.confirmDelete': 'Dieses Asset löschen?',
+    'assets.subtitle': 'ISO-27001-C-I-A-Klassifizierung',
+    'assets.newAsset': '+ Neues Asset',
+    'assets.assetsLabel': 'Assets',
+    'assets.filterByType': 'Nach Typ filtern:',
+    'assets.allTypes': 'Alle Typen',
+    'assets.noneFound': 'Keine Assets gefunden',
+    'assets.addFirst': 'Erstellen Sie Ihr erstes Asset',
+    'assets.table.asset': 'Asset',
+    'assets.table.type': 'Typ',
+    'assets.table.score': 'Score',
+    'assets.table.level': 'Stufe',
+    'assets.table.status': 'Status',
+    'assets.countSummary': '{filtered} von {total} Assets',
+    'assets.editAsset': 'Asset bearbeiten',
+    'assets.newAssetTitle': 'Neues Asset',
+    'assets.editSubtitle': 'Klassifizierung und Metadaten aktualisieren',
+    'assets.newSubtitle': 'Ein neues Informations-Asset registrieren',
+    'assets.field.name': 'Name *',
+    'assets.field.description': 'Beschreibung',
+    'assets.field.type': 'Asset-Typ *',
+    'assets.field.location': 'Standort',
+    'assets.field.cia': 'C-I-A-Klassifizierung',
+    'assets.field.isoClause': 'ISO-Klauselreferenz',
+    'assets.placeholder.name': 'z. B. Produktionsdatenbankserver',
+    'assets.placeholder.description': 'Kurze Beschreibung dieses Assets...',
+    'assets.placeholder.location': 'z. B. AWS us-east-1',
+    'assets.placeholder.isoClause': 'z. B. A.8.1.1',
+    'assets.selectType': 'Typ auswählen...',
+    'assets.ciaScale': '1 = Niedrig · 2 = Mittel · 3 = Hoch',
+    'assets.cia.low': '1 — Niedrig',
+    'assets.cia.medium': '2 — Mittel',
+    'assets.cia.high': '3 — Hoch',
+    'assets.cia.confidentiality': 'Vertraulichkeit',
+    'assets.cia.integrity': 'Integrität',
+    'assets.cia.availability': 'Verfügbarkeit',
+    'assets.validation.nameRequired': 'Name ist erforderlich',
+    'assets.validation.typeRequired': 'Typ ist erforderlich',
+    'assets.ciaScoreHint': 'Score = C×0,4 + I×0,35 + A×0,25 — automatisch berechnet',
+    'assets.type.hardware': 'Hardware',
+    'assets.type.software': 'Software',
+    'assets.type.data': 'Daten',
+    'assets.type.service': 'Dienst',
+    'assets.type.people': 'Personen',
+    'assets.type.facility': 'Anlage',
+    'assets.level.low': 'Niedrig',
+    'assets.level.medium': 'Mittel',
+    'assets.level.high': 'Hoch',
+    'assets.level.critical': 'Kritisch',
+    'assets.status.active': 'Aktiv',
+    'assets.status.inactive': 'Inaktiv',
+    'assets.status.disposed': 'Entsorgt',
+    'assets.saveChanges': 'Änderungen speichern',
+    'assets.createAsset': 'Asset erstellen',
 
     profile: 'Profil',
     exportReport: 'Bericht Exportieren',
@@ -1040,12 +4642,79 @@ export const translations = {
     docsPending: 'Dokumente zur Überprüfung',
     controlsUnverified: 'Kontrollen nicht verifiziert',
     controlsUntested: 'Kontrollen nicht getestet',
+    'common.clear': 'Leeren',
+    'common.close': 'Schließen',
+    'common.refresh': 'Aktualisieren',
+    'common.refreshing': 'Wird aktualisiert...',
+    'validation.table.status': 'Status',
+    'validation.summary': 'Zusammenfassung',
+    'portal.mandatory': 'Verpflichtend',
+    'portal.optional': 'Optional',
+    'portal.acknowledged': 'Bestätigt',
+    'portal.pending': 'Ausstehend',
+    'portal.viewPolicy': 'Richtlinie anzeigen',
+    'portal.versionLine': 'Version {version} · {kind} · Veröffentlicht am {date}',
+    'portal.officialSummary': 'Offizielle Zusammenfassung',
+    'portal.noSummary': 'Keine Zusammenfassung verfügbar.',
+    'portal.notAvailable': 'N/V',
+    'portal.versionPrefix': 'v',
+    'portal.fullText': 'Volltext',
+    'portal.readCarefully': 'Bitte sorgfältig lesen',
+    'portal.ackCheckboxText': 'Ich habe diese Richtlinie gelesen und erkenne die aktuelle Dokumentversion an.',
+    'portal.ackCheckboxHelp': 'Diese Bestätigung wird für Ihre Organisation erfasst.',
+    'portal.ackSuccess': 'Richtlinie erfolgreich bestätigt.',
+    'portal.pageTitle': 'Bestätigungen von Richtlinien',
+    'portal.pageSubtitle': 'Prüfen Sie die von Ihrer Organisation veröffentlichten Richtlinien und bestätigen Sie die, die Sie gelesen haben.',
+    'portal.publishedPolicies': 'Veröffentlichte Richtlinien',
+    'portal.statusAutoUpdate': 'Aktualisiert sich automatisch, sobald Richtlinien bestätigt werden.',
+    'portal.loadingPolicies': 'Richtlinien werden geladen...',
+    'auditRoom.binderQueued': 'Binder in Warteschlange',
+    'auditRoom.error.statusBinder': 'Fehler beim Abrufen des Binder-Status.',
+    'auditRoom.error.downloadBinder': 'Der Binder konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.',
+    'auditRoom.generatingBinder': 'Binder wird erstellt...',
+    'auditRoom.binderStatus': 'Binder-Status',
+    'auditRoom.progressLabel': 'Fortschritt:',
+    'auditRoom.downloading': 'Wird heruntergeladen...',
+    'auditRoom.downloadPdf': 'Binder-PDF herunterladen',
+    'auditRoom.error.loadFolders': 'Audit-Room-Ordner konnten nicht geladen werden.',
+    'auditRoom.error.loadEvidences': 'Die Beweise des Ordners konnten nicht geladen werden.',
+    'auditRoom.error.selectEvidence': 'Wählen Sie mindestens einen Nachweis aus, um den Binder zu erstellen.',
+    'auditRoom.error.startBinder': 'Die Binder-Erstellung konnte nicht gestartet werden.',
+    'auditRoom.binderTitle': 'Audit-Room-Binder',
+    'auditRoom.binderDescriptionFolder': 'Erstellt aus Ordner {folder}',
+    'auditRoom.binderDescription': 'Binder aus dem Audit Room erstellt',
+    'auditRoom.subtitle': 'Erkunden Sie Ordner des Anhangs A und erstellen Sie Binder aus ausgewählten Nachweisen.',
+    'auditRoom.selectedCount': '{count} ausgewählter Nachweis(e)',
+    'auditRoom.folders': 'Ordner',
+    'auditRoom.loadingFolders': 'Ordner werden geladen...',
+    'auditRoom.folderEvidenceCount': '{count} Nachweise',
+    'auditRoom.statusLabel': 'Status:',
+    'auditRoom.notStarted': 'Nicht gestartet',
+    'auditRoom.generatedWhenFinished': 'Er wird erzeugt, sobald der Vorgang abgeschlossen ist.',
+    'auditRoom.selectFolderHint': 'Wählen Sie einen Ordner aus, um Elemente anzuzeigen.',
+    'auditRoom.noFolderSelected': 'Kein Ordner ausgewählt',
+    'auditRoom.loadingEvidences': 'Nachweise werden geladen...',
+    'auditRoom.noEvidencesInFolder': 'In diesem Ordner sind keine Nachweise verfügbar.',
+    'auditRoom.selectFolderToView': 'Wählen Sie einen Ordner aus, um Nachweise anzuzeigen.',
+    'auditRoom.generateBinder': 'Binder erstellen',
+    'auditRoom.createBinderHint': 'Wählen Sie Elemente aus, um ein Binder-PDF aus dem Audit Room zu erstellen.',
     'dashboard.overview': 'Überblick über Compliance-Gesundheit und Fortschritt',
+    'dashboard.overviewLabel': 'Dashboard',
     'dashboard.kpiLoadError': 'KPIs konnten nicht geladen werden',
     'dashboard.loadingKpis': 'KPIs werden geladen...',
+    'dashboard.loading': 'Wird geladen...',
+    'dashboard.noRecentActivity': 'Keine aktuellen Aktivitäten verfügbar',
+    'dashboard.noUpcomingTasks': 'Keine anstehenden Aufgaben gefunden',
+    'dashboard.nextAuditTitle': 'Nächstes Audit',
+    'dashboard.daysLeft': 'Tage verbleibend',
+    'dashboard.targetDate': 'Zieldatum',
     'dashboard.healthScoreTrend': 'Trend des Gesundheits-Scores',
     'dashboard.recentActivity': 'Letzte Aktivitäten',
     'dashboard.upcomingTasks': 'Anstehende Aufgaben',
+    'dashboard.lastAudit': 'Letzte Prüfung',
+    'dashboard.today': 'Ab heute',
+    'dashboard.cycleLabel': 'Zyklus',
+    'dashboard.statusLabel': 'Status',
     'kpi.noData': 'Keine Daten verfügbar',
     'kpi.compliance': 'Compliance',
     'healthScore.subtitle': 'Vom Backend berechnete Compliance-Bereitschaft',
@@ -1073,6 +4742,38 @@ export const translations = {
     'dashboard.priority.high': 'HOCH',
     'dashboard.priority.medium': 'MITTEL',
     'dashboard.priority.low': 'NIEDRIG',
+    'searchBinder.error.enterTerm': 'Geben Sie einen Suchbegriff ein.',
+    'searchBinder.log.search': 'Suche: "{term}" ({count} Ergebnisse)',
+    'searchBinder.log.searchError': 'Suchfehler: "{term}"',
+    'searchBinder.deselected': 'Abgewählt',
+    'searchBinder.selected': 'Ausgewählt',
+    'searchBinder.log.removed': 'Aus dem Binder entfernt: {id}',
+    'searchBinder.log.cleared': 'Binder geleert',
+    'searchBinder.selectedItemsCount': '{count} ausgewähltes Element(e)',
+    'searchBinder.error.selectOne': 'Wählen Sie mindestens ein Element aus, um einen Binder zu erzeugen.',
+    'searchBinder.binderTitle': 'Audit-Binder',
+    'searchBinder.binderDescription': 'Binder aus dem Dashboard erzeugt',
+    'searchBinder.error.generateBinder': 'Binder konnte nicht erzeugt werden. Bitte versuchen Sie es erneut.',
+    'searchBinder.error.search': 'Die Suche ist fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    'searchBinder.binderDetail': 'Binder-Details',
+    'searchBinder.searchPlaceholder': 'Suchen Sie in natürlicher Sprache: z. B. Zugriffsrichtlinien, Audit-Nachweise',
+    'searchBinder.search': 'Suchen',
+    'searchBinder.relevantResults': 'Relevante Ergebnisse',
+    'searchBinder.quickView': 'Schnellansicht Anhang A',
+    'searchBinder.resultsCount': '{count} Ergebnisse',
+    'searchBinder.loadingResults': 'Ergebnisse werden geladen...',
+    'searchBinder.emptyHint': 'Führen Sie eine Suche aus, um Fragmente von Anhang A anzuzeigen.',
+    'searchBinder.addedToBinder': 'Zum Binder hinzugefügt',
+    'searchBinder.addToBinder': 'Zum Binder hinzufügen',
+    'searchBinder.relevance': 'Relevanz {score}%',
+    'searchBinder.inlinePreview': 'Inline-Vorschau',
+    'searchBinder.binder': 'Binder',
+    'searchBinder.multiSelection': 'Mehrfachauswahl',
+    'searchBinder.noneSelected': 'Keine ausgewählten Elemente. Fügen Sie Elemente aus der Liste hinzu.',
+    'searchBinder.generateBinderPdf': 'Binder-PDF erzeugen',
+    'searchBinder.waitingGeneration': 'Warten auf die Erstellung des Binders...',
+    'searchBinder.actionLog': 'Aktionsprotokoll',
+    'searchBinder.emptyLog': 'Ihre letzten 50 Aktionen werden hier angezeigt.',
 
     // Risks
     'risks.title': 'Risikomanagement',
@@ -1119,6 +4820,22 @@ export const translations = {
     'risks.linkThreatButton': 'Bedrohung verknüpfen',
     'risks.linkSelectionRequired': 'Bitte wählen Sie ein Risiko und eine Bedrohung zum Verknüpfen aus',
     'risks.threatLinkedSuccess': 'Bedrohung erfolgreich mit dem Risiko verknüpft',
+    'risks.threatCreatedSuccess': 'Bedrohung erfolgreich erstellt',
+    'risks.vulnerabilityCreatedSuccess': 'Schwachstelle erfolgreich erstellt',
+    'risks.addRiskButton': 'Risiko hinzufügen',
+    'risks.createRiskTitle': 'Risiko erstellen',
+    'risks.createRiskDescription': 'Registrieren Sie ein neues Risiko im Risikoregister.',
+    'risks.riskNameLabel': 'Name',
+    'risks.riskNamePlaceholder': 'z. B. Unzureichende Zugangskontrolle',
+    'risks.riskDescriptionLabel': 'Beschreibung',
+    'risks.riskDescriptionPlaceholder': 'Optionaler zusätzlicher Kontext',
+    'risks.riskAssetLabel': 'Asset',
+    'risks.probabilityLabel': 'Wahrscheinlichkeit',
+    'risks.impactLabel': 'Auswirkung',
+    'risks.cancelButton': 'Abbrechen',
+    'risks.creating': 'Erstellen...',
+    'risks.createRiskButton': 'Risiko erstellen',
+    'risks.riskCreatedSuccess': 'Risiko erfolgreich erstellt',
     'risks.recentThreatsTitle': 'Aktuelle Bedrohungen',
     'risks.loadingThreats': 'Bedrohungen werden geladen...',
     'risks.noThreats': 'Keine Bedrohungen registriert.',
@@ -1130,6 +4847,7 @@ export const translations = {
     'audit.subtitle': 'Validieren Sie Ihre Nachweise anhand der ISO-27001-Standards',
     'audit.fileValidatorTitle': 'Datei mit Agent validieren',
     'audit.dropHint': 'Klicken oder ziehen Sie eine Datei',
+    'audit.dropNow': 'Legen Sie Ihre Datei hier ab',
     'audit.dropSubHint': 'PDF, Word, Excel, Text, Bilder (max. 10 MB)',
     'audit.processing': 'Granulare Validierung wird verarbeitet...',
     'audit.jobId': 'Job-ID',
@@ -1197,6 +4915,24 @@ export const translations = {
     'audit.jobQueued': 'Job in Warteschlange',
     'audit.validationError': 'Validierungsfehler',
     'audit.validationUnknownError': 'Unbekannter Validierungsfehler',
+    'audit.statusCompliant': 'Konform',
+    'audit.statusNonCompliant': 'Nicht konform',
+    'audit.statusNeedsReview': 'Benötigt Prüfung',
+    'audit.findingsLabel': 'Befunde',
+    'audit.detectedFindings': 'Erkannte Befunde',
+    'audit.severity': 'Schweregrad',
+    'audit.recommendation': 'Empfehlung',
+    'audit.impact': 'Auswirkung',
+    'audit.agentNotes': 'Agentenhinweise',
+    'audit.noChanges': 'Keine Änderungen',
+    'preAuditCard.title': 'Voraudit-Selbstbewertung',
+    'preAuditCard.readinessLabel': 'Geschätzte Audit-Bereitschaft',
+    'preAuditCard.readinessSubtitle': '3 Hochrisiko-Nichtkonformitätsbereiche erkannt',
+    'preAuditCard.findingsTitle': 'Wahrscheinliche Audit-Befunde',
+    'preAuditCard.finding.accessManagement': 'Zugriffsmanagement — Nachweis abgelaufen',
+    'preAuditCard.finding.businessContinuity': 'Geschäftskontinuität — kein Wiederherstellungstest in 2025',
+    'preAuditCard.finding.incidentManagement': 'Vorfallmanagement — CAPA seit 45+ Tagen offen',
+    'preAuditCard.finding.cryptographyPolicy': 'Kryptografie-Policy — Entwurf noch nicht genehmigt',
     'settings.title': 'Einstellungen',
     'settings.subtitle': 'Sprache, Erscheinungsbild, Benachrichtigungen und Automatisierung anpassen.',
     'settings.organizationProfile': 'Organisationsprofil',
@@ -1239,11 +4975,65 @@ export const translations = {
     'settings.autoRunAnalysisHelp': 'Periodische Lückenanalysen planen',
     'settings.scheduleFrequency': 'Ausführungsfrequenz',
     'settings.scheduleFrequencyHelp': 'Festlegen, wie oft Prüfungen laufen',
+    'settings.2fa.backupCodes': 'Backup-Codes',
+    'settings.2fa.confirmPassword': 'Passwort bestätigen',
+    'settings.2fa.disableAction': '2FA deaktivieren',
+    'settings.2fa.disableHelp': 'Geben Sie Ihr Passwort ein, um 2FA zu deaktivieren. Dadurch wird das aktuelle Geheimnis und jeder Backup-Code widerrufen.',
+    'settings.2fa.disableTitle': '2FA deaktivieren',
+    'settings.2fa.disabled': 'Deaktiviert',
+    'settings.2fa.disabledHelp': 'Schützen Sie Ihr Konto mit Google Authenticator, Authy oder 1Password.',
+    'settings.2fa.disabledSuccess': 'Die Zwei-Faktor-Authentifizierung wurde deaktiviert und alle Backup-Codes wurden widerrufen.',
+    'settings.2fa.disabling': 'Deaktivierung...',
+    'settings.2fa.enableAction': '2FA aktivieren',
+    'settings.2fa.enabled': 'Aktiviert',
+    'settings.2fa.enabledHelp': 'Ihr Konto ist mit TOTP und Backup-Codes geschützt.',
+    'settings.2fa.passwordValidation': 'Geben Sie Ihr Passwort ein, um 2FA zu deaktivieren',
+    'settings.2fa.setupHelp': 'Richten Sie 2FA ein, um einen scannbaren QR-Code zu generieren und Einmal-Backup-Codes zu erhalten.',
+    'settings.2fa.title': 'Zwei-Faktor-Authentifizierung',
+    'settings.auditCycle.annual': 'Jährlich',
+    'settings.auditCycle.currentFrequency': 'Aktuelle Frequenz',
+    'settings.auditCycle.emptyCalendar': 'Planen Sie ein Audit, um das Datum im Kalender anzuzeigen.',
+    'settings.auditCycle.history': 'Verlauf',
+    'settings.auditCycle.historyEmpty': 'Es wurde noch kein abgeschlossenes Audit erfasst.',
+    'settings.auditCycle.markCompleted': 'Audit als abgeschlossen markieren',
+    'settings.auditCycle.monthly': 'Monatlich',
+    'settings.auditCycle.nextAudit': 'Nächstes Audit',
+    'settings.auditCycle.noDate': 'Kein Datum',
+    'settings.auditCycle.notScheduled': 'Nicht geplant',
+    'settings.auditCycle.quarterly': 'Vierteljährlich',
+    'settings.auditCycle.scheduled': 'Geplant',
+    'settings.auditCycle.title': 'Audit-Zyklus',
+    'settings.auditCycle.toastCompleteError': 'Fehler beim Markieren des Audits als abgeschlossen',
+    'settings.auditCycle.toastCompleted': 'Audit als abgeschlossen markiert',
+    'settings.auditCycle.toastPermissionDenied': 'Unzureichende Berechtigungen, um die Frequenz zu aktualisieren',
+    'settings.auditCycle.toastUpdateError': 'Fehler beim Aktualisieren der Frequenz',
+    'settings.auditCycle.toastUpdated': 'Frequenz aktualisiert',
+    'settings.auditCycleHelp': 'Legen Sie die Häufigkeit geplanter Audits für Ihre Organisation fest.',
+    'settings.password.confirm': 'Neues Passwort bestätigen',
+    'settings.password.current': 'Aktuelles Passwort',
+    'settings.password.hint': 'Verwenden Sie starke Passwörter mit Großbuchstaben, Zahlen und Sonderzeichen.',
+    'settings.password.new': 'Neues Passwort',
+    'settings.password.saving': 'Speichert...',
+    'settings.password.subtitle': 'Aktualisieren Sie Ihr Passwort und widerrufen Sie aktive Refresh-Sitzungen.',
+    'settings.password.title': 'Passwort',
+    'settings.password.updateAction': 'Passwort aktualisieren',
+    'settings.password.updated': 'Ihr Passwort wurde erfolgreich aktualisiert.',
+    'settings.switch.off': 'Aus',
+    'settings.switch.on': 'Ein',
+    'settings.tab.appearance': 'Darstellung',
+    'settings.tab.auditCycle': 'Audit-Zyklus',
+    'settings.tab.preferences': 'Präferenzen',
+    'settings.tab.security': 'Sicherheit',
+    'settings.theme.dark': 'Dunkel',
+    'settings.theme.light': 'Hell',
+    'settings.themeToggleHelp': 'Wechseln Sie das App-Design.',
     'settings.userManagement': 'Benutzerverwaltung',
     'settings.activeUser': 'Aktiver Benutzer',
     'settings.inviteTeamMember': 'Teammitglied einladen',
-  },
-  fr: {
+    'common.edit': 'Bearbeiten',
+    'common.saving': 'Speichern...',
+    },
+fr: {
     dashboard: 'Tableau de Bord',
     understand: 'Comprendre Ma Situation',
     documents: 'Contrôles de Documents',
@@ -1262,6 +5052,644 @@ export const translations = {
     evidenceCenter: 'Centre de Preuves',
     capaTracker: 'Suivi CAPA',
     auditRoom: 'Salle d\'Audit',
+    'tutorial.title': 'Bonjour, je suis Dani27',
+    'tutorial.subtitle': 'Votre assistant virtuel vous guide pas à pas sur la plateforme.',
+    'tutorial.progressLabel': 'Étape',
+    'tutorial.stepHint': 'Brève explication de la section actuelle',
+    'tutorial.previous': 'Précédent',
+    'tutorial.next': 'Suivant',
+    'tutorial.finish': 'Terminer',
+    'tutorial.startPromptKnown': 'Appuyez sur démarrer pour lancer le tutoriel depuis le tableau de bord principal.',
+    'tutorial.startPromptUnknown': 'Vous êtes dans une autre section. Lancez la visite pour revenir au début et suivre le bon flux.',
+    'tutorial.startButton': 'Démarrer le tutoriel',
+    'tutorial.dismissButton': 'Fermer',
+    'tutorial.routeHint': 'Le tutoriel met en évidence chaque route. Suivez les flèches pour continuer.',
+    'tutorial.step1.title': 'Accueil professionnel',
+    'tutorial.step1.description': 'Commencez votre parcours conformité avec une vue claire de chaque module, du tableau de bord à l\'audit et aux preuves.',
+    'tutorial.step2.title': 'Navigation intelligente',
+    'tutorial.step2.description': 'Utilisez le menu des processus ou le panneau des modules pour accéder à tout moment aux risques, preuves, audit et contrôles.',
+    'tutorial.step3.title': 'Profil et paramètres',
+    'tutorial.step3.description': 'Personnalisez votre profil conformité à tout moment et consultez l\'état de votre plan, des notifications et des préférences.',
+    'tutorial.step4.title': 'Ressources clés',
+    'tutorial.step4.description': 'Comprenez chaque option : identifier les risques, ajouter des preuves et préparer des rapports avec des indications claires et une assistance intégrée.',
+    'tutorial.step5.title': 'Préparer l\'audit',
+    'tutorial.step5.description': 'Validez vos preuves, examinez les constats et gardez la préparation d\'audit sous contrôle.',
+    'tutorial.step6.title': 'Auto-évaluation',
+    'tutorial.step6.description': 'Mesurez votre niveau de conformité avec une évaluation rapide et identifiez immédiatement des opportunités d\'amélioration.',
+    'tutorial.step7.title': 'Configuration',
+    'tutorial.step7.description': 'Ajustez vos préférences, la langue et les notifications pour que le système s\'adapte à votre équipe.',
+    'tutorial.note': 'Cette visite reste disponible à tout moment depuis l\'icône supérieure.',
+    'tutorial.close': 'Fermer le guide',
+    'tutorial.steps.dashboard.title': 'Centre de contrôle',
+    'tutorial.steps.dashboard.description': 'Consulte le statut, les alertes et l\'avancement en un coup d\'œil.',
+    'tutorial.steps.dashboard.sections.intro.title': 'Ce que tu verras ici',
+    'tutorial.steps.dashboard.sections.intro.content': `Ce tableau de bord résume l\'état actuel de ton programme :
+- KPI de documentation, d\'implémentation et d\'efficacité
+- Score de santé et tendance
+- Activité récente
+- Tâches à venir
+
+C\'est un espace de priorisation rapide, pas un module d\'édition massive.`,
+    'tutorial.steps.dashboard.sections.intro.action': 'Faire le tour du tableau de bord',
+    'tutorial.steps.dashboard.sections.kpis.title': 'KPI et score',
+    'tutorial.steps.dashboard.sections.kpis.content': `Les cartes affichent les pourcentages actuels et la variation récente.
+
+Utilise-les pour voir si tu progresses ou recules. Dans cette version, ces cartes sont informatives et n\'ouvrent pas de détail au clic.`,
+    'tutorial.steps.dashboard.sections.kpis.action': 'Vérifier les valeurs et tendances',
+    'tutorial.steps.dashboard.sections.activity-tasks.title': 'Activité et tâches à venir',
+    'tutorial.steps.dashboard.sections.activity-tasks.content': `En bas, tu trouveras deux zones utiles :
+- Activité récente : changements effectués dans le système
+- Tâches à venir : éléments avec priorité et échéance
+
+Cela t\'aide à savoir quoi traiter en premier.`,
+    'tutorial.steps.dashboard.sections.activity-tasks.action': 'Comparer activité et tâches',
+    'tutorial.steps.dashboard.sections.scope.title': 'Périmètre de cette étape',
+    'tutorial.steps.dashboard.sections.scope.content': `Cette zone permet :
+- d\'afficher l\'état global et la tendance
+- de montrer l\'activité et les tâches suggérées
+
+Conseil :
+- Utilise-la pour prioriser en quelques minutes
+- Puis détaille chaque module pour agir`,
+    'tutorial.steps.dashboard.sections.scope.action': 'L\'utiliser comme vue de pilotage',
+    'tutorial.steps.dashboard.sections.conclusion.title': 'Étape suivante',
+    'tutorial.steps.dashboard.sections.conclusion.content': `Quand tu identifies les priorités dans le tableau de bord, passe à l\'analyse des écarts pour comprendre pourquoi cet état existe et quoi corriger en premier.`,
+    'tutorial.steps.dashboard.sections.conclusion.action': 'Aller vers Gap Analysis',
+    'tutorial.steps.understand.title': 'Analyse des écarts',
+    'tutorial.steps.understand.description': 'Identifie précisément les écarts entre l\'état actuel et les exigences.',
+    'tutorial.steps.understand.sections.intro.title': 'Analyse des écarts (Gap Analysis)',
+    'tutorial.steps.understand.sections.intro.content': `Nous sommes dans la partie la plus importante : Gap Analysis.
+
+Ici tu vas :
+1. Répondre à des questions sur ton organisation
+2. Le système analyse tes réponses
+3. Tu vois exactement ce qui manque
+4. Tu obtiens un plan pour combler les écarts
+
+C\'est le cœur de la conformité. Prends le temps nécessaire.`,
+    'tutorial.steps.understand.sections.intro.action': 'Lire l\'introduction',
+    'tutorial.steps.understand.sections.framework.title': 'Quelle norme dois-tu respecter ?',
+    'tutorial.steps.understand.sections.framework.content': `Tu peux travailler avec un ou plusieurs cadres :
+- ISO 27001 (sécurité de l\'information)
+- ISO 27002 (contrôles de sécurité)
+- GDPR (protection des données - Europe)
+- HIPAA (santé - USA)
+- NIST (sécurité nationale - USA)
+- SOC 2 (audit de service)
+
+Sélectionne celui qui s\'applique à ton activité.
+Astuce : beaucoup d\'organisations utilisent ISO 27001 comme base.`,
+    'tutorial.steps.understand.sections.framework.action': 'Choisir le bon cadre',
+    'tutorial.steps.understand.sections.questionnaire.title': 'Réponds honnêtement',
+    'tutorial.steps.understand.sections.questionnaire.content': `Tu verras des questions comme :
+'As-tu une politique de sécurité documentée ?'
+'Fais-tu une formation annuelle à la sécurité ?'
+'As-tu un plan de réponse aux incidents ?'
+
+Réponds OUI/NON/PARTIELLEMENT (c\'est confidentiel)
+
+Il n\'y a pas de bonnes réponses. L\'honnêteté est préférable.
+À partir de là, nous calculerons tes écarts.`,
+    'tutorial.steps.understand.sections.questionnaire.action': 'Commencer à répondre',
+    'tutorial.steps.understand.sections.analysis.title': 'Le système analyse...',
+    'tutorial.steps.understand.sections.analysis.content': `Donne-nous un instant pour traiter tes réponses.
+
+Nous :
+✓ comparons ton état aux normes
+✓ calculons le niveau de conformité
+✓ priorisons les écarts selon le risque
+✓ recommandons des actions
+
+Cela peut prendre 10 à 30 secondes...`,
+    'tutorial.steps.understand.sections.analysis.action': 'Attendre l\'analyse',
+    'tutorial.steps.understand.sections.results.title': 'Voici tes écarts',
+    'tutorial.steps.understand.sections.results.content': `Tu vois 3 éléments :
+
+1. ÉCART CRITIQUE (rouge)
+   - impact élevé s\'il n\'est pas comblé
+   - à traiter en premier
+
+2. ÉCART MAJEUR (orange)
+   - important, mais pas urgent
+   - à planifier dans les prochains mois
+
+3. ÉCART MINEUR (jaune)
+   - impact faible
+   - utile, mais non critique
+
+Le pourcentage de conformité est affiché en haut.
+S\'il est <70 %, il reste du travail.`,
+    'tutorial.steps.understand.sections.results.action': 'Examiner les écarts et priorités',
+    'tutorial.steps.understand.sections.action-plan.title': 'Créer ton plan de fermeture',
+    'tutorial.steps.understand.sections.action-plan.content': `Pour chaque écart :
+1. Clique dessus
+2. Assigne un responsable
+3. Fixe une date limite
+4. Décris ce que tu vas faire pour le fermer
+
+Le système suit ta progression.
+Chaque écart clos = pourcentage de conformité plus élevé
+
+Exemple :
+"Écart : 'Nous n\'avons pas activé le MFA'
+Responsable : Juan Pérez (CISO)
+Échéance : 30 mars
+Action : déployer MFA Okta pour tous les accès"`,
+    'tutorial.steps.understand.sections.action-plan.action': 'Créer un plan d\'action',
+    'tutorial.steps.understand.sections.conclusion.title': 'Analyse terminée !',
+    'tutorial.steps.understand.sections.conclusion.content': `Bravo, tu sais maintenant ce qui manque.
+
+Le reste est de l\'implémentation :
+- Étape 3 : documenter tes ACTIFS (ce que tu protèges)
+- Étape 4 : charger politiques et DOCUMENTS
+- Étape 5 : identifier les RISQUES spécifiques
+- Étape 6 : collecter les PREUVES
+- Étape 7 : compiler les CONSTATS pour l\'audit
+
+On continue. Ensuite : Assets (inventaire)`,
+    'tutorial.steps.understand.sections.conclusion.action': 'Cliquer sur Suivant',
+    'tutorial.steps.assets.title': 'Inventaire des actifs',
+    'tutorial.steps.assets.description': 'Documente tous les actifs (systèmes, données, personnes) à protéger.',
+    'tutorial.steps.assets.sections.intro.title': 'Ce que fait ce module',
+    'tutorial.steps.assets.sections.intro.content': `Ici, tu enregistres les actifs de façon structurée pour ta gestion des risques.
+
+Tu peux créer, modifier et supprimer des actifs, et les classer par type et impact CIA (confidentialité, intégrité, disponibilité).`,
+    'tutorial.steps.assets.sections.intro.action': 'Vérifier le tableau et + Nouvel asset',
+    'tutorial.steps.assets.sections.create.title': 'Créer et classer',
+    'tutorial.steps.assets.sections.create.content': `Lors de la création d\'un actif, tu définis le nom, le type, l\'emplacement et les valeurs CIA.
+
+Avec ces valeurs, le système calcule la criticité pour t\'aider à prioriser.`,
+    'tutorial.steps.assets.sections.create.action': 'Créer un actif et remplir le CIA',
+    'tutorial.steps.assets.sections.filters.title': 'Filtrer et vérifier',
+    'tutorial.steps.assets.sections.filters.content': `Tu peux filtrer par type et par niveau de criticité pour voir rapidement quels actifs demandent plus d\'attention.
+
+Tu peux aussi ouvrir un actif existant pour modifier ses données ou le supprimer.`,
+    'tutorial.steps.assets.sections.filters.action': 'Tester les filtres par type et niveau',
+    'tutorial.steps.assets.sections.scope.title': 'Focus du module',
+    'tutorial.steps.assets.sections.scope.content': `L\'objectif de cette étape est de garder un inventaire clair et exploitable.
+
+Quand les actifs sont bien classés et priorisés, l\'analyse des risques et la mise en œuvre des contrôles vont beaucoup plus vite.`,
+    'tutorial.steps.assets.sections.scope.action': 'L\'utiliser comme inventaire',
+    'tutorial.steps.assets.sections.conclusion.title': 'Étape suivante',
+    'tutorial.steps.assets.sections.conclusion.content': `Une fois l\'inventaire de base prêt, l\'étape suivante consiste à centraliser les documents pour soutenir les preuves et les rapports.`,
+    'tutorial.steps.assets.sections.conclusion.action': 'Cliquer sur Suivant',
+    'tutorial.steps.documents.title': 'Gestion documentaire',
+    'tutorial.steps.documents.description': 'Centralise, organise et versionne toutes les politiques et procédures.',
+    'tutorial.steps.documents.sections.intro.title': 'Ce que fait ce module',
+    'tutorial.steps.documents.sections.intro.content': `Ce module regroupe le travail documentaire en cinq onglets :
+- Voir les documents
+- Modifier le contenu
+- Générer un document avec l\'IA
+- Exporter un rapport
+- Charger un document`,
+    'tutorial.steps.documents.sections.intro.action': 'Identifier les onglets disponibles',
+    'tutorial.steps.documents.sections.upload.title': 'Chargement et consultation',
+    'tutorial.steps.documents.sections.upload.content': `Tu peux charger des fichiers ou du texte, les lister et en ouvrir un pour le consulter ou le modifier.
+
+Tu peux aussi supprimer les documents chargés si nécessaire.`,
+    'tutorial.steps.documents.sections.upload.action': 'Charger puis ouvrir un document',
+    'tutorial.steps.documents.sections.ai-generation.title': 'Génération avec l\'IA',
+    'tutorial.steps.documents.sections.ai-generation.content': `L\'onglet de génération permet de créer des brouillons de documents, puis de les charger dans le dépôt.
+
+Pratique pour démarrer rapidement une politique ou une procédure de base.`,
+    'tutorial.steps.documents.sections.ai-generation.action': 'Générer et relire un brouillon',
+    'tutorial.steps.documents.sections.reports.title': 'Exporter des rapports',
+    'tutorial.steps.documents.sections.reports.content': `Dans l\'onglet rapports, tu peux lancer une génération, voir son état et télécharger le résultat quand il est prêt.
+
+Les formats disponibles dépendent de la configuration/API, mais le flux de génération et de téléchargement est bien en place.`,
+    'tutorial.steps.documents.sections.reports.action': 'Générer un rapport et vérifier l\'état',
+    'tutorial.steps.documents.sections.conclusion.title': 'Fin de cette étape',
+    'tutorial.steps.documents.sections.conclusion.content': `Avec ce flux, tu peux centraliser les documents clés, les faire évoluer et produire des supports pour ton programme de conformité.
+
+L\'étape suivante relie ces contenus à la gestion des risques.`,
+    'tutorial.steps.documents.sections.conclusion.action': 'Cliquer sur Suivant',
+    'tutorial.steps.risks.title': 'Gestion des risques',
+    'tutorial.steps.risks.description': 'Identifie, évalue et atténue les risques de conformité avec une méthode claire.',
+    'tutorial.steps.risks.sections.intro.title': 'Analyse des risques',
+    'tutorial.steps.risks.sections.intro.content': `Le risque est la probabilité qu\'un événement négatif survienne.
+
+La gestion des risques répond à :
+1. Qu\'est-ce qui pourrait mal tourner ?
+2. Quelle est la probabilité ?
+3. Quelle serait la gravité ?
+4. Que faisons-nous ?
+
+C\'est ce que les auditeurs examinent de près.`,
+    'tutorial.steps.risks.sections.intro.action': 'Comprendre l\'analyse des risques',
+    'tutorial.steps.risks.sections.matrix.title': 'Comment nous mesurons le risque',
+    'tutorial.steps.risks.sections.matrix.content': `RISQUE = PROBABILITÉ × IMPACT
+
+         PROBABILITÉ
+         Faible Moyen Élevé
+IMPACT Élevé 3     6     9
+       Moyen 2     4     6
+       Faible1     2     3
+
+Couleurs :
+- Rouge (9) : critique - agir immédiatement
+- Orange (6) : élevé - dans les prochaines semaines
+- Jaune (4) : moyen - dans les prochains mois
+- Vert (2-1) : faible - surveillance
+
+Le système calcule automatiquement.`,
+    'tutorial.steps.risks.sections.matrix.action': 'Observer la matrice',
+    'tutorial.steps.risks.sections.create.title': 'Enregistrer un risque',
+    'tutorial.steps.risks.sections.create.content': `Clique sur '+ Nouveau risque'
+
+Formulaire :
+NOM : 'Perte de données par ransomware'
+DESCRIPTION : 'Une attaque ransomware pourrait chiffrer notre base de données'
+CATEGORIE : Cybersécurité / Opérationnel / Conformité / Réputation
+PROBABILITÉ : Faible/Moyenne/Élevée
+IMPACT : Faible/Moyen/Élevé
+RESPONSABLE : Juan Pérez
+ACTIFS AFFECTÉS : sélectionner
+CONTRÔLES EXISTANTS : 'Nous avons des sauvegardes quotidiennes'
+
+Enregistrer = risque ajouté + score automatique`,
+    'tutorial.steps.risks.sections.create.action': 'Créer un premier risque',
+    'tutorial.steps.risks.sections.evaluate.title': 'Voir ta matrice de risques',
+    'tutorial.steps.risks.sections.evaluate.content': `Le tableau de bord des risques affiche :
+
+MATRICE VISUELLE :
+- Chaque risque est un point
+- Rouge dans le coin = critique
+- Vert dans le coin = maîtrisable
+- Clique sur un point pour plus de détails
+
+LISTE TRIÉE :
+- Par risque (du plus élevé au plus faible)
+- Nom, responsable, statut
+
+MÉTRIQUES :
+- Total des risques : 24
+- Critiques : 3 (action immédiate)
+- Élevés : 7
+- Moyens : 10
+- Faibles : 4`,
+    'tutorial.steps.risks.sections.evaluate.action': 'Examiner la matrice',
+    'tutorial.steps.risks.sections.mitigation.title': 'Créer un plan d\'action',
+    'tutorial.steps.risks.sections.mitigation.content': `Pour chaque risque, choisis :
+
+OPTION 1 : ACCEPTER
+- Le risque est acceptable
+- Le documenter clairement
+
+OPTION 2 : ÉVITER
+- Modifier le processus pour supprimer le risque
+
+OPTION 3 : ATTÉNUER
+- Réduire la probabilité OU l\'impact
+
+OPTION 4 : TRANSFÉRER
+- Couvrir le risque (assurance cyber)
+
+Plan CAPA :
+- Action précise
+- Responsable
+- Date limite
+- Indicateurs de succès`,
+    'tutorial.steps.risks.sections.mitigation.action': 'Créer un plan d\'atténuation',
+    'tutorial.steps.risks.sections.controls.title': 'Mettre en œuvre les contrôles',
+    'tutorial.steps.risks.sections.controls.content': `Contrôles = mesures concrètes
+
+Exemple de risque : perte de données
+Contrôles :
+✓ Contrôle A : sauvegarde automatique quotidienne
+✓ Contrôle B : chiffrement au repos
+✓ Contrôle C : MFA pour l\'accès aux données
+✓ Contrôle D : supervision 24/7
+
+Pour chaque contrôle :
+- Affecter un responsable
+- Fixer une date de mise en œuvre
+- Marquer comme 'En cours' → 'Implémenté' → 'Testé'
+- Joindre des preuves
+
+Le système te notifie à l\'échéance.`,
+    'tutorial.steps.risks.sections.controls.action': 'Attribuer les contrôles',
+    'tutorial.steps.risks.sections.monitoring.title': 'Les risques ne dorment jamais',
+    'tutorial.steps.risks.sections.monitoring.content': `Chaque mois :
+1. Revoir chaque risque
+2. La probabilité a-t-elle changé ?
+3. L\'impact a-t-il changé ?
+4. Les contrôles fonctionnent-ils ?
+5. Mettre à jour le score si nécessaire
+
+Chaque année :
+- Analyse complète des risques
+- Évaluer les nouveaux risques
+- Supprimer les risques résolus
+
+Le système garde l\'historique :
+- Le risque X était 'Élevé' en janvier
+- Il est maintenant 'Moyen' en mars
+- Preuve d\'amélioration = auditeur satisfait`,
+    'tutorial.steps.risks.sections.monitoring.action': 'Surveiller et mettre à jour',
+    'tutorial.steps.risks.sections.conclusion.title': 'Registre des risques complet',
+    'tutorial.steps.risks.sections.conclusion.content': `Tu as maintenant un registre des risques complet !
+
+Le système contient :
+✓ Ce qui manque (écarts)
+✓ Ce que tu protèges (actifs)
+✓ Tes règles (documents)
+✓ Les risques identifiés (risks)
+
+Ensuite : les PREUVES
+Comment prouver que c\'a été fait ? Étape 6 : Evidence`,
+    'tutorial.steps.risks.sections.conclusion.action': 'Cliquer sur Suivant',
+    'tutorial.steps.evidence.title': 'Collecte de preuves',
+    'tutorial.steps.evidence.description': 'Centralise et organise tous les éléments prouvant que tes contrôles fonctionnent.',
+    'tutorial.steps.evidence.sections.intro.title': 'Ce que cette page permet',
+    'tutorial.steps.evidence.sections.intro.content': `Ici tu peux :
+- Charger des preuves
+- Rechercher par texte (nom/contrôle/clause)
+- Filtrer par type
+- Voir l\'état de fraîcheur (fresh, expiring, expired)
+- Supprimer des preuves`,
+    'tutorial.steps.evidence.sections.intro.action': 'Trouver recherche, filtre et chargement',
+    'tutorial.steps.evidence.sections.upload.title': 'Charger des preuves',
+    'tutorial.steps.evidence.sections.upload.content': `Le chargement se fait depuis l\'uploader du système, puis l\'élément apparaît dans son groupe.
+
+Ensuite tu peux vérifier sa validité et ne garder que les preuves à jour.`,
+    'tutorial.steps.evidence.sections.upload.action': 'Charger sa première preuve',
+    'tutorial.steps.evidence.sections.organize.title': 'Focus de cette étape',
+    'tutorial.steps.evidence.sections.organize.content': `Le but est de garder les preuves à jour, retrouvables et prêtes pour examen.
+
+Avec la recherche, les filtres et l\'état de fraîcheur, tu maintiens la qualité des preuves tout au long du cycle.`,
+    'tutorial.steps.evidence.sections.organize.action': 'Charger, filtrer et maintenir',
+    'tutorial.steps.evidence.sections.conclusion.title': 'Étape suivante',
+    'tutorial.steps.evidence.sections.conclusion.content': `Avec des preuves chargées et classées, passe à CAPA/Findings pour gérer les actions correctives et les priorités.`,
+    'tutorial.steps.evidence.sections.conclusion.action': 'Cliquer sur Suivant',
+    'tutorial.steps.findings.title': 'Constats / CAPA Tracker',
+    'tutorial.steps.findings.description': 'Gère les actions correctives, les priorités et les échéances au même endroit.',
+    'tutorial.steps.findings.sections.intro.title': 'Ce que tu trouves vraiment ici',
+    'tutorial.steps.findings.sections.intro.content': `Cette page fonctionne actuellement comme CAPA Tracker.
+
+Tu y vois les actions correctives, leur statut, leur priorité, leur date d\'échéance et leur progression.`,
+    'tutorial.steps.findings.sections.intro.action': 'Vérifier les KPI et le tableau CAPA',
+    'tutorial.steps.findings.sections.create.title': 'Créer une CAPA',
+    'tutorial.steps.findings.sections.create.content': `Tu peux créer une CAPA avec un titre, une priorité, une source, une date d\'échéance, un avancement et un contrôle associé.
+
+Elle apparaîtra ensuite dans le tableau principal pour le suivi.`,
+    'tutorial.steps.findings.sections.create.action': 'Créer une CAPA d\'exemple',
+    'tutorial.steps.findings.sections.filters.title': 'Suivi et filtres',
+    'tutorial.steps.findings.sections.filters.content': `Tu peux filtrer par statut et par priorité, puis ouvrir chaque ligne pour voir le détail (description, contrôle/responsable, source et dates).
+
+Tu vois aussi les KPI des éléments ouverts, en retard et clôturés.`,
+    'tutorial.steps.findings.sections.filters.action': 'Appliquer les filtres et ouvrir une ligne',
+    'tutorial.steps.findings.sections.conclusion.title': 'Fin de cette étape',
+    'tutorial.steps.findings.sections.conclusion.content': `Avec des CAPA bien définies et suivies, tu transformes les écarts en plan d\'action exécutable avec responsables et échéances.
+
+Cela te prépare mieux à l\'audit.`,
+    'tutorial.steps.findings.sections.conclusion.action': 'Cliquer sur Suivant',
+    'tutorial.steps.audit.title': 'Préparation à l\'audit',
+    'tutorial.steps.audit.description': 'Prépare et exécute la vérification externe de conformité avec des partenaires certifiés.',
+    'tutorial.steps.audit.sections.intro.title': 'Ce que fait vraiment ce module',
+    'tutorial.steps.audit.sections.intro.content': `Tu y trouves trois fonctions principales :
+- Validation textuelle des preuves
+- Validation granulaire des fichiers
+- Check-list pré-audit avec sauvegarde automatique`,
+    'tutorial.steps.audit.sections.intro.action': 'Repérer le validateur, la check-list et la salle d\'audit',
+    'tutorial.steps.audit.sections.validation.title': 'Validation du contenu et des fichiers',
+    'tutorial.steps.audit.sections.validation.content': `Tu peux coller une preuve textuelle ou charger un fichier pour que le système analyse les constats et l\'état de conformité.
+
+Le résultat affiche l\'avancement, les niveaux de gravité et les observations.`,
+    'tutorial.steps.audit.sections.validation.action': 'Lancer une validation d\'exemple',
+    'tutorial.steps.audit.sections.readiness.title': 'Check-list et salle d\'audit',
+    'tutorial.steps.audit.sections.readiness.content': `La check-list est sauvegardée automatiquement et t\'aide à suivre les points ouverts avant l\'audit.
+
+Dans la salle d\'audit, tu peux sélectionner des preuves et générer un binder PDF à télécharger.`,
+    'tutorial.steps.audit.sections.readiness.action': 'Remplir la check-list et générer le binder',
+    'tutorial.steps.audit.sections.conclusion.title': 'Fin de cette étape',
+    'tutorial.steps.audit.sections.conclusion.content': `Avec la validation, la check-list et le binder PDF, tu arrives à la revue avec des preuves mieux ordonnées.
+
+L\'étape suivante consiste à maintenir ce niveau avec une auto-évaluation régulière.`,
+    'tutorial.steps.audit.sections.conclusion.action': 'Cliquer sur Suivant',
+    'tutorial.steps.self-assessment.title': 'Auto-évaluation continue',
+    'tutorial.steps.self-assessment.description': 'Réalise des évaluations internes régulières pour rester conforme entre les audits.',
+    'tutorial.steps.self-assessment.sections.intro.title': 'Ce que fait ce module',
+    'tutorial.steps.self-assessment.sections.intro.content': `L\'auto-évaluation actuelle est un questionnaire par phases.
+
+Tu réponds à chaque question et le système sauvegarde ta progression pour que tu puisses reprendre plus tard.`,
+    'tutorial.steps.self-assessment.sections.intro.action': 'Identifier les phases et la progression',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.title': 'Réponses disponibles',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.content': `Les options de réponse sont : Yes, Partial, No et N/A.
+
+Tu peux répondre question par question et avancer de phase via le sélecteur latéral.`,
+    'tutorial.steps.self-assessment.sections.self-assessment-form.action': 'Répondre à au moins une question par phase',
+    'tutorial.steps.self-assessment.sections.evidence-review.title': 'Preuve par question',
+    'tutorial.steps.self-assessment.sections.evidence-review.content': `Chaque question permet d\'ajouter une preuve.
+
+Règle importante : si une question critique est marquée "Yes", tu dois joindre une preuve pour la valider correctement.`,
+    'tutorial.steps.self-assessment.sections.evidence-review.action': 'Joindre une preuve à une question critique',
+    'tutorial.steps.self-assessment.sections.persistence.title': 'Sauvegarde et continuité',
+    'tutorial.steps.self-assessment.sections.persistence.content': `La progression est sauvegardée automatiquement (local + backend) pour que tu ne perdes rien lors d\'un changement de phase ou d\'un rechargement.
+
+Tu vois aussi l\'avancement par phase et la progression globale des réponses.`,
+    'tutorial.steps.self-assessment.sections.persistence.action': 'Changer de phase et vérifier la sauvegarde',
+    'tutorial.steps.self-assessment.sections.conclusion.title': 'Fin de cette étape',
+    'tutorial.steps.self-assessment.sections.conclusion.content': `Avec les réponses, les preuves et la sauvegarde continue par phases, tu peux suivre le niveau de conformité de façon stable entre les revues formelles.
+
+Cette discipline améliore la traçabilité et réduit les surprises lors des cycles d\'audit.`,
+    'tutorial.steps.self-assessment.sections.conclusion.action': 'Célébrer ta réussite',
+    'findings.answeredQuestions': 'Questions répondues',
+    'findings.capaLoadError': 'Impossible de charger les données CAPA. Veuillez réessayer.',
+    'findings.controlOwner': 'Contrôle / Responsable',
+    'findings.create.descriptionPlaceholder': 'Décrivez l\'action corrective requise',
+    'findings.create.fieldControlId': 'Control ID',
+    'findings.create.fieldDescription': 'Description',
+    'findings.create.fieldDueDate': 'Date d\'échéance',
+    'findings.create.fieldPriority': 'Priorité',
+    'findings.create.fieldProgress': 'Avancement',
+    'findings.create.fieldSource': 'Source',
+    'findings.create.fieldTitle': 'Titre',
+    'findings.create.subtitle': 'Enregistrez rapidement une action corrective et gardez les données synchronisées.',
+    'findings.create.title': 'Créer une nouvelle CAPA',
+    'findings.create.titlePlaceholder': 'ex. Vérifier les preuves de contrôle d\'accès',
+    'findings.createAction': 'Créer CAPA',
+    'findings.createError': 'Impossible de créer la CAPA. Veuillez vérifier les champs et réessayer.',
+    'findings.createTitleRequired': 'Le titre est requis pour créer une CAPA.',
+    'findings.createdUpdated': 'Créé / Mis à jour',
+    'findings.creating': 'Création...',
+    'findings.criticalGaps': 'Écarts critiques',
+    'findings.description': 'Description',
+    'findings.emptyCapas': 'Aucune CAPA n\'est encore enregistrée. Créez-en une nouvelle pour commencer.',
+    'findings.emptyFiltered': 'Aucune CAPA ne correspond aux filtres. Ajustez les filtres pour voir les résultats.',
+    'findings.filter.allPriorities': 'Toutes les priorités',
+    'findings.filter.allStatuses': 'Tous les statuts',
+    'findings.filter.priority': 'Filtrer par priorité',
+    'findings.filter.status': 'Filtrer par statut',
+    'findings.gapFindings': 'Résultats de l\'analyse des écarts',
+    'findings.gapsLoadError': 'Impossible de charger les résultats. Veuillez réessayer.',
+    'findings.indicators': 'Indicateurs de constats',
+    'findings.kpi.closed': 'Fermées',
+    'findings.kpi.closedHelp': 'CAPAs terminées',
+    'findings.kpi.open': 'CAPAs ouvertes',
+    'findings.kpi.openHelp': 'Actions actuellement en cours',
+    'findings.kpi.overdue': 'En retard',
+    'findings.kpi.overdueHelp': 'CAPAs en retard en attente de clôture',
+    'findings.kpi.total': 'Total CAPAs',
+    'findings.kpi.totalHelp': 'Comprend toutes les CAPAs enregistrées',
+    'findings.loadingCapas': 'Chargement des CAPAs...',
+    'findings.loadingGaps': 'Chargement des écarts...',
+    'findings.noDescription': 'Aucune description disponible.',
+    'findings.noGaps': 'Aucune lacune trouvée pour le moment.',
+    'findings.noOwner': 'Sans responsable',
+    'findings.onTime': 'Dans les temps',
+    'findings.openCorrectiveActions': 'Actions correctives ouvertes',
+    'findings.openCriticalGaps': 'Écarts critiques ouverts',
+    'findings.optional': 'Optionnel',
+    'findings.overdue': 'En retard',
+    'findings.phaseFallback': 'Phase {index}',
+    'findings.phaseSummary': '{unanswered} écarts sans réponse · {critical} critiques',
+    'findings.priority.critical': 'Critique',
+    'findings.priority.high': 'Haute',
+    'findings.priority.low': 'Faible',
+    'findings.priority.medium': 'Moyenne',
+    'findings.priorityBreakdown': 'Répartition par priorité',
+    'findings.progress': 'Avancement',
+    'findings.progressHelp': 'Avancement de l\'analyse des écarts',
+    'findings.showing': 'Affichage de {shown} sur {total} CAPAs',
+    'findings.source': 'Source',
+    'findings.source.externalAudit': 'Audit externe',
+    'findings.source.incident': 'Incident',
+    'findings.source.internalAudit': 'Audit interne',
+    'findings.source.managementReview': 'Revue de direction',
+    'findings.status.closed': 'Fermée',
+    'findings.status.inProgress': 'En cours',
+    'findings.status.open': 'Ouverte',
+    'findings.status.resolved': 'Résolue',
+    'findings.subtitle': 'Gérez les actions correctives, les priorités et les dates butoir à partir d\'un espace unique.',
+    'findings.table.dueDate': 'Date d\'échéance',
+    'findings.table.overdue': 'En retard',
+    'findings.table.priority': 'Priorité',
+    'findings.table.progress': 'Avancement',
+    'findings.table.status': 'Statut',
+    'findings.title': 'Suivi CAPA',
+    'findings.totalGaps': 'Écarts totaux',
+    'findings.totalGapsHelp': 'Questions de l\'analyse des écarts',
+    'findings.unanswered': 'Sans réponse',
+    'findings.unansweredHelp': 'Comprend des écarts critiques',
+    'findings.unassigned': 'Non attribué',
+    'findings.validationFindings': 'Résultats de validation',
+    'findings.validationFindingsHelp': 'Passez en revue les constats générés par la validation granulaire des documents dans l\'historique récent.',
+
+    // Assessment & Evidence
+    'assessment.responded': 'Répondu',
+    'assessment.loadingQuestions': 'Chargement des questions...',
+    'assessment.noQuestions': 'Aucune question dans cette phase.',
+    'assessment.questionLabel': 'Question',
+    'assessment.viewByPhase': 'Vue par phase : répondez à toutes les questions de cette colonne pour ne pas perdre le contexte.',
+    'assessment.criticalNoEvidenceToast': 'Les questions critiques répondues par Oui requièrent l\'ajout de preuves',
+    'assessment.criticalWarning': '⚠️ Les questions critiques répondues par "OUI" requièrent l\'ajout de documents de preuve.',
+    'assessment.criticalBadge': 'CRITIQUE',
+    'answer.yes': 'Oui',
+    'answer.partial': 'Partiel',
+    'answer.no': 'Non',
+    'answer.na': 'N/A',
+    'evidence.dragDropHint': 'Glissez-déposez des preuves ici, ou',
+    'evidence.quickSelect': 'Sélectionner (rapide)',
+    'evidence.advancedUploader': 'Uploader avancé',
+    'evidence.recentUploads': 'Derniers envois',
+    'evidence.title': 'Centre des preuves',
+    'evidence.subtitle': 'Organisez vos preuves par type et par contrôle ISO 27001.',
+    'evidence.uploadAction': '+ Télécharger une preuve',
+    'evidence.kpi.totalItems': 'Nombre total d\'éléments de preuve',
+    'evidence.kpi.totalItemsHelp': 'Organisé par taxonomie de preuves',
+    'evidence.kpi.filteredItems': 'Éléments filtrés',
+    'evidence.kpi.filteredItemsHelp': 'Filtres de recherche et de type appliqués',
+    'evidence.kpi.types': 'Types de preuves',
+    'evidence.kpi.typesHelp': 'Groupés par taxonomie',
+    'evidence.searchPlaceholder': 'Rechercher preuve, contrôle, clause...',
+    'evidence.allTypes': 'Tous les types de preuves',
+    'evidence.showing': 'Affichage de {matched} sur {total} éléments de preuve',
+    'evidence.loading': 'Chargement des preuves...',
+    'evidence.empty': 'Aucune preuve ne correspond à vos filtres.',
+    'evidence.validityDays': '{days} jours',
+    'evidence.deleting': 'Suppression...',
+    'evidence.delete': 'Supprimer',
+    'evidence.loadError': 'Impossible de charger les preuves. Veuillez réessayer.',
+    'evidence.deleteError': 'Impossible de supprimer la preuve. Veuillez réessayer.',
+    'evidence.confirmDelete': 'Supprimer la preuve "{name}" ? Cette action est irréversible.',
+    'evidence.type.policy': 'Policy',
+    'evidence.type.procedure': 'Procedure',
+    'evidence.type.instruction': 'Instruction',
+    'evidence.type.control': 'Control',
+    'evidence.type.record': 'Record',
+    'evidence.freshness.fresh': 'À jour',
+    'evidence.freshness.expiring': 'Bientôt expiré',
+    'evidence.freshness.expired': 'Expiré',
+    'assessment.save.savedPrefix': 'Enregistré :',
+    'assessment.save.notSaved': 'Pas encore enregistré',
+
+    // Risks
+    'risks.title': 'Gestion des risques',
+    'risks.subtitle': 'Créez des menaces, des vulnérabilités et liez des menaces aux risques existants.',
+    'risks.createThreatTitle': 'Créer une menace',
+    'risks.createThreatDescription': 'Identifiez les menaces liées à votre programme de risques.',
+    'risks.threatNameLabel': 'Nom',
+    'risks.threatNamePlaceholder': 'p. ex. hameçonnage interne',
+    'risks.fieldRequired': 'Ce champ est requis',
+    'risks.threatDescriptionLabel': 'Description',
+    'risks.threatDescriptionPlaceholder': 'Informations supplémentaires sur la menace',
+    'risks.threatCategoryLabel': 'Catégorie',
+    'risks.selectCategory': 'Sélectionnez une catégorie',
+    'risks.category.human': 'Humain',
+    'risks.category.technical': 'Technique',
+    'risks.category.environmental': 'Environnemental',
+    'risks.category.organizational': 'Organisationnel',
+    'risks.threatLikelihoodLabel': 'Probabilité',
+    'risks.threatImpactLabel': 'Impact',
+    'risks.saving': 'Enregistrement...',
+    'risks.createThreatButton': 'Créer une menace',
+    'risks.createVulnerabilityTitle': 'Créer une vulnérabilité',
+    'risks.createVulnerabilityDescription': 'Enregistrez des vulnérabilités liées aux actifs critiques.',
+    'risks.vulnerabilityNameLabel': 'Nom',
+    'risks.vulnerabilityNamePlaceholder': 'p. ex. version obsolète',
+    'risks.vulnerabilityDescriptionLabel': 'Description',
+    'risks.vulnerabilityDescriptionPlaceholder': 'Détails de la vulnérabilité',
+    'risks.vulnerabilityAssetLabel': 'Actif concerné',
+    'risks.selectAsset': 'Sélectionnez un actif',
+    'risks.vulnerabilitySeverityLabel': 'Gravité',
+    'risks.selectSeverity': 'Sélectionnez la gravité',
+    'risks.severity.low': 'Faible',
+    'risks.severity.medium': 'Moyenne',
+    'risks.severity.high': 'Élevée',
+    'risks.severity.critical': 'Critique',
+    'risks.createVulnerabilityButton': 'Créer une vulnérabilité',
+    'risks.linkThreatTitle': 'Lier une menace à un risque',
+    'risks.linkThreatDescription': 'Sélectionnez un risque et une menace existante.',
+    'risks.selectRiskLabel': 'Risque',
+    'risks.selectRiskPlaceholder': 'Sélectionnez un risque',
+    'risks.selectThreatLabel': 'Menace',
+    'risks.selectThreatPlaceholder': 'Sélectionnez une menace',
+    'risks.linking': 'Liason en cours...',
+    'risks.linkThreatButton': 'Lier la menace',
+    'risks.linkSelectionRequired': 'Veuillez sélectionner un risque et une menace à lier',
+    'risks.threatLinkedSuccess': 'Menace liée au risque avec succès',
+    'risks.threatCreatedSuccess': 'Menace créée avec succès',
+    'risks.vulnerabilityCreatedSuccess': 'Vulnérabilité créée avec succès',
+    'risks.addRiskButton': 'Ajouter un risque',
+    'risks.createRiskTitle': 'Créer un risque',
+    'risks.createRiskDescription': 'Enregistrez un nouveau risque dans le registre des risques.',
+    'risks.riskNameLabel': 'Nom',
+    'risks.riskNamePlaceholder': 'p. ex. contrôle d’accès insuffisant',
+    'risks.riskDescriptionLabel': 'Description',
+    'risks.riskDescriptionPlaceholder': 'Contexte supplémentaire facultatif',
+    'risks.riskAssetLabel': 'Actif',
+    'risks.probabilityLabel': 'Probabilité',
+    'risks.impactLabel': 'Impact',
+    'risks.cancelButton': 'Annuler',
+    'risks.creating': 'Création...',
+    'risks.createRiskButton': 'Créer le risque',
+    'risks.riskCreatedSuccess': 'Risque créé avec succès',
+    'risks.recentThreatsTitle': 'Menaces récentes',
+    'risks.loadingThreats': 'Chargement des menaces...',
+    'risks.noThreats': 'Aucune menace enregistrée.',
+    'risks.recentVulnerabilitiesTitle': 'Vulnérabilités récentes',
+    'risks.loadingVulnerabilities': 'Chargement des vulnérabilités...',
+    'risks.noVulnerabilities': 'Aucune vulnérabilité enregistrée.',
 
     // Gap Analysis labels
     totalGaps: 'Total des écarts identifiés',
@@ -1274,6 +5702,171 @@ export const translations = {
     administrator: 'Administrateur',
     chatPlaceholder: 'Tapez un message...',
     send: 'Envoyer',
+    'documents.generate.defaultTitle': 'Nouveau document ISO 27001',
+    'documents.generate.defaultDescription': 'Générez un document ISO 27001 obligatoire avec l\'aide de l\'IA.',
+    'documents.generate.defaultAudience': 'Équipe sécurité',
+    'documents.report.defaultTitle': 'Rapport de conformité',
+    'documents.report.defaultDescription': 'Résumé de l\'état et des écarts de conformité.',
+    'documents.error.loadList': 'Impossible de charger les documents. Veuillez recharger la page.',
+    'documents.error.loadSelected': 'Impossible de charger le document sélectionné.',
+    'documents.report.error.timeout': 'La génération du rapport a pris trop de temps. Veuillez réessayer.',
+    'documents.report.error.status': 'Impossible de récupérer le statut du rapport. Veuillez réessayer.',
+    'documents.confirmDelete': 'Êtes-vous sûr de vouloir supprimer ce document ?',
+    'documents.error.delete': 'Impossible de supprimer le document.',
+    'documents.report.error.selectFirst': 'Veuillez d\'abord sélectionner un document dans la barre latérale.',
+    'documents.report.error.start': 'Impossible de démarrer la génération du rapport.',
+    'documents.upload.error.missingInput': 'Vous devez sélectionner un fichier ou saisir du contenu.',
+    'documents.upload.defaultTitle': 'Document téléversé',
+    'documents.upload.success': 'Document téléversé avec succès.',
+    'documents.upload.defaultDescription': 'Document téléversé',
+    'documents.upload.error.generic': 'Erreur lors du téléversement du document. Veuillez réessayer.',
+    'documents.generate.starting': 'Démarrage de la génération...',
+    'documents.generate.fallbackTitle': 'Document ISO 27001',
+    'documents.generate.completed': 'Génération terminée',
+    'documents.generate.errorStatus': 'Erreur de génération',
+    'documents.generate.errorStart': 'Impossible de démarrer la génération. Vérifiez la configuration.',
+    'documents.generate.defaultUploadedDescription': 'Document généré par IA',
+    'documents.generate.uploadError': 'Erreur lors du téléversement du document généré.',
+    'documents.tab.view': 'Vue',
+    'documents.tab.edit': 'Éditeur',
+    'documents.tab.generate': 'Générer avec IA',
+    'documents.tab.report': 'Exporter le rapport',
+    'documents.tab.upload': 'Téléverser',
+    'documents.hero.subtitle': 'Créez, modifiez et gérez des documents ISO 27001 avec assistance IA dans un flux plus clair et professionnel.',
+    'documents.sidebar.quickAccess': 'Accès rapide à vos documents enregistrés.',
+    'documents.sidebar.searchPlaceholder': 'Rechercher des documents',
+    'documents.deleteDocument': 'Supprimer le document',
+    'documents.viewLess': 'Voir moins',
+    'documents.viewMoreCount': 'Voir plus ({count} de plus)',
+    'documents.action.generateAi': '+ Générer avec IA',
+    'documents.action.exportReport': '+ Exporter le rapport',
+    'documents.action.uploadDocument': '+ Téléverser un document',
+    'documents.noDocumentSelected': 'Aucun document sélectionné',
+    'documents.openAssistant': 'Ouvrir l\'assistant',
+    'documents.loadingDocument': 'Chargement du document...',
+    'documents.selectToView': 'Sélectionnez un document pour voir son contenu.',
+    'documents.untitled': 'Document sans titre',
+    'documents.generate.title': 'Générer un document avec IA',
+    'documents.generate.subtitle': 'L\'agent LLM générera un document ISO 27001 complet section par section.',
+    'documents.field.title': 'Titre',
+    'documents.field.description': 'Description',
+    'documents.field.audience': 'Public cible',
+    'documents.field.language': 'Langue',
+    'documents.field.tone': 'Ton',
+    'documents.field.type': 'Type',
+    'documents.field.sections': 'Sections',
+    'documents.placeholder.title': 'Titre du document',
+    'documents.placeholder.context': 'Contexte du document',
+    'documents.placeholder.audience': 'Équipe cible',
+    'documents.placeholder.sections': 'Séparées par des virgules ou des sauts de ligne',
+    'documents.tone.formal': 'Formel',
+    'documents.tone.informal': 'Informel',
+    'documents.type.policy': 'Politique',
+    'documents.type.report': 'Rapport',
+    'documents.type.procedure': 'Procédure',
+    'documents.type.general': 'Général',
+    'documents.jobId': 'ID Job :',
+    'documents.generate.generating': 'Génération en cours...',
+    'documents.generate.button': 'Générer le document',
+    'documents.openInEditor': 'Ouvrir dans l\'éditeur',
+    'documents.uploadGenerated': 'Téléverser le document généré',
+    'documents.report.title': 'Exporter le rapport',
+    'documents.report.subtitle': 'Générez un rapport téléchargeable basé sur le document actuellement sélectionné.',
+    'documents.report.documentToExport': 'Document à exporter :',
+    'documents.report.noneSelected': 'Aucun document sélectionné dans la barre latérale',
+    'documents.report.fieldTitle': 'Titre du rapport',
+    'documents.report.placeholderDescription': 'Ex. : Résumé exécutif du statut des contrôles ISO pour revue de direction',
+    'documents.report.descriptionHint': 'Ce texte apparaîtra comme sous-titre dans l\'en-tête du rapport généré.',
+    'documents.report.template': 'Modèle',
+    'documents.report.format': 'Format',
+    'documents.report.status': 'Statut du rapport',
+    'documents.report.download': 'Télécharger le rapport',
+    'documents.report.generateAnother': 'Générer un autre',
+    'documents.report.recent': 'Rapports récents',
+    'documents.report.generating': 'Génération du rapport...',
+    'documents.report.startExport': 'Démarrer l\'export',
+    'documents.upload.title': 'Téléverser un document',
+    'documents.upload.subtitle': 'Téléversez un fichier ou collez directement le contenu.',
+    'documents.upload.placeholderSummary': 'Résumé court',
+    'documents.upload.file': 'Fichier',
+    'documents.upload.altContent': 'Contenu alternatif',
+    'documents.upload.altPlaceholder': 'Collez le contenu ici si vous ne téléversez pas de fichier',
+    'documents.upload.uploading': 'Téléversement...',
+    'documents.upload.button': 'Téléverser le document',
+    'language.es': 'Espagnol',
+    'language.en': 'Anglais',
+    'common.optional': 'optionnel',
+    'documents.title': 'Générateur de documents',
+    'documents.viewLabel': 'Vue du document',
+    'documentEditor.titlePlaceholder': 'Titre du document',
+    'documentEditor.stats': '{words} mots · {chars} caractères',
+    'documentEditor.saved': '✓ Enregistré',
+    'documentEditor.unsaved': '○ Non enregistré',
+    'documentEditor.copyAsText': 'Copier en texte',
+    'documentEditor.copied': '✓ Copié',
+    'documentEditor.copy': 'Copier',
+    'documentEditor.upload': 'Téléverser',
+    'documentEditor.save': 'Enregistrer',
+    'documentEditor.exitFullscreen': 'Quitter le plein écran',
+    'documentEditor.fullscreen': 'Plein écran',
+    'documentEditor.placeholder': 'Commencez à écrire ou générez un document avec l\'IA...',
+    'documentEditor.footerBrand': 'ISO 27001 · DANI Platform',
+    'documentEditor.mobileWords': '{count} mots',
+    'documentEditor.toolbar.heading1': 'Titre 1',
+    'documentEditor.toolbar.heading2': 'Titre 2',
+    'documentEditor.toolbar.heading3': 'Titre 3',
+    'documentEditor.toolbar.bold': 'Gras',
+    'documentEditor.toolbar.italic': 'Italique',
+    'documentEditor.toolbar.underline': 'Souligné',
+    'documentEditor.toolbar.bulletList': 'Liste non ordonnée',
+    'documentEditor.toolbar.orderedList': 'Liste ordonnée',
+    'documentEditor.toolbar.blockquote': 'Citation',
+    'assessment.progressTitle': 'Progression',
+    'assessment.phaseLabel': 'Phase {order}',
+    'evidence.attachmentDeleted': 'Fichier supprimé',
+    'evidence.replace': 'Remplacer',
+    'evidence.deleteFile': 'Supprimer le fichier',
+    'evidence.viewLess': 'Voir moins',
+    'evidence.viewMoreCount': 'Voir {count} de plus',
+    'auditRoom.title': 'Salle d\'audit',
+    'auditRoom.evidencesLabel': 'Preuves',
+    'navbar.openCommandPalette': 'Ouvrir la palette de commandes',
+    'navbar.cmdShortcut': 'Ctrl + K / ⌘K',
+    'integrations.oauth.title': 'OAuth',
+    'integrations.oauth.processing': 'Traitement en cours...',
+    'integrations.oauth.invalidParams': 'Paramètres invalides',
+    'integrations.oauth.completed': 'Connexion terminée',
+    'integrations.oauth.timeout': 'Délai dépassé. Vérifiez la connexion dans Intégrations.',
+    'upload.field.controlId': 'control_id',
+    'upload.field.clauseRef': 'clause_ref',
+    'upload.placeholder.controlId': 'ISO 27001 A.5.1',
+    'upload.placeholder.clauseRef': 'A.5.1',
+    'upload.dialogTitle': 'Téléverser une preuve',
+    'upload.api.primary': 'POST /api/v1/evidences',
+    'upload.api.secondary': 'POST /api/validate/external',
+    'understand.gapAnalysis': 'Analyse des écarts',
+    'understand.loading': 'Chargement...',
+    'understand.empty': 'Aucun écart à afficher.',
+    'understand.actionHint': 'Cliquez sur "Créer une documentation" pour lancer un parcours guidé où l’IA génère le document recommandé afin de combler ces écarts.',
+    'understand.createDocumentation': 'Créer une documentation',
+    'understand.modifyDocumentation': 'Modifier la documentation',
+    'understand.criticalIntro': 'Ce qu’il vous manque encore dans les écarts critiques :',
+    'understand.missing': 'Manquant :',
+    'understand.suggestedEvidence': 'Preuve suggérée :',
+    'understand.annexALabel': 'Contrôles de l\'annexe A ISO 27001',
+    'understand.auditFinding': 'Constat d\'audit',
+    'understand.clauseLabel': 'Clause {value}',
+    'understand.controlLabel': 'Contrôle {value}',
+    'understand.frameworkSummary': 'Résumé de l\'état du framework',
+    'understand.phaseFallback': 'Phase {index}',
+    'understand.phaseGapsSummary': '{unanswered} écarts non résolus — {critical} critiques',
+    'understand.toast.navigationError': 'Erreur de navigation',
+    'understand.toast.noOpenGaps': 'Il n\'y a pas d\'écarts non résolus dans cette phase, mais vous pouvez toujours créer une documentation.',
+    'understand.linkedEvidence': 'Preuve liée détectée',
+    'understand.reason.no': 'Répondu NON',
+    'understand.reason.partial': 'Répondu PARTIELLEMENT',
+    'understand.reason.unanswered': 'Sans réponse',
+    'app.placeholder.comingSoon': 'Cette page sera bientôt disponible...',
 
     // Header
     'header.searchPlaceholder': 'Rechercher des contrôles ou des preuves...',
@@ -1304,6 +5897,7 @@ export const translations = {
     'menu.audit': 'Audit',
     'menu.integrity': 'Intégrité',
     'menu.regfeed': 'Flux Réglementaire',
+    'menu.portal': 'Portail',
     'menu.gapAnalysis': 'Analyse des Écarts',
     'menu.documentGenerator': 'Générateur de Documents',
     'menu.riskMap': 'Carte des Risques',
@@ -1317,6 +5911,62 @@ export const translations = {
     'menu.integrations': 'Intégrations',
     'menu.settings': 'Paramètres',
     'menu.assets': 'Inventaire des Actifs',
+    'assets.confirmDelete': 'Supprimer cet actif ?',
+    'assets.subtitle': 'Classification C-I-A ISO 27001',
+    'assets.newAsset': '+ Nouvel actif',
+    'assets.assetsLabel': 'actifs',
+    'assets.filterByType': 'Filtrer par type :',
+    'assets.allTypes': 'Tous les types',
+    'assets.noneFound': 'Aucun actif trouvé',
+    'assets.addFirst': 'Ajoutez votre premier actif',
+    'assets.table.asset': 'Actif',
+    'assets.table.type': 'Type',
+    'assets.table.score': 'Score',
+    'assets.table.level': 'Niveau',
+    'assets.table.status': 'Statut',
+    'assets.countSummary': '{filtered} sur {total} actifs',
+    'assets.editAsset': 'Modifier l’actif',
+    'assets.newAssetTitle': 'Nouvel actif',
+    'assets.editSubtitle': 'Mettre à jour la classification et les métadonnées',
+    'assets.newSubtitle': 'Enregistrer un nouvel actif d’information',
+    'assets.field.name': 'Nom *',
+    'assets.field.description': 'Description',
+    'assets.field.type': 'Type d’actif *',
+    'assets.field.location': 'Emplacement',
+    'assets.field.cia': 'Classification C-I-A',
+    'assets.field.isoClause': 'Référence de clause ISO',
+    'assets.placeholder.name': 'ex. Serveur de base de données de production',
+    'assets.placeholder.description': 'Brève description de cet actif...',
+    'assets.placeholder.location': 'ex. AWS us-east-1',
+    'assets.placeholder.isoClause': 'ex. A.8.1.1',
+    'assets.selectType': 'Sélectionner un type...',
+    'assets.ciaScale': '1 = Faible · 2 = Moyen · 3 = Élevé',
+    'assets.cia.low': '1 — Faible',
+    'assets.cia.medium': '2 — Moyen',
+    'assets.cia.high': '3 — Élevé',
+    'common.edit': 'Modifier',
+    'common.saving': 'Enregistrement...',
+    'assets.cia.confidentiality': 'Confidentialité',
+    'assets.cia.integrity': 'Intégrité',
+    'assets.cia.availability': 'Disponibilité',
+    'assets.validation.nameRequired': 'Le nom est requis',
+    'assets.validation.typeRequired': 'Le type est requis',
+    'assets.ciaScoreHint': 'Score = C×0,4 + I×0,35 + A×0,25 — calculé automatiquement',
+    'assets.type.hardware': 'Matériel',
+    'assets.type.software': 'Logiciel',
+    'assets.type.data': 'Données',
+    'assets.type.service': 'Service',
+    'assets.type.people': 'Personnes',
+    'assets.type.facility': 'Installation',
+    'assets.level.low': 'Faible',
+    'assets.level.medium': 'Moyen',
+    'assets.level.high': 'Élevé',
+    'assets.level.critical': 'Critique',
+    'assets.status.active': 'Actif',
+    'assets.status.inactive': 'Inactif',
+    'assets.status.disposed': 'Éliminé',
+    'assets.saveChanges': 'Enregistrer les modifications',
+    'assets.createAsset': 'Créer un actif',
 
     profile: 'Profil',
     exportReport: 'Exporter le Rapport',
@@ -1335,12 +5985,79 @@ export const translations = {
     docsPending: 'docs en attente de révision',
     controlsUnverified: 'contrôles non vérifiés',
     controlsUntested: 'contrôles non testés',
+    'common.clear': 'Effacer',
+    'common.close': 'Fermer',
+    'common.refresh': 'Actualiser',
+    'common.refreshing': 'Actualisation...',
+    'validation.table.status': 'Statut',
+    'validation.summary': 'Résumé',
+    'portal.mandatory': 'Obligatoire',
+    'portal.optional': 'Facultatif',
+    'portal.acknowledged': 'Reconnue',
+    'portal.pending': 'En attente',
+    'portal.viewPolicy': 'Voir la politique',
+    'portal.versionLine': 'Version {version} · {kind} · Publiée le {date}',
+    'portal.officialSummary': 'Résumé officiel',
+    'portal.noSummary': 'Aucun résumé disponible.',
+    'portal.notAvailable': 'N/A',
+    'portal.versionPrefix': 'v',
+    'portal.fullText': 'Texte intégral',
+    'portal.readCarefully': 'À lire attentivement',
+    'portal.ackCheckboxText': 'J’ai lu cette politique et j’accepte la version actuelle du document.',
+    'portal.ackCheckboxHelp': 'Cet accusé de réception sera enregistré pour votre organisation.',
+    'portal.ackSuccess': 'Politique reconnue avec succès.',
+    'portal.pageTitle': 'Reconnaissances des politiques',
+    'portal.pageSubtitle': 'Consultez les politiques publiées par votre organisation et confirmez celles que vous avez lues.',
+    'portal.publishedPolicies': 'Politiques publiées',
+    'portal.statusAutoUpdate': 'Se met à jour automatiquement au fur et à mesure que les politiques sont reconnues.',
+    'portal.loadingPolicies': 'Chargement des politiques...',
+    'auditRoom.binderQueued': 'Classeur mis en file d’attente',
+    'auditRoom.error.statusBinder': 'Erreur lors de la récupération du statut du classeur.',
+    'auditRoom.error.downloadBinder': 'Impossible de télécharger le classeur. Veuillez réessayer.',
+    'auditRoom.generatingBinder': 'Génération du classeur...',
+    'auditRoom.binderStatus': 'Statut du classeur',
+    'auditRoom.progressLabel': 'Progression :',
+    'auditRoom.downloading': 'Téléchargement...',
+    'auditRoom.downloadPdf': 'Télécharger le PDF du classeur',
+    'auditRoom.error.loadFolders': 'Impossible de charger les dossiers d’Audit Room.',
+    'auditRoom.error.loadEvidences': 'Impossible de charger les preuves du dossier.',
+    'auditRoom.error.selectEvidence': 'Sélectionnez au moins une preuve pour générer le classeur.',
+    'auditRoom.error.startBinder': 'Impossible de démarrer la génération du classeur.',
+    'auditRoom.binderTitle': 'Classeur Audit Room',
+    'auditRoom.binderDescriptionFolder': 'Généré à partir du dossier {folder}',
+    'auditRoom.binderDescription': 'Classeur généré à partir d’Audit Room',
+    'auditRoom.subtitle': 'Explorez les dossiers de l’Annexe A et générez des classeurs à partir de preuves sélectionnées.',
+    'auditRoom.selectedCount': '{count} preuve(s) sélectionnée(s)',
+    'auditRoom.folders': 'Dossiers',
+    'auditRoom.loadingFolders': 'Chargement des dossiers...',
+    'auditRoom.folderEvidenceCount': '{count} preuves',
+    'auditRoom.statusLabel': 'Statut :',
+    'auditRoom.notStarted': 'Pas encore commencé',
+    'auditRoom.generatedWhenFinished': 'Il sera généré une fois le processus terminé.',
+    'auditRoom.selectFolderHint': 'Sélectionnez un dossier pour voir les éléments.',
+    'auditRoom.noFolderSelected': 'Aucun dossier sélectionné',
+    'auditRoom.loadingEvidences': 'Chargement des preuves...',
+    'auditRoom.noEvidencesInFolder': 'Aucune preuve disponible dans ce dossier.',
+    'auditRoom.selectFolderToView': 'Sélectionnez un dossier pour voir les preuves.',
+    'auditRoom.generateBinder': 'Générer le classeur',
+    'auditRoom.createBinderHint': 'Sélectionnez des éléments pour créer un PDF de classeur à partir d’Audit Room.',
     'dashboard.overview': 'Aperçu de la santé de conformité et des progrès',
+    'dashboard.overviewLabel': 'Tableau de bord',
     'dashboard.kpiLoadError': 'Impossible de charger les KPI',
     'dashboard.loadingKpis': 'Chargement des KPI...',
+    'dashboard.loading': 'Chargement...',
+    'dashboard.noRecentActivity': 'Aucune activité récente disponible',
+    'dashboard.noUpcomingTasks': 'Aucune tâche à venir trouvée',
+    'dashboard.nextAuditTitle': 'Prochain audit',
+    'dashboard.daysLeft': 'jours restants',
+    'dashboard.targetDate': 'Date cible',
     'dashboard.healthScoreTrend': 'Tendance du score de santé',
     'dashboard.recentActivity': 'Activité récente',
     'dashboard.upcomingTasks': 'Tâches à venir',
+    'dashboard.lastAudit': 'Dernier audit',
+    'dashboard.today': 'À partir d’aujourd’hui',
+    'dashboard.cycleLabel': 'Cycle',
+    'dashboard.statusLabel': 'Statut',
     'kpi.noData': 'Aucune donnée disponible',
     'kpi.compliance': 'Conformité',
     'healthScore.subtitle': 'Préparation à la conformité calculée par le backend',
@@ -1368,10 +6085,43 @@ export const translations = {
     'dashboard.priority.high': 'ÉLEVÉ',
     'dashboard.priority.medium': 'MOYEN',
     'dashboard.priority.low': 'FAIBLE',
+    'searchBinder.error.enterTerm': 'Saisissez un terme à rechercher.',
+    'searchBinder.log.search': 'Recherche : "{term}" ({count} résultats)',
+    'searchBinder.log.searchError': 'Erreur de recherche : "{term}"',
+    'searchBinder.deselected': 'Désélectionné',
+    'searchBinder.selected': 'Sélectionné',
+    'searchBinder.log.removed': 'Supprimé du classeur : {id}',
+    'searchBinder.log.cleared': 'Classeur effacé',
+    'searchBinder.selectedItemsCount': '{count} élément(s) sélectionné(s)',
+    'searchBinder.error.selectOne': 'Sélectionnez au moins un élément pour générer un classeur.',
+    'searchBinder.binderTitle': 'Classeur d’audit',
+    'searchBinder.binderDescription': 'Classeur généré à partir du tableau de bord',
+    'searchBinder.error.generateBinder': 'Impossible de générer le classeur. Veuillez réessayer.',
+    'searchBinder.error.search': 'La recherche a échoué. Veuillez réessayer.',
+    'searchBinder.binderDetail': 'Détail du classeur',
+    'searchBinder.searchPlaceholder': 'Recherchez en langage naturel : par exemple, politiques d’accès, preuves d’audit',
+    'searchBinder.search': 'Rechercher',
+    'searchBinder.relevantResults': 'Résultats pertinents',
+    'searchBinder.quickView': 'Vue rapide de l’Annexe A',
+    'searchBinder.resultsCount': '{count} résultats',
+    'searchBinder.loadingResults': 'Chargement des résultats...',
+    'searchBinder.emptyHint': 'Lancez une recherche pour voir des fragments de l’Annexe A.',
+    'searchBinder.addedToBinder': 'Ajouté au classeur',
+    'searchBinder.addToBinder': 'Ajouter au classeur',
+    'searchBinder.relevance': 'Pertinence {score}%',
+    'searchBinder.inlinePreview': 'Aperçu intégré',
+    'searchBinder.binder': 'Classeur',
+    'searchBinder.multiSelection': 'Sélection multiple',
+    'searchBinder.noneSelected': 'Aucun élément sélectionné. Ajoutez des éléments depuis la liste.',
+    'searchBinder.generateBinderPdf': 'Générer le PDF du classeur',
+    'searchBinder.waitingGeneration': 'En attente de la génération du classeur...',
+    'searchBinder.actionLog': 'Journal d’actions',
+    'searchBinder.emptyLog': 'Vos 50 dernières actions apparaîtront ici.',
     'audit.title': 'Audit de Conformité',
     'audit.subtitle': 'Validez vos preuves selon les normes ISO 27001',
     'audit.fileValidatorTitle': 'Valider un fichier avec l’agent',
     'audit.dropHint': 'Cliquez ou faites glisser un fichier',
+    'audit.dropNow': 'Déposez votre fichier ici',
     'audit.dropSubHint': 'PDF, Word, Excel, texte, images (max 10 Mo)',
     'audit.processing': 'Validation granulaire en cours...',
     'audit.jobId': 'ID de tâche',
@@ -1439,50 +6189,1170 @@ export const translations = {
     'audit.jobQueued': 'Tâche en file d’attente',
     'audit.validationError': 'Erreur de validation',
     'audit.validationUnknownError': 'Erreur de validation inconnue',
+    'audit.statusCompliant': 'Conforme',
+    'audit.statusNonCompliant': 'Non conforme',
+    'audit.statusNeedsReview': 'Nécessite révision',
+    'audit.findingsLabel': 'Constatations',
+    'audit.detectedFindings': 'Constatations détectées',
+    'audit.severity': 'Sévérité',
+    'audit.recommendation': 'Recommandation',
+    'audit.impact': 'Impact',
+    'audit.agentNotes': 'Notes de l’agent',
+    'audit.noChanges': 'Aucune modification',
+    'preAuditCard.title': 'Auto-évaluation pré-audit',
+    'preAuditCard.readinessLabel': 'Niveau de préparation estimé',
+    'preAuditCard.readinessSubtitle': '3 zones de non-conformité à haut risque détectées',
+    'preAuditCard.findingsTitle': 'Constatations d’audit probables',
+    'preAuditCard.finding.accessManagement': 'Gestion des accès — preuve expirée',
+    'preAuditCard.finding.businessContinuity': 'Continuité d’activité — aucun test de reprise en 2025',
+    'preAuditCard.finding.incidentManagement': 'Gestion des incidents — CAPA ouverte depuis 45+ jours',
+    'preAuditCard.finding.cryptographyPolicy': 'Politique de cryptographie — brouillon pas encore approuvé',
     'settings.title': 'Paramètres',
-    'settings.subtitle': 'Ajustez la langue, l’apparence, les notifications et l’automatisation.',
-    'settings.organizationProfile': 'Profil de l’organisation',
+    'settings.subtitle': 'Ajustez la langue, l\'apparence, les notifications et l\'automatisation pour votre espace de travail.',
+    'settings.organizationProfile': 'Profil de l\'organisation',
     'settings.currentProfile': 'Profil actuel',
     'settings.profile.foundational': 'Fondamental',
     'settings.profile.established': 'Établi',
     'settings.profile.advanced': 'Avancé',
     'settings.profile.mature': 'Mûr',
-    'settings.profileDesc.foundational': 'Mode guidé avec plus d’aide et d’explications',
+    'settings.profileDesc.foundational': 'Mode guidé avec plus d\'aide et d\'explications',
     'settings.profileDesc.established': 'Mode équilibré avec navigation par processus et modules',
-    'settings.profileDesc.advanced': 'Mode centré sur les modules avec moins de guidance',
-    'settings.profileDesc.mature': 'Mode très autonome pour équipes avancées',
-    'settings.languageRegion': 'Langue & Région',
-    'settings.interfaceLanguage': "Langue de l’interface",
-    'settings.controlsUI': 'Contrôle la langue de toute la plateforme',
+    'settings.profileDesc.advanced': 'Mode centré sur les modules avec moins d\'assistance',
+    'settings.profileDesc.mature': 'Mode autonome pour les équipes avancées',
+    'settings.languageRegion': 'Langue et région',
+    'settings.interfaceLanguage': 'Langue de l\'interface',
+    'settings.controlsUI': 'Contrôle la langue utilisée sur toute la plateforme',
     'settings.dateFormat': 'Format de date',
-    'settings.dateFormatHelp': 'Comment les dates sont affichées dans l’interface',
+    'settings.dateFormatHelp': 'Comment les dates sont affichées dans l\'interface',
     'settings.timezone': 'Fuseau horaire',
     'settings.timezoneHelp': 'Utilisé pour les rappels et les horodatages',
     'settings.appearance': 'Apparence',
     'settings.darkMode': 'Mode sombre',
     'settings.darkModeHelp': 'Basculer entre le thème clair et sombre',
-    'settings.compactView': 'Vue compacte',
-    'settings.compactViewHelp': 'Réduire l’espace dans les tableaux et cartes',
+    'settings.compactView': 'Affichage compact',
+    'settings.compactViewHelp': 'Réduire les espacements dans les tableaux et les cartes',
     'settings.sidebarLabels': 'Afficher les libellés de la barre latérale',
-    'settings.sidebarLabelsHelp': 'Afficher le texte dans la navigation',
+    'settings.sidebarLabelsHelp': 'Afficher les étiquettes textuelles dans la navigation',
     'settings.notifications': 'Notifications',
     'settings.emailNotifications': 'Notifications par e-mail',
-    'settings.emailNotificationsHelp': 'Recevoir les alertes de conformité par e-mail',
+    'settings.emailNotificationsHelp': 'Recevoir des alertes de conformité par e-mail',
     'settings.capaReminders': 'Rappels CAPA',
-    'settings.capaRemindersHelp': 'Rappeler les actions correctives en retard',
+    'settings.capaRemindersHelp': 'Rappeler à l\'équipe les actions correctives en retard',
     'settings.regulatoryUpdates': 'Mises à jour réglementaires',
-    'settings.regulatoryUpdatesHelp': 'Avertir des nouveaux changements réglementaires',
-    'settings.auditDeadlines': 'Délais d’audit',
-    'settings.auditDeadlinesHelp': 'Notifier avant les dates clés d’audit',
-    'settings.automationScheduling': 'Automatisation & Planification',
-    'settings.autoSave': 'Sauvegarde automatique',
-    'settings.autoSaveHelp': 'Enregistrer automatiquement quand c’est possible',
-    'settings.autoRunAnalysis': 'Analyse automatique',
-    'settings.autoRunAnalysisHelp': 'Planifier des analyses d’écart périodiques',
+    'settings.regulatoryUpdatesHelp': 'Alerter en cas de nouveaux changements réglementaires',
+    'settings.auditDeadlines': 'Dates limites d\'audit',
+    'settings.auditDeadlinesHelp': 'Notifier avant les dates d\'audit clés',
+    'settings.auditCycleHelp': 'Définissez la fréquence des audits programmés pour votre organisation.',
+    'settings.automationScheduling': 'Automatisation et planification',
+    'settings.autoSave': 'Enregistrement automatique',
+    'settings.autoSaveHelp': 'Enregistrer les modifications automatiquement lorsque possible',
+    'settings.autoRunAnalysis': 'Exécution automatique de l\'analyse',
+    'settings.autoRunAnalysisHelp': 'Planifier des exécutions périodiques d\'analyse des écarts',
     'settings.scheduleFrequency': 'Fréquence de planification',
-    'settings.scheduleFrequencyHelp': 'Choisissez la fréquence des vérifications automatiques',
+    'settings.scheduleFrequencyHelp': 'Choisissez la fréquence d\'exécution des vérifications automatisées',
     'settings.userManagement': 'Gestion des utilisateurs',
     'settings.activeUser': 'Utilisateur actif',
-    'settings.inviteTeamMember': 'Inviter un membre de l’équipe',
-  },
+    'settings.inviteTeamMember': 'Inviter un membre de l\'équipe',
+
+    'settings.tab.security': 'Sécurité',
+    'settings.tab.preferences': 'Préférences',
+    'settings.tab.appearance': 'Apparence',
+    'settings.tab.auditCycle': 'Cycle d\'audit',
+    'settings.themeToggleHelp': 'Basculer le thème de l\'application.',
+    'settings.theme.dark': 'Sombre',
+    'settings.theme.light': 'Clair',
+    'settings.switch.on': 'Activé',
+    'settings.switch.off': 'Désactivé',
+
+    'settings.2fa.title': 'Authentification à deux facteurs',
+    'settings.2fa.enabledHelp': 'Votre compte est protégé par TOTP et des codes de secours.',
+    'settings.2fa.disabledHelp': 'Protégez votre compte avec Google Authenticator, Authy ou 1Password.',
+    'settings.2fa.enabled': 'Activé',
+    'settings.2fa.disabled': 'Désactivé',
+    'settings.2fa.setupHelp': 'Configurez la 2FA pour générer un QR code scannable et recevoir des codes de secours à usage unique.',
+    'settings.2fa.enableAction': 'Activer la 2FA',
+    'settings.2fa.disableTitle': 'Désactiver la 2FA',
+    'settings.2fa.disableHelp': 'Veuillez saisir votre mot de passe pour désactiver la 2FA. Cela révoquera le secret actuel et tous les codes de secours.',
+    'settings.2fa.backupCodes': 'Codes de secours',
+    'settings.2fa.confirmPassword': 'Confirmez votre mot de passe',
+    'settings.2fa.disabling': 'Désactivation...',
+    'settings.2fa.disableAction': 'Désactiver la 2FA',
+    'settings.2fa.disabledSuccess': 'L\'authentification à deux facteurs a été désactivée et tous les codes de secours ont été révoqués.',
+    'settings.2fa.passwordValidation': 'Veuillez saisir votre mot de passe pour désactiver la 2FA.',
+
+    'settings.auditCycle.title': 'Cycle d\'audit',
+    'settings.auditCycle.currentFrequency': 'Fréquence actuelle',
+    'settings.auditCycle.nextAudit': 'Prochain audit',
+    'settings.auditCycle.notScheduled': 'Non programmé',
+    'settings.auditCycle.scheduled': 'Programmé',
+    'settings.auditCycle.noDate': 'Aucune date',
+    'settings.auditCycle.emptyCalendar': 'Planifiez un audit pour afficher sa date dans le calendrier.',
+    'settings.auditCycle.markCompleted': 'Marquer l\'audit comme complété',
+    'settings.auditCycle.history': 'Historique',
+    'settings.auditCycle.historyEmpty': 'Aucun audit complété n\'a encore été enregistré.',
+    'settings.auditCycle.monthly': 'Mensuel',
+    'settings.auditCycle.quarterly': 'Trimestriel',
+    'settings.auditCycle.annual': 'Annuel',
+    'settings.auditCycle.toastUpdated': 'Fréquence mise à jour',
+    'settings.auditCycle.toastPermissionDenied': 'Permissions insuffisantes pour mettre à jour la fréquence',
+    'settings.auditCycle.toastUpdateError': 'Erreur lors de la mise à jour de la fréquence',
+    'settings.auditCycle.toastCompleted': 'Audit marqué comme complété',
+    'settings.auditCycle.toastCompleteError': 'Erreur lors du marquage de l\'audit comme complété',
+
+    'settings.password.title': 'Mot de passe',
+    'settings.password.subtitle': 'Mettez à jour votre mot de passe et révoquez les sessions de rafraîchissement actives.',
+    'settings.password.current': 'Mot de passe actuel',
+    'settings.password.new': 'Nouveau mot de passe',
+    'settings.password.confirm': 'Confirmez le nouveau mot de passe',
+    'settings.password.hint': 'Utilisez des mots de passe robustes avec des majuscules, des chiffres et des symboles.',
+    'settings.password.saving': 'Enregistrement...',
+    'settings.password.updateAction': 'Mettre à jour le mot de passe',
+    'settings.password.updated': 'Votre mot de passe a été mis à jour avec succès.',
+    },
+it: {
+    dashboard: 'Cruscotto',
+    understand: 'Comprendi la Mia Situazione',
+    documents: 'Controlli dei Documenti',
+    risks: 'Gestisci i Rischi',
+    evidence: 'Raccogli Evidenze',
+    findings: 'Gestisci i Risultati',
+    audit: 'Prepara l\'Audit',
+    integrity: 'Integrità della Conformità',
+    regfeed: 'Feed Normativo',
+    settings: 'Impostazioni',
+    'menu.dashboard': 'Cruscotto',
+    'menu.understand': 'Comprendere',
+    'menu.documents': 'Documenti',
+    'menu.risks': 'Rischi',
+    'menu.evidence': 'Evidenze',
+    'menu.findings': 'Risultati',
+    'menu.audit': 'Audit',
+    'menu.integrity': 'Integrità',
+    'menu.regfeed': 'Feed Normativo',
+    'menu.portal': 'Portale',
+    'menu.gapAnalysis': 'Analisi delle Lacune',
+    'menu.documentGenerator': 'Generatore di Documenti',
+    'menu.riskMap': 'Mappa del Rischio',
+    'menu.evidenceCenter': 'Centro delle Evidenze',
+    'menu.capaTracker': 'Tracciatore CAPA',
+    'menu.auditRoom': 'Sala Audit',
+    'menu.preAuditAssessment': 'Autovalutazione Pre-Audit',
+    'menu.dora': 'DORA',
+    'menu.euai': 'Legge UE sull\'IA',
+    'menu.escalation': 'Regole di Escalation',
+    'menu.integrations': 'Integrazioni',
+    'menu.settings': 'Impostazioni',
+    'menu.assets': 'Inventario dei beni',
+    'assets.confirmDelete': 'Eliminare questo asset?',
+    'assets.subtitle': 'Classificazione C-I-A ISO 27001',
+    'assets.newAsset': '+ Nuovo asset',
+    'assets.assetsLabel': 'asset',
+    'assets.filterByType': 'Filtra per tipo:',
+    'assets.allTypes': 'Tutti i tipi',
+    'assets.noneFound': 'Nessun asset trovato',
+    'assets.addFirst': 'Aggiungi il tuo primo asset',
+    'assets.table.asset': 'Asset',
+    'assets.table.type': 'Tipo',
+    'assets.table.score': 'Score',
+    'assets.table.level': 'Livello',
+    'assets.table.status': 'Stato',
+    'assets.countSummary': '{filtered} di {total} asset',
+    'assets.editAsset': 'Modifica asset',
+    'assets.newAssetTitle': 'Nuovo asset',
+    'assets.editSubtitle': 'Aggiorna classificazione e metadati',
+    'assets.newSubtitle': 'Registra un nuovo asset informativo',
+    'assets.field.name': 'Nome *',
+    'assets.field.description': 'Descrizione',
+    'assets.field.type': 'Tipo di asset *',
+    'assets.field.location': 'Posizione',
+    'assets.field.cia': 'Classificazione C-I-A',
+    'assets.field.isoClause': 'Riferimento clausola ISO',
+    'assets.placeholder.name': 'es. Server database di produzione',
+    'assets.placeholder.description': 'Breve descrizione di questo asset...',
+    'assets.placeholder.location': 'es. AWS us-east-1',
+    'assets.placeholder.isoClause': 'es. A.8.1.1',
+    'assets.selectType': 'Seleziona tipo...',
+    'assets.ciaScale': '1 = Basso · 2 = Medio · 3 = Alto',
+    'assets.cia.low': '1 — Basso',
+    'assets.cia.medium': '2 — Medio',
+    'assets.cia.high': '3 — Alto',
+    'assets.cia.confidentiality': 'Confidenzialità',
+
+    // Add common.edit / common.saving for missing locales (correct Italian)
+    'common.edit': 'Modifica',
+    'common.saving': 'Salvataggio...',
+    'assets.cia.integrity': 'Integrità',
+    'assets.cia.availability': 'Disponibilità',
+    'assets.validation.nameRequired': 'Il nome è obbligatorio',
+    'assets.validation.typeRequired': 'Il tipo è obbligatorio',
+    'assets.ciaScoreHint': 'Score = C×0,4 + I×0,35 + A×0,25 — calcolato automaticamente',
+    'assets.type.hardware': 'Hardware',
+    'assets.type.software': 'Software',
+    'assets.type.data': 'Dati',
+    'assets.type.service': 'Servizio',
+    'assets.type.people': 'Persone',
+    'assets.type.facility': 'Struttura',
+    'assets.level.low': 'Basso',
+    'assets.level.medium': 'Medio',
+    'assets.level.high': 'Alto',
+    'assets.level.critical': 'Critico',
+    'assets.status.active': 'Attivo',
+    'assets.status.inactive': 'Inattivo',
+    'assets.status.disposed': 'Dismesso',
+    'assets.saveChanges': 'Salva modifiche',
+    'assets.createAsset': 'Crea asset',
+    escalation: 'Regole di Escalation',
+    integrations: 'Integrazioni',
+    gapAnalysis: 'Analisi delle Lacune',
+    documentGenerator: 'Generatore di Documenti',
+    riskMap: 'Mappa del Rischio',
+    evidenceCenter: 'Centro delle Evidenze',
+    capaTracker: 'Tracciatore CAPA',
+    auditRoom: 'Sala Audit',
+    'tutorial.title': 'Ciao, sono Dani27',
+    'tutorial.subtitle': 'Il tuo assistente virtuale ti guida nella piattaforma passo dopo passo.',
+    'tutorial.progressLabel': 'Passo',
+    'tutorial.stepHint': 'Breve spiegazione della sezione corrente',
+    'tutorial.previous': 'Precedente',
+    'tutorial.next': 'Successivo',
+    'tutorial.finish': 'Termina',
+    'tutorial.startPromptKnown': 'Premi avvia per iniziare il tutorial dalla dashboard principale.',
+    'tutorial.startPromptUnknown': 'Sei in un\'altra sezione. Avvia il tour per tornare all\'inizio e seguire il flusso corretto.',
+    'tutorial.startButton': 'Avvia tutorial',
+    'tutorial.dismissButton': 'Chiudi',
+    'tutorial.routeHint': 'Il tutorial evidenzia ogni rotta; segui le frecce per continuare.',
+    'tutorial.step1.title': 'Benvenuto professionale',
+    'tutorial.step1.description': 'Inizia il tuo percorso di compliance con una visione chiara di ogni modulo, dalla dashboard all\'audit e alle evidenze.',
+    'tutorial.step2.title': 'Navigazione intelligente',
+    'tutorial.step2.description': 'Usa il menu dei processi o il pannello moduli per accedere in qualsiasi momento a rischi, evidenze, audit e controlli.',
+    'tutorial.step3.title': 'Profilo e impostazioni',
+    'tutorial.step3.description': 'Personalizza in qualsiasi momento il tuo profilo di compliance e controlla stato del piano, notifiche e preferenze.',
+    'tutorial.step4.title': 'Risorse chiave',
+    'tutorial.step4.description': 'Comprendi ogni opzione: identificare rischi, aggiungere evidenze e preparare report con guida chiara e supporto integrato.',
+    'tutorial.step5.title': 'Preparare audit',
+    'tutorial.step5.description': 'Valida le tue evidenze, rivedi i rilievi e mantieni sotto controllo la preparazione all\'audit.',
+    'tutorial.step6.title': 'Autovalutazione',
+    'tutorial.step6.description': 'Misura il tuo livello di conformità con una valutazione rapida e individua opportunità di miglioramento immediate.',
+    'tutorial.step7.title': 'Configurazione',
+    'tutorial.step7.description': 'Regola preferenze, lingua e notifiche in modo che il sistema si adatti al tuo team.',
+    'tutorial.note': 'Questo tour è sempre disponibile dall\'icona in alto.',
+    'tutorial.close': 'Chiudi guida',
+    'tutorial.steps.dashboard.title': 'Centro di controllo',
+    'tutorial.steps.dashboard.description': 'Controlla stato, avvisi e avanzamento a colpo d\'occhio.',
+    'tutorial.steps.dashboard.sections.intro.title': 'Cosa vedrai qui',
+    'tutorial.steps.dashboard.sections.intro.content': `Questa dashboard riassume lo stato attuale del tuo programma:
+- KPI di documentazione, implementazione ed efficacia
+- Score di salute e trend
+- Attività recente
+- Attività in scadenza
+
+È pensata per dare priorità rapidamente, non per modifiche massive.`,
+    'tutorial.steps.dashboard.sections.intro.action': 'Esplora la dashboard',
+    'tutorial.steps.dashboard.sections.kpis.title': 'KPI e score',
+    'tutorial.steps.dashboard.sections.kpis.content': `Le schede mostrano le percentuali attuali e la variazione recente.
+
+Usale per capire se stai migliorando o peggiorando. In questa versione sono informative e non aprono dettagli al clic.`,
+    'tutorial.steps.dashboard.sections.kpis.action': 'Controlla valori e trend',
+    'tutorial.steps.dashboard.sections.activity-tasks.title': 'Attività e attività in scadenza',
+    'tutorial.steps.dashboard.sections.activity-tasks.content': `In basso trovi due aree utili:
+- Attività recente: cambiamenti nel sistema
+- Attività in scadenza: elementi con priorità e data limite
+
+Ti aiutano a capire cosa fare per primo.`,
+    'tutorial.steps.dashboard.sections.activity-tasks.action': 'Confronta attività e scadenze',
+    'tutorial.steps.dashboard.sections.scope.title': 'Ambito di questa fase',
+    'tutorial.steps.dashboard.sections.scope.content': `Questa area serve a:
+- mostrare lo stato generale e il trend
+- mostrare attività e suggerimenti operativi
+
+Consiglio:
+- usala per dare priorità in pochi minuti
+- poi approfondisci ciascun modulo per agire`,
+    'tutorial.steps.dashboard.sections.scope.action': 'Usarla come vista di monitoraggio',
+    'tutorial.steps.dashboard.sections.conclusion.title': 'Passo successivo',
+    'tutorial.steps.dashboard.sections.conclusion.content': `Quando individui le priorità nella dashboard, passa all\'analisi delle lacune per capire perché sei in questo stato e cosa correggere prima.`,
+    'tutorial.steps.dashboard.sections.conclusion.action': 'Vai a Gap Analysis',
+    'tutorial.steps.understand.title': 'Analisi delle lacune',
+    'tutorial.steps.understand.description': 'Individua con precisione le lacune tra lo stato attuale e i requisiti.',
+    'tutorial.steps.understand.sections.intro.title': 'Analisi delle lacune (Gap Analysis)',
+    'tutorial.steps.understand.sections.intro.content': `Siamo nella parte più importante: Gap Analysis.
+
+Qui dovrai:
+1. Rispondere a domande sulla tua organizzazione
+2. Il sistema analizza le risposte
+3. Vedi esattamente cosa manca
+4. Ricevi un piano per colmare le lacune
+
+È il cuore della compliance. Prenditi il tempo necessario.`,
+    'tutorial.steps.understand.sections.intro.action': 'Leggi l\'introduzione',
+    'tutorial.steps.understand.sections.framework.title': 'Quale norma devi rispettare?',
+    'tutorial.steps.understand.sections.framework.content': `Puoi lavorare con uno o più framework:
+- ISO 27001 (sicurezza delle informazioni)
+- ISO 27002 (controlli di sicurezza)
+- GDPR (protezione dei dati - Europa)
+- HIPAA (sanità - USA)
+- NIST (sicurezza nazionale - USA)
+- SOC 2 (audit di servizio)
+
+Seleziona quello adatto alla tua attività.
+Suggerimento: molte organizzazioni usano ISO 27001 come base.`,
+    'tutorial.steps.understand.sections.framework.action': 'Scegli il framework corretto',
+    'tutorial.steps.understand.sections.questionnaire.title': 'Rispondi con sincerità',
+    'tutorial.steps.understand.sections.questionnaire.content': `Vedrai domande come:
+'Hai una policy di sicurezza documentata?'
+'Fai formazione annuale sulla sicurezza?'
+'Hai un piano di incident response?'
+
+Rispondi SÌ/NO/PARZIALMENTE (è confidenziale)
+
+Non esistono risposte giuste. È meglio essere sinceri.
+Da qui calcoliamo le tue lacune.`,
+    'tutorial.steps.understand.sections.questionnaire.action': 'Inizia a rispondere',
+    'tutorial.steps.understand.sections.analysis.title': 'Il sistema analizza...',
+    'tutorial.steps.understand.sections.analysis.content': `Lasciaci un momento per elaborare le risposte.
+
+Stiamo:
+✓ confrontando il tuo stato con le norme
+✓ calcolando il livello di conformità
+✓ dando priorità alle lacune per rischio
+✓ suggerendo azioni
+
+Può richiedere 10-30 secondi...`,
+    'tutorial.steps.understand.sections.analysis.action': 'Attendere l\'analisi',
+    'tutorial.steps.understand.sections.results.title': 'Ecco le tue lacune',
+    'tutorial.steps.understand.sections.results.content': `Vedi 3 elementi:
+
+1. LACUNA CRITICA (rosso)
+   - impatto alto se non viene chiusa
+   - va trattata per prima
+
+2. LACUNA MAGGIORE (arancione)
+   - importante, ma non urgente
+   - da pianificare nei prossimi mesi
+
+3. LACUNA MINORE (giallo)
+   - impatto basso
+   - utile, ma non critica
+
+La percentuale di conformità è mostrata in alto.
+Se è <70 %, c\'è ancora lavoro da fare.`,
+    'tutorial.steps.understand.sections.results.action': 'Esamina lacune e priorità',
+    'tutorial.steps.understand.sections.action-plan.title': 'Crea il piano di chiusura',
+    'tutorial.steps.understand.sections.action-plan.content': `Per ogni lacuna:
+1. Cliccaci sopra
+2. Assegna un responsabile
+3. Imposta una scadenza
+4. Descrivi cosa farai per chiuderla
+
+Il sistema traccia l\'avanzamento.
+Ogni lacuna chiusa = conformità più alta
+
+Esempio:
+"Lacuna: 'Non abbiamo abilitato il MFA'
+Responsabile: Juan Pérez (CISO)
+Scadenza: 30 marzo
+Azione: implementare Okta MFA per tutti gli accessi"`,
+    'tutorial.steps.understand.sections.action-plan.action': 'Crea un piano d\'azione',
+    'tutorial.steps.understand.sections.conclusion.title': 'Analisi completata!',
+    'tutorial.steps.understand.sections.conclusion.content': `Complimenti, ora sai cosa manca.
+
+Il resto è implementazione:
+- Fase 3: documenta i tuoi ASSET (cosa proteggi)
+- Fase 4: carica policy e DOCUMENTI
+- Fase 5: identifica i RISCHI specifici
+- Fase 6: raccogli le EVIDENZE
+- Fase 7: compila i RISULTATI per l\'audit
+
+Andiamo avanti. Prossimo: Assets (inventario)`,
+    'tutorial.steps.understand.sections.conclusion.action': 'Clicca su Avanti',
+    'tutorial.steps.assets.title': 'Inventario degli asset',
+    'tutorial.steps.assets.description': 'Documenta tutti gli asset (sistemi, dati, persone) che richiedono protezione.',
+    'tutorial.steps.assets.sections.intro.title': 'Cosa fa questo modulo',
+    'tutorial.steps.assets.sections.intro.content': `Qui registri gli asset in modo strutturato per la gestione del rischio.
+
+Puoi creare, modificare ed eliminare asset e classificarli per tipo e impatto CIA (riservatezza, integrità, disponibilità).`,
+    'tutorial.steps.assets.sections.intro.action': 'Controlla la tabella e + Nuovo asset',
+    'tutorial.steps.assets.sections.create.title': 'Crea e classifica',
+    'tutorial.steps.assets.sections.create.content': `Quando crei un asset, definisci nome, tipo, posizione e valori CIA.
+
+Con questi valori il sistema calcola la criticità per aiutarti a priorizzare.`,
+    'tutorial.steps.assets.sections.create.action': 'Crea un asset e compila il CIA',
+    'tutorial.steps.assets.sections.filters.title': 'Filtra e rivedi',
+    'tutorial.steps.assets.sections.filters.content': `Puoi filtrare per tipo e livello di criticità per vedere rapidamente quali asset richiedono più attenzione.
+
+Puoi anche aprire un asset esistente per modificarne i dati o eliminarlo.`,
+    'tutorial.steps.assets.sections.filters.action': 'Prova i filtri per tipo e livello',
+    'tutorial.steps.assets.sections.scope.title': 'Focus del modulo',
+    'tutorial.steps.assets.sections.scope.content': `L\'obiettivo è mantenere un inventario chiaro e utilizzabile.
+
+Quando gli asset sono ben classificati e prioritizzati, l\'analisi del rischio e l\'implementazione dei controlli diventano molto più rapide.`,
+    'tutorial.steps.assets.sections.scope.action': 'Usalo come inventario',
+    'tutorial.steps.assets.sections.conclusion.title': 'Passo successivo',
+    'tutorial.steps.assets.sections.conclusion.content': `Quando l\'inventario di base è pronto, il passo successivo è centralizzare i documenti per supportare evidenze e report.`,
+    'tutorial.steps.assets.sections.conclusion.action': 'Clicca su Avanti',
+    'tutorial.steps.documents.title': 'Gestione documenti',
+    'tutorial.steps.documents.description': 'Centralizza, organizza e versiona tutte le policy e le procedure.',
+    'tutorial.steps.documents.sections.intro.title': 'Cosa fa questo modulo',
+    'tutorial.steps.documents.sections.intro.content': `Questo modulo riunisce il lavoro documentale in cinque schede:
+- Visualizzare i documenti
+- Modificare il contenuto
+- Generare un documento con IA
+- Esportare un report
+- Caricare un documento`,
+    'tutorial.steps.documents.sections.intro.action': 'Individua le schede disponibili',
+    'tutorial.steps.documents.sections.upload.title': 'Carica e consulta',
+    'tutorial.steps.documents.sections.upload.content': `Puoi caricare file o testo, elencarli e aprirne uno per consultarlo o modificarlo.
+
+Puoi anche eliminare i documenti caricati quando necessario.`,
+    'tutorial.steps.documents.sections.upload.action': 'Carica e apri un documento',
+    'tutorial.steps.documents.sections.ai-generation.title': 'Generazione con IA',
+    'tutorial.steps.documents.sections.ai-generation.content': `La scheda di generazione permette di creare bozze di documenti e poi caricarle nel repository.
+
+È utile per iniziare rapidamente una policy o una procedura di base.`,
+    'tutorial.steps.documents.sections.ai-generation.action': 'Genera e rivedi una bozza',
+    'tutorial.steps.documents.sections.reports.title': 'Esporta report',
+    'tutorial.steps.documents.sections.reports.content': `Nella scheda report puoi avviare una generazione, vedere lo stato e scaricare il risultato quando è pronto.
+
+I formati disponibili dipendono dalla configurazione/API, ma il flusso di generazione e download è già presente.`,
+    'tutorial.steps.documents.sections.reports.action': 'Genera un report e controlla lo stato',
+    'tutorial.steps.documents.sections.conclusion.title': 'Fine di questo passaggio',
+    'tutorial.steps.documents.sections.conclusion.content': `Con questo flusso puoi centralizzare i documenti chiave, iterarli e usarli come supporto per il programma di compliance.
+
+Il passo successivo collega questi contenuti alla gestione del rischio.`,
+    'tutorial.steps.documents.sections.conclusion.action': 'Clicca su Avanti',
+    'tutorial.steps.risks.title': 'Gestione dei rischi',
+    'tutorial.steps.risks.description': 'Identifica, valuta e mitiga i rischi di compliance con un metodo chiaro.',
+    'tutorial.steps.risks.sections.intro.title': 'Analisi del rischio',
+    'tutorial.steps.risks.sections.intro.content': `Il rischio è la probabilità che accada qualcosa di negativo.
+
+Il risk management risponde a:
+1. Cosa potrebbe andare storto?
+2. Quanto è probabile?
+3. Quanto sarebbe grave?
+4. Cosa facciamo al riguardo?
+
+È ciò che gli auditor esaminano con attenzione.`,
+    'tutorial.steps.risks.sections.intro.action': 'Comprendi l\'analisi del rischio',
+    'tutorial.steps.risks.sections.matrix.title': 'Come misuriamo il rischio',
+    'tutorial.steps.risks.sections.matrix.content': `RISCHIO = PROBABILITÀ × IMPATTO
+
+         PROBABILITÀ
+         Bassa Media Alta
+IMPATTO Alta  3     6     9
+        Media 2     4     6
+        Bassa 1     2     3
+
+Colori:
+- Rosso (9): critico - agisci subito
+- Arancione (6): alto - nelle prossime settimane
+- Giallo (4): medio - nei prossimi mesi
+- Verde (2-1): basso - monitoraggio
+
+Il sistema calcola automaticamente.`,
+    'tutorial.steps.risks.sections.matrix.action': 'Osserva la matrice',
+    'tutorial.steps.risks.sections.create.title': 'Registra un rischio',
+    'tutorial.steps.risks.sections.create.content': `Clicca su '+ Nuovo rischio'
+
+Modulo:
+NOME: 'Perdita di dati da ransomware'
+DESCRIZIONE: 'Un attacco ransomware potrebbe cifrare il nostro DB'
+CATEGORIA: Cybersecurity / Operativo / Compliance / Reputazione
+PROBABILITÀ: Bassa/Media/Alta
+IMPATTO: Basso/Medio/Alto
+RESPONSABILE: Juan Pérez
+ASSET COINVOLTI: seleziona
+CONTROLLI ESISTENTI: 'Abbiamo backup giornalieri'
+
+Salva = rischio registrato + score automatico`,
+    'tutorial.steps.risks.sections.create.action': 'Crea il primo rischio',
+    'tutorial.steps.risks.sections.evaluate.title': 'Visualizza la matrice dei rischi',
+    'tutorial.steps.risks.sections.evaluate.content': `La dashboard dei rischi mostra:
+
+MATRICE VISIVA:
+- Ogni rischio è un punto
+- Rosso nell\'angolo = critico
+- Verde nell\'angolo = gestibile
+- Clicca su un punto per i dettagli
+
+ELENCO ORDINATO:
+- Per rischio (dal più alto)
+- Nome, responsabile, stato
+
+METRICHE:
+- Rischi totali: 24
+- Critici: 3 (azione immediata)
+- Alti: 7
+- Medi: 10
+- Bassi: 4`,
+    'tutorial.steps.risks.sections.evaluate.action': 'Esamina la matrice dei rischi',
+    'tutorial.steps.risks.sections.mitigation.title': 'Crea un piano d\'azione',
+    'tutorial.steps.risks.sections.mitigation.content': `Per ogni rischio scegli:
+
+OPZIONE 1: ACCETTARE
+- Il rischio è accettabile
+- Documentalo chiaramente
+
+OPZIONE 2: EVITARE
+- Cambia il processo per eliminare il rischio
+
+OPZIONE 3: MITIGARE
+- Riduci probabilità O impatto
+
+OPZIONE 4: TRASFERIRE
+- Coprire il rischio (assicurazione cyber)
+
+Piano CAPA:
+- Azione specifica
+- Responsabile
+- Data limite
+- Indicatori di successo`,
+    'tutorial.steps.risks.sections.mitigation.action': 'Crea un piano di mitigazione',
+    'tutorial.steps.risks.sections.controls.title': 'Implementa i controlli',
+    'tutorial.steps.risks.sections.controls.content': `Controlli = misure concrete
+
+Esempio rischio: perdita di dati
+Controlli:
+✓ Controllo A: backup automatico giornaliero
+✓ Controllo B: cifratura a riposo
+✓ Controllo C: MFA per l\'accesso ai dati
+✓ Controllo D: monitoraggio 24/7
+
+Per ogni controllo:
+- Assegna un responsabile
+- Imposta una data di implementazione
+- Segna come 'In corso' → 'Implementato' → 'Testato'
+- Allega le prove
+
+Il sistema ti avvisa alla scadenza.`,
+    'tutorial.steps.risks.sections.controls.action': 'Assegna i controlli',
+    'tutorial.steps.risks.sections.monitoring.title': 'I rischi non dormono mai',
+    'tutorial.steps.risks.sections.monitoring.content': `Ogni mese:
+1. Rivedi ogni rischio
+2. La probabilità è cambiata?
+3. L\'impatto è cambiato?
+4. I controlli funzionano?
+5. Aggiorna lo score se necessario
+
+Ogni anno:
+- Analisi completa dei rischi
+- Valuta nuovi rischi
+- Elimina i rischi risolti
+
+Il sistema conserva la cronologia:
+- Il rischio X era 'Alto' a gennaio
+- Ora è 'Medio' a marzo
+- Prova di miglioramento = auditor soddisfatto`,
+    'tutorial.steps.risks.sections.monitoring.action': 'Monitora e aggiorna i rischi',
+    'tutorial.steps.risks.sections.conclusion.title': 'Registro rischi completo',
+    'tutorial.steps.risks.sections.conclusion.content': `Ora hai un registro rischi completo!
+
+Il sistema contiene:
+✓ Ciò che manca (gap)
+✓ Ciò che proteggi (asset)
+✓ Le tue regole (documenti)
+✓ I rischi individuati (risks)
+
+Poi: le EVIDENZE
+Come dimostriamo che è stato fatto? Fase 6: Evidence`,
+    'tutorial.steps.risks.sections.conclusion.action': 'Clicca su Avanti',
+    'tutorial.steps.evidence.title': 'Raccolta delle evidenze',
+    'tutorial.steps.evidence.description': 'Centralizza e organizza tutte le prove che i controlli funzionano.',
+    'tutorial.steps.evidence.sections.intro.title': 'Cosa permette questa pagina',
+    'tutorial.steps.evidence.sections.intro.content': `Qui puoi:
+- Caricare evidenze
+- Cercare per testo (nome/controllo/clausola)
+- Filtrare per tipo
+- Vedere lo stato di freschezza (fresh, expiring, expired)
+- Eliminare le evidenze`,
+    'tutorial.steps.evidence.sections.intro.action': 'Trova ricerca, filtro e upload',
+    'tutorial.steps.evidence.sections.upload.title': 'Carica evidenze',
+    'tutorial.steps.evidence.sections.upload.content': `Il caricamento avviene dall\'uploader del sistema, poi l\'elemento appare nel suo gruppo.
+
+Successivamente puoi verificarne la validità e tenere solo le evidenze aggiornate.`,
+    'tutorial.steps.evidence.sections.upload.action': 'Carica la prima evidenza',
+    'tutorial.steps.evidence.sections.organize.title': 'Focus di questa fase',
+    'tutorial.steps.evidence.sections.organize.content': `L\'obiettivo è mantenere le evidenze aggiornate, rintracciabili e pronte per la revisione.
+
+Con ricerca, filtri e stato di freschezza, mantieni la qualità delle evidenze per tutto il ciclo.`,
+    'tutorial.steps.evidence.sections.organize.action': 'Carica, filtra e mantieni',
+    'tutorial.steps.evidence.sections.conclusion.title': 'Passo successivo',
+    'tutorial.steps.evidence.sections.conclusion.content': `Con evidenze caricate e classificate, passa a CAPA/Findings per gestire azioni correttive e priorità.`,
+    'tutorial.steps.evidence.sections.conclusion.action': 'Clicca su Avanti',
+    'tutorial.steps.findings.title': 'Risultati / CAPA Tracker',
+    'tutorial.steps.findings.description': 'Gestisci azioni correttive, priorità e scadenze in un unico posto.',
+    'tutorial.steps.findings.sections.intro.title': 'Cosa trovi davvero qui',
+    'tutorial.steps.findings.sections.intro.content': `Questa pagina oggi funziona come CAPA Tracker.
+
+Qui vedi le azioni correttive, il loro stato, la priorità, la scadenza e l\'avanzamento.`,
+    'tutorial.steps.findings.sections.intro.action': 'Controlla KPI e tabella CAPA',
+    'tutorial.steps.findings.sections.create.title': 'Crea una CAPA',
+    'tutorial.steps.findings.sections.create.content': `Puoi creare una CAPA con titolo, priorità, fonte, scadenza, avanzamento e controllo collegato.
+
+Poi apparirà nella tabella principale per il monitoraggio.`,
+    'tutorial.steps.findings.sections.create.action': 'Crea una CAPA di esempio',
+    'tutorial.steps.findings.sections.filters.title': 'Monitoraggio e filtri',
+    'tutorial.steps.findings.sections.filters.content': `Puoi filtrare per stato e priorità, e aprire ogni riga per vedere il dettaglio (descrizione, controllo/responsabile, fonte e date).
+
+Vedrai anche i KPI di elementi aperti, in ritardo e chiusi.`,
+    'tutorial.steps.findings.sections.filters.action': 'Applica i filtri e apri una riga',
+    'tutorial.steps.findings.sections.conclusion.title': 'Fine di questa fase',
+    'tutorial.steps.findings.sections.conclusion.content': `Con CAPA ben definite e monitorate, trasformi le lacune in un piano eseguibile con responsabili e scadenze.
+
+Così arrivi meglio preparato all\'audit.`,
+    'tutorial.steps.findings.sections.conclusion.action': 'Clicca su Avanti',
+    'tutorial.steps.audit.title': 'Preparazione all\'audit',
+    'tutorial.steps.audit.description': 'Prepara ed esegui la verifica esterna di conformità con partner certificati.',
+    'tutorial.steps.audit.sections.intro.title': 'Cosa fa davvero questo modulo',
+    'tutorial.steps.audit.sections.intro.content': `Qui trovi tre funzioni principali:
+- Validazione testuale delle evidenze
+- Validazione granulare dei file
+- Checklist pre-audit con autosalvataggio`,
+    'tutorial.steps.audit.sections.intro.action': 'Individua validatore, checklist e Audit Room',
+    'tutorial.steps.audit.sections.validation.title': 'Validazione di contenuto e file',
+    'tutorial.steps.audit.sections.validation.content': `Puoi incollare evidenze testuali o caricare un file affinché il sistema analizzi i rilievi e lo stato di conformità.
+
+Il risultato mostra avanzamento, gravità e osservazioni.`,
+    'tutorial.steps.audit.sections.validation.action': 'Esegui una validazione di esempio',
+    'tutorial.steps.audit.sections.readiness.title': 'Checklist e Audit Room',
+    'tutorial.steps.audit.sections.readiness.content': `La checklist viene salvata automaticamente e ti aiuta a tenere traccia dei punti aperti prima dell\'audit.
+
+Nell\'Audit Room puoi selezionare evidenze e generare un binder PDF da scaricare.`,
+    'tutorial.steps.audit.sections.readiness.action': 'Compila la checklist e genera il binder',
+    'tutorial.steps.audit.sections.conclusion.title': 'Fine di questa fase',
+    'tutorial.steps.audit.sections.conclusion.content': `Con validazione, checklist e binder PDF arrivi alla revisione con evidenze più ordinate.
+
+Il passo successivo è mantenere questo livello con una valutazione periodica continua.`,
+    'tutorial.steps.audit.sections.conclusion.action': 'Clicca su Avanti',
+    'tutorial.steps.self-assessment.title': 'Auto-valutazione continua',
+    'tutorial.steps.self-assessment.description': 'Esegui valutazioni interne regolari per restare conforme tra un audit e l\'altro.',
+    'tutorial.steps.self-assessment.sections.intro.title': 'Cosa fa questo modulo',
+    'tutorial.steps.self-assessment.sections.intro.content': `L\'autovalutazione attuale è un questionario suddiviso per fasi.
+
+Rispondi a ogni domanda e il sistema salva l\'avanzamento, così puoi riprendere più tardi.`,
+    'tutorial.steps.self-assessment.sections.intro.action': 'Individua fasi e progresso laterale',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.title': 'Risposte disponibili',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.content': `Le opzioni di risposta sono: Yes, Partial, No e N/A.
+
+Puoi rispondere per domanda e passare alla fase successiva dal selettore laterale.`,
+    'tutorial.steps.self-assessment.sections.self-assessment-form.action': 'Rispondi ad almeno una domanda per fase',
+    'tutorial.steps.self-assessment.sections.evidence-review.title': 'Evidenza per domanda',
+    'tutorial.steps.self-assessment.sections.evidence-review.content': `Ogni domanda consente di allegare evidenze.
+
+Regola importante: se una domanda critica viene marcata "Yes", devi allegare un\'evidenza per validarla correttamente.`,
+    'tutorial.steps.self-assessment.sections.evidence-review.action': 'Allega un\'evidenza a una domanda critica',
+    'tutorial.steps.self-assessment.sections.persistence.title': 'Salvataggio e continuità',
+    'tutorial.steps.self-assessment.sections.persistence.content': `L\'avanzamento viene salvato automaticamente (locale + backend), così non perdi le risposte quando cambi fase o ricarichi.
+
+Vedrai anche il progresso per fase e il progresso complessivo delle risposte.`,
+    'tutorial.steps.self-assessment.sections.persistence.action': 'Cambia fase e verifica il salvataggio',
+    'tutorial.steps.self-assessment.sections.conclusion.title': 'Fine di questa fase',
+    'tutorial.steps.self-assessment.sections.conclusion.content': `Con risposte, evidenze e salvataggio continuo per fasi, puoi seguire in modo stabile il livello di conformità tra le revisioni formali.
+
+Questa disciplina migliora la tracciabilità e riduce le sorprese nei cicli di audit.`,
+    'tutorial.steps.self-assessment.sections.conclusion.action': 'Festeggia il risultato',
+    'audit.statusCompliant': 'Conforme',
+    'audit.statusNonCompliant': 'Non conforme',
+    'audit.statusNeedsReview': 'Richiede revisione',
+    'audit.findingsLabel': 'Constatations',
+    'audit.detectedFindings': 'Constatations rilevate',
+    'audit.severity': 'Gravità',
+    'audit.recommendation': 'Raccomandazione',
+    'audit.impact': 'Impatto',
+    'audit.agentNotes': 'Note dell’agente',
+    'audit.noChanges': 'Nessuna modifica',
+    'preAuditCard.title': 'Auto-valutazione pre-audit',
+    'preAuditCard.readinessLabel': 'Prontezza stimata per l’audit',
+    'preAuditCard.readinessSubtitle': '3 aree di non conformità ad alto rischio rilevate',
+    'preAuditCard.findingsTitle': 'Probabili rilievi di audit',
+    'preAuditCard.finding.accessManagement': 'Gestione accessi — evidenza scaduta',
+    'preAuditCard.finding.businessContinuity': 'Continuità operativa — nessun test di recupero nel 2025',
+    'preAuditCard.finding.incidentManagement': 'Gestione incidenti — CAPA aperta da 45+ giorni',
+    'preAuditCard.finding.cryptographyPolicy': 'Politica di crittografia — bozza non ancora approvata',
+    'risks.threatCreatedSuccess': 'Minaccia creata con successo',
+    'risks.vulnerabilityCreatedSuccess': 'Vulnerabilità creata con successo',
+    'risks.fieldRequired': 'Questo campo è obbligatorio',
+    'risks.riskCreatedSuccess': 'Rischio creato con successo',
+    'risks.linkSelectionRequired': 'Seleziona un rischio e una minaccia da collegare',
+    'risks.threatLinkedSuccess': 'Minaccia collegata al rischio con successo',
+    'risks.title': 'Gestione dei rischi',
+    'risks.subtitle': 'Crea minacce, vulnerabilità e collega le minacce ai rischi esistenti.',
+    'risks.addRiskButton': 'Aggiungi rischio',
+    'risks.createRiskTitle': 'Crea rischio',
+    'risks.createRiskDescription': 'Registra un nuovo rischio nel registro dei rischi.',
+    'risks.riskNameLabel': 'Nome',
+    'risks.riskNamePlaceholder': 'es. Controllo di accesso insufficiente',
+    'risks.riskDescriptionLabel': 'Descrizione',
+    'risks.riskDescriptionPlaceholder': 'Contesto aggiuntivo facoltativo',
+    'risks.riskAssetLabel': 'Asset',
+    'risks.selectAsset': 'Seleziona un asset',
+    'risks.probabilityLabel': 'Probabilità',
+    'risks.impactLabel': 'Impatto',
+    'risks.cancelButton': 'Annulla',
+    'risks.creating': 'Creazione in corso...',
+    'risks.createRiskButton': 'Crea rischio',
+    'risks.createThreatTitle': 'Crea minaccia',
+    'risks.createThreatDescription': 'Identifica le minacce collegate al tuo programma di rischi.',
+    'risks.threatNameLabel': 'Nome',
+    'risks.threatNamePlaceholder': 'es. Phishing interno',
+    'risks.threatDescriptionLabel': 'Descrizione',
+    'risks.threatDescriptionPlaceholder': 'Informazioni aggiuntive sulla minaccia',
+    'risks.threatCategoryLabel': 'Categoria',
+    'risks.selectCategory': 'Seleziona categoria',
+    'risks.threatLikelihoodLabel': 'Probabilità',
+    'risks.threatImpactLabel': 'Impatto',
+    'risks.saving': 'Salvataggio in corso...',
+    'risks.createThreatButton': 'Crea minaccia',
+    'risks.createVulnerabilityTitle': 'Crea vulnerabilità',
+    'risks.createVulnerabilityDescription': 'Registra vulnerabilità relative agli asset critici.',
+    'risks.vulnerabilityNameLabel': 'Nome',
+    'risks.vulnerabilityNamePlaceholder': 'es. Versione obsoleta',
+    'risks.vulnerabilityDescriptionLabel': 'Descrizione',
+    'risks.vulnerabilityDescriptionPlaceholder': 'Dettagli della vulnerabilità',
+    'risks.vulnerabilityAssetLabel': 'Asset interessato',
+    'risks.vulnerabilitySeverityLabel': 'Gravità',
+    'risks.selectSeverity': 'Seleziona gravità',
+    'risks.createVulnerabilityButton': 'Crea vulnerabilità',
+    'risks.linkThreatTitle': 'Collega una minaccia a un rischio',
+    'risks.linkThreatDescription': 'Seleziona un rischio e una minaccia esistente.',
+    'risks.selectRiskLabel': 'Rischio',
+    'risks.selectRiskPlaceholder': 'Seleziona un rischio',
+    'risks.selectThreatLabel': 'Minaccia',
+    'risks.selectThreatPlaceholder': 'Seleziona una minaccia',
+    'risks.linking': 'Collegamento in corso...',
+    'risks.linkThreatButton': 'Collega minaccia',
+    'risks.recentThreatsTitle': 'Minacce recenti',
+    'risks.loadingThreats': 'Caricamento minacce...',
+    'risks.noThreats': 'Nessuna minaccia registrata.',
+    'risks.recentVulnerabilitiesTitle': 'Vulnerabilità recenti',
+    'risks.loadingVulnerabilities': 'Caricamento vulnerabilità...',
+    'risks.noVulnerabilities': 'Nessuna vulnerabilità registrata.',
+    'risks.category.human': 'Umano',
+    'risks.category.technical': 'Tecnico',
+    'risks.category.environmental': 'Ambientale',
+    'risks.category.organizational': 'Organizzativo',
+    'risks.severity.low': 'Bassa',
+    'risks.severity.medium': 'Media',
+    'risks.severity.high': 'Alta',
+    'risks.severity.critical': 'Critica',
+    'findings.answeredQuestions': 'Domande risposte',
+    'findings.capaLoadError': 'Impossibile caricare i dati CAPA. Riprova.',
+    'findings.controlOwner': 'Controllo / Responsabile',
+    'findings.create.descriptionPlaceholder': 'Descrivi l\'azione correttiva richiesta',
+    'findings.create.fieldControlId': 'Control ID',
+    'findings.create.fieldDescription': 'Descrizione',
+    'findings.create.fieldDueDate': 'Data di scadenza',
+    'findings.create.fieldPriority': 'Priorità',
+    'findings.create.fieldProgress': 'Progresso',
+    'findings.create.fieldSource': 'Fonte',
+    'findings.create.fieldTitle': 'Titolo',
+    'findings.create.subtitle': 'Registra rapidamente un\'azione correttiva e mantieni i dati sincronizzati.',
+    'findings.create.title': 'Crea nuova CAPA',
+    'findings.create.titlePlaceholder': 'es. Verificare le evidenze del controllo accessi',
+    'findings.createAction': 'Crea CAPA',
+    'findings.createError': 'Impossibile creare la CAPA. Controlla i campi e riprova.',
+    'findings.createTitleRequired': 'Il titolo è obbligatorio per creare una CAPA.',
+    'findings.createdUpdated': 'Creato / Aggiornato',
+    'findings.creating': 'Creazione in corso...',
+    'findings.criticalGaps': 'Lacune critiche',
+    'findings.description': 'Descrizione',
+    'findings.emptyCapas': 'Non ci sono ancora CAPA registrate. Crea una nuova per iniziare.',
+    'findings.emptyFiltered': 'Nessuna CAPA corrisponde ai filtri. Regola i filtri per visualizzare i risultati.',
+    'findings.filter.allPriorities': 'Tutte le priorità',
+    'findings.filter.allStatuses': 'Tutti gli stati',
+    'findings.filter.priority': 'Filtra per priorità',
+    'findings.filter.status': 'Filtra per stato',
+    'findings.gapFindings': 'Risultati dell\'analisi delle lacune',
+    'findings.gapsLoadError': 'Impossibile caricare i risultati. Riprova.',
+    'findings.indicators': 'Indicatori dei riscontri',
+    'findings.kpi.closed': 'Chiuse',
+    'findings.kpi.closedHelp': 'CAPA completate',
+    'findings.kpi.open': 'CAPA aperte',
+    'findings.kpi.openHelp': 'Azioni attualmente in corso',
+    'findings.kpi.overdue': 'In ritardo',
+    'findings.kpi.overdueHelp': 'CAPA scadute in attesa di completamento',
+    'findings.kpi.total': 'Totale CAPAs',
+    'findings.kpi.totalHelp': 'Include tutte le CAPA registrate',
+    'findings.loadingCapas': 'Caricamento CAPA...',
+    'findings.loadingGaps': 'Caricamento delle lacune...',
+    'findings.noDescription': 'Nessuna descrizione disponibile.',
+    'findings.noGaps': 'Nessuna lacuna trovata al momento.',
+    'findings.noOwner': 'Nessun responsabile',
+    'findings.onTime': 'In tempo',
+    'findings.openCorrectiveActions': 'Azioni correttive aperte',
+    'findings.openCriticalGaps': 'Lacune critiche aperte',
+    'findings.optional': 'Facoltativo',
+    'findings.overdue': 'In ritardo',
+    'findings.phaseFallback': 'Fase {index}',
+    'findings.phaseSummary': '{unanswered} lacune senza risposta · {critical} critiche',
+    'findings.priority.critical': 'Critica',
+    'findings.priority.high': 'Alta',
+    'findings.priority.low': 'Bassa',
+    'findings.priority.medium': 'Media',
+    'findings.priorityBreakdown': 'Ripartizione per priorità',
+    'findings.progress': 'Progresso',
+    'findings.progressHelp': 'Avanzamento dell\'analisi delle lacune',
+    'findings.showing': 'Visualizzo {shown} di {total} CAPA',
+    'findings.source': 'Origine',
+    'findings.source.externalAudit': 'Audit esterno',
+    'findings.source.incident': 'Incidente',
+    'findings.source.internalAudit': 'Audit interno',
+    'findings.source.managementReview': 'Riesame della direzione',
+    'findings.status.closed': 'Chiusa',
+    'findings.status.inProgress': 'In corso',
+    'findings.status.open': 'Aperta',
+    'findings.status.resolved': 'Risolta',
+    'findings.subtitle': 'Gestisci azioni correttive, priorità e date di scadenza da un unico spazio.',
+    'findings.table.dueDate': 'Data di scadenza',
+    'findings.table.overdue': 'In ritardo',
+    'findings.table.priority': 'Priorità',
+    'findings.table.progress': 'Progresso',
+    'findings.table.status': 'Stato',
+    'findings.title': 'Monitor CAPA',
+    'findings.totalGaps': 'Lacune totali',
+    'findings.totalGapsHelp': 'Domande dell\'analisi delle lacune',
+    'findings.unanswered': 'Senza risposta',
+    'findings.unansweredHelp': 'Include lacune critiche',
+    'findings.unassigned': 'Non assegnato',
+    'findings.validationFindings': 'Risultati di validazione',
+    'findings.validationFindingsHelp': 'Rivedi i riscontri generati dalla validazione granulare dei documenti nella cronologia recente.',
+
+    // Assessment & Evidence
+    'assessment.responded': 'Risposto',
+    'assessment.loadingQuestions': 'Caricamento domande...',
+    'assessment.noQuestions': 'Nessuna domanda in questa fase.',
+    'assessment.questionLabel': 'Domanda',
+    'assessment.viewByPhase': 'Vista per fase: rispondi a tutte le domande in questa colonna per non perdere il contesto.',
+    'assessment.criticalNoEvidenceToast': 'Le domande critiche risposte con Sì richiedono l\'allegato di evidenze',
+    'assessment.criticalWarning': '⚠️ Le domande critiche risposte con "SÌ" richiedono l\'allegato di documentazione di evidenza.',
+    'assessment.criticalBadge': 'CRITICO',
+    'answer.yes': 'Sì',
+    'answer.partial': 'Parziale',
+    'answer.no': 'No',
+    'answer.na': 'N/D',
+    'evidence.dragDropHint': 'Trascina e rilascia le evidenze qui, oppure',
+    'evidence.quickSelect': 'Seleziona (rapido)',
+    'evidence.advancedUploader': 'Uploader avanzato',
+    'evidence.recentUploads': 'Ultimi caricamenti',
+    'evidence.title': 'Centro Evidenze',
+    'evidence.subtitle': 'Organizza le evidenze per tipo e controllo ISO 27001.',
+    'evidence.uploadAction': '+ Carica evidenza',
+    'evidence.kpi.totalItems': 'Totale elementi di evidenza',
+    'evidence.kpi.totalItemsHelp': 'Organizzati per tassonomia delle evidenze',
+    'evidence.kpi.filteredItems': 'Elementi filtrati',
+    'evidence.kpi.filteredItemsHelp': 'Filtri di ricerca e tipo applicati',
+    'evidence.kpi.types': 'Tipi di evidenza',
+    'evidence.kpi.typesHelp': 'Raggruppati per tassonomia',
+    'evidence.searchPlaceholder': 'Cerca evidenza, controllo, clausola...',
+    'evidence.allTypes': 'Tutti i tipi di evidenza',
+    'evidence.showing': 'Mostrando {matched} di {total} elementi di evidenza',
+    'evidence.loading': 'Caricamento evidenze...',
+    'evidence.empty': 'Nessuna evidenza corrisponde ai tuoi filtri.',
+    'evidence.validityDays': '{days} giorni',
+    'evidence.deleting': 'Eliminazione...',
+    'evidence.delete': 'Elimina',
+    'evidence.loadError': 'Impossibile caricare le evidenze. Per favore riprova.',
+    'evidence.deleteError': 'Impossibile eliminare l\'evidenza. Per favore riprova.',
+    'evidence.confirmDelete': 'Eliminare l\'evidenza "{name}"? Questa azione non può essere annullata.',
+    'evidence.type.policy': 'Policy',
+    'evidence.type.procedure': 'Procedure',
+    'evidence.type.instruction': 'Instruction',
+    'evidence.type.control': 'Control',
+    'evidence.type.record': 'Record',
+    'evidence.freshness.fresh': 'Valida',
+    'evidence.freshness.expiring': 'In scadenza',
+    'evidence.freshness.expired': 'Scaduta',
+    'assessment.save.savedPrefix': 'Salvato:',
+    'assessment.save.notSaved': 'Non ancora salvato',
+    'understand.actionHint': 'Facendo clic su "Crea documentazione" si avvia un flusso guidato in cui l\'IA genera il documento consigliato per colmare queste lacune.',
+    'understand.createDocumentation': 'Crea documentazione',
+    'understand.modifyDocumentation': 'Modifica documentazione',
+    'understand.criticalIntro': 'Ciò di cui hai ancora bisogno nelle lacune critiche:',
+    'understand.empty': 'Nessuna lacuna da mostrare.',
+    'understand.gapAnalysis': 'Analisi delle Lacune',
+    'understand.linkedEvidence': 'Evidenza collegata rilevata',
+    'understand.loading': 'Caricamento...',
+    'understand.missing': 'Mancante:',
+    'understand.reason.no': 'Risposto NO',
+    'understand.reason.partial': 'Risposto PARZIALMENTE',
+    'understand.reason.unanswered': 'Senza risposta',
+    'understand.suggestedEvidence': 'Evidenza suggerita:',
+    'understand.annexALabel': 'Controlli Allegato A ISO 27001',
+    'understand.auditFinding': 'Risultato di audit',
+    'understand.clauseLabel': 'Clausola {value}',
+    'understand.controlLabel': 'Controllo {value}',
+    'understand.frameworkSummary': 'Riepilogo dello stato del framework',
+    'understand.phaseFallback': 'Fase {index}',
+    'understand.phaseGapsSummary': '{unanswered} lacune senza risposta — {critical} critiche',
+    'understand.toast.navigationError': 'Errore di navigazione',
+    'understand.toast.noOpenGaps': 'Non ci sono lacune senza risposta in questa fase, ma puoi comunque creare la documentazione.',
+    'common.clear': 'Pulisci',
+    'common.close': 'Chiudi',
+    'common.refresh': 'Aggiorna',
+    'common.refreshing': 'Aggiornamento...',
+    'validation.table.status': 'Stato',
+    'validation.summary': 'Riepilogo',
+    'portal.mandatory': 'Obbligatoria',
+    'portal.optional': 'Opzionale',
+    'portal.acknowledged': 'Riconosciuta',
+    'portal.pending': 'In sospeso',
+    'portal.viewPolicy': 'Visualizza politica',
+    'portal.versionLine': 'Versione {version} · {kind} · Pubblicata il {date}',
+    'portal.officialSummary': 'Sommario ufficiale',
+    'portal.noSummary': 'Nessun sommario disponibile.',
+    'portal.notAvailable': 'N/D',
+    'portal.versionPrefix': 'v',
+    'portal.fullText': 'Testo completo',
+    'portal.readCarefully': 'Leggere attentamente',
+    'portal.ackCheckboxText': 'Ho letto questa politica e riconosco la versione attuale del documento.',
+    'portal.ackCheckboxHelp': 'Questa conferma verrà registrata per la tua organizzazione.',
+    'portal.ackSuccess': 'Politica riconosciuta con successo.',
+    'portal.pageTitle': 'Riconoscimenti delle politiche',
+    'portal.pageSubtitle': 'Esamina le politiche pubblicate dalla tua organizzazione e conferma quelle che hai letto.',
+    'portal.publishedPolicies': 'Politiche pubblicate',
+    'portal.statusAutoUpdate': 'Si aggiorna automaticamente man mano che le politiche vengono riconosciute.',
+    'portal.loadingPolicies': 'Caricamento politiche...',
+    'auditRoom.binderQueued': 'Binder in coda',
+    'auditRoom.error.statusBinder': 'Errore durante il recupero dello stato del binder.',
+    'auditRoom.error.downloadBinder': 'Impossibile scaricare il binder. Riprova.',
+    'auditRoom.generatingBinder': 'Generazione del binder...',
+    'auditRoom.binderStatus': 'Stato del binder',
+    'auditRoom.progressLabel': 'Avanzamento:',
+    'auditRoom.downloading': 'Download in corso...',
+    'auditRoom.downloadPdf': 'Scarica PDF del binder',
+    'auditRoom.error.loadFolders': 'Impossibile caricare le cartelle di Audit Room.',
+    'auditRoom.error.loadEvidences': 'Impossibile caricare le evidenze della cartella.',
+    'auditRoom.error.selectEvidence': 'Seleziona almeno un’evidenza per generare il binder.',
+    'auditRoom.error.startBinder': 'Impossibile avviare la generazione del binder.',
+    'auditRoom.binderTitle': 'Binder di Audit Room',
+    'auditRoom.binderDescriptionFolder': 'Generato dalla cartella {folder}',
+    'auditRoom.binderDescription': 'Binder generato da Audit Room',
+    'auditRoom.subtitle': 'Esplora le cartelle dell’Allegato A e genera binder da evidenze selezionate.',
+    'auditRoom.selectedCount': '{count} evidenza(e) selezionata(e)',
+    'auditRoom.folders': 'Cartelle',
+    'auditRoom.loadingFolders': 'Caricamento cartelle...',
+    'auditRoom.folderEvidenceCount': '{count} evidenze',
+    'auditRoom.statusLabel': 'Stato:',
+    'auditRoom.notStarted': 'Non avviato',
+    'auditRoom.generatedWhenFinished': 'Verrà generato al termine del processo.',
+    'auditRoom.selectFolderHint': 'Seleziona una cartella per vedere gli elementi.',
+    'auditRoom.noFolderSelected': 'Nessuna cartella selezionata',
+    'auditRoom.loadingEvidences': 'Caricamento evidenze...',
+    'auditRoom.noEvidencesInFolder': 'Nessuna evidenza disponibile in questa cartella.',
+    'auditRoom.selectFolderToView': 'Seleziona una cartella per vedere le evidenze.',
+    'auditRoom.generateBinder': 'Genera binder',
+    'auditRoom.createBinderHint': 'Seleziona gli elementi per creare un PDF binder da Audit Room.',
+    'dashboard.documentation': 'Documentazione',
+    'dashboard.implementation': 'Implementazione',
+    'dashboard.tested': 'Testato / Efficace',
+    'dashboard.overview': 'Panoramica della salute della conformità e dei prossimi passi per la tua organizzazione.',
+    'dashboard.overviewLabel': 'Cruscotto',
+    'dashboard.kpiLoadError': 'Impossibile caricare i KPI',
+    'dashboard.loadingKpis': 'Caricamento KPI...',
+    'dashboard.loading': 'Caricamento...',
+    'dashboard.noRecentActivity': 'Nessuna attività recente disponibile',
+    'dashboard.noUpcomingTasks': 'Nessuna attività imminente trovata',
+    'dashboard.nextAuditTitle': 'Prossimo audit',
+    'dashboard.daysLeft': 'giorni rimanenti',
+    'dashboard.targetDate': 'Data obiettivo',
+    'dashboard.healthScoreTrend': 'Andamento del punteggio di salute',
+    'dashboard.recentActivity': 'Attività recente',
+    'dashboard.upcomingTasks': 'Attività imminenti',
+    'dashboard.lastAudit': 'Ultimo audit',
+    'dashboard.today': 'Da oggi',
+    'dashboard.cycleLabel': 'Ciclo',
+    'dashboard.statusLabel': 'Stato',
+    'dashboard.activity.gapAnalysis': 'Analisi delle lacune completata per ISO 27001',
+    'dashboard.activity.evidence': 'Evidenza caricata per A.8.1',
+    'dashboard.activity.capa': 'CAPA NC-2024-015 aggiornata',
+    'dashboard.activity.risk': 'Piano di trattamento del rischio R-001 approvato',
+    'dashboard.time.2hours': '2 ore fa',
+    'dashboard.time.5hours': '5 ore fa',
+    'dashboard.time.1day': '1 giorno fa',
+    'dashboard.time.2days': '2 giorni fa',
+    'dashboard.task.evidence': 'Completa l’evidenza per A.9.2',
+    'dashboard.task.capa': 'Revisiona CAPA NC-2025-002',
+    'dashboard.task.risk': 'Aggiorna il piano di trattamento del rischio',
+    'dashboard.task.auditDocs': 'Prepara la documentazione di audit',
+    'dashboard.due.today': 'Oggi',
+    'dashboard.due.tomorrow': 'Domani',
+    'dashboard.due.thisWeek': 'Questa settimana',
+    'dashboard.due.nextWeek': 'Prossima settimana',
+    'dashboard.priority.high': 'ALTA',
+    'dashboard.priority.medium': 'MEDIA',
+    'dashboard.priority.low': 'BASSA',
+    'searchBinder.error.enterTerm': 'Inserisci un termine da cercare.',
+    'searchBinder.log.search': 'Ricerca: "{term}" ({count} risultati)',
+    'searchBinder.log.searchError': 'Errore di ricerca: "{term}"',
+    'searchBinder.deselected': 'Deselezionato',
+    'searchBinder.selected': 'Selezionato',
+    'searchBinder.log.removed': 'Rimosso dal binder: {id}',
+    'searchBinder.log.cleared': 'Binder pulito',
+    'searchBinder.selectedItemsCount': '{count} elemento(i) selezionato(i)',
+    'searchBinder.error.selectOne': 'Seleziona almeno un elemento per generare un binder.',
+    'searchBinder.binderTitle': 'Binder di audit',
+    'searchBinder.binderDescription': 'Binder generato dal dashboard',
+    'searchBinder.error.generateBinder': 'Impossibile generare il binder. Riprova.',
+    'searchBinder.error.search': 'Ricerca fallita. Riprova.',
+    'searchBinder.binderDetail': 'Dettaglio del binder',
+    'searchBinder.searchPlaceholder': 'Cerca in linguaggio naturale: ad esempio policy di accesso, evidenze di audit',
+    'searchBinder.search': 'Cerca',
+    'searchBinder.relevantResults': 'Risultati rilevanti',
+    'searchBinder.quickView': 'Vista rapida dell’Allegato A',
+    'searchBinder.resultsCount': '{count} risultati',
+    'searchBinder.loadingResults': 'Caricamento risultati...',
+    'searchBinder.emptyHint': 'Esegui una ricerca per visualizzare frammenti dell’Allegato A.',
+    'searchBinder.addedToBinder': 'Aggiunto al binder',
+    'searchBinder.addToBinder': 'Aggiungi al binder',
+    'searchBinder.relevance': 'Rilevanza {score}%',
+    'searchBinder.inlinePreview': 'Anteprima inline',
+    'searchBinder.binder': 'Binder',
+    'searchBinder.multiSelection': 'Selezione multipla',
+    'searchBinder.noneSelected': 'Nessun elemento selezionato. Aggiungi elementi dall’elenco.',
+    'searchBinder.generateBinderPdf': 'Genera PDF del binder',
+    'searchBinder.waitingGeneration': 'In attesa della generazione del binder...',
+    'searchBinder.actionLog': 'Registro azioni',
+    'searchBinder.emptyLog': 'Le tue ultime 50 azioni appariranno qui.',
+    'documents.generate.defaultTitle': 'Nuovo documento ISO 27001',
+    'documents.generate.defaultDescription': 'Genera un documento ISO 27001 obbligatorio con supporto IA.',
+    'documents.generate.defaultAudience': 'Team di sicurezza',
+    'documents.report.defaultTitle': 'Report di conformità',
+    'documents.report.defaultDescription': 'Riepilogo dello stato e delle lacune di conformità.',
+    'documents.error.loadList': 'Impossibile caricare i documenti. Prova a ricaricare la pagina.',
+    'documents.error.loadSelected': 'Impossibile caricare il documento selezionato.',
+    'documents.report.error.timeout': 'La generazione del report ha richiesto troppo tempo. Riprova.',
+    'documents.report.error.status': 'Impossibile recuperare lo stato del report. Riprova.',
+    'documents.confirmDelete': 'Sei sicuro di voler eliminare questo documento?',
+    'documents.error.delete': 'Impossibile eliminare il documento.',
+    'documents.report.error.selectFirst': 'Seleziona prima un documento dalla barra laterale.',
+    'documents.report.error.start': 'Impossibile avviare la generazione del report.',
+    'documents.upload.error.missingInput': 'Devi selezionare un file o inserire contenuto.',
+    'documents.upload.defaultTitle': 'Documento caricato',
+    'documents.upload.success': 'Documento caricato con successo.',
+    'documents.upload.defaultDescription': 'Documento caricato',
+    'documents.upload.error.generic': 'Errore durante il caricamento del documento. Riprova.',
+    'documents.generate.starting': 'Avvio generazione...',
+    'documents.generate.fallbackTitle': 'Documento ISO 27001',
+    'documents.generate.completed': 'Generazione completata',
+    'documents.generate.errorStatus': 'Errore di generazione',
+    'documents.generate.errorStart': 'Impossibile avviare la generazione. Controlla la configurazione.',
+    'documents.generate.defaultUploadedDescription': 'Documento generato da IA',
+    'documents.generate.uploadError': 'Errore durante il caricamento del documento generato.',
+    'documents.tab.view': 'Vista',
+    'documents.tab.edit': 'Editor',
+    'documents.tab.generate': 'Genera con IA',
+    'documents.tab.report': 'Esporta report',
+    'documents.tab.upload': 'Carica',
+    'documents.hero.subtitle': 'Crea, modifica e gestisci documenti ISO 27001 con assistenza IA in un flusso più chiaro e professionale.',
+    'documents.sidebar.quickAccess': 'Accesso rapido ai documenti salvati.',
+    'documents.sidebar.searchPlaceholder': 'Cerca documenti',
+    'documents.deleteDocument': 'Elimina documento',
+    'documents.viewLess': 'Mostra meno',
+    'documents.viewMoreCount': 'Mostra di più ({count} in più)',
+    'documents.action.generateAi': '+ Genera con IA',
+    'documents.action.exportReport': '+ Esporta report',
+    'documents.action.uploadDocument': '+ Carica documento',
+    'documents.noDocumentSelected': 'Nessun documento selezionato',
+    'documents.openAssistant': 'Apri assistente',
+    'documents.loadingDocument': 'Caricamento documento...',
+    'documents.selectToView': 'Seleziona un documento per visualizzarne il contenuto.',
+    'documents.untitled': 'Documento senza titolo',
+    'documents.generate.title': 'Genera documento con IA',
+    'documents.generate.subtitle': 'L\'agente LLM genererà un documento ISO 27001 completo sezione per sezione.',
+    'documents.field.title': 'Titolo',
+    'documents.field.description': 'Descrizione',
+    'documents.field.audience': 'Pubblico',
+    'documents.field.language': 'Lingua',
+    'documents.field.tone': 'Tono',
+    'documents.field.type': 'Tipo',
+    'documents.field.sections': 'Sezioni',
+    'documents.placeholder.title': 'Titolo del documento',
+    'documents.placeholder.context': 'Contesto del documento',
+    'documents.placeholder.audience': 'Team destinatario',
+    'documents.placeholder.sections': 'Separate da virgole o interruzioni di riga',
+    'documents.tone.formal': 'Formale',
+    'documents.tone.informal': 'Informale',
+    'documents.type.policy': 'Politica',
+    'documents.type.report': 'Report',
+    'documents.type.procedure': 'Procedura',
+    'documents.type.general': 'Generale',
+    'documents.jobId': 'ID Job:',
+    'documents.generate.generating': 'Generazione in corso...',
+    'documents.generate.button': 'Genera documento',
+    'documents.openInEditor': 'Apri nell\'editor',
+    'documents.uploadGenerated': 'Carica documento generato',
+    'documents.report.title': 'Esporta report',
+    'documents.report.subtitle': 'Genera un report scaricabile basato sul documento attualmente selezionato.',
+    'documents.report.documentToExport': 'Documento da esportare:',
+    'documents.report.noneSelected': 'Nessun documento selezionato nella barra laterale',
+    'documents.report.fieldTitle': 'Titolo del report',
+    'documents.report.placeholderDescription': 'Es.: Riepilogo esecutivo dello stato dei controlli ISO per il riesame della direzione',
+    'documents.report.descriptionHint': 'Questo testo apparirà come sottotitolo nell\'intestazione del report generato.',
+    'documents.report.template': 'Modello',
+    'documents.report.format': 'Formato',
+    'documents.report.status': 'Stato del report',
+    'documents.report.download': 'Scarica report',
+    'documents.report.generateAnother': 'Genera un altro',
+    'documents.report.recent': 'Report recenti',
+    'documents.report.generating': 'Generazione report...',
+    'documents.report.startExport': 'Avvia esportazione',
+    'documents.upload.title': 'Carica documento',
+    'documents.upload.subtitle': 'Carica un file o incolla direttamente il contenuto.',
+    'documents.upload.placeholderSummary': 'Breve riepilogo',
+    'documents.upload.file': 'File',
+    'documents.upload.altContent': 'Contenuto alternativo',
+    'documents.upload.altPlaceholder': 'Incolla qui il contenuto se non carichi un file',
+    'documents.upload.uploading': 'Caricamento...',
+    'documents.upload.button': 'Carica documento',
+    'language.es': 'Spagnolo',
+    'language.en': 'Inglese',
+    'common.optional': 'opzionale',
+    'documents.title': 'Generatore di documenti',
+    'documents.viewLabel': 'Vista documento',
+    'documentEditor.titlePlaceholder': 'Titolo del documento',
+    'documentEditor.stats': '{words} parole · {chars} caratteri',
+    'documentEditor.saved': '✓ Salvato',
+    'documentEditor.unsaved': '○ Non salvato',
+    'documentEditor.copyAsText': 'Copia come testo',
+    'documentEditor.copied': '✓ Copiato',
+    'documentEditor.copy': 'Copia',
+    'documentEditor.upload': 'Carica',
+    'documentEditor.save': 'Salva',
+    'documentEditor.exitFullscreen': 'Esci da schermo intero',
+    'documentEditor.fullscreen': 'Schermo intero',
+    'documentEditor.placeholder': 'Inizia a scrivere o genera un documento con IA...',
+    'documentEditor.footerBrand': 'ISO 27001 · DANI Platform',
+    'documentEditor.mobileWords': '{count} parole',
+    'documentEditor.toolbar.heading1': 'Titolo 1',
+    'documentEditor.toolbar.heading2': 'Titolo 2',
+    'documentEditor.toolbar.heading3': 'Titolo 3',
+    'documentEditor.toolbar.bold': 'Grassetto',
+    'documentEditor.toolbar.italic': 'Corsivo',
+    'documentEditor.toolbar.underline': 'Sottolineato',
+    'documentEditor.toolbar.bulletList': 'Elenco puntato',
+    'documentEditor.toolbar.orderedList': 'Elenco numerato',
+    'documentEditor.toolbar.blockquote': 'Citazione',
+    'assessment.progressTitle': 'Progresso',
+    'assessment.phaseLabel': 'Fase {order}',
+    'evidence.attachmentDeleted': 'File eliminato',
+    'evidence.replace': 'Sostituisci',
+    'evidence.deleteFile': 'Elimina file',
+    'evidence.viewLess': 'Mostra meno',
+    'evidence.viewMoreCount': 'Mostra altri {count}',
+    'auditRoom.title': 'Audit Room',
+    'auditRoom.evidencesLabel': 'Evidenze',
+    'navbar.openCommandPalette': 'Apri palette comandi',
+    'navbar.cmdShortcut': 'Ctrl + K / ⌘K',
+    'integrations.oauth.title': 'OAuth',
+    'integrations.oauth.processing': 'Elaborazione in corso...',
+    'integrations.oauth.invalidParams': 'Parametri non validi',
+    'integrations.oauth.completed': 'Connessione completata',
+    'integrations.oauth.timeout': 'Tempo scaduto. Controlla la connessione in Integrazioni.',
+    'upload.field.controlId': 'control_id',
+    'upload.field.clauseRef': 'clause_ref',
+    'upload.placeholder.controlId': 'ISO 27001 A.5.1',
+    'upload.placeholder.clauseRef': 'A.5.1',
+    'upload.dialogTitle': 'Carica evidenza',
+    'upload.api.primary': 'POST /api/v1/evidences',
+    'upload.api.secondary': 'POST /api/validate/external',
+    },
 };
