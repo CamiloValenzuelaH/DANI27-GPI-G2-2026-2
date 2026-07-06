@@ -12,13 +12,14 @@ from app.models.evidence_taxonomy import (
     EVIDENCE_TAXONOMY_TYPES,
     EvidenceTaxonomy,
 )
+from app.models.assessment_answer import AssessmentAnswer
 from app.models.organization import Organization
 from app.db.database import get_db
 from app.schemas.evidence_taxonomy import EvidenceTaxonomyGroup, EvidenceTaxonomyItem
 
 router = APIRouter(prefix="/evidences", tags=["evidences"])
 
-UPLOAD_ROOT = Path("uploads") / "evidences"
+UPLOAD_ROOT = Path(__file__).resolve().parents[2] / "uploads" / "evidences"
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".png", ".jpg", ".jpeg"}
 
 def _taxonomy_item_from_row(row: EvidenceTaxonomy) -> EvidenceTaxonomyItem:
@@ -29,6 +30,8 @@ def _taxonomy_item_from_row(row: EvidenceTaxonomy) -> EvidenceTaxonomyItem:
         control_id=row.control_id,
         clause_ref=row.clause_ref,
         organization_id=str(row.organization_id),
+        question_id=str(row.question_id) if getattr(row, "question_id", None) else None,
+        answer_id=str(row.answer_id) if getattr(row, "answer_id", None) else None,
         validity_days=row.validity_days,
         freshness_status=row.freshness_status,
     )
@@ -85,6 +88,8 @@ async def upload_evidence(
     control_id: Optional[str] = Form(None),
     clause_ref: Optional[str] = Form(None),
     validity_days: Optional[int] = Form(None),
+    answer_id: Optional[str] = Form(None),
+    question_id: Optional[str] = Form(None),
     org: Organization = Depends(get_current_org),
     db: Session = Depends(get_db),
 ):
@@ -133,14 +138,46 @@ async def upload_evidence(
     else:
         resolved_validity_days = validity_days
 
+    # Validate question_id and answer_id if provided.
+    resolved_question_id = None
+    resolved_answer_id = None
+    if question_id:
+        try:
+            from uuid import UUID
+            resolved_question_id = UUID(question_id)
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="question_id inválido")
+    if answer_id:
+        try:
+            from uuid import UUID
+            resolved_answer_id = UUID(answer_id)
+        except (ValueError, TypeError):
+            raise HTTPException(status_code=400, detail="answer_id inválido")
+    elif resolved_question_id:
+        # Try to find the most recent answer for this question in this organization
+        try:
+            recent_answer = db.query(AssessmentAnswer).filter(
+                AssessmentAnswer.organization_id == org.id,
+                AssessmentAnswer.question_id == resolved_question_id,
+            ).order_by(AssessmentAnswer.updated_at.desc()).first()
+            if recent_answer:
+                resolved_answer_id = recent_answer.id
+        except Exception:
+            # Silently ignore lookup issues; question_id is still stored for traceability.
+            pass
+
     evidence_row = EvidenceTaxonomy(
         id=evidence_id,
         organization_id=org.id,
+        question_id=resolved_question_id,
+        answer_id=resolved_answer_id,
         name=(name or file.filename).strip(),
         type=normalized_type,
         control_id=normalized_control_id,
         clause_ref=normalized_clause_ref,
         validity_days=resolved_validity_days,
+        original_file_name=file.filename,
+        file_path=str(destination),
     )
     db.add(evidence_row)
     db.commit()
@@ -163,3 +200,35 @@ async def upload_evidence(
         "file_path": str(destination.as_posix()),
         "created_date": evidence_row.created_at.date().isoformat() if evidence_row.created_at else None,
     }
+
+
+@router.delete("/{evidence_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_evidence(
+    evidence_id: str,
+    org: Organization = Depends(get_current_org),
+    db: Session = Depends(get_db),
+):
+    evidence_row = (
+        db.query(EvidenceTaxonomy)
+        .filter(
+            EvidenceTaxonomy.id == evidence_id,
+            EvidenceTaxonomy.organization_id == org.id,
+        )
+        .one_or_none()
+    )
+
+    if not evidence_row:
+        raise HTTPException(status_code=404, detail="Evidencia no encontrada")
+
+    db.delete(evidence_row)
+    db.commit()
+
+    # Best-effort filesystem cleanup for files stored as <evidence_id>.<extension>.
+    org_dir = UPLOAD_ROOT / str(org.id)
+    for candidate in org_dir.glob(f"{evidence_id}.*"):
+        try:
+            candidate.unlink(missing_ok=True)
+        except Exception:
+            continue
+
+    return None

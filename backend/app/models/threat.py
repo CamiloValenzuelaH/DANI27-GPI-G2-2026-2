@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 risk_threats = Table(
     "risk_threats",
     Base.metadata,
+    Column("id", PGUUID(as_uuid=True), primary_key=True),
     Column("organization_id", PGUUID(as_uuid=True), ForeignKey("organizations.id", ondelete="CASCADE"), primary_key=True),
     Column("risk_id", PGUUID(as_uuid=True), ForeignKey("risks.id", ondelete="CASCADE"), primary_key=True),
     Column("threat_id", PGUUID(as_uuid=True), ForeignKey("threats.id", ondelete="CASCADE"), primary_key=True),

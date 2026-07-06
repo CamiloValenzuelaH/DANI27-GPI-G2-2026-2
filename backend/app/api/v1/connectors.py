@@ -18,7 +18,7 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from app.core.dependencies import get_current_org
+from app.core.dependencies import get_current_org, require_roles
 from app.db.database import get_db
 from app.models.organization import Organization
 from app.services import connector_service
@@ -48,6 +48,11 @@ class AwsConfigureRequest(BaseModel):
     access_key_id: str = Field(..., min_length=16, max_length=128)
     secret_access_key: str = Field(..., min_length=1)
     region: str = Field(..., min_length=1, max_length=32)
+
+
+class ScheduleRequest(BaseModel):
+    hours: int = Field(..., ge=1, le=24*365)
+    enabled: bool = Field(default=True)
 
 
 # ── Helper: genera state token con org_id embebido ────────────────────────────
@@ -88,6 +93,19 @@ def google_auth(
     state = _build_state(org.id)
     auth_url = connector_service.get_google_auth_url(org_id=org.id, state_token=state)
     return RedirectResponse(url=auth_url)
+
+
+@router.post("/google/start", summary="Preparar URL OAuth Google Workspace", dependencies=[Depends(require_roles("admin"))])
+def google_start(
+    org: Organization = Depends(get_current_org),
+):
+    """
+    Devuelve la URL de autorización para iniciar en el cliente.
+    Requiere permisos de administrador.
+    """
+    state = _build_state(org.id)
+    auth_url = connector_service.get_google_auth_url(org_id=org.id, state_token=state)
+    return {"url": auth_url}
 
 
 @router.get("/google/callback", summary="Callback OAuth Google Workspace")
@@ -136,6 +154,60 @@ def google_disconnect(
     connector_service.disconnect_connector(db=db, org_id=org.id, connector_type="google_workspace")
 
 
+@router.post("/google/schedule", summary="Configurar frecuencia de sincronización Google", dependencies=[Depends(require_roles("admin"))])
+def google_schedule(
+    body: ScheduleRequest,
+    org: Organization = Depends(get_current_org),
+    db: Session = Depends(get_db),
+):
+    from app.services import connector_service as svc
+
+    connector = svc._get_or_create_connector(db=db, org_id=org.id, connector_type="google_workspace")
+    connector.sync_interval_hours = body.hours
+    connector.auto_sync_enabled = bool(body.enabled)
+    db.commit()
+    return {"message": "Schedule updated", "hours": connector.sync_interval_hours, "enabled": connector.auto_sync_enabled}
+
+
+@router.post("/microsoft/schedule", summary="Configurar frecuencia de sincronización Microsoft", dependencies=[Depends(require_roles("admin"))])
+def microsoft_schedule(
+    body: ScheduleRequest,
+    org: Organization = Depends(get_current_org),
+    db: Session = Depends(get_db),
+):
+    connector = connector_service._get_or_create_connector(db=db, org_id=org.id, connector_type="microsoft_365")
+    connector.sync_interval_hours = body.hours
+    connector.auto_sync_enabled = bool(body.enabled)
+    db.commit()
+    return {"message": "Schedule updated", "hours": connector.sync_interval_hours, "enabled": connector.auto_sync_enabled}
+
+
+@router.post("/github/schedule", summary="Configurar frecuencia de sincronización GitHub", dependencies=[Depends(require_roles("admin"))])
+def github_schedule(
+    body: ScheduleRequest,
+    org: Organization = Depends(get_current_org),
+    db: Session = Depends(get_db),
+):
+    connector = connector_service._get_or_create_connector(db=db, org_id=org.id, connector_type="github")
+    connector.sync_interval_hours = body.hours
+    connector.auto_sync_enabled = bool(body.enabled)
+    db.commit()
+    return {"message": "Schedule updated", "hours": connector.sync_interval_hours, "enabled": connector.auto_sync_enabled}
+
+
+@router.post("/aws/schedule", summary="Configurar frecuencia de sincronización AWS", dependencies=[Depends(require_roles("admin"))])
+def aws_schedule(
+    body: ScheduleRequest,
+    org: Organization = Depends(get_current_org),
+    db: Session = Depends(get_db),
+):
+    connector = connector_service._get_or_create_connector(db=db, org_id=org.id, connector_type="aws")
+    connector.sync_interval_hours = body.hours
+    connector.auto_sync_enabled = bool(body.enabled)
+    db.commit()
+    return {"message": "Schedule updated", "hours": connector.sync_interval_hours, "enabled": connector.auto_sync_enabled}
+
+
 # ═══════════════════════════════════════════════════════════════
 # DANI-BE-022: Microsoft 365
 # ═══════════════════════════════════════════════════════════════
@@ -147,6 +219,15 @@ def microsoft_auth(
     state = _build_state(org.id)
     auth_url = connector_service.get_microsoft_auth_url(org_id=org.id, state_token=state)
     return RedirectResponse(url=auth_url)
+
+
+@router.post("/microsoft/start", summary="Preparar URL OAuth Microsoft 365", dependencies=[Depends(require_roles("admin"))])
+def microsoft_start(
+    org: Organization = Depends(get_current_org),
+):
+    state = _build_state(org.id)
+    auth_url = connector_service.get_microsoft_auth_url(org_id=org.id, state_token=state)
+    return {"url": auth_url}
 
 
 @router.get("/microsoft/callback", summary="Callback OAuth Microsoft 365")
@@ -182,7 +263,7 @@ def microsoft_status(
     return ConnectorStatusResponse(**result)
 
 
-@router.delete("/microsoft", status_code=status.HTTP_204_NO_CONTENT, summary="Desconectar Microsoft 365")
+@router.delete("/microsoft", status_code=status.HTTP_204_NO_CONTENT, summary="Desconectar Microsoft 365", dependencies=[Depends(require_roles("admin"))])
 def microsoft_disconnect(
     org: Organization = Depends(get_current_org),
     db: Session = Depends(get_db),
@@ -194,7 +275,7 @@ def microsoft_disconnect(
 # DANI-BE-023: AWS
 # ═══════════════════════════════════════════════════════════════
 
-@router.post("/aws/configure", summary="Configurar credenciales AWS")
+@router.post("/aws/configure", summary="Configurar credenciales AWS", dependencies=[Depends(require_roles("admin"))])
 def aws_configure(
     body: AwsConfigureRequest,
     org: Organization = Depends(get_current_org),
@@ -236,7 +317,7 @@ def aws_status(
     return ConnectorStatusResponse(**result)
 
 
-@router.delete("/aws", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar configuración AWS")
+@router.delete("/aws", status_code=status.HTTP_204_NO_CONTENT, summary="Eliminar configuración AWS", dependencies=[Depends(require_roles("admin"))])
 def aws_disconnect(
     org: Organization = Depends(get_current_org),
     db: Session = Depends(get_db),
@@ -255,6 +336,15 @@ def github_auth(
     state = _build_state(org.id)
     auth_url = connector_service.get_github_auth_url(org_id=org.id, state_token=state)
     return RedirectResponse(url=auth_url)
+
+
+@router.post("/github/start", summary="Preparar URL OAuth GitHub", dependencies=[Depends(require_roles("admin"))])
+def github_start(
+    org: Organization = Depends(get_current_org),
+):
+    state = _build_state(org.id)
+    auth_url = connector_service.get_github_auth_url(org_id=org.id, state_token=state)
+    return {"url": auth_url}
 
 
 @router.get("/github/callback", summary="Callback OAuth GitHub")
@@ -296,7 +386,7 @@ def github_list_repos(
     return {"repos": data.get("repos", [])}
 
 
-@router.delete("/github", status_code=status.HTTP_204_NO_CONTENT, summary="Desconectar GitHub")
+@router.delete("/github", status_code=status.HTTP_204_NO_CONTENT, summary="Desconectar GitHub", dependencies=[Depends(require_roles("admin"))])
 def github_disconnect(
     org: Organization = Depends(get_current_org),
     db: Session = Depends(get_db),

@@ -1,0 +1,388 @@
+'tutorial.steps.dashboard.title': `Panel de Control`
+'tutorial.steps.dashboard.description': `Revisa el estado general de cumplimiento, alertas y progresos clave desde tu panel principal.`
+'tutorial.steps.dashboard.sections.dashboard.title': `Panel de Control`
+'tutorial.steps.dashboard.sections.dashboard.content': `Este dashboard resume el estado actual de tu programa:
+  - KPIs de documentación, implementación y efectividad
+  - Score de salud y tendencia
+  - Actividad reciente
+  - Tareas próximas por vencer
+
+  Es un panel de lectura rápida para priorizar, no un módulo de edición masiva.`
+'tutorial.steps.dashboard.sections.dashboard.action': `Recorre visualmente el panel principal`
+'tutorial.steps.dashboard.sections.kpis.title': `KPIs y score`
+'tutorial.steps.dashboard.sections.kpis.content': `Las tarjetas muestran porcentajes actuales y variación reciente.
+
+  Úsalo para detectar si vas mejorando o retrocediendo. En esta versión, estas tarjetas son informativas y no abren un detalle al hacer clic.`
+'tutorial.steps.dashboard.sections.kpis.action': `Revisa valores y variaciones de las tarjetas`
+'tutorial.steps.dashboard.sections.activity-tasks.title': `Actividad y próximos pendientes`
+'tutorial.steps.dashboard.sections.activity-tasks.content': `Abajo verás dos bloques útiles:
+  - Actividad reciente: cambios que ocurrieron en el sistema
+  - Próximas tareas: items con prioridad/fecha para seguimiento
+
+  Esto te ayuda a decidir qué atender primero cada día.`
+'tutorial.steps.dashboard.sections.activity-tasks.action': `Compara actividad reciente con tareas próximas`
+'tutorial.steps.dashboard.sections.scope.title': `Alcance real de este paso`
+'tutorial.steps.dashboard.sections.scope.content': `Lo que sí hace:
+  - Mostrar estado agregado y tendencia
+  - Mostrar actividad y tareas sugeridas
+
+  Recomendación de uso:
+  - Úsalo para priorizar en minutos qué atender primero
+  - Luego profundiza en cada módulo para ejecutar acciones`
+'tutorial.steps.dashboard.sections.scope.action': `Ten claro que este paso es de monitoreo`
+'tutorial.steps.dashboard.sections.conclusion.title': `Siguiente paso`
+'tutorial.steps.dashboard.sections.conclusion.content': `Cuando detectes prioridades en el dashboard, pasa al análisis de brechas para entender por qué estás en ese estado y qué corregir primero.`
+'tutorial.steps.dashboard.sections.conclusion.action': `Haz clic en Siguiente para Gap Analysis`
+'tutorial.steps.understand.title': `Análisis de Brechas`
+'tutorial.steps.understand.description': `Identifica exactamente qué brechas tienes entre tu estado actual y los requerimientos de compliance.`
+'tutorial.steps.understand.sections.understand.title': `Análisis de Brechas`
+'tutorial.steps.understand.sections.understand.content': `Estamos en la sección más importante: Gap Analysis.
+
+Aquí vamos a:
+1. Responder preguntas sobre tu organización
+2. El sistema analiza tus respuestas
+3. Te mostramos EXACTAMENTE qué te falta
+4. Te damos un plan para cerrar brechas
+
+Este es el corazón del compliance. Tómate tiempo aquí.`
+'tutorial.steps.understand.sections.understand.action': `Lee esta introducción`
+'tutorial.steps.understand.sections.framework.title': `¿Qué Normativa Debes Cumplir?`
+'tutorial.steps.understand.sections.framework.content': `Puedes trabajar con uno o varios marcos:
+- ISO 27001 (Seguridad de Información)
+- ISO 27002 (Controles de Seguridad)
+- GDPR (Protección de Datos - Europa)
+- HIPAA (Salud - USA)
+- NIST (Seguridad Nacional - USA)
+- SOC 2 (Auditoría de Servicios)
+
+Selecciona el que aplique a tu negocio.
+Consejo: Muchas orgs usan ISO 27001 como base.`
+'tutorial.steps.understand.sections.framework.action': `Selecciona el framework normativo que aplique`
+'tutorial.steps.understand.sections.questionnaire.title': `Responde Honestamente`
+'tutorial.steps.understand.sections.questionnaire.content': `Verás preguntas como:
+'¿Tienes una política de seguridad documentada?'
+'¿Realizas capacitación anual en security?'
+'¿Tienes un plan de incident response?'
+
+Responde SÍ/NO/PARCIALMENTE (esto es confidencial)
+
+No hay respuestas 'correctas'. La verdad es mejor.
+Basado en esto, calcularemos tus brechas.`
+'tutorial.steps.understand.sections.questionnaire.action': `Comienza a responder las preguntas`
+'tutorial.steps.understand.sections.analysis.title': `El Sistema Analiza...`
+'tutorial.steps.understand.sections.analysis.content': `Déjanos un momento para procesar tus respuestas.
+
+Estamos:
+✓ Comparando tu estado con normas
+✓ Calculando % de cumplimiento
+✓ Priorizando brechas por riesgo
+✓ Recomendando acciones
+
+Esto puede tomar 10-30 segundos...`
+'tutorial.steps.understand.sections.analysis.action': `Espera mientras procesamos el análisis`
+'tutorial.steps.understand.sections.results.title': `Aquí Están tus Brechas`
+'tutorial.steps.understand.sections.results.content': `Ves 3 cosas:
+
+1. BRECHA CRÍTICA (Rojo)
+   - Impacto alto si no lo cierras
+   - Debes hacer esto PRIMERO
+   
+2. BRECHA MAYOR (Naranja)
+   - Importante pero no urgente
+   - Planifica en próximos meses
+
+3. BRECHA MENOR (Amarillo)
+   - Impacto bajo
+   - Útil tener pero no crítico
+
+El % de cumplimiento está arriba.
+Si es <70%, hay trabajo por hacer.`
+'tutorial.steps.understand.sections.results.action': `Examina tus brechas y su prioridad`
+'tutorial.steps.understand.sections.action-plan.title': `Crea tu Plan de Cierre`
+'tutorial.steps.understand.sections.action-plan.content': `Para cada brecha:
+1. Haz clic en ella
+2. Asigna un responsable
+3. Establece una fecha límite
+4. Describe qué harás para cerrarla
+
+El sistema rastrea tu progreso.
+Cada brecha cerrada = % cumplimiento sube
+
+Ejemplo: 
+"Brecha: 'No tenemos MFA habilitado'
+Responsable: Juan Pérez (CISO)
+Plazo: 30 de Marzo
+Acción: Implementar Okta MFA en todos los accesos"`
+'tutorial.steps.understand.sections.action-plan.action': `Crea un plan de acción para una brecha`
+'tutorial.steps.understand.sections.conclusion.title': `¡Análisis Completo!`
+'tutorial.steps.understand.sections.conclusion.content': `Felicitaciones, ya SABES qué te falta.
+
+El resto es implementación:
+- Paso 3: Documenta tus ACTIVOS (qué proteges)
+- Paso 4: Sube políticas y DOCUMENTOS
+- Paso 5: Identifica RIESGOS específicos
+- Paso 6: Recopila EVIDENCIA de cumplimiento
+- Paso 7: Compila HALLAZGOS para auditoría
+
+Sigamos. Próximo: Assets (Inventario)`
+'tutorial.steps.understand.sections.conclusion.action': `Haz clic en Siguiente para continuar`
+'tutorial.steps.assets.title': `Inventario de Activos`
+'tutorial.steps.assets.description': `Documenta todos tus activos (sistemas, datos, personas) que necesitan protección.`
+'tutorial.steps.assets.sections.assets.title': `Inventario de Activos`
+'tutorial.steps.assets.sections.assets.content': `Aquí registras activos de forma estructurada para tu gestión de riesgos.
+
+Puedes crear, editar y eliminar activos, y clasificarlos por tipo y por impacto C-I-A (confidencialidad, integridad y disponibilidad).`
+'tutorial.steps.assets.sections.assets.action': `Revisa la tabla y el botón + New asset`
+'tutorial.steps.assets.sections.create.title': `Crear y clasificar`
+'tutorial.steps.assets.sections.create.content': `Al crear un activo, defines nombre, tipo, ubicación y puntajes C-I-A.
+
+Con esos valores, el sistema calcula criticidad para ayudarte a priorizar.`
+'tutorial.steps.assets.sections.create.action': `Crea un activo y completa C-I-A`
+'tutorial.steps.assets.sections.filters.title': `Filtrar y revisar`
+'tutorial.steps.assets.sections.filters.content': `Puedes filtrar por tipo y por nivel de criticidad para revisar rápidamente qué activos requieren más atención.
+
+También puedes abrir un activo existente para editar sus datos o eliminarlo.`
+'tutorial.steps.assets.sections.filters.action': `Prueba los filtros por tipo y nivel`
+'tutorial.steps.assets.sections.scope.title': `Enfoque del módulo`
+'tutorial.steps.assets.sections.scope.content': `El objetivo de este paso es mantener un inventario claro y accionable.
+
+      Cuando los activos están bien clasificados y priorizados, el análisis de riesgos y la ejecución de controles se vuelven mucho más rápidos.`
+'tutorial.steps.assets.sections.scope.action': `Úsalo como inventario y clasificación de activos`
+'tutorial.steps.assets.sections.conclusion.title': `Siguiente paso`
+'tutorial.steps.assets.sections.conclusion.content': `Con el inventario base listo, el siguiente paso es centralizar documentos para soportar evidencia y reportes.`
+'tutorial.steps.assets.sections.conclusion.action': `Haz clic en Siguiente`
+'tutorial.steps.documents.title': `Gestión de Documentos`
+'tutorial.steps.documents.description': `Compila, organiza y versionea todas tus políticas y procedimientos.`
+'tutorial.steps.documents.sections.documents.title': `Gestión de Documentos`
+'tutorial.steps.documents.sections.documents.content': `Este módulo concentra trabajo documental en cinco pestañas:
+- Ver documentos
+- Editar contenido
+- Generar documento con IA
+- Exportar reporte
+- Subir documento`
+'tutorial.steps.documents.sections.documents.action': `Identifica las pestañas disponibles`
+'tutorial.steps.documents.sections.upload.title': `Carga y consulta`
+'tutorial.steps.documents.sections.upload.content': `Puedes subir archivos o contenido textual, listarlos y abrir uno para verlo/editarlo.
+
+También puedes eliminar documentos cargados cuando corresponda.`
+'tutorial.steps.documents.sections.upload.action': `Sube un documento y ábrelo desde la lista`
+'tutorial.steps.documents.sections.ai-generation.title': `Generación con IA`
+'tutorial.steps.documents.sections.ai-generation.content': `La pestaña de generación permite crear borradores de documentos y luego subirlos al repositorio.
+
+Es útil para arrancar rápido una política o procedimiento base.`
+'tutorial.steps.documents.sections.ai-generation.action': `Prueba generar un borrador y revisarlo`
+'tutorial.steps.documents.sections.reports.title': `Exportación de reportes`
+'tutorial.steps.documents.sections.reports.content': `Desde la pestaña de reportes puedes lanzar una generación, ver su estado y descargar el resultado cuando esté listo.
+
+La disponibilidad de formatos depende de configuración/API, pero el flujo de generación y descarga sí está implementado.`
+'tutorial.steps.documents.sections.reports.action': `Genera un reporte y revisa su estado`
+'tutorial.steps.documents.sections.conclusion.title': `Cierre del paso`
+'tutorial.steps.documents.sections.conclusion.content': `Con este flujo ya puedes centralizar documentos clave, iterarlos y generar reportes de soporte para tu proceso de compliance.
+
+      El siguiente paso es conectar estos insumos con la gestión de riesgos.`
+'tutorial.steps.documents.sections.conclusion.action': `Haz clic en Siguiente`
+'tutorial.steps.risks.title': `Gestión de Riesgos`
+'tutorial.steps.risks.description': `Identifica, evalúa y mitiga riesgos de compliance con una metodología estructurada.`
+'tutorial.steps.risks.sections.risks.title': `Gestión de Riesgos`
+'tutorial.steps.risks.sections.risks.content': `Riesgo es la probabilidad de que algo malo suceda.
+
+Risk Management responde:
+1. ¿QUÉ podría salir mal?
+2. ¿QUÉ TAN PROBABLE es?
+3. ¿QUÉ TAN GRAVE sería?
+4. ¿QUÉ HACEMOS al respecto?
+
+Esto es lo que auditorios MÁS validan.
+Hazlo bien.`
+'tutorial.steps.risks.sections.risks.action': `Comprende el análisis de riesgos`
+'tutorial.steps.risks.sections.matrix.title': `Cómo Medimos Riesgo`
+'tutorial.steps.risks.sections.matrix.content': `RIESGO = PROBABILIDAD × IMPACTO
+
+         PROBABILIDAD
+         Baja  Media  Alta
+IM  Alta  3     6     9
+PA  Media 2     4     6  
+CT Baja  1     2     3
+
+Colores:
+- Rojo (9): CRÍTICO - Actúa YA
+- Naranja (6): ALTO - Próximas semanas
+- Amarillo (4): MEDIO - Próximos meses
+- Verde (2-1): BAJO - Seguimiento
+
+El sistema calcula automáticamente.`
+'tutorial.steps.risks.sections.matrix.action': `Observa la matriz de riesgos`
+'tutorial.steps.risks.sections.create.title': `Registrar un Riesgo`
+'tutorial.steps.risks.sections.create.content': `Haz clic en '+ Nuevo Riesgo'
+
+Formulario:
+NOMBRE: 'Pérdida de Datos por Ransomware'
+DESCRIPCIÓN: 'Ataque de ransomware podría encriptar nuestra BD'
+CATEGORÍA: Ciberseguridad / Operacional / Cumplimiento / Reputación
+PROBABILIDAD: Baja/Media/Alta
+IMPACTO: Bajo/Medio/Alto
+PROPIETARIO: Juan Pérez
+ACTIVOS AFECTADOS: Selecciona
+CONTROLES EXISTENTES: 'Tenemos backup diario'
+
+Guardar = Riesgo registrado + Score automático`
+'tutorial.steps.risks.sections.create.action': `Crea tu primer riesgo`
+'tutorial.steps.risks.sections.evaluate.title': `Ver tu Matriz de Riesgos`
+'tutorial.steps.risks.sections.evaluate.content': `Dashboard de riesgos te muestra:
+
+MATRIZ VISUAL:
+- Cada riesgo es un punto
+- Rojo en esquina = crítico
+- Verde en esquina = manejable
+- Haz clic en punto para detalles
+
+LISTA ORDENADA:
+- Por riesgo (mayor primero)
+- Nombre, Propietario, Status
+
+MÉTRICAS:
+- Total de riesgos: 24
+- Críticos: 3 (acción inmediata)
+- Altos: 7
+- Medios: 10
+- Bajos: 4`
+'tutorial.steps.risks.sections.evaluate.action': `Examina tu matriz de riesgos`
+'tutorial.steps.risks.sections.mitigation.title': `Crear Plan de Acción`
+'tutorial.steps.risks.sections.mitigation.content': `Para cada riesgo, elige:
+
+OPCIÓN 1: ACEPTAR
+- El riesgo es asumible
+- Documentar por qué
+
+OPCIÓN 2: EVITAR
+- Cambiar proceso para eliminar riesgo
+
+OPCIÓN 3: MITIGAR
+- Reducir probabilidad O impacto
+
+OPCIÓN 4: TRANSFERIR
+- Asegurar (seguros de cyber)
+
+Plan CAPA (Corrective Action Plan):
+- Acción específica
+- Responsable
+- Fecha límite
+- Métricas de éxito`
+'tutorial.steps.risks.sections.mitigation.action': `Crea un plan de mitigación`
+'tutorial.steps.risks.sections.controls.title': `Implementar Controles`
+'tutorial.steps.risks.sections.controls.content': `Controles = medidas específicas
+
+Ejemplo Riesgo: Pérdida de Datos
+Controles:
+✓ Control A: Backup automático diario
+✓ Control B: Cifrado en reposo
+✓ Control C: MFA para acceso a datos
+✓ Control D: Monitoring 24/7
+
+Para cada control:
+- Asignar responsable
+- Fecha de implementación
+- Marcar como 'En Proceso' → 'Implementado' → 'Testado'
+- Adjuntar evidencia
+
+El sistema te notifica cuando vencen.`
+'tutorial.steps.risks.sections.controls.action': `Asigna controles a un riesgo`
+'tutorial.steps.risks.sections.monitoring.title': `Riesgos Nunca Duermen`
+'tutorial.steps.risks.sections.monitoring.content': `Mensualmente:
+1. Revisar cada riesgo
+2. ¿Cambió la probabilidad?
+3. ¿Cambió el impacto?
+4. ¿Los controles funcionan?
+5. Actualizar score si es necesario
+
+Anualmente:
+- Auditoría completa de riesgos
+- Evaluar nuevos riesgos
+- Eliminar riesgos resueltos
+
+El sistema rastrea historia:
+- Riesgo X estaba 'Alto' en Jan
+- Ahora es 'Medio' en March
+- Evidencia de mejora = auditor feliz`
+'tutorial.steps.risks.sections.monitoring.action': `Monitorea y actualiza tus riesgos`
+'tutorial.steps.risks.sections.conclusion.title': `Risk Register Completo`
+'tutorial.steps.risks.sections.conclusion.content': `¡Ahora tienes un Risk Register completo!
+
+El sistema tiene:
+✓ QUÉ FALTA (Gaps)
+✓ QUÉ PROTEGES (Assets)
+✓ TUS REGLAS (Documentos)
+✓ QUÉ RIESGOS TIENES (Risks)
+
+Próximo: EVIDENCIA
+¿Cómo probamos que lo hicimos? Paso 6: Evidence`
+'tutorial.steps.risks.sections.conclusion.action': `Haz clic en Siguiente`
+'tutorial.steps.evidence.title': `Recopilación de Evidencia`
+'tutorial.steps.evidence.description': `Centraliza y organiza todas las pruebas de que tus controles funcionan.`
+'tutorial.steps.evidence.sections.evidence.title': `Recopilación de Evidencia`
+'tutorial.steps.evidence.sections.evidence.content': `Aquí puedes:
+- Subir evidencia
+- Buscar por texto (nombre/control/cláusula)
+- Filtrar por tipo
+- Ver estado de frescura (fresh, expiring, expired)
+- Eliminar evidencia`
+'tutorial.steps.evidence.sections.evidence.action': `Ubica buscador, filtro y botón de carga`
+'tutorial.steps.evidence.sections.upload.title': `Carga de evidencias`
+'tutorial.steps.evidence.sections.upload.content': `La carga se realiza desde el uploader del sistema y luego verás el item clasificado dentro de su grupo.
+
+Después puedes revisar su vigencia y mantener solo evidencias actuales.`
+'tutorial.steps.evidence.sections.upload.action': `Sube tu primera evidencia`
+'tutorial.steps.evidence.sections.organize.title': `Enfoque del paso`
+'tutorial.steps.evidence.sections.organize.content': `La meta aquí es mantener evidencia vigente, localizable y lista para revisión.
+
+      Con buscador, filtros y estados de frescura, puedes sostener la calidad de evidencia durante todo el ciclo.`
+'tutorial.steps.evidence.sections.organize.action': `Usa este paso para cargar, filtrar y mantener evidencia al día`
+'tutorial.steps.evidence.sections.conclusion.title': `Siguiente paso`
+'tutorial.steps.evidence.sections.conclusion.content': `Con evidencias cargadas y clasificadas, pasa a CAPA/Findings para gestionar acciones correctivas y prioridades.`
+'tutorial.steps.evidence.sections.conclusion.action': `Haz clic en Siguiente`
+'tutorial.steps.findings.title': `Reporte de Hallazgos`
+'tutorial.steps.findings.description': `Compila hallazgos de auditoría y genera reportes finales para stakeholders.`
+'tutorial.steps.findings.sections.findings.title': `Reporte de Hallazgos`
+'tutorial.steps.findings.sections.findings.content': `Esta pantalla funciona hoy como CAPA Tracker.
+
+Aquí ves acciones correctivas, su estado, prioridad, fecha de vencimiento y progreso.`
+'tutorial.steps.findings.sections.findings.action': `Revisa KPIs y tabla de CAPAs`
+'tutorial.steps.findings.sections.create.title': `Crear CAPA`
+'tutorial.steps.findings.sections.create.content': `Puedes crear una CAPA con título, prioridad, fuente, due date, progreso y control relacionado.
+
+Después aparecerá en la tabla principal para seguimiento.`
+'tutorial.steps.findings.sections.create.action': `Crea una CAPA de ejemplo`
+'tutorial.steps.findings.sections.filters.title': `Seguimiento y filtros`
+'tutorial.steps.findings.sections.filters.content': `Puedes filtrar por estado y prioridad, y abrir cada fila para ver detalle (descripción, control/owner, fuente y fechas).
+
+También verás KPIs de abiertas, vencidas y cerradas.`
+'tutorial.steps.findings.sections.filters.action': `Aplica filtros y expande una fila`
+'tutorial.steps.findings.sections.conclusion.title': `Cierre del paso`
+'tutorial.steps.findings.sections.conclusion.content': `Con CAPAs bien definidas y monitoreadas, conviertes brechas en un plan ejecutable con responsables y fechas.
+
+      Esto te deja listo para preparar auditoría con mayor control operativo.`
+'tutorial.steps.findings.sections.conclusion.action': `Haz clic en Siguiente`
+'tutorial.steps.audit.title': `Preparación de Auditoría`
+'tutorial.steps.audit.description': `Prepara y ejecuta la auditoría externa de compliance con socios certificados.`
+'tutorial.steps.audit.sections.audit.title': `Preparación de Auditoría`
+'tutorial.steps.audit.sections.audit.content': `Aquí tienes tres capacidades principales:
+  - Validación de evidencia por texto
+  - Validación granular de archivos
+  - Checklist pre-auditoría con auto-guardado`
+'tutorial.steps.audit.sections.audit.action': `Ubica el validador, checklist y Audit Room`
+'tutorial.steps.audit.sections.validation.title': `Validación de contenido y archivo`
+'tutorial.steps.audit.sections.validation.content': `Puedes pegar evidencia textual o subir un archivo para que el sistema analice hallazgos y estado de cumplimiento.
+
+  El resultado se muestra con progreso, severidades y observaciones.`
+'tutorial.steps.audit.sections.validation.action': `Ejecuta una validación de ejemplo`
+'tutorial.steps.audit.sections.readiness.title': `Checklist y Audit Room`
+'tutorial.steps.audit.sections.readiness.content': `El checklist se guarda automáticamente y te permite controlar pendientes previos a auditoría.
+
+  En Audit Room puedes seleccionar evidencias y generar un binder en PDF para descarga.`
+'tutorial.steps.audit.sections.readiness.action': `Marca items del checklist y genera un binder`
+'tutorial.steps.audit.sections.conclusion.title': `Cierre del paso`
+'tutorial.steps.audit.sections.conclusion.content': `Con validación, checklist y binder PDF, este módulo te ayuda a llegar a revisión con evidencia ordenada y mejor preparada.
+
+El siguiente paso es sostener ese nivel de forma continua con autoevaluación periódica.`
+'tutorial.steps.audit.sections.conclusion.action': `Haz clic en Siguiente`
+TOTAL 142

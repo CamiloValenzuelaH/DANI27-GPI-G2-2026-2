@@ -858,6 +858,7 @@ That discipline improves traceability and reduces surprises in audit cycles.`,
     'phase.2': 'Planning & Risk',
     'phase.3': 'Support & Operations',
     'phase.4': 'Annex A Controls',
+    'phase.5': 'Performance & Improvement',
     // Assessment & Evidence
     'assessment.responded': 'Responded',
     'assessment.loadingQuestions': 'Loading questions...',
@@ -964,6 +965,11 @@ That discipline improves traceability and reduces surprises in audit cycles.`,
     'settings.auditCycle.monthly': 'Monthly',
     'settings.auditCycle.quarterly': 'Quarterly',
     'settings.auditCycle.annual': 'Annual',
+    'settings.auditCycle.dayOfMonth': 'Audit day of month',
+    'settings.auditCycle.dayOfMonthHelp': 'Choose a day between 1 and 28 for the audit schedule.',
+    'settings.auditCycle.auditDayPreview': 'Selected audit day',
+    'settings.auditCycle.saveDay': 'Save day',
+    'settings.auditCycle.toastInvalidDay': 'Day of month must be between 1 and 28',
     'settings.auditCycle.toastUpdated': 'Frequency updated',
     'settings.auditCycle.toastPermissionDenied': 'Insufficient permissions to update frequency',
     'settings.auditCycle.toastUpdateError': 'Error updating frequency',
@@ -1552,6 +1558,7 @@ es: {
     administrator: 'Administrador',
     chatPlaceholder: 'Escribe un mensaje...',
     send: 'Enviar',
+    'common.loading': 'Cargando...',
     'understand.gapAnalysis': 'Análisis de Brechas',
     'understand.loading': 'Cargando...',
     'understand.empty': 'No hay brechas para mostrar.',
@@ -1597,6 +1604,424 @@ es: {
     'tutorial.step7.description': 'Ajusta tus preferencias, idioma y notificaciones para que el programa se adapte a tu equipo.',
     'tutorial.note': 'Este recorrido está disponible siempre con el icono superior.',
     'tutorial.close': 'Cerrar guía',
+    'tutorial.steps.dashboard.title': `Panel de Control`,
+    'tutorial.steps.dashboard.description': `Revisa el estado general de cumplimiento, alertas y progresos clave desde tu panel principal.`,
+    'tutorial.steps.dashboard.sections.intro.title': `Panel de Control`,
+    'tutorial.steps.dashboard.sections.intro.content': `Este dashboard resume el estado actual de tu programa:
+  - KPIs de documentación, implementación y efectividad
+  - Score de salud y tendencia
+  - Actividad reciente
+  - Tareas próximas por vencer
+
+  Es un panel de lectura rápida para priorizar, no un módulo de edición masiva.`,
+    'tutorial.steps.dashboard.sections.intro.action': `Recorre visualmente el panel principal`,
+    'tutorial.steps.dashboard.sections.kpis.title': `KPIs y score`,
+    'tutorial.steps.dashboard.sections.kpis.content': `Las tarjetas muestran porcentajes actuales y variación reciente.
+
+  Úsalo para detectar si vas mejorando o retrocediendo. En esta versión, estas tarjetas son informativas y no abren un detalle al hacer clic.`,
+    'tutorial.steps.dashboard.sections.kpis.action': `Revisa valores y variaciones de las tarjetas`,
+    'tutorial.steps.dashboard.sections.activity-tasks.title': `Actividad y próximos pendientes`,
+    'tutorial.steps.dashboard.sections.activity-tasks.content': `Abajo verás dos bloques útiles:
+  - Actividad reciente: cambios que ocurrieron en el sistema
+  - Próximas tareas: items con prioridad/fecha para seguimiento
+
+  Esto te ayuda a decidir qué atender primero cada día.`,
+    'tutorial.steps.dashboard.sections.activity-tasks.action': `Compara actividad reciente con tareas próximas`,
+    'tutorial.steps.dashboard.sections.scope.title': `Alcance real de este paso`,
+    'tutorial.steps.dashboard.sections.scope.content': `Lo que sí hace:
+  - Mostrar estado agregado y tendencia
+  - Mostrar actividad y tareas sugeridas
+
+  Recomendación de uso:
+  - Úsalo para priorizar en minutos qué atender primero
+  - Luego profundiza en cada módulo para ejecutar acciones`,
+    'tutorial.steps.dashboard.sections.scope.action': `Ten claro que este paso es de monitoreo`,
+    'tutorial.steps.dashboard.sections.conclusion.title': `Siguiente paso`,
+    'tutorial.steps.dashboard.sections.conclusion.content': `Cuando detectes prioridades en el dashboard, pasa al análisis de brechas para entender por qué estás en ese estado y qué corregir primero.`,
+    'tutorial.steps.dashboard.sections.conclusion.action': `Haz clic en Siguiente para Gap Analysis`,
+    'tutorial.steps.understand.title': `Análisis de Brechas`,
+    'tutorial.steps.understand.description': `Identifica exactamente qué brechas tienes entre tu estado actual y los requerimientos de compliance.`,
+    'understand.noEvidence': 'Sin evidencia',
+    'tutorial.steps.understand.sections.intro.title': `Análisis de Brechas`,
+    'tutorial.steps.understand.sections.intro.content': `Estamos en la sección más importante: Gap Analysis.
+
+Aquí vamos a:
+1. Responder preguntas sobre tu organización
+2. El sistema analiza tus respuestas
+3. Te mostramos EXACTAMENTE qué te falta
+4. Te damos un plan para cerrar brechas
+
+Este es el corazón del compliance. Tómate tiempo aquí.`,
+    'tutorial.steps.understand.sections.intro.action': `Lee esta introducción`,
+    'tutorial.steps.understand.sections.framework.title': `¿Qué Normativa Debes Cumplir?`,
+    'tutorial.steps.understand.sections.framework.content': `Puedes trabajar con uno o varios marcos:
+- ISO 27001 (Seguridad de Información)
+- ISO 27002 (Controles de Seguridad)
+- GDPR (Protección de Datos - Europa)
+- HIPAA (Salud - USA)
+- NIST (Seguridad Nacional - USA)
+- SOC 2 (Auditoría de Servicios)
+
+Selecciona el que aplique a tu negocio.
+Consejo: Muchas orgs usan ISO 27001 como base.`,
+    'tutorial.steps.understand.sections.framework.action': `Selecciona el framework normativo que aplique`,
+    'tutorial.steps.understand.sections.questionnaire.title': `Responde Honestamente`,
+    'tutorial.steps.understand.sections.questionnaire.content': `Verás preguntas como:
+'¿Tienes una política de seguridad documentada?'
+'¿Realizas capacitación anual en security?'
+'¿Tienes un plan de incident response?'
+
+Responde SÍ/NO/PARCIALMENTE (esto es confidencial)
+
+No hay respuestas 'correctas'. La verdad es mejor.
+Basado en esto, calcularemos tus brechas.`,
+    'tutorial.steps.understand.sections.questionnaire.action': `Comienza a responder las preguntas`,
+    'tutorial.steps.understand.sections.analysis.title': `El Sistema Analiza...`,
+    'tutorial.steps.understand.sections.analysis.content': `Déjanos un momento para procesar tus respuestas.
+
+Estamos:
+✓ Comparando tu estado con normas
+✓ Calculando % de cumplimiento
+✓ Priorizando brechas por riesgo
+✓ Recomendando acciones
+
+Esto puede tomar 10-30 segundos...`,
+    'tutorial.steps.understand.sections.analysis.action': `Espera mientras procesamos el análisis`,
+    'tutorial.steps.understand.sections.results.title': `Aquí Están tus Brechas`,
+    'tutorial.steps.understand.sections.results.content': `Ves 3 cosas:
+
+1. BRECHA CRÍTICA (Rojo)
+   - Impacto alto si no lo cierras
+   - Debes hacer esto PRIMERO
+   
+2. BRECHA MAYOR (Naranja)
+   - Importante pero no urgente
+   - Planifica en próximos meses
+
+3. BRECHA MENOR (Amarillo)
+   - Impacto bajo
+   - Útil tener pero no crítico
+
+El % de cumplimiento está arriba.
+Si es <70%, hay trabajo por hacer.`,
+    'tutorial.steps.understand.sections.results.action': `Examina tus brechas y su prioridad`,
+    'tutorial.steps.understand.sections.action-plan.title': `Crea tu Plan de Cierre`,
+    'tutorial.steps.understand.sections.action-plan.content': `Para cada brecha:
+1. Haz clic en ella
+2. Asigna un responsable
+3. Establece una fecha límite
+4. Describe qué harás para cerrarla
+
+El sistema rastrea tu progreso.
+Cada brecha cerrada = % cumplimiento sube
+
+Ejemplo: 
+"Brecha: 'No tenemos MFA habilitado'
+Responsable: Juan Pérez (CISO)
+Plazo: 30 de Marzo
+Acción: Implementar Okta MFA en todos los accesos"`,
+    'tutorial.steps.understand.sections.action-plan.action': `Crea un plan de acción para una brecha`,
+    'tutorial.steps.understand.sections.conclusion.title': `¡Análisis Completo!`,
+    'tutorial.steps.understand.sections.conclusion.content': `Felicitaciones, ya SABES qué te falta.
+
+El resto es implementación:
+- Paso 3: Documenta tus ACTIVOS (qué proteges)
+- Paso 4: Sube políticas y DOCUMENTOS
+- Paso 5: Identifica RIESGOS específicos
+- Paso 6: Recopila EVIDENCIA de cumplimiento
+- Paso 7: Compila HALLAZGOS para auditoría
+
+Sigamos. Próximo: Assets (Inventario)`,
+    'tutorial.steps.understand.sections.conclusion.action': `Haz clic en Siguiente para continuar`,
+    'tutorial.steps.assets.title': `Inventario de Activos`,
+    'tutorial.steps.assets.description': `Documenta todos tus activos (sistemas, datos, personas) que necesitan protección.`,
+    'tutorial.steps.assets.sections.intro.title': `Inventario de Activos`,
+    'tutorial.steps.assets.sections.intro.content': `Aquí registras activos de forma estructurada para tu gestión de riesgos.
+
+Puedes crear, editar y eliminar activos, y clasificarlos por tipo y por impacto C-I-A (confidencialidad, integridad y disponibilidad).`,
+    'tutorial.steps.assets.sections.intro.action': `Revisa la tabla y el botón + New asset`,
+    'tutorial.steps.assets.sections.create.title': `Crear y clasificar`,
+    'tutorial.steps.assets.sections.create.content': `Al crear un activo, defines nombre, tipo, ubicación y puntajes C-I-A.
+
+Con esos valores, el sistema calcula criticidad para ayudarte a priorizar.`,
+    'tutorial.steps.assets.sections.create.action': `Crea un activo y completa C-I-A`,
+    'tutorial.steps.assets.sections.filters.title': `Filtrar y revisar`,
+    'tutorial.steps.assets.sections.filters.content': `Puedes filtrar por tipo y por nivel de criticidad para revisar rápidamente qué activos requieren más atención.
+
+También puedes abrir un activo existente para editar sus datos o eliminarlo.`,
+    'tutorial.steps.assets.sections.filters.action': `Prueba los filtros por tipo y nivel`,
+    'tutorial.steps.assets.sections.scope.title': `Enfoque del módulo`,
+    'tutorial.steps.assets.sections.scope.content': `El objetivo de este paso es mantener un inventario claro y accionable.
+
+      Cuando los activos están bien clasificados y priorizados, el análisis de riesgos y la ejecución de controles se vuelven mucho más rápidos.`,
+    'tutorial.steps.assets.sections.scope.action': `Úsalo como inventario y clasificación de activos`,
+    'tutorial.steps.assets.sections.conclusion.title': `Siguiente paso`,
+    'tutorial.steps.assets.sections.conclusion.content': `Con el inventario base listo, el siguiente paso es centralizar documentos para soportar evidencia y reportes.`,
+    'tutorial.steps.assets.sections.conclusion.action': `Haz clic en Siguiente`,
+    'tutorial.steps.documents.title': `Gestión de Documentos`,
+    'tutorial.steps.documents.description': `Compila, organiza y versionea todas tus políticas y procedimientos.`,
+    'tutorial.steps.documents.sections.intro.title': `Gestión de Documentos`,
+    'tutorial.steps.documents.sections.intro.content': `Este módulo concentra trabajo documental en cinco pestañas:
+- Ver documentos
+- Editar contenido
+- Generar documento con IA
+- Exportar reporte
+- Subir documento`,
+    'tutorial.steps.documents.sections.intro.action': `Identifica las pestañas disponibles`,
+    'tutorial.steps.documents.sections.upload.title': `Carga y consulta`,
+    'tutorial.steps.documents.sections.upload.content': `Puedes subir archivos o contenido textual, listarlos y abrir uno para verlo/editarlo.
+
+También puedes eliminar documentos cargados cuando corresponda.`,
+    'tutorial.steps.documents.sections.upload.action': `Sube un documento y ábrelo desde la lista`,
+    'tutorial.steps.documents.sections.ai-generation.title': `Generación con IA`,
+    'tutorial.steps.documents.sections.ai-generation.content': `La pestaña de generación permite crear borradores de documentos y luego subirlos al repositorio.
+
+Es útil para arrancar rápido una política o procedimiento base.`,
+    'tutorial.steps.documents.sections.ai-generation.action': `Prueba generar un borrador y revisarlo`,
+    'tutorial.steps.documents.sections.reports.title': `Exportación de reportes`,
+    'tutorial.steps.documents.sections.reports.content': `Desde la pestaña de reportes puedes lanzar una generación, ver su estado y descargar el resultado cuando esté listo.
+
+La disponibilidad de formatos depende de configuración/API, pero el flujo de generación y descarga sí está implementado.`,
+    'tutorial.steps.documents.sections.reports.action': `Genera un reporte y revisa su estado`,
+    'tutorial.steps.documents.sections.conclusion.title': `Cierre del paso`,
+    'tutorial.steps.documents.sections.conclusion.content': `Con este flujo ya puedes centralizar documentos clave, iterarlos y generar reportes de soporte para tu proceso de compliance.
+
+      El siguiente paso es conectar estos insumos con la gestión de riesgos.`,
+    'tutorial.steps.documents.sections.conclusion.action': `Haz clic en Siguiente`,
+    'tutorial.steps.risks.title': `Gestión de Riesgos`,
+    'tutorial.steps.risks.description': `Identifica, evalúa y mitiga riesgos de compliance con una metodología estructurada.`,
+    'tutorial.steps.risks.sections.intro.title': `Gestión de Riesgos`,
+    'tutorial.steps.risks.sections.intro.content': `Riesgo es la probabilidad de que algo malo suceda.
+
+Risk Management responde:
+1. ¿QUÉ podría salir mal?
+2. ¿QUÉ TAN PROBABLE es?
+3. ¿QUÉ TAN GRAVE sería?
+4. ¿QUÉ HACEMOS al respecto?
+
+Esto es lo que auditorios MÁS validan.
+Hazlo bien.`,
+    'tutorial.steps.risks.sections.intro.action': `Comprende el análisis de riesgos`,
+    'risks.vulnerabilityThreatLabel': 'Amenaza vinculada',
+    'risks.vulnerabilityThreatHelp': 'Vincula una amenaza para mantener la vulnerabilidad en su contexto de amenaza.',
+    'tutorial.steps.risks.sections.matrix.title': `Cómo Medimos Riesgo`,
+    'tutorial.steps.risks.sections.matrix.content': `RIESGO = PROBABILIDAD × IMPACTO
+
+         PROBABILIDAD
+         Baja  Media  Alta
+IM  Alta  3     6     9
+PA  Media 2     4     6  
+CT Baja  1     2     3
+
+Colores:
+- Rojo (9): CRÍTICO - Actúa YA
+- Naranja (6): ALTO - Próximas semanas
+- Amarillo (4): MEDIO - Próximas meses
+- Verde (2-1): BAJO - Seguimiento
+
+El sistema calcula automáticamente.`,
+    'tutorial.steps.risks.sections.matrix.action': `Observa la matriz de riesgos`,
+    'tutorial.steps.risks.sections.create.title': `Registrar un Riesgo`,
+    'tutorial.steps.risks.sections.create.content': `Haz clic en '+ Nuevo Riesgo'
+
+Formulario:
+NOMBRE: 'Pérdida de Datos por Ransomware'
+DESCRIPCIÓN: 'Ataque de ransomware podría encriptar nuestra BD'
+CATEGORÍA: Ciberseguridad / Operacional / Cumplimiento / Reputación
+PROBABILIDAD: Baja/Media/Alta
+IMPACTO: Bajo/Medio/Alto
+PROPIETARIO: Juan Pérez
+ACTIVOS AFECTADOS: Selecciona
+CONTROLES EXISTENTES: 'Tenemos backup diario'
+
+Guardar = Riesgo registrado + Score automático`,
+    'tutorial.steps.risks.sections.create.action': `Crea tu primer riesgo`,
+    'tutorial.steps.risks.sections.evaluate.title': `Ver tu Matriz de Riesgos`,
+    'tutorial.steps.risks.sections.evaluate.content': `Dashboard de riesgos te muestra:
+
+MATRIZ VISUAL:
+- Cada riesgo es un punto
+- Rojo en esquina = crítico
+- Verde en esquina = manejable
+- Haz clic en punto para detalles
+
+LISTA ORDENADA:
+- Por riesgo (mayor primero)
+- Nombre, Propietario, Status
+
+MÉTRICAS:
+- Total de riesgos: 24
+- Críticos: 3 (acción inmediata)
+- Altos: 7
+- Medios: 10
+- Bajos: 4`,
+    'tutorial.steps.risks.sections.evaluate.action': `Examina tu matriz de riesgos`,
+    'tutorial.steps.risks.sections.mitigation.title': `Crear Plan de Acción`,
+    'tutorial.steps.risks.sections.mitigation.content': `Para cada riesgo, elige:
+
+OPCIÓN 1: ACEPTAR
+- El riesgo es asumible
+- Documentar por qué
+
+OPCIÓN 2: EVITAR
+- Cambiar proceso para eliminar riesgo
+
+OPCIÓN 3: MITIGAR
+- Reducir probabilidad O impacto
+
+OPCIÓN 4: TRANSFERIR
+- Asegurar (seguros de cyber)
+
+Plan CAPA (Corrective Action Plan):
+- Acción específica
+- Responsable
+- Fecha límite
+- Métricas de éxito`,
+    'tutorial.steps.risks.sections.mitigation.action': `Crea un plan de mitigación`,
+    'tutorial.steps.risks.sections.controls.title': `Implementar Controles`,
+    'tutorial.steps.risks.sections.controls.content': `Controles = medidas específicas
+
+Ejemplo Riesgo: Pérdida de Datos
+Controles:
+✓ Control A: Backup automático diario
+✓ Control B: Cifrado en reposo
+✓ Control C: MFA para acceso a datos
+✓ Control D: Monitoring 24/7
+
+Para cada control:
+- Asignar responsable
+- Fecha de implementación
+- Marcar como 'En Proceso' → 'Implementado' → 'Testado'
+- Adjuntar evidencia
+
+El sistema te notifica cuando vencen.`,
+    'tutorial.steps.risks.sections.controls.action': `Asigna controles a un riesgo`,
+    'tutorial.steps.risks.sections.monitoring.title': `Riesgos Nunca Duermen`,
+    'tutorial.steps.risks.sections.monitoring.content': `Mensualmente:
+1. Revisar cada riesgo
+2. ¿Cambió la probabilidad?
+3. ¿Cambió el impacto?
+4. ¿Los controles funcionan?
+5. Actualizar score si es necesario
+
+Anualmente:
+- Auditoría completa de riesgos
+- Evaluar nuevos riesgos
+- Eliminar riesgos resueltos
+
+El sistema rastrea historia:
+- Riesgo X estaba 'Alto' en Jan
+- Ahora es 'Medio' en March
+- Evidencia de mejora = auditor feliz`,
+    'tutorial.steps.risks.sections.monitoring.action': `Monitorea y actualiza tus riesgos`,
+    'tutorial.steps.risks.sections.conclusion.title': `Risk Register Completo`,
+    'tutorial.steps.risks.sections.conclusion.content': `¡Ahora tienes un Risk Register completo!
+
+El sistema tiene:
+✓ QUÉ FALTA (Gaps)
+✓ QUÉ PROTEGES (Assets)
+✓ TUS REGLAS (Documentos)
+✓ QUÉ RIESGOS TIENES (Risks)
+
+Próximo: EVIDENCIA
+¿Cómo probamos que lo hicimos? Paso 6: Evidence`,
+    'tutorial.steps.risks.sections.conclusion.action': `Haz clic en Siguiente`,
+    'tutorial.steps.evidence.title': `Recopilación de Evidencia`,
+    'tutorial.steps.evidence.description': `Centraliza y organiza todas las pruebas de que tus controles funcionan.`,
+    'tutorial.steps.evidence.sections.intro.title': `Recopilación de Evidencia`,
+    'tutorial.steps.evidence.sections.intro.content': `Aquí puedes:
+- Subir evidencia
+- Buscar por texto (nombre/control/cláusula)
+- Filtrar por tipo
+- Ver estado de frescura (fresh, expiring, expired)
+- Eliminar evidencia`,
+    'tutorial.steps.evidence.sections.intro.action': `Ubica buscador, filtro y botón de carga`,
+    'tutorial.steps.evidence.sections.upload.title': `Carga de evidencias`,
+    'tutorial.steps.evidence.sections.upload.content': `La carga se realiza desde el uploader del sistema y luego verás el item clasificado dentro de su grupo.
+
+Después puedes revisar su vigencia y mantener solo evidencias actuales.`,
+    'tutorial.steps.evidence.sections.upload.action': `Sube tu primera evidencia`,
+    'tutorial.steps.evidence.sections.organize.title': `Enfoque del paso`,
+    'tutorial.steps.evidence.sections.organize.content': `La meta aquí es mantener evidencia vigente, localizable y lista para revisión.
+
+      Con buscador, filtros y estados de frescura, puedes sostener la calidad de evidencia durante todo el ciclo.`,
+    'tutorial.steps.evidence.sections.organize.action': `Usa este paso para cargar, filtrar y mantener evidencia al día`,
+    'tutorial.steps.evidence.sections.conclusion.title': `Siguiente paso`,
+    'tutorial.steps.evidence.sections.conclusion.content': `Con evidencias cargadas y clasificadas, pasa a CAPA/Findings para gestionar acciones correctivas y prioridades.`,
+    'tutorial.steps.evidence.sections.conclusion.action': `Haz clic en Siguiente`,
+    'tutorial.steps.findings.title': `Reporte de Hallazgos`,
+    'tutorial.steps.findings.description': `Compila hallazgos de auditoría y genera reportes finales para stakeholders.`,
+    'tutorial.steps.findings.sections.intro.title': `Reporte de Hallazgos`,
+    'tutorial.steps.findings.sections.intro.content': `Esta pantalla funciona hoy como CAPA Tracker.
+
+Aquí ves acciones correctivas, su estado, prioridad, fecha de vencimiento y progreso.`,
+    'tutorial.steps.findings.sections.intro.action': `Revisa KPIs y la tabla de CAPAs`,
+    'tutorial.steps.findings.sections.create.title': `Crear CAPA`,
+    'tutorial.steps.findings.sections.create.content': `Puedes crear una CAPA con título, prioridad, fuente, due date, progreso y control relacionado.
+
+Después aparecerá en la tabla principal para seguimiento.`,
+    'tutorial.steps.findings.sections.create.action': `Crea una CAPA de ejemplo`,
+    'tutorial.steps.findings.sections.filters.title': `Seguimiento y filtros`,
+    'tutorial.steps.findings.sections.filters.content': `Puedes filtrar por estado y prioridad, y abrir cada fila para ver detalle (descripción, control/owner, fuente y fechas).
+
+También verás KPIs de abiertas, vencidas y cerradas.`,
+    'tutorial.steps.findings.sections.filters.action': `Aplica filtros y expande una fila`,
+    'tutorial.steps.findings.sections.conclusion.title': `Cierre del paso`,
+    'tutorial.steps.findings.sections.conclusion.content': `Con CAPAs bien definidas y monitoreadas, conviertes brechas en un plan ejecutable con responsables y fechas.
+
+      Esto te deja listo para preparar auditoría con mayor control operativo.`,
+    'tutorial.steps.findings.sections.conclusion.action': `Haz clic en Siguiente`,
+    'findings.table.capa': 'CAPA',
+    'tutorial.steps.audit.title': `Preparación de Auditoría`,
+    'tutorial.steps.audit.description': `Prepara y ejecuta la auditoría externa de compliance con socios certificados.`,
+    'tutorial.steps.audit.sections.intro.title': `Preparación de Auditoría`,
+    'tutorial.steps.audit.sections.intro.content': `Aquí tienes tres capacidades principales:
+  - Validación de evidencia por texto
+  - Validación granular de archivos
+  - Checklist pre-auditoría con auto-guardado`,
+    'tutorial.steps.audit.sections.intro.action': `Ubica el validador, checklist y Audit Room`,
+    'tutorial.steps.audit.sections.validation.title': `Validación de contenido y archivo`,
+    'tutorial.steps.audit.sections.validation.content': `Puedes pegar evidencia textual o subir un archivo para que el sistema analice hallazgos y estado de cumplimiento.
+
+  El resultado se muestra con progreso, severidades y observaciones.`,
+    'tutorial.steps.audit.sections.validation.action': `Ejecuta una validación de ejemplo`,
+    'tutorial.steps.audit.sections.readiness.title': `Checklist y Audit Room`,
+    'tutorial.steps.audit.sections.readiness.content': `El checklist se guarda automáticamente y te permite controlar pendientes previos a auditoría.
+
+  En Audit Room puedes seleccionar evidencias y generar un binder en PDF para descarga.`,
+    'tutorial.steps.audit.sections.readiness.action': `Marca items del checklist y genera un binder`,
+    'tutorial.steps.audit.sections.conclusion.title': `Cierre del paso`,
+    'tutorial.steps.audit.sections.conclusion.content': `Con validación, checklist y binder PDF, este módulo te ayuda a llegar a revisión con evidencia ordenada y mejor preparada.
+
+El siguiente paso es sostener ese nivel de forma continua con autoevaluación periódica.`,
+    'tutorial.steps.audit.sections.conclusion.action': `Haz clic en Siguiente`,
+    'tutorial.steps.self-assessment.title': 'Autoevaluación continua',
+    'tutorial.steps.self-assessment.description': 'Realiza evaluaciones internas periódicas para mantener el cumplimiento entre auditorías.',
+    'tutorial.steps.self-assessment.sections.intro.title': 'Qué hace este módulo',
+    'tutorial.steps.self-assessment.sections.intro.content': `La autoevaluación actual es un cuestionario por fases.
+
+Respondes cada pregunta y el sistema guarda el progreso para que puedas continuar luego.`,
+    'tutorial.steps.self-assessment.sections.intro.action': 'Identificar fases y progreso lateral',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.title': 'Respuestas disponibles',
+    'tutorial.steps.self-assessment.sections.self-assessment-form.content': `Las opciones de respuesta son: Sí, Parcial, No y N/A.
+
+Puedes responder pregunta por pregunta y avanzar por fase desde el selector lateral.`,
+    'tutorial.steps.self-assessment.sections.self-assessment-form.action': 'Responder al menos una pregunta por fase',
+    'tutorial.steps.self-assessment.sections.evidence-review.title': 'Evidencia por pregunta',
+    'tutorial.steps.self-assessment.sections.evidence-review.content': `Cada pregunta permite adjuntar evidencias.
+
+Regla importante: si una pregunta crítica se marca como "Sí", debes adjuntar evidencia para validarla correctamente.`,
+    'tutorial.steps.self-assessment.sections.evidence-review.action': 'Adjuntar evidencia a una pregunta crítica',
+    'tutorial.steps.self-assessment.sections.persistence.title': 'Guardado y continuidad',
+    'tutorial.steps.self-assessment.sections.persistence.content': `El progreso se guarda automáticamente (local + backend), así no pierdes respuestas al cambiar de fase o recargar.
+
+También verás barra de progreso por fase y progreso global respondido.`,
+    'tutorial.steps.self-assessment.sections.persistence.action': 'Cambiar de fase y verificar el guardado',
+    'tutorial.steps.self-assessment.sections.conclusion.title': 'Cierre del paso',
+    'tutorial.steps.self-assessment.sections.conclusion.content': `Con respuestas, evidencias y guardado continuo por fases, puedes mantener un seguimiento estable del cumplimiento entre revisiones formales.
+
+Esta disciplina mejora la trazabilidad y reduce sorpresas en los ciclos de auditoría.`,
+    'tutorial.steps.self-assessment.sections.conclusion.action': 'Celebrar tu progreso',
 
     // Sidebar
     'sidebar.menu': 'Menú',
@@ -1617,6 +2042,7 @@ es: {
     'phase.2': 'Planificación & Riesgo',
     'phase.3': 'Soporte & Operaciones',
     'phase.4': 'Controles Anexo A',
+    'phase.5': 'Evaluación de Desempeño y Mejora',
     // Assessment & Evidence
     'assessment.responded': 'Respondido',
     'assessment.loadingQuestions': 'Cargando preguntas...',
@@ -1978,11 +2404,22 @@ es: {
     'settings.auditCycle.monthly': 'Mensual',
     'settings.auditCycle.quarterly': 'Trimestral',
     'settings.auditCycle.annual': 'Anual',
+    'settings.auditCycle.dayOfMonth': 'Día del mes de auditoría',
+    'settings.auditCycle.dayOfMonthHelp': 'Elige un día entre 1 y 28 para el calendario de auditorías.',
+    'settings.auditCycle.auditDayPreview': 'Día de auditoría seleccionado',
+    'settings.auditCycle.saveDay': 'Guardar día',
+    'settings.auditCycle.toastInvalidDay': 'El día debe estar entre 1 y 28',
     'settings.auditCycle.toastUpdated': 'Frecuencia actualizada',
     'settings.auditCycle.toastPermissionDenied': 'Permisos insuficientes para actualizar la frecuencia',
     'settings.auditCycle.toastUpdateError': 'Error al actualizar la frecuencia',
     'settings.auditCycle.toastCompleted': 'Auditoría marcada como completada',
     'settings.auditCycle.toastCompleteError': 'Error al marcar la auditoría como completada',
+    'tutorial.progressLabel': 'Paso',
+    'tutorial.previous': 'Anterior',
+    'tutorial.next': 'Siguiente',
+    'tutorial.startPromptKnown': 'Presiona iniciar para comenzar el tutorial desde el panel principal.',
+    'tutorial.startButton': 'Iniciar tutorial',
+    'tutorial.dismissButton': 'Cerrar',
     'understand.frameworkSummary': 'Resumen del estado del framework',
     'understand.phaseFallback': 'Fase {index}',
     'understand.phaseGapsSummary': '{unanswered} brechas sin responder — {critical} críticas',
@@ -2471,6 +2908,14 @@ pt: {
     evidenceCenter: 'Centro de Evidências',
     capaTracker: 'Rastreador de CAPA',
     auditRoom: 'Sala de Auditoria',
+    'navbar.openSidebar': 'Abrir barra lateral',
+    'navbar.onboarding': 'Abrir tutorial',
+    'sidebar.menu': 'Menu',
+    'sidebar.closeMenu': 'Fechar menu',
+    'common.viewMore': 'Ver mais',
+    'understand.noEvidence': 'Sem evidência',
+    'risks.vulnerabilityThreatLabel': 'Ameaça vinculada',
+    'risks.vulnerabilityThreatHelp': 'Vincule uma ameaça para manter a vulnerabilidade em seu contexto de ameaça.',
     'findings.answeredQuestions': 'Perguntas respondidas',
     'findings.capaLoadError': 'Não foi possível carregar os dados de CAPA. Tente novamente.',
     'findings.controlOwner': 'Controle / Responsável',
@@ -2544,6 +2989,7 @@ pt: {
     'findings.table.priority': 'Prioridade',
     'findings.table.progress': 'Progresso',
     'findings.table.status': 'Estado',
+    'findings.table.capa': 'CAPA',
     'findings.title': 'Rastreador CAPA',
     'findings.totalGaps': 'Lacunas totais',
     'findings.totalGapsHelp': 'Perguntas do gap analysis',
@@ -2552,9 +2998,11 @@ pt: {
     'findings.unassigned': 'Não atribuído',
     'findings.validationFindings': 'Resultados de validação',
     'findings.validationFindingsHelp': 'Revise os achados gerados pela validação granular de documentos no histórico recente.',
+    'common.loading': 'Carregando...',
     
     // Gap Analysis labels
     totalGaps: 'Total de Lacunas Identificadas',
+
     criticalGaps: 'Lacunas Críticas',
     gapsClosed: 'Lacunas Fechadas',
     acrossFrameworks: 'Em todos os frameworks',
@@ -3201,9 +3649,9 @@ Essa disciplina melhora a rastreabilidade e reduz surpresas nos ciclos de audito
     'evidence.kpi.totalItems': 'Total de evidências',
     'evidence.kpi.totalItemsHelp': 'Organizadas por taxonomia de evidência',
     'evidence.kpi.filteredItems': 'Elementos filtrados',
-    'evidence.kpi.filteredItemsHelp': '',
-    'evidence.kpi.types': '',
-    'evidence.kpi.typesHelp': '',
+    'evidence.kpi.filteredItemsHelp': 'Filtros de busca e tipo aplicados',
+    'evidence.kpi.types': 'Tipos de evidência',
+    'evidence.kpi.typesHelp': 'Agrupados por taxonomia',
     'evidence.searchPlaceholder': 'Pesquisar evidências, controle, cláusula...',
     'evidence.allTypes': 'Todos os tipos de evidência',
     'evidence.showing': 'Mostrando {matched} de {total} evidências',
@@ -3300,6 +3748,7 @@ Essa disciplina melhora a rastreabilidade e reduz surpresas nos ciclos de audito
     'phase.2': 'Planejamento e Risco',
     'phase.3': 'Suporte e Operações',
     'phase.4': 'Controles do Anexo A',
+    'phase.5': 'Avaliação de Desempenho e Melhoria',
     // Assessment & Evidence
     'assessment.responded': 'Respondido',
     'assessment.loadingQuestions': 'Carregando perguntas...',
@@ -3700,6 +4149,11 @@ Essa disciplina melhora a rastreabilidade e reduz surpresas nos ciclos de audito
     'settings.2fa.title': 'Autenticação de dois fatores',
     'settings.auditCycle.annual': 'Anual',
     'settings.auditCycle.currentFrequency': 'Frequência atual',
+    'settings.auditCycle.dayOfMonth': 'Dia do mês de auditoria',
+    'settings.auditCycle.dayOfMonthHelp': 'Escolha um dia entre 1 e 28 para a programação de auditorias.',
+    'settings.auditCycle.auditDayPreview': 'Dia de auditoria selecionado',
+    'settings.auditCycle.saveDay': 'Salvar dia',
+    'settings.auditCycle.toastInvalidDay': 'O dia do mês deve estar entre 1 e 28',
     'settings.auditCycle.emptyCalendar': 'Agende uma auditoria para exibir sua data no calendário.',
     'settings.auditCycle.history': 'Histórico',
     'settings.auditCycle.historyEmpty': 'Nenhuma auditoria concluída foi registrada ainda.',
@@ -4271,6 +4725,7 @@ Diese Disziplin verbessert die Rückverfolgbarkeit und reduziert Überraschungen
     'findings.table.priority': 'Priorität',
     'findings.table.progress': 'Fortschritt',
     'findings.table.status': 'Status',
+    'findings.table.capa': 'CAPA',
     'findings.title': 'CAPA-Tracker',
     'findings.totalGaps': 'Gesamte Lücken',
     'findings.totalGapsHelp': 'Fragen der Lückenanalyse',
@@ -4279,6 +4734,7 @@ Diese Disziplin verbessert die Rückverfolgbarkeit und reduziert Überraschungen
     'findings.unassigned': 'Nicht zugewiesen',
     'findings.validationFindings': 'Validierungsergebnisse',
     'findings.validationFindingsHelp': 'Überprüfe die Befunde, die durch die granulare Dokumentvalidierung in der jüngsten Historie erzeugt wurden.',
+    'common.loading': 'Wird geladen...',
     // Login
     'login.welcome': 'Willkommen bei Dani27001',
     'login.subtitle': 'Melden Sie sich in Ihrem Konto an',
@@ -4498,6 +4954,7 @@ Diese Disziplin verbessert die Rückverfolgbarkeit und reduziert Überraschungen
     'phase.2': 'Planung & Risiko',
     'phase.3': 'Support & Betrieb',
     'phase.4': 'Anhang A Kontrollen',
+    'phase.5': 'Leistung & Verbesserung',
     // Assessment & Evidence
     'assessment.responded': 'Beantwortet',
     'assessment.loadingQuestions': 'Fragen werden geladen...',
@@ -4802,6 +5259,8 @@ Diese Disziplin verbessert die Rückverfolgbarkeit und reduziert Überraschungen
     'risks.vulnerabilityDescriptionLabel': 'Beschreibung',
     'risks.vulnerabilityDescriptionPlaceholder': 'Details zur Schwachstelle',
     'risks.vulnerabilityAssetLabel': 'Betroffenes Asset',
+    'risks.vulnerabilityThreatLabel': 'Verknüpfte Bedrohung',
+    'risks.vulnerabilityThreatHelp': 'Verknüpfen Sie eine Bedrohung, um die Schwachstelle mit ihrem Bedrohungskontext verbunden zu halten.',
     'risks.selectAsset': 'Asset auswählen',
     'risks.vulnerabilitySeverityLabel': 'Schweregrad',
     'risks.selectSeverity': 'Schweregrad auswählen',
@@ -4902,6 +5361,7 @@ Diese Disziplin verbessert die Rückverfolgbarkeit und reduziert Überraschungen
     'audit.checklist.PRE-AUD-03': 'Verantwortliche und Zuständige bestätigen',
     'audit.checklist.PRE-AUD-04': 'Offene Befunde und CAPAs prüfen',
     'audit.checklist.PRE-AUD-05': 'Audit-Dry-Run-Simulation durchführen',
+    'understand.noEvidence': 'Keine Beweise',
     'audit.chatGreeting': 'Hallo! Ich bin der Audit-Agent. Ich bin bereit, Ihre Compliance-Nachweise zu analysieren und eine Validierung auf Basis der ISO-27001-Standards bereitzustellen.',
     'audit.chatAnalysisComplete': 'Ich habe die Audit-Analyse abgeschlossen. Compliance-Score: {score}%. Status: {status}. Ich habe {count} Befunde gefunden.',
     'audit.chatRiskResponse': 'Zu den kritischen Risiken zählen unkontrollierter physischer Zugriff auf Geräte, fehlendes MFA und unzureichende Richtlinien zur Credential-Rotation.',
@@ -5008,6 +5468,11 @@ Diese Disziplin verbessert die Rückverfolgbarkeit und reduziert Überraschungen
     'settings.auditCycle.toastPermissionDenied': 'Unzureichende Berechtigungen, um die Frequenz zu aktualisieren',
     'settings.auditCycle.toastUpdateError': 'Fehler beim Aktualisieren der Frequenz',
     'settings.auditCycle.toastUpdated': 'Frequenz aktualisiert',
+    'settings.auditCycle.dayOfMonth': 'Audit-Tag des Monats',
+    'settings.auditCycle.dayOfMonthHelp': 'Wählen Sie einen Tag zwischen 1 und 28 für den Audit-Zeitplan.',
+    'settings.auditCycle.auditDayPreview': 'Ausgewählter Audittag',
+    'settings.auditCycle.saveDay': 'Tag speichern',
+    'settings.auditCycle.toastInvalidDay': 'Der Tag des Monats muss zwischen 1 und 28 liegen',
     'settings.auditCycleHelp': 'Legen Sie die Häufigkeit geplanter Audits für Ihre Organisation fest.',
     'settings.password.confirm': 'Neues Passwort bestätigen',
     'settings.password.current': 'Aktuelles Passwort',
@@ -5052,6 +5517,60 @@ fr: {
     evidenceCenter: 'Centre de Preuves',
     capaTracker: 'Suivi CAPA',
     auditRoom: 'Salle d\'Audit',
+    'phase.1': 'Contexte et Leadership',
+    'phase.2': 'Planification et Risque',
+    'phase.3': 'Support et Opérations',
+    'phase.4': 'Annexe A Contrôles',
+    'phase.5': 'Évaluation et Amélioration',
+    'navbar.openSidebar': 'Ouvrir la barre latérale',
+    'navbar.onboarding': 'Ouvrir le tutoriel',
+    'login.welcome': 'Bienvenue sur Dani27001',
+    'login.subtitle': 'Connectez-vous à votre compte',
+    'login.email': 'E-mail',
+    'login.emailPlaceholder': 'vous@entreprise.com',
+    'login.emailRequired': 'L’e-mail est requis',
+    'login.password': 'Mot de passe',
+    'login.passwordRequired': 'Le mot de passe est requis',
+    'login.signIn': 'Se connecter',
+    'login.signingIn': 'Connexion...',
+    'login.noAccount': 'Vous n’avez pas de compte ?',
+    'login.register': 'S’inscrire',
+    'validation.historyTitle': 'Historique des validations',
+    'validation.jobsCount': '{count} tâches',
+    'validation.searchPlaceholder': 'Rechercher par nom de fichier...',
+    'validation.last7Days': '7 derniers jours',
+    'validation.last30Days': '30 derniers jours',
+    'validation.all': 'Tous',
+    'validation.table.file': 'Fichier',
+    'validation.table.score': 'Score',
+    'validation.table.action': 'Action',
+    'validation.viewDetail': 'Voir le détail',
+    'validation.noJobs': 'Aucune tâche trouvée',
+    'validation.status.completed': 'Terminé',
+    'validation.status.processing': 'En traitement',
+    'validation.status.queued': 'En attente',
+    'validation.status.failed': 'Échec',
+    'common.loading': 'Chargement...',
+    'findings.table.capa': 'CAPA',
+    'validation.viewDetail': 'Voir le détail',
+    'sidebar.menu': 'Menu',
+    'sidebar.closeMenu': 'Fermer le menu',
+    'common.viewMore': 'Voir plus',
+    'understand.noEvidence': 'Aucune preuve',
+    'risks.vulnerabilityThreatLabel': 'Menace liée',
+    'risks.vulnerabilityThreatHelp': 'Reliez une menace pour garder la vulnérabilité dans son contexte de menace.',
+    'upload.flowDescription': 'Flux DANI-FE-022 : upload de fichier dans la taxonomie ISO avec édition des métadonnées en ligne.',
+    'upload.maxFilesBadge': 'Maximum {max} fichiers',
+    'upload.formatsBadge': 'Formats {formats}',
+    'upload.overallStatus': 'Statut global',
+    'upload.queueSummary': 'Résumé de la file d\'attente actuelle',
+    'upload.readyCount': '{done}/{total} prêts',
+    'upload.pending': 'En attente',
+    'upload.completed': 'Terminés',
+    'upload.noFilesYetTitle': 'Pas encore de fichiers',
+    'upload.noFilesYetHint': 'Ajoutez jusqu\'à {max} fichiers puis lancez l\'upload pour obtenir des suggestions de contrôles ISO.',
+    'upload.footerNote': 'Chaque upload crée ou met à jour une preuve documentaire dans la taxonomie ISO.',
+    'upload.noPendingFiles': 'Aucun fichier en attente',
     'tutorial.title': 'Bonjour, je suis Dani27',
     'tutorial.subtitle': 'Votre assistant virtuel vous guide pas à pas sur la plateforme.',
     'tutorial.progressLabel': 'Étape',
@@ -6294,6 +6813,11 @@ Cette discipline améliore la traçabilité et réduit les surprises lors des cy
     'settings.auditCycle.quarterly': 'Trimestriel',
     'settings.auditCycle.annual': 'Annuel',
     'settings.auditCycle.toastUpdated': 'Fréquence mise à jour',
+    'settings.auditCycle.dayOfMonth': 'Jour du mois de l\'audit',
+    'settings.auditCycle.dayOfMonthHelp': 'Choisissez un jour entre 1 et 28 pour le planning des audits.',
+    'settings.auditCycle.auditDayPreview': 'Jour d\'audit sélectionné',
+    'settings.auditCycle.saveDay': 'Enregistrer le jour',
+    'settings.auditCycle.toastInvalidDay': 'Le jour du mois doit être compris entre 1 et 28',
     'settings.auditCycle.toastPermissionDenied': 'Permissions insuffisantes pour mettre à jour la fréquence',
     'settings.auditCycle.toastUpdateError': 'Erreur lors de la mise à jour de la fréquence',
     'settings.auditCycle.toastCompleted': 'Audit marqué comme complété',
@@ -6342,6 +6866,108 @@ it: {
     'menu.escalation': 'Regole di Escalation',
     'menu.integrations': 'Integrazioni',
     'menu.settings': 'Impostazioni',
+    'settings.title': 'Impostazioni',
+    'settings.subtitle': 'Configuri lingua, aspetto, notifiche e automazioni per il suo spazio di lavoro.',
+    'settings.organizationProfile': 'Profilo dell\'organizzazione',
+    'settings.currentProfile': 'Profilo corrente',
+    'settings.profile.foundational': 'Fondamentale',
+    'settings.profile.established': 'Consolidato',
+    'settings.profile.advanced': 'Avanzato',
+    'settings.profile.mature': 'Maturo',
+    'settings.profileDesc.foundational': 'Modalità guidata con maggior assistenza e spiegazioni',
+    'settings.profileDesc.established': 'Modalità bilanciata con navigazione per processi e moduli',
+    'settings.profileDesc.advanced': 'Modalità orientata ai moduli con minore guida',
+    'settings.profileDesc.mature': 'Modalità ad alta autonomia per team maturi',
+    'settings.languageRegion': 'Lingua e regione',
+    'settings.interfaceLanguage': 'Lingua dell\'interfaccia',
+    'settings.controlsUI': 'Controlla la lingua utilizzata nell\'intera piattaforma',
+    'settings.dateFormat': 'Formato data',
+    'settings.dateFormatHelp': 'Come le date vengono visualizzate nell\'interfaccia',
+    'settings.timezone': 'Fuso orario',
+    'settings.timezoneHelp': 'Utilizzato per promemoria e timestamp',
+    'settings.appearance': 'Aspetto',
+    'settings.darkMode': 'Tema scuro',
+    'settings.darkModeHelp': 'Consente di passare tra tema chiaro e tema scuro',
+    'settings.compactView': 'Vista compatta',
+    'settings.compactViewHelp': 'Riduce gli spazi in tabelle e schede',
+    'settings.sidebarLabels': 'Mostra etichette nella barra laterale',
+    'settings.sidebarLabelsHelp': 'Visualizza etichette testuali nella navigazione',
+    'settings.notifications': 'Notifiche',
+    'settings.emailNotifications': 'Notifiche e-mail',
+    'settings.emailNotificationsHelp': 'Ricevere avvisi di conformità via e-mail',
+    'settings.capaReminders': 'Promemoria CAPA',
+    'settings.capaRemindersHelp': 'Ricorda al team le azioni correttive scadute',
+    'settings.regulatoryUpdates': 'Aggiornamenti normativi',
+    'settings.2fa.title': 'Autenticazione a due fattori',
+    'settings.2fa.enabledHelp': 'Il suo account è protetto da TOTP e da codici di backup.',
+    'settings.2fa.disabledHelp': 'Protegga il suo account con Google Authenticator, Authy o 1Password.',
+    'settings.2fa.enabled': 'Abilitata',
+    'settings.2fa.disabled': 'Disabilitata',
+    'settings.2fa.setupHelp': 'Configuri la 2FA per generare un codice QR scansionabile e ricevere codici di backup monouso.',
+    'settings.2fa.enableAction': 'Attivi la 2FA',
+    'settings.2fa.disableTitle': 'Disattivare la 2FA',
+    'settings.2fa.disableHelp': 'Inserisca la sua password per disattivare la 2FA. Questo revocherà il segreto corrente e tutti i codici di backup.',
+    'settings.2fa.backupCodes': 'Codici di backup',
+    'settings.2fa.confirmPassword': 'Confermi la sua password attuale',
+    'settings.2fa.disabling': 'Disattivazione in corso...',
+    'settings.2fa.disableAction': 'Disattivi la 2FA',
+    'settings.2fa.disabledSuccess': 'L\'autenticazione a due fattori è stata disattivata e tutti i codici di backup sono stati revocati.',
+    'settings.2fa.passwordValidation': 'Inserisca la sua password per disattivare la 2FA.',
+    'settings.password.title': 'Password',
+    'settings.password.subtitle': 'Aggiorni la sua password e revochi le sessioni di refresh attive.',
+    'settings.password.current': 'Password attuale',
+    'settings.password.new': 'Nuova password',
+    'settings.password.confirm': 'Confermi la nuova password',
+    'settings.password.hint': 'Utilizzi password robuste con maiuscole, numeri e simboli.',
+    'settings.password.saving': 'Salvataggio...',
+    'settings.password.updateAction': 'Aggiorni la password',
+    'settings.password.updated': 'La sua password è stata aggiornata con successo.',
+    'settings.tab.security': 'Sicurezza',
+    'settings.tab.preferences': 'Preferenze',
+    'settings.tab.appearance': 'Aspetto',
+    'settings.tab.auditCycle': 'Ciclo di audit',
+    'settings.themeToggleHelp': 'Attivi il tema dell\'applicazione.',
+    'settings.theme.dark': 'Scuro',
+    'settings.theme.light': 'Chiaro',
+    'settings.switch.on': 'Attivato',
+    'settings.switch.off': 'Disattivato',
+    'settings.auditCycle.title': 'Ciclo di audit',
+    'settings.auditCycle.currentFrequency': 'Frequenza corrente',
+    'settings.auditCycle.nextAudit': 'Prossimo audit',
+    'settings.auditCycle.notScheduled': 'Non pianificato',
+    'settings.auditCycle.scheduled': 'Pianificato',
+    'settings.auditCycle.noDate': 'Nessuna data',
+    'settings.auditCycle.emptyCalendar': 'Programmi un audit per visualizzarne la data nel calendario.',
+    'settings.auditCycle.markCompleted': 'Segni l\'audit come completato',
+    'settings.auditCycle.history': 'Cronologia',
+    'settings.auditCycle.historyEmpty': 'Nessun audit completato è stato registrato.',
+    'settings.auditCycle.monthly': 'Mensile',
+    'settings.auditCycle.quarterly': 'Trimestrale',
+    'settings.auditCycle.annual': 'Annuale',
+    'settings.auditCycle.toastUpdated': 'Frequenza aggiornata',
+    'settings.auditCycle.dayOfMonth': 'Giorno del mese per l\'audit',
+    'settings.auditCycle.dayOfMonthHelp': 'Scegli un giorno tra 1 e 28 per la pianificazione dell\'audit.',
+    'settings.auditCycle.auditDayPreview': 'Giorno di audit selezionato',
+    'settings.auditCycle.saveDay': 'Salva giorno',
+    'settings.auditCycle.toastInvalidDay': 'Il giorno del mese deve essere compreso tra 1 e 28',
+    'settings.auditCycle.toastPermissionDenied': 'Permessi insufficienti per aggiornare la frequenza',
+    'settings.auditCycle.toastUpdateError': 'Errore durante l\'aggiornamento della frequenza',
+    'settings.auditCycle.toastCompleted': 'Audit segnato come completato',
+    'settings.auditCycle.toastCompleteError': 'Errore durante la marcatura dell\'audit come completato',
+    'settings.automationScheduling': 'Automazione e pianificazione',
+    'settings.autoSave': 'Salvataggio automatico',
+    'settings.autoSaveHelp': 'Salvi le modifiche automaticamente quando possibile',
+    'settings.autoRunAnalysis': 'Esecuzione automatica dell\'analisi',
+    'settings.autoRunAnalysisHelp': 'Programmi esecuzioni periodiche dell\'analisi delle lacune',
+    'settings.scheduleFrequency': 'Frequenza di pianificazione',
+    'settings.scheduleFrequencyHelp': 'Scelga la frequenza di esecuzione dei controlli automatici',
+    'settings.userManagement': 'Gestione degli utenti',
+    'settings.activeUser': 'Utente attivo',
+    'settings.inviteTeamMember': 'Inviti un membro del team',
+    'settings.auditDeadlines': 'Scadenze di audit',
+    'settings.auditDeadlinesHelp': 'Notifichi prima delle date chiave dell\'audit',
+    'settings.regulatoryUpdatesHelp': 'Riceva avvisi in caso di nuovi cambiamenti normativi',
+    'settings.auditCycleHelp': 'Definisca la frequenza degli audit programmati per la sua organizzazione.',
     'menu.assets': 'Inventario dei beni',
     'assets.confirmDelete': 'Eliminare questo asset?',
     'assets.subtitle': 'Classificazione C-I-A ISO 27001',
@@ -6909,6 +7535,8 @@ Questa disciplina migliora la tracciabilità e riduce le sorprese nei cicli di a
     'risks.vulnerabilityDescriptionLabel': 'Descrizione',
     'risks.vulnerabilityDescriptionPlaceholder': 'Dettagli della vulnerabilità',
     'risks.vulnerabilityAssetLabel': 'Asset interessato',
+    'risks.vulnerabilityThreatLabel': 'Minaccia collegata',
+    'risks.vulnerabilityThreatHelp': 'Collega una minaccia per mantenere la vulnerabilità nel suo contesto di minaccia.',
     'risks.vulnerabilitySeverityLabel': 'Gravità',
     'risks.selectSeverity': 'Seleziona gravità',
     'risks.createVulnerabilityButton': 'Crea vulnerabilità',
@@ -7007,6 +7635,7 @@ Questa disciplina migliora la tracciabilità e riduce le sorprese nei cicli di a
     'findings.table.priority': 'Priorità',
     'findings.table.progress': 'Progresso',
     'findings.table.status': 'Stato',
+    'findings.table.capa': 'CAPA',
     'findings.title': 'Monitor CAPA',
     'findings.totalGaps': 'Lacune totali',
     'findings.totalGapsHelp': 'Domande dell\'analisi delle lacune',
@@ -7071,6 +7700,7 @@ Questa disciplina migliora la tracciabilità e riduce le sorprese nei cicli di a
     'understand.gapAnalysis': 'Analisi delle Lacune',
     'understand.linkedEvidence': 'Evidenza collegata rilevata',
     'understand.loading': 'Caricamento...',
+    'understand.noEvidence': 'Nessuna evidenza',
     'understand.missing': 'Mancante:',
     'understand.reason.no': 'Risposto NO',
     'understand.reason.partial': 'Risposto PARZIALMENTE',
@@ -7089,6 +7719,7 @@ Questa disciplina migliora la tracciabilità e riduce le sorprese nei cicli di a
     'common.close': 'Chiudi',
     'common.refresh': 'Aggiorna',
     'common.refreshing': 'Aggiornamento...',
+    'common.loading': 'Caricamento...',
     'validation.table.status': 'Stato',
     'validation.summary': 'Riepilogo',
     'portal.mandatory': 'Obbligatoria',

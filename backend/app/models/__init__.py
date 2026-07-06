@@ -20,9 +20,17 @@ from app.models.threat import Threat, risk_threats
 from app.models.vulnerability import Vulnerability
 from app.models.notification import Notification, NotificationPreference
 from app.models.iso_threat_catalog import ISOThreatCatalog
+from app.models.document import Document, DocumentVersion, DocumentSection, DocumentReviewAction
 from app.models.report_job import ReportJob
+from app.models.capa import CAPA, CAPAPriority, CAPASource, CAPAStatus
+from app.models.external_validation_job import ExternalValidationJob
+from app.models.soa_control_status import SOAControlStatus, ImplementationStatus
 
 __all__ = [
+    "CAPA",
+    "CAPAStatus",
+    "CAPAPriority",
+    "CAPASource",
     "Plan",
     "Organization",
     "User",
@@ -50,4 +58,11 @@ __all__ = [
     "NotificationPreference",
     "ISOThreatCatalog",
     "ReportJob",
+    "Document",
+    "DocumentVersion",
+    "DocumentSection",
+    "DocumentReviewAction",
+    "ExternalValidationJob",
+    "SOAControlStatus",
+    "ImplementationStatus",
 ]

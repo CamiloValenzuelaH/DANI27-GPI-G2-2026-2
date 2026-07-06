@@ -24,19 +24,36 @@ celery_app.conf.update(
     worker_max_tasks_per_child=1000,
 )
 
-# Schedule cleanup monthly (approx every 30 days) and daily reminder emails at 08:00 UTC.
+# Maintenance beat schedule.
 celery_app.conf.beat_schedule = {
-    "audit-cleanup-monthly": {
-        "task": "audit.cleanup_old_logs",
-        "schedule": 30 * 24 * 60 * 60,
+    "maintenance-cleanup-expired-tokens": {
+        "task": "maintenance.cleanup_expired_tokens",
+        "schedule": 6 * 60 * 60,
         "args": (),
     },
-    "notifications-send-reminder-emails": {
-        "task": "notifications.send_reminder_emails",
+    "maintenance-check-evidence-freshness": {
+        "task": "maintenance.check_evidence_freshness",
+        "schedule": crontab(hour=6, minute=0),
+        "args": (),
+    },
+    "maintenance-send-reminder-emails": {
+        "task": "maintenance.send_reminder_emails",
         "schedule": crontab(hour=8, minute=0),
+        "args": (),
+    },
+    "maintenance-cleanup-old-audit-logs": {
+        "task": "maintenance.cleanup_old_audit_logs",
+        "schedule": crontab(day_of_month="1", hour=3, minute=0),
+        "args": (),
+    },
+    "maintenance-sync-connectors": {
+        "task": "maintenance.sync_connectors",
+        "schedule": crontab(minute=0),
         "args": (),
     },
 }
 
 # Auto-descubrir tareas
 celery_app.autodiscover_tasks(["app.workers"])
+
+from app.workers import maintenance_tasks  # noqa: E402,F401

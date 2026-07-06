@@ -19,7 +19,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    # Ensure the Vite dev server origin is allowed during local development
+    allow_origins=list(dict.fromkeys([*settings.allowed_origins, 'http://localhost:5173'])),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

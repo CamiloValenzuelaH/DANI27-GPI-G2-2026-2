@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { listExternalValidationJobs, getExternalValidationResult } from '../../api/externalValidation';
 import type { ValidationReportResponse } from '../../api/externalValidation';
 import { formatDateTime } from '../lib/date';
@@ -19,12 +20,12 @@ function getStatusColor(status: string) {
   }
 }
 
-function translateStatus(status: string) {
+function translateStatus(status: string, formatMessage: (v: { id: string; defaultMessage: string }) => string) {
   switch (status) {
-    case 'completed': return 'Completado';
-    case 'processing': return 'Procesando';
-    case 'queued': return 'En cola';
-    case 'failed': return 'Fallido';
+    case 'completed': return formatMessage({ id: 'validation.status.completed', defaultMessage: 'Completed' });
+    case 'processing': return formatMessage({ id: 'validation.status.processing', defaultMessage: 'Processing' });
+    case 'queued': return formatMessage({ id: 'validation.status.queued', defaultMessage: 'Queued' });
+    case 'failed': return formatMessage({ id: 'validation.status.failed', defaultMessage: 'Failed' });
     default: return status;
   }
 }
@@ -39,8 +40,10 @@ function getDocumentStatusColor(status?: string) {
 }
 
 export default function ValidationHistory() {
+  const intl = useIntl();
   const [jobs, setJobs] = useState<ValidationReportResponse[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [dateRange, setDateRange] = useState<'7'|'30'|'all'>('7');
   const [visibleCount, setVisibleCount] = useState(10);
   const [loading, setLoading] = useState(false);
@@ -66,6 +69,11 @@ export default function ValidationHistory() {
     return () => { mounted = false; };
   }, []);
 
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
   const filteredJobs = useMemo(() => {
     const now = new Date();
     const days = dateRange === '7' ? 7 : dateRange === '30' ? 30 : Infinity;
@@ -74,12 +82,12 @@ export default function ValidationHistory() {
       const d = new Date(job.created_at ?? job.updated_at ?? new Date().toISOString());
       const withinDays = days === Infinity ? true : ((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24)) <= days;
       if (!withinDays) return false;
-      // search filter (file_name ILIKE %search%) - local, case-insensitive
-      if (!searchTerm) return true;
+      // search filter (file_name ILIKE %search%) - local, case-insensitive (debounced)
+      if (!debouncedSearch) return true;
       const fname = (job.file_name ?? job.job_id ?? '').toLowerCase();
-      return fname.includes(searchTerm.toLowerCase());
+      return fname.includes(debouncedSearch.toLowerCase());
     });
-  }, [jobs, searchTerm, dateRange]);
+  }, [jobs, debouncedSearch, dateRange]);
 
   const displayedJobs = filteredJobs.slice(0, visibleCount);
 
@@ -100,14 +108,14 @@ export default function ValidationHistory() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Historial de validaciones</h3>
-        <div className="text-sm text-gray-400">{loading ? 'Cargando...' : `${jobs.length} trabajos`}</div>
+        <h3 className="text-lg font-semibold text-white">{intl.formatMessage({ id: 'validation.historyTitle', defaultMessage: 'Validation history' })}</h3>
+        <div className="text-sm text-gray-400">{loading ? intl.formatMessage({ id: 'common.loading', defaultMessage: 'Loading...' }) : intl.formatMessage({ id: 'validation.jobsCount', defaultMessage: '{count} jobs' }, { count: jobs.length })}</div>
       </div>
 
       <div className="flex items-center gap-3">
         <input
           type="text"
-          placeholder="Buscar por nombre de archivo..."
+          placeholder={intl.formatMessage({ id: 'validation.searchPlaceholder', defaultMessage: 'Search by file name...' })}
           value={searchTerm}
           onChange={(e) => { setSearchTerm(e.target.value); setVisibleCount(10); }}
           className="px-3 py-2 rounded-md bg-[#0B0D12] border border-[#22252F] text-sm text-white w-64"
@@ -117,11 +125,11 @@ export default function ValidationHistory() {
           onChange={(e) => { setDateRange(e.target.value as '7'|'30'|'all'); setVisibleCount(10); }}
           className="px-3 py-2 rounded-md bg-[#0B0D12] border border-[#22252F] text-sm text-white"
         >
-          <option value="7">Últimos 7 días</option>
-          <option value="30">Últimos 30 días</option>
-          <option value="all">Todos</option>
+          <option value="7">{intl.formatMessage({ id: 'validation.last7Days', defaultMessage: 'Last 7 days' })}</option>
+          <option value="30">{intl.formatMessage({ id: 'validation.last30Days', defaultMessage: 'Last 30 days' })}</option>
+          <option value="all">{intl.formatMessage({ id: 'validation.all', defaultMessage: 'All' })}</option>
         </select>
-        <div className="text-sm text-gray-400 ml-auto">{loading ? 'Cargando...' : `${filteredJobs.length} trabajos`}</div>
+        <div className="text-sm text-gray-400 ml-auto">{loading ? intl.formatMessage({ id: 'common.loading', defaultMessage: 'Loading...' }) : intl.formatMessage({ id: 'validation.jobsCount', defaultMessage: '{count} jobs' }, { count: filteredJobs.length })}</div>
       </div>
 
       <div className="bg-[#0F1119] border border-[#2A2E3D] rounded-md overflow-hidden">
@@ -129,10 +137,10 @@ export default function ValidationHistory() {
           <thead className="text-gray-400 text-xs uppercase">
             <tr>
               <th className="px-4 py-3">Fecha</th>
-              <th className="px-4 py-3">Archivo</th>
-              <th className="px-4 py-3">Score</th>
-              <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3">Acción</th>
+              <th className="px-4 py-3">{intl.formatMessage({ id: 'validation.table.file', defaultMessage: 'File' })}</th>
+              <th className="px-4 py-3">{intl.formatMessage({ id: 'validation.table.score', defaultMessage: 'Score' })}</th>
+              <th className="px-4 py-3">{intl.formatMessage({ id: 'validation.table.status', defaultMessage: 'Status' })}</th>
+              <th className="px-4 py-3">{intl.formatMessage({ id: 'validation.table.action', defaultMessage: 'Action' })}</th>
             </tr>
           </thead>
           <tbody>
@@ -146,21 +154,21 @@ export default function ValidationHistory() {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`font-medium ${getStatusColor(job.status)}`}>{translateStatus(job.status)}</span>
+                  <span className={`font-medium ${getStatusColor(job.status)}`}>{translateStatus(job.status, intl.formatMessage)}</span>
                 </td>
                 <td className="px-4 py-3">
                   <button
                     onClick={() => onView(job.job_id)}
                     className="px-3 py-1.5 rounded-md bg-[#4F6EF7] hover:bg-[#3D5AD7] text-white text-xs"
                   >
-                    Ver detalle
+                    {intl.formatMessage({ id: 'validation.viewDetail', defaultMessage: 'View detail' })}
                   </button>
                 </td>
               </tr>
             ))}
             {filteredJobs.length === 0 && !loading && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">No hay trabajos</td>
+                <td colSpan={5} className="px-4 py-8 text-center text-gray-500">{intl.formatMessage({ id: 'validation.noJobs', defaultMessage: 'No jobs found' })}</td>
               </tr>
             )}
           </tbody>
@@ -173,7 +181,7 @@ export default function ValidationHistory() {
             onClick={() => setVisibleCount((c) => c + 10)}
             className="px-4 py-2 rounded-md bg-[#2B3350] text-white text-sm"
           >
-            Ver más
+            {intl.formatMessage({ id: 'common.viewMore', defaultMessage: 'View more' })}
           </button>
         </div>
       )}
@@ -181,43 +189,43 @@ export default function ValidationHistory() {
       {error && (
         <div className="text-rose-300 text-sm">
           {error.includes('Not Found') || error.includes('not found')
-            ? 'Este resultado no está disponible. Solo los trabajos completados después de la última actualización pueden verse en detalle.'
+            ? intl.formatMessage({ id: 'validation.detailUnavailable', defaultMessage: 'This result is not available. Only jobs completed after the latest update can be viewed in detail.' })
             : error}
         </div>
       )}
 
-      {detailLoading && <div className="text-gray-400">Cargando detalle...</div>}
+      {detailLoading && <div className="text-gray-400">{intl.formatMessage({ id: 'validation.loadingDetail', defaultMessage: 'Loading detail...' })}</div>}
 
       {selected && selected.status === 'completed' && (
         <div className="mt-4 space-y-3">
           <div className="bg-[#0F1119] p-4 rounded-lg">
-            <p className="text-gray-400 text-sm mb-1">Archivo</p>
+            <p className="text-gray-400 text-sm mb-1">{intl.formatMessage({ id: 'validation.table.file', defaultMessage: 'File' })}</p>
             <p className="text-white font-medium">{selected.file_name}</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-[#0F1119] p-4 rounded-lg">
-              <p className="text-gray-400 text-sm mb-1">Average compliance</p>
+              <p className="text-gray-400 text-sm mb-1">{intl.formatMessage({ id: 'validation.avgCompliance', defaultMessage: 'Average compliance' })}</p>
               <p className={`text-2xl font-bold ${getComplianceScoreColor(selected.overall_score ?? 0)}`}>
                 {selected.overall_score ?? 0}%
               </p>
             </div>
             <div className="bg-[#0F1119] p-4 rounded-lg">
-              <p className="text-gray-400 text-sm mb-1">Status</p>
+              <p className="text-gray-400 text-sm mb-1">{intl.formatMessage({ id: 'validation.table.status', defaultMessage: 'Status' })}</p>
               <p className={`font-medium ${getStatusColor(selected.status)}`}>
-                {selected.status === 'completed' ? '✓ Validación completada' : selected.status.toUpperCase()}
+                {selected.status === 'completed' ? intl.formatMessage({ id: 'validation.completed', defaultMessage: 'Validation completed' }) : selected.status.toUpperCase()}
               </p>
             </div>
           </div>
 
           <div className="bg-[#0F1119] p-4 rounded-lg">
-            <p className="text-gray-400 text-sm mb-2">Summary</p>
+            <p className="text-gray-400 text-sm mb-2">{intl.formatMessage({ id: 'validation.summary', defaultMessage: 'Summary' })}</p>
             <p className="text-white text-sm">{selected.summary}</p>
           </div>
 
           {selected.findings.length > 0 && (
             <div className="bg-[#0F1119] p-4 rounded-lg space-y-2">
-              <p className="text-gray-400 text-sm mb-3">Findings by ISO chunk</p>
+              <p className="text-gray-400 text-sm mb-3">{intl.formatMessage({ id: 'validation.findingsByChunk', defaultMessage: 'Findings by ISO chunk' })}</p>
               <div className="space-y-2">
                 {selected.findings.map((finding, idx) => (
                   <div key={idx} className="text-sm">
@@ -236,10 +244,10 @@ export default function ValidationHistory() {
                             {finding.document_status ?? ''}
                           </span>
                         </div>
-                        <p className="text-gray-400 text-xs mt-1">Score: {finding.compliance_score}% · Relevance: {Math.round((finding.relevance_score ?? 0) * 100)}%</p>
+                        <p className="text-gray-400 text-xs mt-1">{intl.formatMessage({ id: 'validation.scoreRelevance', defaultMessage: 'Score: {score}% · Relevance: {relevance}%' }, { score: finding.compliance_score, relevance: Math.round((finding.relevance_score ?? 0) * 100) })}</p>
                         {(finding.missing_elements?.length ?? 0) > 0 && (
                           <div className="mt-2">
-                            <p className="text-rose-300 text-xs font-medium">Elementos faltantes:</p>
+                            <p className="text-rose-300 text-xs font-medium">{intl.formatMessage({ id: 'validation.missingElements', defaultMessage: 'Missing elements:' })}</p>
                             <ul className="mt-1 space-y-1 text-rose-200 text-xs list-disc list-inside">
                               {finding.missing_elements?.map((m:any, i:number) => <li key={i}>{m}</li>)}
                             </ul>

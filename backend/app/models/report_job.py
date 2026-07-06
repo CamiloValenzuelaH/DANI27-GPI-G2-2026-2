@@ -22,6 +22,7 @@ class ReportJob(Base, UUIDMixin, TimestampMixin):
     report_template: Mapped[str] = mapped_column(String(64), nullable=True)
     report_format: Mapped[str] = mapped_column(String(10), nullable=True)
     created_date: Mapped[str] = mapped_column(String(10), nullable=True)
+    file_path: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -38,4 +39,5 @@ class ReportJob(Base, UUIDMixin, TimestampMixin):
             "created_at": self.created_at.isoformat() if isinstance(self.created_at, datetime) else None,
             "created_date": self.created_date,
             "updated_at": self.updated_at.isoformat() if isinstance(self.updated_at, datetime) else None,
+            "file_path": self.file_path,
         }

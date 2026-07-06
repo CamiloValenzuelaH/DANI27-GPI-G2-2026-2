@@ -96,6 +96,7 @@ class EvidenceTaxonomy(Base, UUIDMixin, TimestampMixin):
         ),
         CheckConstraint("(validity_days IS NULL) OR (validity_days > 0)", name="ck_evidence_taxonomy_validity_days_positive"),
         Index("ix_evidence_taxonomy_org_type", "organization_id", "type"),
+        Index("ix_evidence_taxonomy_org_created_at", "organization_id", "created_at"),
     )
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
@@ -104,12 +105,28 @@ class EvidenceTaxonomy(Base, UUIDMixin, TimestampMixin):
         nullable=False,
         index=True,
     )
+    question_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("assessment_questions.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    answer_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("assessment_answers.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     type: Mapped[str] = mapped_column(String(20), nullable=False)
     control_id: Mapped[str] = mapped_column(String(64), nullable=False)
     clause_ref: Mapped[str] = mapped_column(String(32), nullable=False)
+    # Optional long-form text used to improve natural-language search and inline preview.
+    search_text: Mapped[str | None] = mapped_column(String(4000), nullable=True)
     # Allow NULL for types that have no fixed validity (e.g. CONTROL)
     validity_days: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    original_file_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    file_path: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
     @property
     def freshness_status(self) -> str:

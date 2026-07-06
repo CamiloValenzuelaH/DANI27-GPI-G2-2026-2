@@ -3,11 +3,8 @@
  */
 
 // Components
-export { SkipToMainContent } from './components/SkipToMainContent';
-export { AccessibleModal } from './components/AccessibleModal';
-export { AccessibleDropdown } from './components/AccessibleDropdown';
-export { AccessibleTabs, type TabItem } from './components/AccessibleTabs';
-export { ResponsiveProvider, useResponsive, type BreakpointType } from './components/ResponsiveProvider';
+export { MobileOptimizedDrawer } from './components/MobileOptimized';
+export { useCloseOnNavigation } from './hooks/useMobileViewport';
 
 // Hooks
 export {
@@ -42,17 +39,3 @@ export {
   escapeHtml,
 } from './utils/a11y-helpers';
 
-// Audit
-export { accessibilityAudit, getAuditSummary, findingsByComponent, findingsByLevel } from './audit/audit-report';
-
-// Tests
-export {
-  testA11y,
-  testKeyboardNavigation,
-  testContrast,
-  testAriaLabel,
-  testTouchTarget,
-  testHeadingHierarchy,
-  testFormLabels,
-  testImageAltText,
-} from './tests/a11y-test-utils';

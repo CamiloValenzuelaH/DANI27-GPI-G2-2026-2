@@ -30,26 +30,92 @@ const localizedUiText = {
   es: {
     clear: 'Limpiar',
     documentMode: 'Modo ISO habilitado. Abre un documento para usar el modo de documento.',
+    requestError: 'Lo siento, no pude procesar la solicitud. Intenta de nuevo.',
+    typing: 'Escribiendo...',
+    unknownError: 'Error desconocido',
+    actionProcessing: 'Procesando acción...',
+    actionError: 'Lo siento, no pude procesar la acción. Intenta de nuevo.',
+    assistantSubtitle: 'Asistente ISO 27001',
+    chatMode: 'Modo de chat',
+    modeDocument: 'Documento',
+    modeBoth: 'Documento + ISO',
+    actionSuggestions: 'Sugerencias de acción',
+    inputPlaceholder: 'Escribe tu pregunta aquí...',
   },
   en: {
     clear: 'Clear',
     documentMode: 'ISO mode enabled. Open a document to use document mode.',
+    requestError: 'Sorry, I could not process your request. Please try again.',
+    typing: 'Typing...',
+    unknownError: 'Unknown error',
+    actionProcessing: 'Processing action...',
+    actionError: 'Sorry, I could not process the action. Please try again.',
+    assistantSubtitle: 'ISO 27001 Assistant',
+    chatMode: 'Chat mode',
+    modeDocument: 'Document',
+    modeBoth: 'Document + ISO',
+    actionSuggestions: 'Action suggestions',
+    inputPlaceholder: 'Type your question here...',
   },
   pt: {
     clear: 'Limpar',
     documentMode: 'Modo ISO ativado. Abra um documento para usar o modo de documento.',
+    requestError: 'Desculpe, não consegui processar sua solicitação. Tente novamente.',
+    typing: 'Digitando...',
+    unknownError: 'Erro desconhecido',
+    actionProcessing: 'Processando ação...',
+    actionError: 'Desculpe, não consegui processar a ação. Tente novamente.',
+    assistantSubtitle: 'Assistente ISO 27001',
+    chatMode: 'Modo de chat',
+    modeDocument: 'Documento',
+    modeBoth: 'Documento + ISO',
+    actionSuggestions: 'Sugestões de ação',
+    inputPlaceholder: 'Digite sua pergunta aqui...',
   },
   it: {
     clear: 'Pulisci',
     documentMode: 'Modalità ISO abilitata. Apri un documento per usare la modalità documento.',
+    requestError: 'Mi dispiace, non sono riuscito a elaborare la richiesta. Riprova.',
+    typing: 'Scrittura in corso...',
+    unknownError: 'Errore sconosciuto',
+    actionProcessing: 'Elaborazione azione...',
+    actionError: 'Mi dispiace, non sono riuscito a elaborare l\'azione. Riprova.',
+    assistantSubtitle: 'Assistente ISO 27001',
+    chatMode: 'Modalità chat',
+    modeDocument: 'Documento',
+    modeBoth: 'Documento + ISO',
+    actionSuggestions: 'Suggerimenti di azione',
+    inputPlaceholder: 'Scrivi qui la tua domanda...',
   },
   de: {
     clear: 'Löschen',
     documentMode: 'ISO-Modus aktiviert. Öffne ein Dokument, um den Dokumentmodus zu verwenden.',
+    requestError: 'Entschuldigung, ich konnte die Anfrage nicht verarbeiten. Bitte versuche es erneut.',
+    typing: 'Schreibt...',
+    unknownError: 'Unbekannter Fehler',
+    actionProcessing: 'Aktion wird verarbeitet...',
+    actionError: 'Entschuldigung, ich konnte die Aktion nicht verarbeiten. Bitte versuche es erneut.',
+    assistantSubtitle: 'ISO 27001 Assistent',
+    chatMode: 'Chat-Modus',
+    modeDocument: 'Dokument',
+    modeBoth: 'Dokument + ISO',
+    actionSuggestions: 'Aktionsvorschläge',
+    inputPlaceholder: 'Schreibe deine Frage hier...',
   },
   fr: {
     clear: 'Effacer',
     documentMode: 'Mode ISO activé. Ouvrez un document pour utiliser le mode document.',
+    requestError: 'Désolé, je n\'ai pas pu traiter votre demande. Veuillez réessayer.',
+    typing: 'En train d\'écrire...',
+    unknownError: 'Erreur inconnue',
+    actionProcessing: 'Traitement de l\'action...',
+    actionError: 'Désolé, je n\'ai pas pu traiter l\'action. Veuillez réessayer.',
+    assistantSubtitle: 'Assistant ISO 27001',
+    chatMode: 'Mode de chat',
+    modeDocument: 'Document',
+    modeBoth: 'Document + ISO',
+    actionSuggestions: 'Suggestions d\'action',
+    inputPlaceholder: 'Saisissez votre question ici...',
   },
 } as const;
 
@@ -88,6 +154,7 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
   const documentId = useMemo(() => new URLSearchParams(location.search).get('docId'), [location.search]);
 
   const chatLanguage = (preferences.language || 'es') as 'es' | 'en' | 'pt' | 'it' | 'de' | 'fr';
+  const ui = localizedUiText[chatLanguage];
 
   useEffect(() => {
     const handleOpenChat = () => setShowChat(true);
@@ -224,12 +291,12 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
         (err) => {
           setIsStreaming(false);
           setError(err.message);
-          addAssistantMessage('Lo siento, no pude procesar la solicitud. Intenta de nuevo.', false);
+          addAssistantMessage(ui.requestError, false);
         },
       );
     } else {
       setIsStreaming(true);
-      addAssistantMessage('Escribiendo...', true);
+      addAssistantMessage(ui.typing, true);
 
       try {
         const response = await sendChatMessage(payload);
@@ -249,13 +316,13 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
           setUnreadCount((count) => count + 1);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido');
+        setError(err instanceof Error ? err.message : ui.unknownError);
         setChatMessages((prev) =>
           prev.map((message) =>
             message.role === 'assistant' && message.pending
               ? {
                   ...message,
-                  text: 'Lo siento, no pude procesar la solicitud. Intenta de nuevo.',
+                  text: ui.requestError,
                   pending: false,
                 }
               : message,
@@ -281,7 +348,7 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
     setError(null);
     setActionOptions([]);
     setIsStreaming(true);
-    addAssistantMessage('Procesando acción...', true);
+    addAssistantMessage(ui.actionProcessing, true);
 
     try {
       if (documentId) {
@@ -307,13 +374,13 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
         handleSendMessage(action.command?.trim() || action.label.trim());
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      setError(err instanceof Error ? err.message : ui.unknownError);
       setChatMessages((prev) =>
         prev.map((message) =>
           message.role === 'assistant' && message.pending
             ? {
                 ...message,
-                text: 'Lo siento, no pude procesar la acción. Intenta de nuevo.',
+                text: ui.actionError,
                 pending: false,
               }
             : message,
@@ -356,32 +423,35 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
 
   return (
     <>
-      <button
-        onClick={toggleChat}
-        className="fixed bottom-6 right-7 w-[52px] h-[52px] rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform z-50"
-      >
-        <MessageCircle className="w-6 h-6" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
-            {unreadCount}
-          </span>
-        )}
-      </button>
+      {/* Chat button always visible */}
+      <div className="fixed bottom-6 right-28 z-50">
+        <button
+          onClick={toggleChat}
+          className="relative z-10 w-[52px] h-[52px] rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+        >
+          <MessageCircle className="w-6 h-6" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[11px] font-semibold text-white">
+              {unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
 
       {showChat && (
-        <div className={`fixed bottom-[88px] right-7 w-[420px] min-h-[520px] rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden ${darkMode ? 'bg-[#1A1D28]' : 'bg-white'}`}>
+        <div className={`fixed bottom-[88px] right-24 w-[420px] min-h-[520px] rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden ${darkMode ? 'bg-[#1A1D28]' : 'bg-white'}`}>
           <div className="px-5 py-4 bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center text-sm">🤖</div>
             <div className="flex-1">
               <div className="font-semibold text-sm">Dani AI</div>
-              <div className="text-[11px] opacity-75">Asistente ISO 27001</div>
+              <div className="text-[11px] opacity-75">{ui.assistantSubtitle}</div>
             </div>
             <button
               type="button"
               onClick={clearConversation}
               className="mr-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[12px] text-white transition hover:bg-white/20"
             >
-              {localizedUiText[chatLanguage].clear}
+              {ui.clear}
             </button>
             <button onClick={toggleChat} className="opacity-70 hover:opacity-100">
               <X className="w-5 h-5" />
@@ -391,19 +461,19 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
           <div className="px-4 py-3 border-b border-slate-200 bg-slate-50 text-[12px] text-slate-600 dark:border-[#2A2E3D] dark:bg-[#161923] dark:text-slate-300">
             {documentId ? (
               <div className="flex flex-col gap-2">
-                <span className="text-[11px] uppercase tracking-wide text-slate-500">Modo de chat</span>
+                <span className="text-[11px] uppercase tracking-wide text-slate-500">{ui.chatMode}</span>
                 <select
                   value={mode}
                   onChange={(event) => setMode(event.target.value as ChatMode)}
                   className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#4F6EF7] dark:border-[#2A2E3D] dark:bg-[#111318] dark:text-white"
                 >
                   <option value="iso">ISO</option>
-                  <option value="document">Documento</option>
-                  <option value="both">Documento + ISO</option>
+                  <option value="document">{ui.modeDocument}</option>
+                  <option value="both">{ui.modeBoth}</option>
                 </select>
               </div>
             ) : (
-              <div>{localizedUiText[chatLanguage].documentMode}</div>
+              <div>{ui.documentMode}</div>
             )}
           </div>
 
@@ -423,7 +493,7 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
           {actionOptions.length > 0 ? (
             <div className="px-4 py-3 border-t border-slate-200 bg-slate-50 dark:border-[#2A2E3D] dark:bg-[#161923]">
               <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Sugerencias de acción
+                {ui.actionSuggestions}
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
                 {actionOptions.map((action) => (
@@ -440,13 +510,18 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
             </div>
           ) : null}
 
-          <div className={`p-3 border-t flex gap-2 ${darkMode ? 'border-[#2A2E3D]' : 'border-[#E2E5EB]'}`}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSendMessage()
+            }}
+            className={`p-3 border-t flex gap-2 ${darkMode ? 'border-[#2A2E3D]' : 'border-[#E2E5EB]'}`}
+          >
             <input
               type="text"
               value={chatMessage}
               onChange={(e) => setChatMessage(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={t.chatPlaceholder ?? 'Escribe tu pregunta aquí...'}
+              placeholder={t.chatPlaceholder ?? ui.inputPlaceholder}
               className={`flex-1 px-3 py-2 border rounded-lg text-[13px] focus:outline-none focus:ring-1 focus:ring-[#4F6EF7] ${
                 darkMode
                   ? 'bg-[#111318] border-[#2A2E3D] text-[#E4E7EE]'
@@ -455,15 +530,14 @@ export default function ChatWidget({ darkMode, t }: ChatWidgetProps) {
               disabled={isStreaming}
             />
             <button
-              type="button"
-              onClick={handleSendMessage}
+              type="submit"
               disabled={isStreaming}
               className="px-3.5 py-2 bg-[#4F6EF7] text-white rounded-lg text-[13px] font-medium hover:bg-[#3D5BE0] transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-3.5 h-3.5" />
-              {isStreaming ? 'Escribiendo...' : t.send}
+              {isStreaming ? ui.typing : t.send}
             </button>
-          </div>
+          </form>
         </div>
       )}
     </>

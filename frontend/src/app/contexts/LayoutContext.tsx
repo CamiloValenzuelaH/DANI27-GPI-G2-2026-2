@@ -149,7 +149,13 @@ export function LayoutProvider({ children, initialPlan = 'free' }: LayoutProvide
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === 1) {
               const el = node as Element;
-              if (el.className && el.className.includes('overflow')) {
+              const className = typeof el.className === 'string'
+                ? el.className
+                : typeof (el as any).className?.baseVal === 'string'
+                ? (el as any).className.baseVal
+                : '';
+
+              if (className.includes('overflow')) {
                 blockHorizontalScrollOnElement(el);
               }
             }

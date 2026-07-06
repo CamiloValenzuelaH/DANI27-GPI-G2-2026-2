@@ -87,6 +87,12 @@ PHASES = [
                 False,
                 "Adjunta los objetivos de seguridad, KPIs o revisiones periódicas.",
             ),
+            build_question(
+                "¿Está definido cómo el SGSI se integra con los procesos de negocio existentes de la organización?",
+                "4.4",
+                False,
+                "Adjunta evidencias de integración del SGSI en procesos clave o flujos de trabajo.",
+            ),
         ],
     },
     {
@@ -142,6 +148,12 @@ PHASES = [
                 "6.3",
                 False,
                 "Adjunta el procedimiento de gestión de cambios o impactos en riesgos.",
+            ),
+            build_question(
+                "¿Se han determinado las acciones necesarias para abordar los riesgos y oportunidades identificados, integrándolas en los procesos del SGSI?",
+                "6.1.1",
+                False,
+                "Adjunta el plan de tratamiento de riesgos o las acciones definidas para riesgos y oportunidades.",
             ),
         ],
     },
@@ -199,6 +211,30 @@ PHASES = [
                 False,
                 "Adjunta revisiones periódicas, control de versiones o aprobaciones.",
             ),
+            build_question(
+                "¿La organización determina y asigna los recursos necesarios (humanos, técnicos, de infraestructura) para establecer y mantener el SGSI?",
+                "7.1",
+                True,
+                "Adjunta la planificación de recursos, roles asignados y evidencias de disponibilidad de recursos.",
+            ),
+            build_question(
+                "¿El personal es consciente de la política de seguridad, su contribución al SGSI y las consecuencias de no cumplirla?",
+                "7.3",
+                False,
+                "Adjunta evidencias de concienciación, comunicaciones internas o formación sobre la política.",
+            ),
+            build_question(
+                "¿Se realizan evaluaciones de riesgos de seguridad de la información a intervalos planificados o ante cambios significativos?",
+                "8.2",
+                True,
+                "Adjunta registros de evaluaciones de riesgos y evidencias de planificación de revisiones.",
+            ),
+            build_question(
+                "¿Se implementa el plan de tratamiento de riesgos de seguridad de la información y se documentan los resultados?",
+                "8.3",
+                True,
+                "Adjunta evidencia del plan de tratamiento implementado y los resultados documentados.",
+            ),
         ],
     },
     {
@@ -207,6 +243,50 @@ PHASES = [
         "description": "Una pregunta por cada control del Anexo A de ISO 27001:2022.",
         "sort_order": 4,
         "questions": [],
+    },
+    {
+        "code": "phase-5",
+        "name": "Performance Evaluation & Improvement",
+        "description": "Preguntas sobre monitoreo, auditorías internas, revisión por la dirección y mejora continua del SGSI.",
+        "sort_order": 5,
+        "questions": [
+            build_question(
+                "¿La organización monitorea, mide, analiza y evalúa el desempeño y la eficacia del SGSI de forma periódica?",
+                "9.1",
+                True,
+                "Adjunta registros de monitoreo, indicadores de desempeño y análisis de eficacia del SGSI.",
+            ),
+            build_question(
+                "¿Se planifican y ejecutan auditorías internas del SGSI a intervalos definidos?",
+                "9.2",
+                True,
+                "Adjunta planes de auditoría interna y evidencias de ejecución.",
+            ),
+            build_question(
+                "¿Los resultados de las auditorías internas se reportan a la dirección correspondiente?",
+                "9.2",
+                False,
+                "Adjunta informes de auditoría interna y comunicaciones enviadas a la dirección.",
+            ),
+            build_question(
+                "¿La alta dirección revisa el SGSI a intervalos planificados para asegurar su conveniencia, adecuación y eficacia continuas?",
+                "9.3",
+                True,
+                "Adjunta actas de revisión por la dirección o resultados de revisiones planificadas.",
+            ),
+            build_question(
+                "¿La organización mejora continuamente la conveniencia, adecuación y eficacia del SGSI?",
+                "10.1",
+                False,
+                "Adjunta evidencias de iniciativas de mejora continua y resultados de cambios implementados.",
+            ),
+            build_question(
+                "¿Ante una no conformidad, la organización reacciona, evalúa la necesidad de acción correctiva y elimina las causas para que no se repita?",
+                "10.2",
+                True,
+                "Adjunta registros de no conformidades, acciones correctivas y evidencias de seguimiento.",
+            ),
+        ],
     },
 ]
 
@@ -372,7 +452,10 @@ def seed() -> None:
 
         question_rows: list[dict] = []
 
-        for phase in PHASES[:3]:
+        for phase in PHASES:
+            if phase["code"] == "phase-4":
+                continue
+
             phase_db = phase_map[phase["code"]]
             for idx, question in enumerate(phase["questions"], start=1):
                 question_rows.append(

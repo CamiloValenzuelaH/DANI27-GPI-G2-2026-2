@@ -3,6 +3,7 @@ export interface User {
   email: string
   full_name: string
   phone_number: string | null
+  language: 'en' | 'es' | 'pt' | 'de' | 'fr' | 'it'
   is_active: boolean
   organization_id: string
   two_factor_enabled: boolean
@@ -21,6 +22,28 @@ export interface LoginResponse {
   user: User
 }
 
+export interface PolicyOut {
+  id: string
+  title: string
+  summary: string | null
+  content: string
+  status: 'draft' | 'published' | 'archived'
+  document_version: string
+  mandatory: boolean
+  published_at: string | null
+  acknowledged?: boolean
+}
+
+export interface PolicyAcknowledgmentResponse {
+  id: string
+  policy_id: string
+  user_id: string
+  acknowledged_at: string
+  ip_address: string | null
+  document_version: string
+  content_hash: string
+}
+
 export interface TwoFactorChallengeResponse {
   requires_two_factor: true
   challenge_token: string
@@ -32,6 +55,11 @@ export type AuthLoginResponse = LoginResponse | TwoFactorChallengeResponse
 export interface LoginRequest {
   email: string
   password: string
+}
+
+export interface ChangePasswordRequest {
+  current_password: string
+  new_password: string
 }
 
 export interface RegisterRequest {
@@ -126,7 +154,11 @@ export interface Vulnerability {
   name: string
   description: string | null
   asset_id: string
+  threat_id: string | null
   severity: string
+  likelihood: number
+  impact: number
+  remediation_plan: string | null
   created_at: string
   updated_at: string
 }
@@ -152,6 +184,22 @@ export interface DashboardTrendItem {
   tested_percentage: number
   overall_percentage: number
   health_score: number
+}
+
+export interface DashboardActivityItem {
+  id: string
+  title: string
+  category: string
+  time: string
+}
+
+export interface DashboardUpcomingTaskItem {
+  id: string
+  title: string
+  category: string
+  priority: 'high' | 'medium' | 'low'
+  due: 'today' | 'tomorrow' | 'thisWeek' | 'nextWeek'
+  due_date: string | null
 }
 
 export interface DashboardMetricsResponse {

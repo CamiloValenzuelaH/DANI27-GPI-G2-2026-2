@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.models.plan import Plan
     from app.models.user import User
     from app.models.role import Role
+    from app.models.soa_control_status import SOAControlStatus
 
 
 class Organization(Base, UUIDMixin, TimestampMixin):
@@ -39,6 +40,11 @@ class Organization(Base, UUIDMixin, TimestampMixin):
         cascade="all, delete-orphan",
     )
     roles: Mapped[list["Role"]] = relationship(
+        back_populates="organization",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )
+    soa_control_statuses: Mapped[list["SOAControlStatus"]] = relationship(
         back_populates="organization",
         lazy="select",
         cascade="all, delete-orphan",

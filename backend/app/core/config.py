@@ -8,6 +8,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
     )
 
     # App
@@ -51,6 +52,10 @@ class Settings(BaseSettings):
     validation_jobs_dir: str = "/shared/validation_jobs"
     iso_chunks_table: str = "iso_27001_chunks"
     validation_stream_poll_seconds: float = 1.0
+    audit_room_search_semantic_enabled: bool = True
+    audit_room_search_semantic_timeout_seconds: float = 2.5
+    audit_room_search_max_results: int = 20
+    reminder_emails_dry_run: bool = True
 
     # Google
     google_client_id: str = ""

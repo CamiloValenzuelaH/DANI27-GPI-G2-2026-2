@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
+from fastapi import HTTPException, Request, status
 
 from app.models.user import User
 from app.models.organization import Organization
@@ -8,6 +8,7 @@ from app.models.plan import Plan
 from app.models.role import Role
 from app.models.user_role import UserRole
 from app.models.refresh_token import RefreshToken
+from app.models.audit_log import AuditLog
 from app.schemas.auth import (
     RegisterRequest,
     LoginRequest,
@@ -82,6 +83,34 @@ def _build_tokens(db: Session, user: User) -> TokenResponse:
         access_token=access_token,
         refresh_token=raw_refresh,
     )
+
+
+def _log_password_change_audit(
+    db: Session,
+    current_user: User,
+    request: Request,
+) -> None:
+    try:
+        previous = db.query(AuditLog).order_by(AuditLog.timestamp.desc()).first()
+        record = AuditLog(
+            user_id=str(current_user.id),
+            user_role=None,
+            action='POST',
+            resource='/api/v1/auth/change-password',
+            details={'message': 'User requested password change'},
+            timestamp=datetime.now(timezone.utc),
+            ip_address=request.client.host if request.client else request.headers.get('x-forwarded-for'),
+            user_agent=request.headers.get('user-agent'),
+            http_status=204,
+            success=True,
+            previous_hash=previous.current_hash if previous else None,
+            current_hash='',
+        )
+        record.current_hash = record.compute_hash()
+        db.add(record)
+        db.commit()
+    except Exception:
+        db.rollback()
 
 
 def issue_tokens(db: Session, user: User) -> TokenResponse:
@@ -213,3 +242,34 @@ def logout(raw_token: str, db: Session) -> None:
     if db_token:
         db_token.is_revoked = True
         db.commit()
+
+
+def change_password(
+    current_user: User,
+    current_password: str,
+    new_password: str,
+    db: Session,
+    request: Request,
+) -> None:
+    if not verify_password(current_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Current password is incorrect",
+        )
+
+    if current_password == new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The new password must be different from the current password",
+        )
+
+    current_user.hashed_password = hash_password(new_password)
+    current_user.updated_at = datetime.now(timezone.utc)
+
+    db.query(RefreshToken).filter(
+        RefreshToken.user_id == current_user.id,
+        RefreshToken.is_revoked == False,
+    ).update({"is_revoked": True}, synchronize_session=False)
+
+    _log_password_change_audit(db, current_user, request)
+    db.commit()

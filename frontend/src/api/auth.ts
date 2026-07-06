@@ -1,5 +1,12 @@
 import client, { storage } from './client'
-import type { AuthLoginResponse, LoginRequest, LoginResponse, RegisterRequest, User } from './types'
+import type {
+  AuthLoginResponse,
+  ChangePasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  User,
+} from './types'
 
 export const authApi = {
   login: async (data: LoginRequest): Promise<AuthLoginResponse> => {
@@ -10,6 +17,10 @@ export const authApi = {
   register: async (data: RegisterRequest): Promise<LoginResponse> => {
     const res = await client.post<LoginResponse>('/auth/register', data)
     return res.data
+  },
+
+  changePassword: async (data: ChangePasswordRequest): Promise<void> => {
+    await client.post('/auth/change-password', data)
   },
 
   me: async (): Promise<User> => {

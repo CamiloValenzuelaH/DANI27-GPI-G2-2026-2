@@ -3,7 +3,9 @@ import { Trash2 } from 'lucide-react';
 import UploadModal from '../uploader/UploadModal';
 import type { UploadItem } from '../uploader/UploadModal';
 import { usePreferences } from '../AppShell';
+import { useIntl } from 'react-intl';
 import { formatDateTime } from '../../lib/date';
+import { buildTenantStorageKey } from '../../lib/tenantStorage';
 
 const DEFAULT_VISIBLE_ATTACHMENTS = 5;
 
@@ -45,10 +47,11 @@ export default function EvidenceAttachment({
   onRemove: (id: string) => void;
 }) {
   const { dateFormat, language } = usePreferences();
+  const intl = useIntl();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [showUploader, setShowUploader] = useState(false);
   const [showAllAttachments, setShowAllAttachments] = useState(false);
-  const historyKey = `evidence-upload-history:${questionId}`;
+  const historyKey = buildTenantStorageKey(`evidence-upload-history:${questionId}`);
   const [history, setHistory] = useState<UploadedHistoryItem[]>(() => {
     try {
       const raw = localStorage.getItem(historyKey);
@@ -134,25 +137,25 @@ export default function EvidenceAttachment({
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className="border-2 border-dashed border-gray-700 rounded-md p-4 text-sm text-gray-300 bg-gray-800"
+        className="rounded-md border-2 border-dashed border-gray-700 bg-gray-800 p-3 text-xs text-gray-300 sm:p-4 sm:text-sm"
       >
-        <div className="flex items-center justify-between">
-          <div>Arrastra y suelta evidencias aquí, o</div>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="leading-relaxed">{intl.formatMessage({ id: 'evidence.dragDropHint', defaultMessage: 'Arrastra y suelta evidencias aquí, o' })}</div>
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => inputRef.current?.click()}
-              className="ml-4 px-3 py-1 bg-indigo-600 rounded text-white text-sm"
-              title="Seleccionar rápido: abre el selector de archivos para subir sin entrar al modo avanzado"
-              aria-label="Seleccionar archivos rápido"
+              className="rounded bg-indigo-600 px-3 py-1 text-xs text-white sm:text-sm"
+              title={intl.formatMessage({ id: 'evidence.quickSelect', defaultMessage: 'Seleccionar (rápido)' })}
+              aria-label={intl.formatMessage({ id: 'evidence.quickSelect', defaultMessage: 'Seleccionar (rápido)' })}
             >
-              Seleccionar (rápido)
+              {intl.formatMessage({ id: 'evidence.quickSelect', defaultMessage: 'Seleccionar (rápido)' })}
             </button>
             <button
               onClick={() => setShowUploader(true)}
-              className="ml-2 px-3 py-1 bg-cyan-600 rounded text-white text-sm"
+              className="rounded bg-cyan-600 px-3 py-1 text-xs text-white sm:text-sm"
               type="button"
             >
-              Uploader avanzado
+              {intl.formatMessage({ id: 'evidence.advancedUploader', defaultMessage: 'Uploader avanzado' })}
             </button>
           </div>
         </div>
@@ -170,30 +173,30 @@ export default function EvidenceAttachment({
 
       <ul className="mt-3 space-y-2">
         {visibleAttachments.map((a) => (
-          <li key={a.id} className="flex items-center justify-between bg-gray-900 p-2 rounded">
+          <li key={a.id} className="flex flex-col gap-2 rounded bg-gray-900 p-2 sm:flex-row sm:items-center sm:justify-between">
             {a.removed ? (
               <>
-                <span className="text-sm text-gray-400">Archivo eliminado</span>
-                <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-400 sm:text-sm">{intl.formatMessage({ id: 'evidence.attachmentDeleted', defaultMessage: 'File deleted' })}</span>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
                   <button
                     type="button"
                     onClick={() => inputRef.current?.click()}
-                    className="text-xs text-cyan-300"
+                    className="text-[11px] text-cyan-300 sm:text-xs"
                   >
-                    Reemplazar
+                    {intl.formatMessage({ id: 'evidence.replace', defaultMessage: 'Replace' })}
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <span className="text-sm">
+                <span className="text-xs leading-relaxed sm:text-sm break-words">
                   {a.name} · {(a.size / 1024).toFixed(1)} KB
                   {a.controlId ? ` · ${a.controlId}` : ''}
                 </span>
                 <button
                   onClick={() => onRemove(a.id)}
-                  title="Eliminar archivo"
-                  className="ml-3 inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs text-red-400 hover:bg-white/5 hover:text-red-300 pointer-events-auto"
+                  title={intl.formatMessage({ id: 'evidence.deleteFile', defaultMessage: 'Delete file' })}
+                  className="inline-flex items-center gap-1 self-start rounded px-2 py-0.5 text-[11px] text-red-400 hover:bg-white/5 hover:text-red-300 pointer-events-auto sm:ml-3 sm:text-xs sm:self-auto"
                 >
                   <Trash2 className="size-4" />
                 </button>
@@ -210,14 +213,16 @@ export default function EvidenceAttachment({
             className="text-xs font-medium text-cyan-300 hover:text-cyan-200"
             onClick={() => setShowAllAttachments((prev) => !prev)}
           >
-            {showAllAttachments ? 'Ver menos' : `Ver ${hiddenAttachmentCount} más`}
+            {showAllAttachments
+              ? intl.formatMessage({ id: 'evidence.viewLess', defaultMessage: 'View less' })
+              : intl.formatMessage({ id: 'evidence.viewMoreCount', defaultMessage: 'View {count} more' }, { count: hiddenAttachmentCount })}
           </button>
         </div>
       )}
 
       {history.length > 0 && (
         <div className="mt-3 rounded-md border border-gray-700 bg-gray-900 p-3">
-          <p className="text-xs uppercase tracking-wide text-gray-400">Últimas cargas</p>
+          <p className="text-xs uppercase tracking-wide text-gray-400">{intl.formatMessage({ id: 'evidence.recentUploads', defaultMessage: 'Últimas cargas' })}</p>
           <ul className="mt-2 space-y-2">
             {history.slice(0, 5).map((item) => (
               <li key={`${item.id}-${item.uploadedAt}`} className="rounded bg-gray-800 p-2 text-xs text-gray-200">

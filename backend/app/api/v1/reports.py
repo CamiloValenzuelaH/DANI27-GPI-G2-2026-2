@@ -5,6 +5,7 @@ import io
 import logging
 import uuid
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 from urllib.parse import quote
 
@@ -275,6 +276,63 @@ async def get_report_status(
     return _build_status_response(raw, download_url=download_url)
 
 
+@router.get("", response_model=list[dict[str, Any]])
+def list_reports(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    reports = (
+        db.query(ReportJob)
+        .filter(ReportJob.organization_id == str(current_user.organization_id))
+        .order_by(ReportJob.created_at.desc())
+        .all()
+    )
+
+    return [
+        {
+            "job_id": report.job_id,
+            "report_title": report.report_title,
+            "report_template": report.report_template,
+            "report_format": report.report_format,
+            "status": report.status,
+            "created_at": report.created_at.isoformat() if report.created_at else None,
+            "file_path": report.file_path,
+            "download_url": (
+                f"/api/v1/reports/{quote(report.job_id)}/download?token={quote(_create_download_token(report.job_id, str(current_user.organization_id)))}"
+                if report.status == "completed"
+                else None
+            ),
+        }
+        for report in reports
+    ]
+
+
+@router.delete("/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_report(
+    job_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    report = db.query(ReportJob).filter(ReportJob.job_id == job_id).first()
+    if report is None or str(report.organization_id) != str(current_user.organization_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Reporte no encontrado")
+
+    if report.file_path:
+        try:
+            Path(report.file_path).unlink(missing_ok=True)
+        except Exception:
+            pass
+
+    db.delete(report)
+    db.commit()
+
+    redis_client = get_redis_client()
+    try:
+        await redis_client.delete(_download_key(job_id))
+    finally:
+        await redis_client.close()
+
+
 @router.get("/{job_id}/download")
 async def get_report_download(
     job_id: str,
@@ -296,15 +354,22 @@ async def get_report_download(
         if str(raw.get("organization_id")) != str(current_user.organization_id):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Acceso denegado al reporte")
 
-    redis_client = get_redis_client()
-    encoded = await redis_client.get(_download_key(job_id))
-    if not encoded:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Archivo de reporte no encontrado o expirado")
+    report_job = db.query(ReportJob).filter(ReportJob.job_id == job_id).first()
+    file_path = report_job.file_path if report_job else None
 
-    try:
-        report_bytes = base64.b64decode(encoded)
-    except Exception:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al decodificar el reporte")
+    if file_path and Path(file_path).exists():
+        report_bytes = Path(file_path).read_bytes()
+    else:
+        redis_client = get_redis_client()
+        encoded = await redis_client.get(_download_key(job_id))
+        await redis_client.close()
+        if not encoded:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Archivo de reporte no encontrado o expirado")
+
+        try:
+            report_bytes = base64.b64decode(encoded)
+        except Exception:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error al decodificar el reporte")
 
     report_format = raw.get("report_format")
     title_safe = quote((raw.get("report_title") or job_id).replace(" ", "_"))

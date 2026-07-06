@@ -1,6 +1,26 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '/api/v1'
+// Resolve API base URL: prefer VITE_API_URL, otherwise default to '/api/v1'.
+// When running the dev server on port 5173 and no VITE_API_URL is set,
+// point to the backend at localhost:8000 so API calls don't hit the dev server.
+const envUrl = import.meta.env.VITE_API_URL
+let BASE_URL = (envUrl ?? '/api/v1').replace(/\/$/, '')
+try {
+  if (!envUrl && typeof window !== 'undefined') {
+    const { hostname, port } = window.location
+      if (hostname === 'localhost' && port === '5173') {
+        // In local Docker setups this project exposes the backend on host port 8001
+        // (docker-compose maps 8001->8000). Prefer 8001 to match developer docker mapping.
+        BASE_URL = 'http://localhost:8001/api/v1'
+      }
+  }
+} catch (e) {
+  // ignore
+}
+
+// debug
+// eslint-disable-next-line no-console
+console.info('API base URL:', BASE_URL)
 
 const TOKEN_KEY = 'access_token'
 const REFRESH_KEY = 'refresh_token'
@@ -25,12 +45,13 @@ const client: AxiosInstance = axios.create({
 // Adjunta el access token en cada request y maneja FormData correctamente
 client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = storage.getToken()
-  if (token && config.headers) {
+  config.headers = config.headers ?? {}
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
   
   // Si es FormData, no establecer Content-Type (dejar que el navegador lo haga)
-  if (!(config.data instanceof FormData)) {
+  if (config.data && !(config.data instanceof FormData)) {
     config.headers['Content-Type'] = 'application/json'
   }
   

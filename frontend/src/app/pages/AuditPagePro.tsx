@@ -1,25 +1,20 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
-import { AlertCircle, CheckCircle, AlertTriangle, MessageCircle, Send, Upload, FileUp } from 'lucide-react';
+import { AlertCircle, CheckCircle, AlertTriangle, Upload, FileUp } from 'lucide-react';
 import type { AuditValidationResponse, AuditChecklistItem } from '../../api/audit';
 import { getAuditChecklist, saveAuditChecklist, validateAudit } from '../../api/audit';
 import {
   enqueueExternalValidation,
   generateMissingForChunk,
-  subscribeExternalValidationJob,
   type ChunkValidationResult,
   type GenerateMissingResponse,
   type ValidationReportResponse,
 } from '../../api/externalValidation';
+import { useValidationJob } from '../contexts/ValidationJobContext';
 import { usePreferences } from '../components/AppShell';
 import { formatDateTime } from '../lib/date';
 import { translations } from '../types';
-
-interface ChatMessage {
-  id: number;
-  text: string;
-  isAgent: boolean;
-  timestamp: Date;
-}
+import ValidationHistory from '../components/ValidationHistory';
+import AuditRoomPanel from '../components/AuditRoomPanel';
 
 export default function AuditPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,18 +48,7 @@ export default function AuditPage() {
   const [missingGenerationLoadingByChunk, setMissingGenerationLoadingByChunk] = useState<Record<string, boolean>>({});
   const [missingGenerationErrorByChunk, setMissingGenerationErrorByChunk] = useState<Record<string, string>>({});
   const [missingGenerationResultByChunk, setMissingGenerationResultByChunk] = useState<Record<string, GenerateMissingResponse>>({});
-  const validationStreamRef = useRef<EventSource | null>(null);
-
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      text: t('audit.chatGreeting', 'Hi! I am the Audit Agent. I am ready to analyze your compliance evidence and provide validation based on ISO 27001 standards.'),
-      isAgent: true,
-      timestamp: new Date(),
-    }
-  ]);
-  const [chatInput, setChatInput] = useState('');
-  const [showChat, setShowChat] = useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
   const [checklistItems, setChecklistItems] = useState<AuditChecklistItem[]>([]);
   const [checklistLoaded, setChecklistLoaded] = useState(false);
   const [checklistSaving, setChecklistSaving] = useState(false);
@@ -161,6 +145,30 @@ export default function AuditPage() {
     setChecklistDirty(true);
   };
 
+  // validation SSE handled by ValidationJobContext
+  const { activeJob, subscribe } = useValidationJob();
+
+  useEffect(() => {
+    if (!activeJob) {
+      setExternalValidationJob(null);
+      setExternalValidationReport(null);
+      return;
+    }
+
+    const interim: ValidationReportResponse = {
+      job_id: activeJob.jobId,
+      status: activeJob.status,
+      progress: activeJob.progress,
+      message: (activeJob.result && (activeJob.result.message ?? undefined)) as any,
+      total_chunks: (activeJob.result && (activeJob.result.total_chunks ?? 0)) as any,
+      findings: (activeJob.result && (activeJob.result.findings ?? [])) as any,
+    } as ValidationReportResponse;
+
+    setExternalValidationJob(interim);
+    if (activeJob.result) setExternalValidationReport(activeJob.result as ValidationReportResponse);
+    else setExternalValidationReport(interim);
+  }, [activeJob]);
+
   const forceSaveChecklist = async () => {
     try {
       setChecklistSaving(true);
@@ -188,20 +196,6 @@ export default function AuditPage() {
         priority
       });
       setAuditResponse(response);
-
-      // Agregar mensaje del agente al chat
-      setChatMessages(prev => [...prev, {
-        id: prev.length + 1,
-        text: t(
-          'audit.chatAnalysisComplete',
-          'I have completed the audit analysis. Compliance score: {score}%. Status: {status}. I found {count} findings.'
-        )
-          .replace('{score}', String(response.overall_compliance_score))
-          .replace('{status}', response.status)
-          .replace('{count}', String(response.findings.length)),
-        isAgent: true,
-        timestamp: new Date()
-      }]);
     } catch (err) {
       setAuditResponse(null);
       if (err instanceof Error) {
@@ -212,38 +206,6 @@ export default function AuditPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const onSendChatMessage = () => {
-    if (!chatInput.trim()) return;
-
-    setChatMessages(prev => [...prev, {
-      id: prev.length + 1,
-      text: chatInput,
-      isAgent: false,
-      timestamp: new Date()
-    }]);
-
-    // Simular respuesta del agente
-    setTimeout(() => {
-      let agentResponse = '';
-      if (chatInput.toLowerCase().includes('riesgo') || chatInput.toLowerCase().includes('risk') || chatInput.toLowerCase().includes('critical')) {
-        agentResponse = t('audit.chatRiskResponse', 'Critical risks identified include uncontrolled physical access to equipment, lack of MFA, and insufficient credential rotation policies.');
-      } else if (chatInput.toLowerCase().includes('recomendación') || chatInput.toLowerCase().includes('recommend')) {
-        agentResponse = t('audit.chatRecommendationResponse', 'Recommendations: 1) Implement controlled physical access, 2) Enable MFA on all systems, 3) Set credential rotation policies every 90 days.');
-      } else {
-        agentResponse = t('audit.chatFallback', 'Understood. Based on the audit analysis, I can help you with findings, recommendations, or next steps.');
-      }
-
-      setChatMessages(prev => [...prev, {
-        id: prev.length + 1,
-        text: agentResponse,
-        isAgent: true,
-        timestamp: new Date()
-      }]);
-    }, 500);
-
-    setChatInput('');
   };
 
   const onValidateFile = async (file: File) => {
@@ -257,8 +219,7 @@ export default function AuditPage() {
     setMissingGenerationLoadingByChunk({});
     setMissingGenerationErrorByChunk({});
     setMissingGenerationResultByChunk({});
-    validationStreamRef.current?.close();
-    validationStreamRef.current = null;
+    // event subscription now handled by ValidationJobContext
 
     try {
       const job = await enqueueExternalValidation(file);
@@ -274,19 +235,8 @@ export default function AuditPage() {
       setExternalValidationReport(queuedState);
 
       try {
-        validationStreamRef.current = await subscribeExternalValidationJob(job.job_id, {
-          onProgress: (payload) => {
-            setExternalValidationJob(payload);
-            setExternalValidationReport(payload);
-          },
-          onDone: (payload) => {
-            setExternalValidationJob(payload);
-            setExternalValidationReport(payload);
-          },
-          onError: (message) => {
-            setExternalValidationError(message);
-          },
-        });
+        // Use context to subscribe to SSE for this job
+        await subscribe(job.job_id);
       } catch (err) {
         const message = err instanceof Error ? err.message : t('audit.unknownError', 'Unknown error');
         setExternalValidationError(`${t('audit.granularValidationStartError', 'Could not start granular validation')}: ${message}`);
@@ -301,6 +251,36 @@ export default function AuditPage() {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(true);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      const file = droppedFiles[0];
+      onValidateFile(file);
     }
   };
 
@@ -367,25 +347,21 @@ export default function AuditPage() {
     return t('audit.statusUnknown', 'SIN ESTADO');
   };
 
-  useEffect(() => {
-    return () => {
-      validationStreamRef.current?.close();
-    };
-  }, []);
+  // Cleanup handled by ValidationJobContext
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F1119] to-[#1A1D28] p-6">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Panel Principal - Formulario */}
         <div className="lg:col-span-2 space-y-6">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-8 rounded-3xl border border-slate-700 bg-[#111827] p-6 shadow-[0_15px_45px_-25px_rgba(0,0,0,0.7)]">
             <h1 className="text-3xl font-bold text-white mb-2">{t('audit.title', 'Compliance Audit')}</h1>
-            <p className="text-gray-400">{t('audit.subtitle', 'Validate your evidence against ISO 27001 standards')}</p>
+            <p className="text-slate-300">{t('audit.subtitle', 'Validate your evidence against ISO 27001 standards')}</p>
           </div>
 
           {/* Validación de Archivos con Agente */}
-          <div className="bg-[#1A1D28] border border-[#2A2E3D] rounded-xl p-6">
+          <div className="bg-slate-900/95 border border-slate-800/80 shadow-xl rounded-3xl p-6 backdrop-blur-sm">
             <div className="flex items-center gap-2 mb-4">
               <FileUp className="w-5 h-5 text-[#4F6EF7]" />
               <h2 className="text-lg font-bold text-white">{t('audit.fileValidatorTitle', 'Validate File with Agent')}</h2>
@@ -404,23 +380,31 @@ export default function AuditPage() {
             />
             
             <div
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-[#4F6EF7] rounded-lg p-6 text-center cursor-pointer hover:bg-[#4F6EF7]/5 transition"
+              className={`border-2 border-dashed rounded-[28px] p-8 text-center cursor-pointer transition-all duration-200 ${
+                isDragActive
+                  ? 'border-[#1DB954] bg-[#1DB954]/12 shadow-[0_20px_60px_-30px_rgba(29,185,84,0.55)] scale-105'
+                  : 'border-[#4F6EF7] bg-slate-950/70 hover:bg-slate-950/90 hover:border-[#4F6EF7]/80'
+              }`}
             >
-              <Upload className="w-8 h-8 text-[#4F6EF7] mx-auto mb-2" />
-              <p className="text-white font-medium">{t('audit.dropHint', 'Click or drag a file')}</p>
+              <Upload className={`w-8 h-8 mx-auto mb-2 transition-colors ${isDragActive ? 'text-[#1DB954]' : 'text-[#4F6EF7]'}`} />
+              <p className="text-white font-medium">{isDragActive ? t('audit.dropNow', 'Drop your file here') : t('audit.dropHint', 'Click or drag a file')}</p>
               <p className="text-gray-400 text-sm mt-1">{t('audit.dropSubHint', 'PDF, Word, Excel, Text, Images (max 10MB)')}</p>
             </div>
 
             {isValidatingFile && (
-              <div className="mt-4 p-4 bg-[#0F1119] rounded-lg text-center">
+              <div className="mt-4 p-4 bg-slate-950/90 rounded-2xl text-center border border-slate-800/80">
                 <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-[#4F6EF7] border-t-transparent"></div>
                 <p className="text-white text-sm ml-2 inline">{t('audit.processing', 'Processing granular validation...')}</p>
               </div>
             )}
 
             {externalValidationJob && (
-              <div className="mt-4 bg-[#0F1119] border border-[#2A2E3D] rounded-lg p-4 space-y-3">
+              <div className="mt-4 bg-slate-950/90 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-lg shadow-slate-950/20">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-gray-400 text-xs uppercase tracking-wide">{t('audit.jobId', 'Job ID')}</p>
@@ -432,11 +416,11 @@ export default function AuditPage() {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-2">
+                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
                     <span>{t('audit.progress', 'Progress')}</span>
                     <span>{externalValidationJob.progress}%</span>
                   </div>
-                  <div className="h-2 rounded-full bg-[#1A1D28] overflow-hidden">
+                  <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-[#4F6EF7] to-[#1DB954] transition-all duration-300"
                       style={{ width: `${externalValidationJob.progress}%` }}
@@ -466,33 +450,33 @@ export default function AuditPage() {
 
             {externalValidationReport && externalValidationReport.status === 'completed' && (
               <div className="mt-4 space-y-3">
-                <div className="bg-[#0F1119] p-4 rounded-lg">
-                  <p className="text-gray-400 text-sm mb-1">{t('audit.file', 'File')}</p>
+                <div className="bg-slate-950/90 p-4 rounded-3xl border border-slate-800/80 shadow-sm">
+                  <p className="text-slate-400 text-sm mb-1">{t('audit.file', 'File')}</p>
                   <p className="text-white font-medium">{externalValidationReport.file_name}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#0F1119] p-4 rounded-lg">
+                  <div className="bg-slate-950/90 p-4 rounded-3xl border border-slate-800/80 shadow-sm">
                     <p className="text-gray-400 text-sm mb-1">{t('audit.avgCompliance', 'Average compliance')}</p>
                     <p className={`text-2xl font-bold ${getComplianceScoreColor(externalValidationReport.overall_score ?? 0)}`}>
                       {externalValidationReport.overall_score ?? 0}%
                     </p>
                   </div>
-                  <div className="bg-[#0F1119] p-4 rounded-lg">
-                    <p className="text-gray-400 text-sm mb-1">{t('audit.status', 'Status')}</p>
+                  <div className="bg-slate-950/90 p-4 rounded-3xl border border-slate-800/80 shadow-sm">
+                    <p className="text-slate-400 text-sm mb-1">{t('audit.status', 'Status')}</p>
                     <p className={`font-medium ${getStatusColor(externalValidationReport.status)}`}>
                       {externalValidationReport.status === 'completed' ? `✓ ${t('audit.validationCompleted', 'Validation completed')}` : externalValidationReport.status.toUpperCase()}
                     </p>
                   </div>
                 </div>
 
-                <div className="bg-[#0F1119] p-4 rounded-lg">
-                  <p className="text-gray-400 text-sm mb-2">{t('audit.summary', 'Summary')}</p>
+                <div className="bg-slate-950/90 p-4 rounded-3xl border border-slate-800/80 shadow-sm">
+                  <p className="text-slate-400 text-sm mb-2">{t('audit.summary', 'Summary')}</p>
                   <p className="text-white text-sm">{externalValidationReport.summary}</p>
                 </div>
 
                 {externalValidationReport.findings.length > 0 && (
-                  <div className="bg-[#0F1119] p-4 rounded-lg">
+                  <div className="bg-slate-950/90 p-4 rounded-3xl border border-slate-800/80 shadow-sm">
                     <p className="text-gray-400 text-sm mb-3">{t('audit.findingsByChunk', 'Findings by ISO chunk')}</p>
                     <div className="mb-4">
                       <p className="text-gray-400 text-xs mb-2">{t('audit.heatmapTitle', 'Mapa de calor por control')}</p>
@@ -509,13 +493,13 @@ export default function AuditPage() {
                         ))}
                       </div>
                       <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                        <div className="bg-[#1A1D28] rounded px-3 py-2 text-emerald-300 border border-emerald-500/30">
+                        <div className="bg-slate-950/90 rounded-2xl px-3 py-2 text-emerald-300 border border-emerald-500/30 shadow-sm">
                           {t('audit.completeCount', 'COMPLETO')}: {externalValidationReport.findings.filter((item) => item.document_status === 'COMPLETO').length}
                         </div>
-                        <div className="bg-[#1A1D28] rounded px-3 py-2 text-amber-300 border border-amber-500/30">
+                        <div className="bg-slate-950/90 rounded-2xl px-3 py-2 text-amber-300 border border-amber-500/30 shadow-sm">
                           {t('audit.incompleteCount', 'INCOMPLETO')}: {externalValidationReport.findings.filter((item) => item.document_status === 'INCOMPLETO').length}
                         </div>
-                        <div className="bg-[#1A1D28] rounded px-3 py-2 text-rose-300 border border-rose-500/30">
+                        <div className="bg-slate-950/90 rounded-2xl px-3 py-2 text-rose-300 border border-rose-500/30 shadow-sm">
                           {t('audit.missingCount', 'INEXISTENTE')}: {externalValidationReport.findings.filter((item) => item.document_status === 'INEXISTENTE').length}
                         </div>
                       </div>
@@ -566,7 +550,7 @@ export default function AuditPage() {
                                   )}
 
                                   {missingGenerationResultByChunk[finding.clause_ref] && (
-                                    <div className="rounded-md border border-[#2A2E3D] bg-[#131725] p-3 space-y-2">
+                                    <div className="rounded-3xl border border-slate-800/80 bg-slate-950/90 p-3 space-y-2 shadow-sm">
                                       <p className="text-xs text-gray-300">
                                         {t('audit.generatedValidation', 'Validación')}: {missingGenerationResultByChunk[finding.clause_ref].validation_passed ? 'OK' : 'Requiere revisión'} ·
                                         {' '}{t('audit.score', 'Score')}: {missingGenerationResultByChunk[finding.clause_ref].validation_score}% ·
@@ -612,10 +596,21 @@ export default function AuditPage() {
                 {externalValidationReport.error || t('audit.failed', 'Granular validation failed.')}
               </div>
             )}
+
+            {/* Historial de validaciones: debajo del resultado actual de la validación */}
+            <div className="mt-6">
+              <hr className="border-t border-slate-800/80 my-6" />
+              <ValidationHistory />
+            </div>
+          </div>
+
+          {/* Audit Room */}
+          <div className="bg-slate-900/95 border border-slate-800/80 shadow-xl rounded-3xl p-6 space-y-4 backdrop-blur-sm">
+            <AuditRoomPanel />
           </div>
 
           {/* Formulario */}
-          <div className="bg-[#1A1D28] border border-[#2A2E3D] rounded-xl p-6 space-y-4">
+          <div className="bg-slate-900/95 border border-slate-800/80 shadow-xl rounded-3xl p-6 space-y-4 backdrop-blur-sm">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">{t('audit.titleField', 'Audit Title')}</label>
               <input
@@ -623,7 +618,7 @@ export default function AuditPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder={t('audit.titlePlaceholder', 'Example: Physical Security Assessment')}
-                className="w-full bg-[#0F1119] border border-[#2A2E3D] rounded-lg px-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#4F6EF7]"
+                className="w-full bg-slate-950/90 border border-slate-800 rounded-2xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4F6EF7] focus:border-transparent"
               />
             </div>
 
@@ -634,17 +629,17 @@ export default function AuditPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('audit.descriptionPlaceholder', 'Brief description of the audit')}
-                className="w-full bg-[#0F1119] border border-[#2A2E3D] rounded-lg px-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#4F6EF7]"
+                className="w-full bg-slate-950/90 border border-slate-800 rounded-2xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4F6EF7] focus:border-transparent"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">{t('audit.typeField', 'Audit Type')}</label>
                 <select
                   value={auditType}
                   onChange={(e) => setAuditType(e.target.value as any)}
-                  className="w-full bg-[#0F1119] border border-[#2A2E3D] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#4F6EF7]"
+                  className="w-full bg-slate-950/90 border border-slate-800 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#4F6EF7] focus:border-transparent"
                 >
                   <option value="security">{t('audit.type.security', 'Security')}</option>
                   <option value="compliance">{t('audit.type.compliance', 'Compliance')}</option>
@@ -675,7 +670,7 @@ export default function AuditPage() {
                 onChange={(e) => setEvidenceText(e.target.value)}
                 placeholder={t('audit.evidencePlaceholder', 'Describe the evidence to analyze...')}
                 rows={6}
-                className="w-full bg-[#0F1119] border border-[#2A2E3D] rounded-lg px-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-[#4F6EF7]"
+                className="w-full bg-slate-950/90 border border-slate-800 rounded-2xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#4F6EF7] focus:border-transparent"
               />
             </div>
 
@@ -689,7 +684,7 @@ export default function AuditPage() {
             <button
               onClick={onValidateAudit}
               disabled={isLoading}
-              className="w-full bg-[#4F6EF7] hover:bg-[#3D5AD7] disabled:opacity-50 text-white font-medium py-2 rounded-lg transition"
+              className="w-full bg-gradient-to-r from-[#4F6EF7] to-[#1DB954] hover:from-[#3D5AD7] hover:to-[#17A05B] disabled:opacity-50 text-white font-semibold py-3 rounded-2xl shadow-lg shadow-[#4F6EF7]/20 transition-all duration-200"
             >
               {isLoading ? t('audit.validatingButton', 'Validating...') : t('audit.validateButton', 'Validate Audit')}
             </button>
@@ -697,8 +692,8 @@ export default function AuditPage() {
 
           {/* Resultados */}
           {auditResponse && (
-            <div className="bg-[#1A1D28] border border-[#2A2E3D] rounded-xl p-6 space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="bg-slate-900/95 border border-slate-800/80 shadow-xl rounded-3xl p-6 space-y-4 backdrop-blur-sm">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
                 <h2 className="text-xl font-bold text-white">{t('audit.resultsTitle', 'Audit Results')}</h2>
                 <div className={`text-4xl font-bold ${getComplianceScoreColor(auditResponse.overall_compliance_score)}`}>
                   {auditResponse.overall_compliance_score}%
@@ -743,7 +738,7 @@ export default function AuditPage() {
             </div>
           )}
 
-          <div className="bg-[#1A1D28] border border-[#2A2E3D] rounded-xl p-6 space-y-4">
+          <div className="bg-slate-900/95 border border-slate-800/80 shadow-xl rounded-3xl p-6 space-y-4 backdrop-blur-sm">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-bold text-white">{t('audit.checklistTitle', 'Pre-Audit Checklist')}</h2>
@@ -756,16 +751,16 @@ export default function AuditPage() {
                 <button
                   onClick={forceSaveChecklist}
                   disabled={checklistSaving || !checklistLoaded}
-                  className="px-3 py-1.5 rounded-lg bg-[#4F6EF7] hover:bg-[#3D5AD7] disabled:opacity-50 text-white text-sm"
+                  className="px-3 py-1.5 rounded-2xl bg-gradient-to-r from-[#4F6EF7] to-[#1DB954] hover:from-[#3D5AD7] hover:to-[#17A05B] disabled:opacity-50 text-white text-sm shadow-lg shadow-[#4F6EF7]/20"
                 >
                   {t('audit.saveNow', 'Save now')}
                 </button>
               </div>
             </div>
 
-            <div className="h-2 bg-[#0F1119] rounded-full overflow-hidden">
+            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#1DB954] transition-all duration-300"
+                className="h-full bg-gradient-to-r from-[#4F6EF7] to-[#1DB954] transition-all duration-300"
                 style={{ width: `${checklistCompletion}%` }}
               />
             </div>
@@ -780,7 +775,7 @@ export default function AuditPage() {
 
             <div className="space-y-3">
               {checklistItems.map(item => (
-                <div key={item.id} className="border border-[#2A2E3D] rounded-lg p-4 bg-[#0F1119]">
+                <div key={item.id} className="border border-slate-800 rounded-3xl p-4 bg-slate-950/90 shadow-sm">
                   <div className="flex flex-wrap items-center gap-3 justify-between">
                     <label className="flex items-center gap-3 text-white">
                       <input
@@ -804,7 +799,7 @@ export default function AuditPage() {
                           status: e.target.value as AuditChecklistItem['status'],
                         })
                       }
-                      className="bg-[#1A1D28] border border-[#2A2E3D] rounded px-2 py-1 text-sm text-white"
+                      className="bg-slate-950/90 border border-slate-800 rounded-2xl px-2 py-1 text-sm text-white"
                     >
                       <option value="pending">{t('audit.checklist.pending', 'Pending')}</option>
                       <option value="in_progress">{t('audit.checklist.inProgress', 'In progress')}</option>
@@ -818,62 +813,12 @@ export default function AuditPage() {
                     onChange={(e) => updateChecklistItem(item.id, { notes: e.target.value })}
                     placeholder={t('audit.checklistNotesPlaceholder', 'Evidence notes, observations, or blockers...')}
                     rows={2}
-                    className="mt-3 w-full bg-[#1A1D28] border border-[#2A2E3D] rounded-lg px-3 py-2 text-white placeholder-gray-600 text-sm focus:outline-none focus:border-[#4F6EF7]"
+                    className="mt-3 w-full bg-slate-950/90 border border-slate-800 rounded-2xl px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-[#4F6EF7] focus:border-transparent"
                   />
                 </div>
               ))}
             </div>
           </div>
-        </div>
-
-        {/* Chat del Agente */}
-        <div className="lg:col-span-1">
-          <button
-            onClick={() => setShowChat(!showChat)}
-            className="w-full mb-4 bg-[#4F6EF7] hover:bg-[#3D5AD7] text-white font-medium py-2 rounded-lg flex items-center justify-center gap-2 transition"
-          >
-            <MessageCircle className="w-5 h-5" />
-            {showChat ? t('audit.closeChat', 'Close Chat') : t('audit.openChat', 'Open Chat')}
-          </button>
-
-          {showChat && (
-            <div className="bg-[#1A1D28] border border-[#2A2E3D] rounded-xl flex flex-col h-[600px]">
-              {/* Chat Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {chatMessages.map(msg => (
-                  <div key={msg.id} className={`flex ${msg.isAgent ? 'justify-start' : 'justify-end'}`}>
-                    <div
-                      className={`max-w-xs px-4 py-2 rounded-lg ${
-                        msg.isAgent
-                          ? 'bg-[#4F6EF7] text-white'
-                          : 'bg-[#2A2E3D] text-gray-200'
-                      }`}
-                    >
-                      {msg.text}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Chat Input */}
-              <div className="border-t border-[#2A2E3D] p-4 flex gap-2">
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && onSendChatMessage()}
-                  placeholder={t('audit.chatPlaceholder', 'Ask the agent...')}
-                  className="flex-1 bg-[#0F1119] border border-[#2A2E3D] rounded px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-[#4F6EF7]"
-                />
-                <button
-                  onClick={onSendChatMessage}
-                  className="bg-[#4F6EF7] hover:bg-[#3D5AD7] text-white px-3 py-2 rounded transition"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ export interface InviteUserRequest {
 export interface UpdateUserRequest {
   full_name?: string
   is_active?: boolean
+  language?: 'en' | 'es' | 'pt' | 'de' | 'fr' | 'it'
 }
 
 export const usersApi = {

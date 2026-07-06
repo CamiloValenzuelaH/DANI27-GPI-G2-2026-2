@@ -207,6 +207,10 @@ def sync_google_workspace(org_id: UUID, db: Session) -> dict:
     db.commit()
 
     try:
+        # Refresh access token if expired
+        if connector.is_token_expired:
+            _refresh_google_token(connector, db)
+
         access_token = decrypt(connector.encrypted_access_token)
 
         headers = {"Authorization": f"Bearer {access_token}"}
@@ -354,6 +358,10 @@ def sync_microsoft_365(org_id: UUID, db: Session) -> dict:
     db.commit()
 
     try:
+        # Refresh token if needed
+        if connector.is_token_expired:
+            _refresh_microsoft_token(connector, db)
+
         access_token = decrypt(connector.encrypted_access_token)
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -536,6 +544,65 @@ def _aws_user_has_mfa(iam_client, username: str) -> bool:
         return len(devices) > 0
     except Exception:
         return False
+
+
+# ── Token refresh helpers ───────────────────────────────────────────────────
+def _refresh_google_token(connector: Connector, db: Session) -> None:
+    """Refresca access_token usando refresh_token para Google."""
+    if not connector.encrypted_refresh_token:
+        connector.status = "error"
+        db.commit()
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No refresh_token disponible para Google")
+
+    refresh_token = decrypt(connector.encrypted_refresh_token)
+    token_url = "https://oauth2.googleapis.com/token"
+    payload = {
+        "client_id": settings.google_client_id,
+        "client_secret": settings.google_client_secret,
+        "refresh_token": refresh_token,
+        "grant_type": "refresh_token",
+    }
+    with httpx.Client() as client:
+        resp = client.post(token_url, data=payload)
+
+    if resp.status_code != 200:
+        connector.status = "error"
+        db.commit()
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Google token refresh falló: {resp.text}")
+
+    data = resp.json()
+    connector.encrypted_access_token = encrypt(data["access_token"])
+    connector.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=data.get("expires_in", 3600))
+    db.commit()
+
+
+def _refresh_microsoft_token(connector: Connector, db: Session) -> None:
+    if not connector.encrypted_refresh_token:
+        connector.status = "error"
+        db.commit()
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No refresh_token disponible para Microsoft")
+
+    refresh_token = decrypt(connector.encrypted_refresh_token)
+    tenant = settings.microsoft_tenant_id or "common"
+    token_url = f"https://login.microsoftonline.com/{tenant}/oauth2/v2.0/token"
+    payload = {
+        "client_id": settings.microsoft_client_id,
+        "client_secret": settings.microsoft_client_secret,
+        "refresh_token": refresh_token,
+        "grant_type": "refresh_token",
+    }
+    with httpx.Client() as client:
+        resp = client.post(token_url, data=payload)
+
+    if resp.status_code != 200:
+        connector.status = "error"
+        db.commit()
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"Microsoft token refresh falló: {resp.text}")
+
+    data = resp.json()
+    connector.encrypted_access_token = encrypt(data["access_token"])
+    connector.token_expires_at = datetime.now(timezone.utc) + timedelta(seconds=data.get("expires_in", 3600))
+    db.commit()
 
 
 # ── DANI-BE-024: GitHub ───────────────────────────────────────────────────────

@@ -292,6 +292,63 @@ async def _call_deepseek_json(
         return json.loads(repaired)
 
 
+def _build_cross_check_prompt(documents: list[dict[str, str]]) -> str:
+    lines: list[str] = [
+        "Eres un asistente experto en comparación de políticas, controles y consistencia documental de una misma organización.",
+        "Analiza cada documento con la información entregada y detecta inconsistencias reales entre ellos.",
+        "No uses el texto completo de los documentos; solo el resumen y los hallazgos proporcionados.",
+        "Responde SOLO con JSON válido sin markdown ni explicaciones adicionales.",
+        "JSON esperado:",
+        "{",
+        '  "inconsistencies": [',
+        '    {"description": "...", "documents": ["job-id-1", "job-id-2"], "severity": "critical"}',
+        "  ]",
+        "}",
+        "",
+        "Busca específicamente:",
+        "- responsables con nombres distintos que parezcan la misma función.",
+        "- fechas de aprobación o versiones contradictorias entre políticas relacionadas.",
+        "- referencias a procedimientos que aparecen en un documento pero no en los demás.",
+        "- controles ISO marcados como implementados en un documento y como no implementados en otro.",
+        "",
+        "Documentos a comparar:",
+    ]
+
+    for document in documents:
+        lines.append("---")
+        lines.append(f"Job ID: {document.get('job_id', 'unknown')}")
+        lines.append(f"Nombre de archivo: {document.get('file_name', 'Sin nombre')}")
+        if document.get('summary'):
+            lines.append("Resumen de validación:")
+            lines.append(document['summary'])
+        if document.get('findings_summary'):
+            lines.append("Hallazgos y estado de controles:")
+            lines.append(document['findings_summary'])
+
+    lines.extend([
+        "",
+        "Devuelve inconsistencias solo si son relevantes y están respaldadas por diferencias claras entre documentos.",
+        "Si no encuentras inconsistencias, responde {\"inconsistencies\": []}.",
+    ])
+
+    return "\n".join(lines)
+
+
+async def compare_validation_summaries_with_deepseek(
+    *,
+    documents: list[dict[str, str]],
+) -> dict[str, Any]:
+    prompt = _build_cross_check_prompt(documents)
+    payload = {
+        "system_prompt": "Responde solo JSON válido sin markdown.",
+        "user_prompt": prompt,
+        "max_output_tokens": 900,
+        "temperature": 0.0,
+        "top_p": 0.7,
+    }
+    return await _call_deepseek_json(**payload)
+
+
 async def generate_embedding(text: str) -> list[float]:
     """Genera embedding de texto usando Gemini."""
     if not settings.gemini_api_key:
@@ -368,6 +425,63 @@ def build_chunk_quality_prompt(document_text: str, chunk: dict, classification: 
     ])
 
 
+def build_evidence_verification_prompt(document_text: str) -> str:
+    """Prompt 3: verificar menciones de evidencia y detectar brechas sin respaldo documental real."""
+    return "\n".join([
+        "Evalúa si el documento menciona evidencia real y si esa evidencia está respaldada en el texto extraído.",
+        "Responde SOLO JSON válido, sin markdown y sin explicaciones adicionales.",
+        "Esquema:",
+        "{",
+        '  "evidence_verified": true|false,',
+        '  "evidence_gaps": ["..."],',
+        "}",
+        "",
+        "Revisa específicamente lo siguiente:",
+        "1. Firma: si el documento menciona una firma o aprobación firmada, determina si el texto extraído describe un bloque de firma real o solo menciona el nombre de quien firma.",
+        "2. Fecha de aprobación: si se menciona aprobación, verifica que haya una fecha concreta y específica (día, mes y año) y no una referencia genérica como 'a la fecha' o 'en breve'.",
+        "3. Acta o registro de reunión: si se menciona un acta, minuta o registro de reunión, verifica si en el texto se indica claramente que está adjunto como anexo o si solo se hace una mención de pasada.",
+        "4. Para este prompt, solo puedes usar el texto extraído del documento. No intentes deducir la existencia de imágenes o firmas que no estén descritas en el texto.",
+        "5. Si encuentras menciones de evidencia sin respaldo completo en el texto, marca evidence_verified como false e incluye las brechas en evidence_gaps.",
+        "",
+        "Documento:",
+        document_text,
+    ])
+
+
+async def verify_document_evidence_with_deepseek(
+    document_text: str,
+    *,
+    max_output_tokens: int = 900,
+) -> dict[str, Any]:
+    """Verifica si el texto extraído respalda evidencia mencionada en el documento."""
+    prompt = build_evidence_verification_prompt(document_text)
+    parsed = await _call_deepseek_json(
+        system_prompt="Responde solo JSON válido, sin markdown.",
+        user_prompt=prompt,
+        max_output_tokens=max_output_tokens,
+        temperature=0.0,
+        top_p=0.8,
+    )
+
+    if not isinstance(parsed, dict):
+        raise ValueError(f"DeepSeek devolvió una estructura inválida: {parsed}")
+
+    evidence_verified = parsed.get("evidence_verified")
+    if not isinstance(evidence_verified, bool):
+        evidence_verified = False
+
+    evidence_gaps = parsed.get("evidence_gaps")
+    if not isinstance(evidence_gaps, list):
+        evidence_gaps = []
+    else:
+        evidence_gaps = [str(item).strip() for item in evidence_gaps if str(item).strip()]
+
+    return {
+        "evidence_verified": evidence_verified,
+        "evidence_gaps": evidence_gaps,
+    }
+
+
 def _normalize_observations(raw_value: Any) -> list[dict[str, str]]:
     observations: list[dict[str, str]] = []
     if not isinstance(raw_value, list):
@@ -400,7 +514,7 @@ def _derive_document_status(score: int, relevance_score: float, observations: li
     has_critical = any(obs.get("severity") == "critical" for obs in observations)
     has_major = any(obs.get("severity") == "major" for obs in observations)
 
-    if score < 40 or relevance_score < 70:
+    if score < 20 or relevance_score < 50:
         return "INEXISTENTE"
     if score >= 85 and not has_critical:
         return "COMPLETO"
@@ -417,7 +531,14 @@ async def analyze_chunk_with_deepseek(
 ) -> dict:
     """Analiza un chunk con dos prompts secuenciales: clasificación y control de calidad."""
     classification = await _call_deepseek_json(
-        system_prompt="Responde solo JSON válido, sin markdown.",
+        system_prompt=(
+            "You ONLY know ISO/IEC 27001:2022. NEVER reference controls A.9.x "
+            "through A.18.x (obsolete 2013 version). The ONLY valid control prefixes "
+            "are A.5, A.6, A.7, A.8 (93 controls total). The clause_ref and title "
+            "you receive in the prompt come directly from our verified 2022 database "
+            "— trust them as ground truth, never override or \"correct\" them with "
+            "your own knowledge. Respond only valid JSON, no markdown."
+        ),
         user_prompt=build_chunk_classification_prompt(document_text, chunk),
         max_output_tokens=min(max_output_tokens, 900),
         temperature=0.0,
@@ -425,7 +546,15 @@ async def analyze_chunk_with_deepseek(
     )
 
     quality = await _call_deepseek_json(
-        system_prompt="Responde solo JSON válido, sin markdown. Evalúa cumplimiento ISO con rigor.",
+        system_prompt=(
+            "You ONLY know ISO/IEC 27001:2022. NEVER reference controls A.9.x "
+            "through A.18.x (obsolete 2013 version) or claim a control \"should be\" "
+            "something else. The clause_ref and title provided in the prompt are "
+            "ground truth from our verified database — do not contradict them, do not "
+            "say they are \"mislabeled\". Evaluate ONLY whether the document content "
+            "satisfies that specific control as named. Respond only valid JSON, no "
+            "markdown. Apply ISO criteria rigorously based on the control as given."
+        ),
         user_prompt=build_chunk_quality_prompt(document_text, chunk, classification),
         max_output_tokens=max_output_tokens,
         temperature=0.1,

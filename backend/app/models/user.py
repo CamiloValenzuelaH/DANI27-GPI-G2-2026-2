@@ -31,6 +31,7 @@ class User(Base, UUIDMixin, TimestampMixin):
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     phone_number: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    language: Mapped[str] = mapped_column(String(5), nullable=False, default="es")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_superadmin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     two_factor_enabled: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

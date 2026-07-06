@@ -64,8 +64,8 @@ def build_phase_chunks() -> list[ChunkSeed]:
 def build_annex_chunks() -> list[ChunkSeed]:
     contents_by_ref = load_annex_a_control_contents()
     chunks: list[ChunkSeed] = []
-    for clause_ref, _control_label, _is_critical in ANNEX_A_CONTROLS:
-        title = f"Anexo A - {clause_ref}"
+    for clause_ref, control_label, _is_critical in ANNEX_A_CONTROLS:
+        title = f"Anexo A - {clause_ref}: {control_label.capitalize()}"
         generic_content = (
             f"Anexo A - {clause_ref}. "
             "Evidencia básica: documento o registro que demuestre su implementación."
@@ -88,7 +88,8 @@ def embedding_to_literal(values: list[float]) -> str:
 
 
 def chunk_id(chunk: ChunkSeed) -> uuid.UUID:
-    return uuid.uuid5(UUID_NAMESPACE, f"iso-27001::{chunk.clause_ref}")
+    stable_text = f"iso-27001::{chunk.clause_ref}::{chunk.title}::{chunk.content}"
+    return uuid.uuid5(UUID_NAMESPACE, stable_text)
 
 
 def load_annex_a_control_contents() -> dict[str, str]:
@@ -131,13 +132,13 @@ async def seed_async() -> None:
 
         existing_rows = db.execute(
             text(
-                "SELECT clause_ref, id, title, content, embedding IS NOT NULL AS has_embedding "
+                "SELECT id, clause_ref, title, content, embedding IS NOT NULL AS has_embedding "
                 "FROM iso_27001_chunks WHERE section_type = 'annex_a'"
             )
         ).fetchall()
-        existing_by_clause_ref = {
-            row[0]: {
-                "id": str(row[1]),
+        existing_by_id = {
+            str(row[0]): {
+                "clause_ref": row[1],
                 "title": row[2],
                 "content": row[3],
                 "has_embedding": bool(row[4]),
@@ -152,18 +153,26 @@ async def seed_async() -> None:
         update_sql = text(
             "UPDATE iso_27001_chunks "
             "SET title = :title, content = :content, embedding = CAST(:embedding AS vector) "
-            "WHERE clause_ref = :clause_ref AND section_type = 'annex_a'"
+            "WHERE id = :id"
         )
 
         inserted = 0
         updated = 0
         skipped = 0
+        seen_ids: set[str] = set()
         for chunk in catalog:
             if not chunk.content.strip():
                 skipped += 1
                 continue
 
-            existing = existing_by_clause_ref.get(chunk.clause_ref)
+            chunk_uuid = chunk_id(chunk)
+            chunk_id_str = str(chunk_uuid)
+            if chunk_id_str in seen_ids:
+                skipped += 1
+                continue
+            seen_ids.add(chunk_id_str)
+
+            existing = existing_by_id.get(chunk_id_str)
             if existing and not force_reseed:
                 if (
                     existing["title"] == chunk.title
@@ -180,7 +189,7 @@ async def seed_async() -> None:
                 db.execute(
                     update_sql,
                     {
-                        "clause_ref": chunk.clause_ref,
+                        "id": chunk_id_str,
                         "title": chunk.title,
                         "content": chunk.content,
                         "embedding": embedding_literal,
@@ -191,7 +200,7 @@ async def seed_async() -> None:
                 db.execute(
                     insert_sql,
                     {
-                        "id": str(chunk_id(chunk)),
+                        "id": chunk_id_str,
                         "clause_ref": chunk.clause_ref,
                         "title": chunk.title,
                         "content": chunk.content,

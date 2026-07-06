@@ -1,0 +1,29 @@
+/* Tutorial Highlight Styles */
+
+.tutorial-highlight {
+  position: relative;
+  z-index: 40;
+  outline: 3px solid #4F6EF7 !important;
+  outline-offset: 2px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6), inset 0 0 0 3px #4F6EF7;
+  animation: tutorial-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tutorial-pulse {
+  0%,
+  100% {
+    outline-width: 3px;
+    box-shadow: 0 0 0 4000px rgba(0, 0, 0, 0.6), inset 0 0 0 3px #4F6EF7;
+  }
+  50% {
+    outline-width: 4px;
+    box-shadow: 0 0 20px rgba(79, 110, 247, 0.8), 0 0 0 4000px rgba(0, 0, 0, 0.6),
+      inset 0 0 0 3px #4F6EF7;
+  }
+}
+
+/* Ensure tutorial modal is above highlights */
+.fixed.right-6.top-24 {
+  z-index: 50 !important;
+}

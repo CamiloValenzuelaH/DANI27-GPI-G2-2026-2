@@ -14,7 +14,10 @@ def send_reminder_emails() -> dict:
         users = (
             db.query(User)
             .join(Notification, Notification.user_id == User.id)
-            .filter(Notification.is_read.is_(False))
+            .filter(
+                Notification.is_read.is_(False),
+                Notification.organization_id == User.organization_id,
+            )
             .distinct()
             .all()
         )
@@ -26,7 +29,11 @@ def send_reminder_emails() -> dict:
 
             unread_notifications = (
                 db.query(Notification)
-                .filter(Notification.user_id == user.id, Notification.is_read.is_(False))
+                .filter(
+                    Notification.user_id == user.id,
+                    Notification.organization_id == user.organization_id,
+                    Notification.is_read.is_(False),
+                )
                 .order_by(Notification.created_at.desc())
                 .all()
             )
@@ -34,7 +41,7 @@ def send_reminder_emails() -> dict:
             reminders = [
                 notification
                 for notification in unread_notifications
-                if _email_enabled(db, user.id, notification.notification_type)
+                if _email_enabled(db, user.id, notification.notification_type, user.organization_id)
             ]
             if not reminders:
                 continue

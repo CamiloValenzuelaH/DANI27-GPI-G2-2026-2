@@ -1,4 +1,5 @@
 from uuid import UUID
+from uuid import uuid4
 
 from fastapi import HTTPException, status
 from sqlalchemy import func
@@ -6,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.models.iso_threat_catalog import ISOThreatCatalog
 from app.models.risk import Risk
-from app.models.threat import Threat
+from app.models.threat import Threat, risk_threats
 from app.schemas.iso_threat_catalog import ISOThreatCatalogResponse, ISOThreatCatalogByCategory
 
 
@@ -98,7 +99,14 @@ def add_iso_threat_to_risk(
     
     # Vincular la amenaza al riesgo si no está ya vinculada
     if threat not in risk.linked_threats:
-        risk.linked_threats.append(threat)
+        db.execute(
+            risk_threats.insert().values(
+                id=uuid4(),
+                organization_id=org_id,
+                risk_id=risk.id,
+                threat_id=threat.id,
+            )
+        )
         db.commit()
     
     db.refresh(threat)

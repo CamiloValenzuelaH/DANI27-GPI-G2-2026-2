@@ -1,50 +1,130 @@
-# Arquitectura Frontend - Plataforma DANI (ISO 27001)
+# DANI27 - Plataforma de Gestion ISO 27001
 
-Este proyecto utiliza una arquitectura modular basada en **Feature-Sliced Design (FSD)**.
+Sistema web para gestion de cumplimiento, autoevaluacion, evidencias, riesgos y soporte de auditoria.
 
-## 📁 Árbol de Carpetas (Boilerplate)
+## Vision general
 
-\`\`\`text
-src/
-├── assets/        # Recursos estáticos globales
-├── components/    # Componentes UI puros y reutilizables 
-├── features/      # Módulos de negocio aislados:
-│   ├── auth/            # Lógica de login
-│   ├── audit-room/      # Vista de auditor
-│   ├── dashboard/       # Métricas generales
-│   ├── evidence-center/ # Carga masiva
-│   └── risk-map/        # Matriz térmica
-├── hooks/         # Custom Hooks globales
-├── i18n/          # Diccionarios de internacionalización (ES, EN, FR)
-├── layouts/       # Estructuras de página
-├── pages/         # Componentes de enrutamiento principal
-├── services/      # Configuración de API
-├── store/         # Estados globales
-└── utils/         # Funciones puras de ayuda
-\`\`\`
+El proyecto se compone de:
 
-## 🧩 Lógica de Checklist de Auditoría
+- `frontend`: aplicacion React + Vite.
+- `backend`: API FastAPI + workers Celery.
+- `db`: PostgreSQL con extension pgvector.
+- `redis`: broker/cache para tareas asincronas.
+- `mailhog`: captura de correo para entorno local.
 
-La vista de auditoría implementa una autoevaluación interactiva con persistencia real en backend.
+La orquestacion local se hace con `docker-compose.yml` en la raiz.
 
-- La interfaz carga el checklist con `GET /audit/checklist`.
-- Cada cambio en estado o notas marca el checklist como modificado.
-- El auto-guardado se ejecuta con debounce y persiste los cambios con `PUT /audit/checklist`.
-- También existe un guardado manual con el botón `Guardar ahora`.
-- La persistencia se hace por organización en la tabla `audit_checklists`.
-- Si todavía no existe un registro, el backend devuelve el checklist por defecto.
+## Estructura principal
 
-Esto permite validar el avance de la autoevaluación sin perder cambios al recargar la página.
+```text
+.
+|- docker-compose.yml
+|- init.sql
+|- backend/
+|  |- Dockerfile
+|  |- entrypoint.sh
+|  |- main.py
+|  |- app/
+|  |- migrations/
+|  |- scripts/
+|  |- tests/
+|- frontend/
+|  |- Dockerfile
+|  |- package.json
+|  |- src/
+```
 
-## 📤 Validación de Archivos con Agente
+## Requisitos
 
-En la pantalla de Auditoría hay una sección dedicada para subir archivos y validarlos con el agente:
+- Docker
+- Docker Compose
 
-- Ubicación: Panel principal, debajo del título "Auditoría de Cumplimiento"
-- Formatos soportados: PDF, Word (.doc, .docx), Excel (.xlsx, .xls), Texto (.txt), Imágenes (.jpg, .png)
-- Tamaño máximo: 10MB por archivo
-- El agente analiza la calidad de evidencia buscando: fechas, responsables, firmas, verificaciones
-- Devuelve un score de cumplimiento (0-100%) con estado (Conforme, Revisar, No Conforme)
-- Muestra hallazgos específicos con severidad y recomendaciones
-- Endpoint backend: `POST /audit/validate-file` con multipart form-data
- 
+Opcional para desarrollo sin Docker:
+
+- Python 3.12+
+- Node.js 18+
+
+## Variables de entorno
+
+El repositorio tiene ejemplos para configurar el sistema:
+
+- `.example.env` (raiz, usado por `docker-compose.yml`)
+- `backend/.example.env`
+- `frontend/.example.env`
+
+Crear los archivos reales a partir de los ejemplos:
+
+```bash
+cp .example.env .env
+cp backend/.example.env backend/.env
+cp frontend/.example.env frontend/.env
+```
+
+En Windows PowerShell:
+
+```powershell
+Copy-Item .example.env .env
+Copy-Item backend/.example.env backend/.env
+Copy-Item frontend/.example.env frontend/.env
+```
+
+## Levantar el sistema (local con Docker)
+
+Desde la raiz del proyecto:
+
+```bash
+docker compose up -d --build
+```
+
+Servicios y puertos por defecto:
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8001`
+- PostgreSQL: `localhost:5433`
+- Redis: `localhost:6379`
+- Mailhog UI: `http://localhost:8025`
+
+Ver logs:
+
+```bash
+docker compose logs -f backend
+docker compose logs -f frontend
+docker compose logs -f celery-worker
+```
+
+Detener servicios:
+
+```bash
+docker compose down
+```
+
+## Migraciones y seed
+
+El `backend/entrypoint.sh` aplica migraciones y ejecuta seeds al iniciar (segun variables de entorno).
+
+Si necesitas ejecutar migraciones manualmente:
+
+```bash
+docker compose exec backend alembic upgrade head
+```
+
+## Flujo recomendado para desarrollo
+
+1. Configurar `.env` desde los `.example.env`.
+2. Levantar stack con `docker compose up -d --build`.
+3. Validar salud de backend y frontend en sus puertos.
+4. Trabajar por ramas y commitear cambios por modulo.
+
+## Soporte rapido
+
+Si un servicio no levanta:
+
+1. Revisa `docker compose ps`.
+2. Revisa logs del servicio.
+3. Verifica que los `.env` esten completos.
+4. Reinicia solo el servicio afectado:
+
+```bash
+docker compose restart backend
+docker compose restart frontend
+```

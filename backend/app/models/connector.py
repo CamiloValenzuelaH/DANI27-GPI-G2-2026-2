@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, String, Text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, String, Text, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -89,6 +89,9 @@ class Connector(Base, UUIDMixin, TimestampMixin):
     auto_sync_enabled: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True
     )
+
+    # Intervalo de sincronización en horas (por defecto 24)
+    sync_interval_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=24)
 
     # ── Helpers ───────────────────────────────────────────────────────
 

@@ -14,6 +14,7 @@ export interface ReportTemplatesResponse {
 }
 
 export interface ReportGenerateRequest {
+  documentId: string
   title: string
   description?: string
   template: ReportTemplate
@@ -39,6 +40,17 @@ export interface ReportStatusResponse {
   updated_at?: string
 }
 
+export interface ReportHistoryItem {
+  job_id: string
+  report_title?: string
+  report_template?: ReportTemplate
+  report_format?: ReportFormat
+  status: string
+  created_at?: string
+  file_path?: string | null
+  download_url?: string
+}
+
 export const getReportTemplates = async (): Promise<ReportTemplatesResponse> => {
   const { data } = await client.get<ReportTemplatesResponse>('/reports/templates')
   return data
@@ -56,4 +68,13 @@ export const getReportStatus = async (
 ): Promise<ReportStatusResponse> => {
   const { data } = await client.get<ReportStatusResponse>(`/reports/${jobId}/status`)
   return data
+}
+
+export const listReports = async (): Promise<ReportHistoryItem[]> => {
+  const { data } = await client.get<ReportHistoryItem[]>('/reports')
+  return data
+}
+
+export const deleteReport = async (jobId: string): Promise<void> => {
+  await client.delete(`/reports/${jobId}`)
 }

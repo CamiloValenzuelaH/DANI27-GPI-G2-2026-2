@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, EmailStr, field_validator
+from typing import Literal
 from uuid import UUID
 from datetime import datetime
 
@@ -31,12 +32,14 @@ class InviteUserRequest(BaseModel):
 class UpdateUserRequest(BaseModel):
     full_name: str | None = None
     is_active: bool | None = None
+    language: Literal["en", "es", "pt", "de", "fr", "it"] | None = None
 
 
 class UserResponse(BaseModel):
     id: UUID
     email: str
     full_name: str
+    language: Literal["en", "es", "pt", "de", "fr", "it"] = "es"
     is_active: bool
     organization_id: UUID
     last_login_at: datetime | None = None

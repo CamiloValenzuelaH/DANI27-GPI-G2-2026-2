@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin, UUIDMixin
@@ -8,6 +8,9 @@ from app.db.base import Base, TimestampMixin, UUIDMixin
 
 class AssessmentAnswer(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "assessment_answers"
+    __table_args__ = (
+        Index("ix_assessment_answers_org_updated_at", "organization_id", "updated_at"),
+    )
 
     organization_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True

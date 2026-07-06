@@ -36,6 +36,22 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 8:
+            raise ValueError("The new password must be at least 8 characters long")
+        if not any(c.isupper() for c in v):
+            raise ValueError("The new password must contain at least one uppercase letter")
+        if not any(c.isdigit() for c in v):
+            raise ValueError("The new password must contain at least one number")
+        return v
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
@@ -51,6 +67,7 @@ class UserResponse(BaseModel):
     email: str
     full_name: str
     phone_number: str | None = None
+    language: Literal["en", "es", "pt", "de", "fr", "it"] = "es"
     is_active: bool
     organization_id: UUID
     two_factor_enabled: bool = False

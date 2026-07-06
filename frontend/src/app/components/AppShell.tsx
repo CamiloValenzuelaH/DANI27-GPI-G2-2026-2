@@ -6,9 +6,13 @@ import SidebarPro, { SidebarSkeleton } from './SidebarPro';
 import NavbarPro, { NavbarSkeleton } from './NavbarPro';
 import OnboardingTour from './OnboardingTour';
 import ChatWidget from './ChatWidget';
+import { CommandPalette } from './CommandPalette';
 import { DateFormat, Language, Profile } from '../types';
 import { translations } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { usersApi } from '../../api/users';
+
+type AuditCycle = 'monthly' | 'quarterly' | 'annual';
 
 type PreferencesState = {
   darkMode: boolean;
@@ -35,6 +39,8 @@ type PreferencesState = {
   setRegulatoryUpdates: (value: boolean) => void;
   auditDeadlines: boolean;
   setAuditDeadlines: (value: boolean) => void;
+  auditCycle: AuditCycle;
+  setAuditCycle: (value: AuditCycle) => void;
   autoRunAnalysis: boolean;
   setAutoRunAnalysis: (value: boolean) => void;
   scheduleFrequency: string;
@@ -42,6 +48,7 @@ type PreferencesState = {
 };
 
 const PREFERENCES_KEY = 'dani_preferences_v1';
+const LANGUAGE_CHANGE_EVENT = 'dani:language-change';
 
 const defaultPreferences = {
   darkMode: false,
@@ -56,6 +63,7 @@ const defaultPreferences = {
   capaReminders: true,
   regulatoryUpdates: true,
   auditDeadlines: true,
+  auditCycle: 'monthly' as AuditCycle,
   autoRunAnalysis: true,
   scheduleFrequency: 'monthly',
 };
@@ -84,7 +92,7 @@ function loadPreferences() {
     const saved = JSON.parse(raw);
     return {
       darkMode: typeof saved.darkMode === 'boolean' ? saved.darkMode : defaultPreferences.darkMode,
-      language: ['en', 'es', 'pt', 'de', 'fr'].includes(saved.language) ? saved.language : defaultPreferences.language,
+      language: ['en', 'es', 'pt', 'de', 'fr', 'it'].includes(saved.language) ? saved.language : defaultPreferences.language,
       profile: ['foundational', 'established', 'advanced', 'mature'].includes(saved.profile) ? saved.profile : defaultPreferences.profile,
       dateFormat: ['dmy', 'mdy', 'ymd'].includes(saved.dateFormat) ? saved.dateFormat : defaultPreferences.dateFormat,
       timezone: typeof saved.timezone === 'string' && saved.timezone ? saved.timezone : defaultPreferences.timezone,
@@ -95,6 +103,7 @@ function loadPreferences() {
       capaReminders: typeof saved.capaReminders === 'boolean' ? saved.capaReminders : defaultPreferences.capaReminders,
       regulatoryUpdates: typeof saved.regulatoryUpdates === 'boolean' ? saved.regulatoryUpdates : defaultPreferences.regulatoryUpdates,
       auditDeadlines: typeof saved.auditDeadlines === 'boolean' ? saved.auditDeadlines : defaultPreferences.auditDeadlines,
+      auditCycle: ['monthly', 'quarterly', 'annual'].includes(saved.auditCycle) ? saved.auditCycle : defaultPreferences.auditCycle,
       autoRunAnalysis: typeof saved.autoRunAnalysis === 'boolean' ? saved.autoRunAnalysis : defaultPreferences.autoRunAnalysis,
       scheduleFrequency: typeof saved.scheduleFrequency === 'string' && saved.scheduleFrequency ? saved.scheduleFrequency : defaultPreferences.scheduleFrequency,
     };
@@ -108,7 +117,7 @@ interface AppShellProps {
 }
 
 export default function AppShell({ children }: AppShellProps) {
-  const { isLoading } = useAuth();
+  const { isLoading, user, refreshUser } = useAuth();
   const initialPreferences = loadPreferences();
   const [darkMode, setDarkMode] = useState(initialPreferences.darkMode);
   const [language, setLanguage] = useState<Language>(initialPreferences.language);
@@ -117,15 +126,21 @@ export default function AppShell({ children }: AppShellProps) {
   const [timezone, setTimezone] = useState(initialPreferences.timezone);
   const [notifications, setNotifications] = useState(initialPreferences.notifications);
   const [autoSave, setAutoSave] = useState(initialPreferences.autoSave);
-  const [compactView, setCompactView] = useState(initialPreferences.compactView);
+  // Force compact view disabled: remove ability to enable compact layout
+  const compactView: boolean = false;
+  const setCompactView = (_: boolean) => {
+    // intentional no-op to prevent enabling compact view
+  };
   const [sidebarLabels, setSidebarLabels] = useState(initialPreferences.sidebarLabels);
   const [capaReminders, setCapaReminders] = useState(initialPreferences.capaReminders);
   const [regulatoryUpdates, setRegulatoryUpdates] = useState(initialPreferences.regulatoryUpdates);
   const [auditDeadlines, setAuditDeadlines] = useState(initialPreferences.auditDeadlines);
+  const [auditCycle, setAuditCycle] = useState<AuditCycle>(initialPreferences.auditCycle);
   const [autoRunAnalysis, setAutoRunAnalysis] = useState(initialPreferences.autoRunAnalysis);
   const [scheduleFrequency, setScheduleFrequency] = useState(initialPreferences.scheduleFrequency);
   const [showProfileOverlay, setShowProfileOverlay] = useState(false);
   const [showOnboardingTour, setShowOnboardingTour] = useState(false);
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
 
   const t = translations[language];
 
@@ -145,6 +160,10 @@ export default function AppShell({ children }: AppShellProps) {
       return;
     }
 
+    if (user && !preferencesLoaded) {
+      return;
+    }
+
     window.localStorage.setItem(
       PREFERENCES_KEY,
       JSON.stringify({
@@ -160,11 +179,69 @@ export default function AppShell({ children }: AppShellProps) {
         capaReminders,
         regulatoryUpdates,
         auditDeadlines,
+        auditCycle,
         autoRunAnalysis,
         scheduleFrequency,
       })
     );
-  }, [darkMode, language, profile, dateFormat, timezone, notifications, autoSave, compactView, sidebarLabels, capaReminders, regulatoryUpdates, auditDeadlines, autoRunAnalysis, scheduleFrequency]);
+  }, [darkMode, language, profile, dateFormat, timezone, notifications, autoSave, compactView, sidebarLabels, capaReminders, regulatoryUpdates, auditDeadlines, auditCycle, autoRunAnalysis, scheduleFrequency, user, preferencesLoaded]);
+
+  useEffect(() => {
+    if (!user) {
+      setPreferencesLoaded(true);
+      return;
+    }
+
+    const saved = loadPreferences();
+    setDarkMode(saved.darkMode);
+    setLanguage(user.language || saved.language);
+    setProfile(saved.profile);
+    setDateFormat(saved.dateFormat);
+    setTimezone(saved.timezone);
+    setNotifications(saved.notifications);
+    setAutoSave(saved.autoSave);
+    setCompactView(saved.compactView);
+    setSidebarLabels(saved.sidebarLabels);
+    setCapaReminders(saved.capaReminders);
+    setRegulatoryUpdates(saved.regulatoryUpdates);
+    setAuditDeadlines(saved.auditDeadlines);
+    setAuditCycle(saved.auditCycle);
+    setAutoRunAnalysis(saved.autoRunAnalysis);
+    setScheduleFrequency(saved.scheduleFrequency);
+    setPreferencesLoaded(true);
+  }, [user?.id, user?.language]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (!user || !preferencesLoaded) {
+      return;
+    }
+
+    if (user.language === language) {
+      return;
+    }
+
+    usersApi.update(user.id, { language })
+      .then(() => refreshUser())
+      .catch((error) => {
+        console.error('Failed to persist language preference', error);
+      });
+  }, [language, preferencesLoaded, refreshUser, user]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.dispatchEvent(
+      new CustomEvent(LANGUAGE_CHANGE_EVENT, {
+        detail: { language },
+      })
+    );
+  }, [language]);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
@@ -173,7 +250,20 @@ export default function AppShell({ children }: AppShellProps) {
     }
   }, [darkMode, language]);
 
-  const navigate = useNavigate()
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (darkMode) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  }, [darkMode]);
+
+  const navigate = useNavigate();
+  const handleNavbarSearch = (query: string) => {
+    if (!query.trim()) {
+      return;
+    }
+
+    navigate(`/evidence?q=${encodeURIComponent(query.trim())}`);
+  };
 
   const preferencesValue = useMemo(
     () => ({
@@ -201,38 +291,15 @@ export default function AppShell({ children }: AppShellProps) {
       setRegulatoryUpdates,
       auditDeadlines,
       setAuditDeadlines,
+      auditCycle,
+      setAuditCycle,
       autoRunAnalysis,
       setAutoRunAnalysis,
       scheduleFrequency,
       setScheduleFrequency,
     }),
-    [darkMode, language, profile, dateFormat, timezone, notifications, autoSave, compactView, sidebarLabels, capaReminders, regulatoryUpdates, auditDeadlines, autoRunAnalysis, scheduleFrequency]
+    [darkMode, language, profile, dateFormat, timezone, notifications, autoSave, sidebarLabels, capaReminders, regulatoryUpdates, auditDeadlines, auditCycle, autoRunAnalysis, scheduleFrequency]
   );
-
-  const handleNavbarSearch = (query: string) => {
-    if (!query.trim()) {
-      return
-    }
-    navigate(`/dashboard?q=${encodeURIComponent(query.trim())}`)
-  }
-
-  if (isLoading) {
-    return (
-      <div className={`flex h-screen ${darkMode ? 'bg-[#0A0D16]' : 'bg-[#F8F9FC]'}`}>
-        <SidebarSkeleton darkMode={darkMode} />
-        <div className="flex-1 flex flex-col">
-          <NavbarSkeleton darkMode={darkMode} />
-          <div className="flex-1 p-8">
-            <div className="max-w-7xl mx-auto space-y-6">
-              <div className="h-8 bg-white/10 rounded animate-pulse w-64" />
-              <div className="h-32 bg-white/10 rounded animate-pulse" />
-              <div className="h-64 bg-white/10 rounded animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <PreferencesContext.Provider value={preferencesValue}>
@@ -259,6 +326,7 @@ export default function AppShell({ children }: AppShellProps) {
             </div>
 
             <ChatWidget darkMode={darkMode} t={t} />
+            <CommandPalette language={language} />
             <OnboardingTour open={showOnboardingTour} setOpen={setShowOnboardingTour} />
 
             {showProfileOverlay && (

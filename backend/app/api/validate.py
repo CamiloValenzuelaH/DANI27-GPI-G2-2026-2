@@ -4,6 +4,7 @@ import asyncio
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status, Query
@@ -19,6 +20,8 @@ from app.db.database import get_db
 from app.models.user import User
 from app.models.external_validation_job import ExternalValidationJob
 from app.schemas.validation import (
+    CrossCheckRequest,
+    CrossCheckResponse,
     GenerateMissingRequest,
     GenerateMissingResponse,
     ValidationJobResponse,
@@ -26,6 +29,7 @@ from app.schemas.validation import (
 )
 from app.workers.file_extraction import extract_text_from_file
 from app.workers.gemini_service import (
+    compare_validation_summaries_with_deepseek,
     generate_missing_content_with_deepseek,
     validate_generated_missing_content_with_deepseek,
 )
@@ -59,6 +63,7 @@ async def _write_initial_job_state(
     user_id: str,
     file_name: str,
     file_path: str,
+    verify_evidence: bool = False,
 ) -> None:
     redis_client = get_redis_client()
     now = datetime.now(timezone.utc).isoformat()
@@ -78,6 +83,9 @@ async def _write_initial_job_state(
             "overall_score": "",
             "findings": "[]",
             "summary": "",
+            "evidence_verified": "",
+            "evidence_gaps": "[]",
+            "verify_evidence": str(verify_evidence).lower(),
             "error": "",
             "created_at": now,
             "created_date": now_date,
@@ -109,6 +117,23 @@ async def _read_job_state(job_id: str) -> ValidationReportResponse:
             return None
 
     overall_score = raw.get("overall_score")
+    evidence_verified_raw = raw.get("evidence_verified")
+    evidence_gaps_raw = raw.get("evidence_gaps")
+    evidence_verified = None
+    if isinstance(evidence_verified_raw, str):
+        evidence_verified = evidence_verified_raw.lower() == "true"
+    elif isinstance(evidence_verified_raw, bool):
+        evidence_verified = evidence_verified_raw
+
+    evidence_gaps = []
+    if evidence_gaps_raw:
+        try:
+            evidence_gaps = json.loads(evidence_gaps_raw) if isinstance(evidence_gaps_raw, str) else evidence_gaps_raw
+        except json.JSONDecodeError:
+            evidence_gaps = [str(evidence_gaps_raw)]
+    if not isinstance(evidence_gaps, list):
+        evidence_gaps = []
+
     return ValidationReportResponse(
         job_id=raw.get("job_id", job_id),
         status=raw.get("status", "queued"),
@@ -122,6 +147,8 @@ async def _read_job_state(job_id: str) -> ValidationReportResponse:
         overall_score=int(float(overall_score)) if overall_score not in (None, "") else None,
         findings=findings,
         summary=raw.get("summary") or None,
+        evidence_verified=evidence_verified,
+        evidence_gaps=evidence_gaps,
         error=raw.get("error") or None,
         created_at=_parse_dt(raw.get("created_at")),
         updated_at=_parse_dt(raw.get("updated_at")),
@@ -189,10 +216,132 @@ def _load_iso_chunk(db: Session, chunk_id: str, fallback_clause_ref: str | None 
     }
 
 
+def _build_findings_summary(findings: list[dict[str, Any]], max_items: int = 40) -> str:
+    if not findings:
+        return "Sin hallazgos detallados."
+
+    lines: list[str] = []
+    for idx, finding in enumerate(findings):
+        if idx >= max_items:
+            break
+
+        if hasattr(finding, "model_dump"):
+            finding = finding.model_dump(mode="python")
+        if not isinstance(finding, dict):
+            continue
+
+        clause_ref = str(finding.get("clause_ref") or finding.get("title") or "").strip()
+        title = str(finding.get("title") or "").strip()
+        document_status = str(finding.get("document_status") or "").strip()
+        missing_elements = finding.get("missing_elements") or []
+        if isinstance(missing_elements, list):
+            missing_text = ", ".join(str(item).strip() for item in missing_elements if str(item).strip())
+        else:
+            missing_text = str(missing_elements).strip()
+
+        observations = finding.get("observations") or []
+        obs_texts: list[str] = []
+        if isinstance(observations, list):
+            for obs in observations[:2]:
+                if isinstance(obs, dict):
+                    severity = str(obs.get("severity") or "").strip()
+                    text = str(obs.get("text") or "").strip()
+                    if severity and text:
+                        obs_texts.append(f"{severity}: {text}")
+                    elif text:
+                        obs_texts.append(text)
+                else:
+                    obs_texts.append(str(obs).strip())
+
+        prefix = clause_ref or title or f"hallazgo_{idx + 1}"
+        line = f"- {prefix} | status: {document_status or 'N/A'}"
+        if missing_text:
+            line += f" | missing: {missing_text}"
+        if obs_texts:
+            line += f" | observations: {'; '.join(obs_texts)}"
+
+        lines.append(line)
+
+    if len(findings) > max_items:
+        lines.append(f"... {len(findings) - max_items} hallazgos adicionales omitidos ...")
+
+    return "\n".join(lines)
+
+
+@router.post("/external/cross-check", response_model=CrossCheckResponse)
+async def cross_check_validations(
+    payload: CrossCheckRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not payload.job_ids or len(payload.job_ids) < 2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Se requieren al menos dos job_id para la comparación de consistencia",
+        )
+
+    unique_job_ids = list(dict.fromkeys(payload.job_ids))
+    jobs = (
+        db.query(ExternalValidationJob)
+        .filter(ExternalValidationJob.job_id.in_(unique_job_ids))
+        .all()
+    )
+
+    if len(jobs) != len(unique_job_ids):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Al menos uno de los job_id no existe")
+
+    org_id = str(current_user.organization_id)
+    for job in jobs:
+        if str(job.organization_id) != org_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No se pueden comparar validaciones de organizaciones distintas")
+        if job.status != "completed":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"La validación {job.job_id} no está completada",
+            )
+
+    documents: list[dict[str, str]] = []
+    for job in jobs:
+        documents.append(
+            {
+                "job_id": job.job_id,
+                "file_name": job.file_name or "Sin nombre",
+                "summary": job.summary or "",
+                "findings_summary": _build_findings_summary(job.findings or []),
+            }
+        )
+
+    deepseek_result = await compare_validation_summaries_with_deepseek(documents=documents)
+    inconsistencies_raw = deepseek_result.get("inconsistencies") or []
+    normalized_inconsistencies: list[dict[str, Any]] = []
+    for item in inconsistencies_raw:
+        if not isinstance(item, dict):
+            continue
+        description = str(item.get("description") or item.get("detail") or "").strip()
+        documents_list = item.get("documents") or item.get("job_ids") or []
+        if isinstance(documents_list, str):
+            documents_list = [documents_list]
+        documents_list = [str(doc).strip() for doc in documents_list if str(doc).strip()]
+        severity = str(item.get("severity") or "minor").strip().lower()
+        if severity not in {"critical", "major", "minor"}:
+            severity = "minor"
+        if description:
+            normalized_inconsistencies.append(
+                {
+                    "description": description,
+                    "documents": documents_list,
+                    "severity": severity,
+                }
+            )
+
+    return CrossCheckResponse(inconsistencies=normalized_inconsistencies)
+
+
 @router.post("/external", response_model=ValidationJobResponse, status_code=status.HTTP_202_ACCEPTED)
 async def create_external_validation_job(
     file: UploadFile = File(...),
     clause_refs: list[str] | None = Query(None),
+    verify_evidence: bool = Query(False),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -210,6 +359,7 @@ async def create_external_validation_job(
         user_id=str(current_user.id),
         file_name=file.filename,
         file_path=str(file_path),
+        verify_evidence=verify_evidence,
     )
 
     # Encolar en Celery
@@ -221,6 +371,7 @@ async def create_external_validation_job(
         user_id=str(current_user.id),
         content_type=file.content_type or "application/octet-stream",
         clause_refs=clause_refs,
+        verify_evidence=verify_evidence,
     )
 
     return ValidationJobResponse(
@@ -266,6 +417,8 @@ async def list_external_validation_jobs(
                 overall_score=int(job.overall_score) if job.overall_score not in (None, "") else None,
                 findings=findings,
                 summary=job.summary,
+                evidence_verified=job.evidence_verified,
+                evidence_gaps=job.evidence_gaps or [],
                 error=job.error,
                 created_at=job.created_at,
                 updated_at=job.updated_at,

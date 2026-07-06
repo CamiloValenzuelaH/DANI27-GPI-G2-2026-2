@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 from datetime import datetime
 from math import sqrt
 
@@ -11,8 +12,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.db.database import SessionLocal
 from app.workers.celery_app import celery_app
 from app.workers.file_extraction import extract_text_from_file
-from app.workers.gemini_service import generate_embedding, analyze_chunk_with_deepseek
+from app.workers.gemini_service import (
+    generate_embedding,
+    analyze_chunk_with_deepseek,
+    verify_document_evidence_with_deepseek,
+)
 from app.core.config import settings
+from app.models.external_validation_job import ExternalValidationJob
 
 
 _FALLBACK_ISO_CHUNKS = [
@@ -25,28 +31,30 @@ _FALLBACK_ISO_CHUNKS = [
     {
         "id": "fallback-a-6-1",
         "clause_ref": "A.6.1",
-        "title": "Roles y responsabilidades",
-        "content": "Asignar responsables claros, separar funciones críticas y documentar la rendición de cuentas en procesos de seguridad.",
+        "title": "Verificación de antecedentes",
+        "content": "Verificar antecedentes de empleados y contratistas antes de otorgar acceso a información sensible.",
     },
     {
         "id": "fallback-a-7-2",
         "clause_ref": "A.7.2",
-        "title": "Concientización y formación",
-        "content": "Asegurar que el personal reciba formación y recordatorios sobre prácticas seguras y manejo correcto de evidencias.",
+        "title": "Controles de entrada física",
+        "content": "Implementar controles de acceso físico, registros de entrada y barreras para proteger áreas sensibles.",
     },
     {
         "id": "fallback-a-8-1",
         "clause_ref": "A.8.1",
-        "title": "Controles de acceso",
-        "content": "Restringir el acceso a información, sistemas y ubicaciones físicas según necesidad de negocio y privilegio mínimo.",
+        "title": "Dispositivos de usuario final",
+        "content": "Asegurar que los dispositivos de usuario final estén protegidos y gestionados según políticas de seguridad de activos.",
     },
     {
         "id": "fallback-a-8-7",
         "clause_ref": "A.8.7",
-        "title": "Registro y monitoreo",
-        "content": "Conservar registros y monitorear eventos relevantes para detectar incidentes, trazabilidad y desviaciones.",
+        "title": "Protección contra malware",
+        "content": "Implementar detección, prevención y respuesta a malware para proteger sistemas y datos.",
     },
 ]
+
+logger = logging.getLogger(__name__)
 
 
 def _cosine_similarity(left: list[float], right: list[float]) -> float:
@@ -146,19 +154,51 @@ async def publish_progress(job_id: str, fields: dict) -> None:
     now_date = datetime.utcnow().date().isoformat()
     fields["updated_at"] = fields.get("updated_at") or now_iso
     fields["updated_date"] = fields.get("updated_date") or now_date
-    
-    # Convertir listas/dicts a JSON strings para Redis
-    for key, value in fields.items():
-        if isinstance(value, (list, dict)):
-            fields[key] = json.dumps(value)
+    # Preparar campos para Redis (serializar listas/dicts) y para BD (valores nativos)
+    redis_fields = {**fields}
+    db_fields = {k: v for k, v in fields.items()}
 
-    # Crear cliente Redis para esta operación
+    for key, value in redis_fields.items():
+        if value is None:
+            redis_fields[key] = ""
+        elif isinstance(value, (list, dict)):
+            redis_fields[key] = json.dumps(value)
+
+    # Escribir en Redis siempre
     redis_client = Redis.from_url(settings.redis_url, decode_responses=True)
     try:
-        await redis_client.hset(f"validation:job:{job_id}", mapping=fields)
+        await redis_client.hset(f"validation:job:{job_id}", mapping=redis_fields)
         await redis_client.expire(f"validation:job:{job_id}", 7 * 24 * 60 * 60)
     finally:
         await redis_client.close()
+
+    # Persistir en BD solo al finalizar (completed | failed)
+    if str(db_fields.get("status", "")).lower() in ("completed", "failed"):
+        db = SessionLocal()
+        try:
+            job = db.query(ExternalValidationJob).filter(ExternalValidationJob.job_id == job_id).first()
+            if not job:
+                job = ExternalValidationJob(job_id=job_id)
+                db.add(job)
+
+            for key, value in db_fields.items():
+                # Skip computed/read-only date properties provided by TimestampMixin
+                if key in ("created_date", "updated_date"):
+                    continue
+                # Avoid setting read-only properties (like @property without setter)
+                cls_attr = getattr(type(job), key, None)
+                if isinstance(cls_attr, property) and getattr(cls_attr, 'fset', None) is None:
+                    continue
+                if hasattr(job, key):
+                    setattr(job, key, value)
+
+            print(f"[DB PERSIST] guardando job {job_id} status={db_fields.get('status')}")
+            db.commit()
+            print(f"[DB PERSIST] commit OK job {job_id}")
+        except SQLAlchemyError:
+            db.rollback()
+        finally:
+            db.close()
 
 
 @celery_app.task(bind=True, name="validate_external_audit")
@@ -171,6 +211,7 @@ def validate_external_audit(
     user_id: str,
     content_type: str = "application/octet-stream",
     clause_refs: list[str] | None = None,
+    verify_evidence: bool = False,
 ):
     """Tarea principal de validación de auditoría externa."""
     
@@ -187,6 +228,7 @@ def validate_external_audit(
                 organization_id=organization_id,
                 user_id=user_id,
                 clause_refs=clause_refs,
+                verify_evidence=verify_evidence,
             )
         )
         return result
@@ -210,6 +252,7 @@ async def _validate_external_audit_async(
     organization_id: str,
     user_id: str,
     clause_refs: list[str] | None = None,
+    verify_evidence: bool = False,
 ) -> dict:
     """Lógica async de validación."""
     
@@ -235,6 +278,31 @@ async def _validate_external_audit_async(
 
     if len(normalized_text) < 20:
         raise ValueError("No se pudo extraer suficiente texto del documento")
+
+    evidence_verified: bool | None = None
+    evidence_gaps: list[str] = []
+    if verify_evidence:
+        await publish_progress(job_id, {
+            "status": "processing",
+            "progress": 18,
+            "message": "Verificando evidencia del documento",
+        })
+        try:
+            evidence_result = await verify_document_evidence_with_deepseek(normalized_text)
+            evidence_verified = evidence_result.get("evidence_verified")
+            evidence_gaps = evidence_result.get("evidence_gaps", []) or []
+        except Exception as exc:
+            logger.exception("Error verifying evidence for job %s: %s", job_id, exc)
+            evidence_verified = False
+            evidence_gaps = [f"Error al verificar evidencia: {exc}"]
+
+        await publish_progress(job_id, {
+            "status": "processing",
+            "progress": 22,
+            "message": "Verificación de evidencia completada",
+            "evidence_verified": evidence_verified,
+            "evidence_gaps": evidence_gaps,
+        })
 
     # Paso 2: Generar embedding
     await publish_progress(job_id, {
@@ -284,6 +352,11 @@ async def _validate_external_audit_async(
         chunks = selected_chunks[:5]
     else:
         chunks = await get_top_iso_chunks(embedding, 5)
+        # Fallback: si no hay chunks en BD (tabla vacía), usar fallback para que el pipeline funcione
+        if not chunks:
+            logger.warning(f"No chunks found in DB for job {job_id}; using fallback chunks")
+            chunks = _fallback_iso_chunks(5)
+    
     findings = []
 
     # Paso 4: Analizar cada chunk
@@ -332,29 +405,55 @@ async def _validate_external_audit_async(
             "total_chunks": len(chunks),
         })
 
-        analysis = await analyze_chunk_with_deepseek(
-            build_document_context(normalized_text, chunk["clause_ref"]),
-            chunk,
-            max_output_tokens=2048,
-        )
+        try:
+            analysis = await analyze_chunk_with_deepseek(
+                build_document_context(normalized_text, chunk["clause_ref"]),
+                chunk,
+                max_output_tokens=2048,
+            )
+        except Exception as e:
+            logger.exception("Error analyzing chunk %s: %s", chunk.get("clause_ref"), e)
+            analysis = {
+                "score": 0,
+                "document_status": "INCOMPLETO",
+                "missing_elements": [],
+                "observations": [],
+                "suggestions": [],
+            }
+
+        # Safety: ensure analysis is a dict with expected keys
+        if not isinstance(analysis, dict):
+            logger.error("Unexpected analysis type for chunk %s: %r", chunk.get("clause_ref"), analysis)
+            analysis = {
+                "score": 0,
+                "document_status": "INCOMPLETO",
+                "missing_elements": [],
+                "observations": [],
+                "suggestions": [],
+            }
 
         findings.append({
             "clause_ref": chunk["clause_ref"],
             "title": chunk["title"],
             "relevance_score": chunk["relevance_score"],
-            "compliance_score": analysis["score"],
+            "compliance_score": int(analysis.get("score", 0) or 0),
             "document_status": analysis.get("document_status", "INCOMPLETO"),
             "missing_elements": analysis.get("missing_elements", []),
-            "observations": analysis["observations"],
-            "suggestions": analysis["suggestions"],
+            "observations": analysis.get("observations", []),
+            "suggestions": analysis.get("suggestions", []),
         })
 
     # Paso 5: Calcular score general
-    overall_score = (
-        clamp_score(sum(f["compliance_score"] for f in findings) / len(findings))
-        if findings
-        else 0
-    )
+    if findings:
+        try:
+            overall_score = clamp_score(sum(f["compliance_score"] for f in findings) / len(findings))
+        except Exception as e:
+            logger.exception("Error calculando overall_score: %s", e)
+            overall_score = 0
+            # attach error to summary/result later
+    else:
+        logger.warning("No findings were produced for job %s", job_id)
+        overall_score = 0
     summary = summarize_results(findings)
 
     # Paso 6: Completar
@@ -371,7 +470,9 @@ async def _validate_external_audit_async(
         "overall_score": overall_score,
         "findings": findings,
         "summary": summary,
-        "error": "",
+        "evidence_verified": evidence_verified,
+        "evidence_gaps": evidence_gaps,
+        "error": "" if findings else "No se obtuvieron hallazgos del agente; revisar logs del worker",
     }
 
     await publish_progress(job_id, result)

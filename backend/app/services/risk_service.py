@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from uuid import uuid4
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -7,8 +8,8 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models.asset import Asset
 from app.models.evidence_taxonomy import EvidenceTaxonomy
-from app.models.risk import Risk, RiskEvaluation
-from app.models.threat import Threat
+from app.models.risk import Risk, RiskEvaluation, risk_assets
+from app.models.threat import Threat, risk_threats
 from app.schemas.risk import (
     CreateRiskRequest,
     LinkRiskAssetsRequest,
@@ -189,7 +190,13 @@ def create_risk(data: CreateRiskRequest, org_id: UUID, db: Session) -> Risk:
     )
     db.add(risk)
     db.flush()
-    risk.linked_assets.append(asset)
+    db.execute(
+        risk_assets.insert().values(
+            organization_id=org_id,
+            risk_id=risk.id,
+            asset_id=asset.id,
+        )
+    )
     _append_evaluation(db, risk, "created")
     db.commit()
     db.refresh(risk)
@@ -203,7 +210,13 @@ def update_risk(risk_id: UUID, data: UpdateRiskRequest, org_id: UUID, db: Sessio
         asset = _validate_asset(data.asset_id, org_id, db)
         risk.asset_id = data.asset_id
         if all(existing.id != asset.id for existing in risk.linked_assets):
-            risk.linked_assets.append(asset)
+            db.execute(
+                risk_assets.insert().values(
+                    organization_id=org_id,
+                    risk_id=risk.id,
+                    asset_id=asset.id,
+                )
+            )
     if data.name is not None:
         risk.name = data.name
     if data.description is not None:
@@ -246,7 +259,13 @@ def link_assets_to_risk(risk_id: UUID, data: LinkRiskAssetsRequest, org_id: UUID
     existing_ids = {asset.id for asset in risk.linked_assets}
     for asset in assets:
         if asset.id not in existing_ids:
-            risk.linked_assets.append(asset)
+            db.execute(
+                risk_assets.insert().values(
+                    organization_id=org_id,
+                    risk_id=risk.id,
+                    asset_id=asset.id,
+                )
+            )
             existing_ids.add(asset.id)
 
     if risk.asset_id not in existing_ids and assets:
@@ -262,7 +281,14 @@ def link_threat_to_risk(risk_id: UUID, threat_id: UUID, org_id: UUID, db: Sessio
     threat = _get_threat_or_404(threat_id, org_id, db)
 
     if all(existing.id != threat.id for existing in risk.linked_threats):
-        risk.linked_threats.append(threat)
+        db.execute(
+            risk_threats.insert().values(
+                id=uuid4(),
+                organization_id=org_id,
+                risk_id=risk.id,
+                threat_id=threat.id,
+            )
+        )
         db.commit()
 
     db.refresh(threat)

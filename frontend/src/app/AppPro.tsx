@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { I18nProvider } from './i18n';
+import { useIntl } from 'react-intl';
 import { AuthProvider } from './contexts/AuthContext';
+import { ValidationJobProvider } from './contexts/ValidationJobContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppShell from './components/AppShell';
 import LoginPage from './pages/LoginPage';
@@ -15,13 +16,20 @@ import RisksPage from './pages/RisksPage';
 import UnderstandPage from './pages/UnderstandPage';
 import SettingsPage from './pages/SettingsPage';
 import DocumentGeneratorPage from './pages/DocumentGeneratorPage';
+import EmployeePortalPage from './pages/EmployeePortalPage';
+import EvidencePage from './pages/EvidencePage';
+import FindingsPage from './pages/FindingsPage';
+import ConnectorList from './components/integrations/ConnectorList';
+import OAuthCallback from './components/integrations/OAuthCallback';
 
 export default function AppPro() {
+  const intl = useIntl();
+
   return (
-    <I18nProvider locale="en">
-      <BrowserRouter>
+    <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <ValidationJobProvider>
+            <Routes>
             {/* Public routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/two-factor" element={<TwoFactorPage />} />
@@ -32,19 +40,21 @@ export default function AppPro() {
               <Route element={<AppShell />}>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/portal" element={<EmployeePortalPage />} />
                 <Route path="/understand" element={<UnderstandPage />} />
                 <Route path="/documents" element={<DocumentGeneratorPage />} />
                 <Route path="/risks" element={<RisksPage />} />
-                <Route path="/evidence" element={<PlaceholderPage title="Collect Evidence" />} />
-                <Route path="/findings" element={<PlaceholderPage title="Manage Findings" />} />
+                <Route path="/evidence" element={<EvidencePage />} />
+                <Route path="/findings" element={<FindingsPage />} />
                 <Route path="/audit" element={<AuditPagePro />} />
                 <Route path="/assessment" element={<AssessmentPage />} />
-                <Route path="/integrity" element={<PlaceholderPage title="Compliance Integrity" />} />
-                <Route path="/regfeed" element={<PlaceholderPage title="Regulatory Feed" />} />
-                <Route path="/dora" element={<PlaceholderPage title="DORA" />} />
-                <Route path="/euai" element={<PlaceholderPage title="EU AI Act" />} />
-                <Route path="/escalation" element={<PlaceholderPage title="Escalation Rules" />} />
-                <Route path="/integrations" element={<PlaceholderPage title="Integrations" />} />
+                <Route path="/integrity" element={<PlaceholderPage title={intl.formatMessage({ id: 'menu.integrity' })} />} />
+                <Route path="/regfeed" element={<PlaceholderPage title={intl.formatMessage({ id: 'menu.regfeed' })} />} />
+                <Route path="/dora" element={<PlaceholderPage title={intl.formatMessage({ id: 'menu.dora' })} />} />
+                <Route path="/euai" element={<PlaceholderPage title={intl.formatMessage({ id: 'menu.euai' })} />} />
+                <Route path="/escalation" element={<PlaceholderPage title={intl.formatMessage({ id: 'menu.escalation' })} />} />
+                <Route path="/integrations" element={<ConnectorList />} />
+                <Route path="/integrations/oauth/callback" element={<OAuthCallback />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/setup-mfa" element={<SetupMFAPage />} />
                 <Route path="/assets" element={<AssetsPage />} />
@@ -53,19 +63,21 @@ export default function AppPro() {
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+            </Routes>
+          </ValidationJobProvider>
         </AuthProvider>
       </BrowserRouter>
-    </I18nProvider>
   );
 }
 
 function PlaceholderPage({ title }: { title: string }) {
+  const intl = useIntl();
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <div className="bg-[#1A1D28] rounded-xl p-12 border border-[#2A2E3D] text-center">
         <h1 className="text-2xl font-semibold text-white mb-2">{title}</h1>
-        <p className="text-white/60">This page is coming soon...</p>
+        <p className="text-white/60">{intl.formatMessage({ id: 'app.placeholder.comingSoon', defaultMessage: 'This page is coming soon...' })}</p>
       </div>
     </div>
   );

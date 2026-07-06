@@ -178,4 +178,35 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
+
+  table {
+    @apply w-full border-separate border-spacing-0 bg-[#0B1220] text-sm text-white/80;
+    border-color: rgba(255, 255, 255, 0.08);
+    background-color: #0B1220 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  thead tr {
+    @apply bg-[#0F1729];
+    background-color: #0F1729 !important;
+  }
+
+  th,
+  td {
+    @apply border-b border-white/10 px-3 py-3 align-middle text-left;
+    background-color: transparent !important;
+    color: inherit !important;
+  }
+
+  th {
+    @apply text-white/60 uppercase tracking-[0.18em] text-[11px] font-semibold;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: rgba(255, 255, 255, 0.025) !important;
+  }
+
+  tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
 }

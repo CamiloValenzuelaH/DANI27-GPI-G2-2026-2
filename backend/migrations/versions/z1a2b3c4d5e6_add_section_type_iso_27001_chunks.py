@@ -1,7 +1,7 @@
 """Add section_type to iso_27001_chunks
 
 Revision ID: z1a2b3c4d5e6
-Revises: d4e5f6a7b8c9
+Revises: e7f8a9b0c1d2
 Create Date: 2026-06-20 15:36:00.000000
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = "z1a2b3c4d5e6"
-down_revision: Union[str, Sequence[str], None] = "d4e5f6a7b8c9"
+down_revision: Union[str, Sequence[str], None] = "e7f8a9b0c1d2"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

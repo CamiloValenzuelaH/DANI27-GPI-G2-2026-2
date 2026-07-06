@@ -27,7 +27,10 @@ def list_notifications(
     offset = (page - 1) * page_size
     notifications = (
         db.query(Notification)
-        .filter(Notification.user_id == current_user.id)
+        .filter(
+            Notification.user_id == current_user.id,
+            Notification.organization_id == current_user.organization_id,
+        )
         .order_by(Notification.created_at.desc())
         .offset(offset)
         .limit(page_size)
@@ -43,7 +46,10 @@ def get_notification_preferences(
 ):
     preferences = (
         db.query(NotificationPreference)
-        .filter(NotificationPreference.user_id == current_user.id)
+        .filter(
+            NotificationPreference.user_id == current_user.id,
+            NotificationPreference.organization_id == current_user.organization_id,
+        )
         .order_by(NotificationPreference.notification_type, NotificationPreference.channel)
         .all()
     )
@@ -62,6 +68,7 @@ def update_notification_preferences(
             db.query(NotificationPreference)
             .filter(
                 NotificationPreference.user_id == current_user.id,
+                NotificationPreference.organization_id == current_user.organization_id,
                 NotificationPreference.notification_type == item.notification_type,
                 NotificationPreference.channel == item.channel,
             )
@@ -95,7 +102,11 @@ def mark_notification_read(
 ):
     notification = (
         db.query(Notification)
-        .filter(Notification.id == notification_id, Notification.user_id == current_user.id)
+        .filter(
+            Notification.id == notification_id,
+            Notification.user_id == current_user.id,
+            Notification.organization_id == current_user.organization_id,
+        )
         .first()
     )
     if not notification:
@@ -115,6 +126,7 @@ def mark_all_read(
 ):
     db.query(Notification).filter(
         Notification.user_id == current_user.id,
+        Notification.organization_id == current_user.organization_id,
         Notification.is_read == False,
     ).update({"is_read": True, "read_at": datetime.now(timezone.utc)})
     db.commit()
@@ -129,7 +141,11 @@ def delete_notification(
 ):
     notification = (
         db.query(Notification)
-        .filter(Notification.id == notification_id, Notification.user_id == current_user.id)
+        .filter(
+            Notification.id == notification_id,
+            Notification.user_id == current_user.id,
+            Notification.organization_id == current_user.organization_id,
+        )
         .first()
     )
     if not notification:

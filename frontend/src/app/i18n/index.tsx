@@ -8,11 +8,15 @@ interface I18nProviderProps {
 }
 
 export function I18nProvider({ children, locale }: I18nProviderProps) {
+  const messages = translations[locale]
+    ? { ...translations.en, ...translations[locale] }
+    : translations.en;
+
   return (
     <IntlProvider
       key={locale}
       locale={locale}
-      messages={translations[locale]}
+      messages={messages}
       defaultLocale="en"
     >
       {children}

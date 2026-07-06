@@ -24,6 +24,7 @@ export interface DocumentGenerationRequest {
   targetAudience?: string
   language?: string
   tone?: string
+  type?: 'policy' | 'report' | 'procedure' | 'general'
   sections?: string[]
   controlRefs?: string[]
 }

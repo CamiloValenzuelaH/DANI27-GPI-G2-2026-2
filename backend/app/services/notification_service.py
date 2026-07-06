@@ -6,6 +6,7 @@ import asyncio
 from email.message import EmailMessage
 from datetime import datetime, timezone
 from typing import Any
+from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -38,13 +39,23 @@ def send_email_message(email: str, subject: str, html_body: str) -> None:
     _send_email_message(email, subject, html_body)
 
 
-def _email_enabled(db: Session, user_id: str, notification_type: NotificationType) -> bool:
+def _email_enabled(
+    db: Session,
+    user_id: str,
+    notification_type: NotificationType,
+    organization_id: UUID | None = None,
+) -> bool:
     preference = (
         db.query(NotificationPreference)
         .filter(
             NotificationPreference.user_id == user_id,
             NotificationPreference.notification_type == notification_type,
             NotificationPreference.channel == NotificationChannel.email,
+            *(
+                [NotificationPreference.organization_id == organization_id]
+                if organization_id is not None
+                else []
+            ),
         )
         .first()
     )
@@ -183,7 +194,7 @@ class NotificationService:
             db.commit()
             db.refresh(notification)
 
-            if _email_enabled(db, user.id, notification_type):
+            if _email_enabled(db, user.id, notification_type, user.organization_id):
                 try:
                     _send_email_message(user.email, title, html)
                 except Exception:

@@ -52,6 +52,16 @@ class AuditMiddleware(BaseHTTPMiddleware):
             if body:
                 try:
                     details = json.loads(body.decode("utf-8"))
+                    if isinstance(details, dict):
+                        for sensitive_key in (
+                            "password",
+                            "current_password",
+                            "new_password",
+                            "refresh_token",
+                            "token",
+                        ):
+                            if sensitive_key in details:
+                                details[sensitive_key] = "[REDACTED]"
                 except Exception:
                     details = {"raw": body.decode("utf-8", errors="ignore")[:1000]}
         except Exception:

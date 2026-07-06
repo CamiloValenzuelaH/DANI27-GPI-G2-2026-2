@@ -16,6 +16,8 @@ class ReportBranding(BaseModel):
 
 
 class ReportGenerateRequest(BaseModel):
+    document_id: str | None = Field(default=None, alias="documentId")
+    document_text: str | None = Field(default=None, alias="documentText")
     title: str = Field(min_length=5)
     description: str | None = None
     template: ReportTemplate

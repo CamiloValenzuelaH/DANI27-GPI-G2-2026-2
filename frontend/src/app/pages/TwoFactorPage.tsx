@@ -11,7 +11,6 @@ const TWO_FACTOR_SESSION_KEY = "dani_two_factor_challenge";
 
 const METHOD_LABELS: Record<FormValues["mode"], string> = {
   totp: "Authenticator App",
-  sms: "SMS",
   email: "Email",
   backup: "Backup code",
 };
@@ -29,7 +28,7 @@ function maskPhone(phone: string): string {
 
 const schema = z
   .object({
-    mode: z.enum(["totp", "backup", "sms", "email"]),
+    mode: z.enum(["totp", "backup", "email"]),
     code: z.string().trim().optional().default(""),
     backupCode: z.string().trim().optional().default(""),
   })
@@ -66,7 +65,7 @@ export default function TwoFactorPage() {
   const [email, setEmail] = useState<string>("");
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [status, setStatus] = useState<string | null>(null);
-  const [isSending, setIsSending] = useState<"sms" | "email" | null>(null);
+  const [isSending, setIsSending] = useState<"email" | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,36 +109,25 @@ export default function TwoFactorPage() {
 
   const title = useMemo(() => {
     if (mode === "backup") return "Use a backup code";
-    if (mode === "sms") return "Enter the SMS code";
     if (mode === "email") return "Enter the email code";
     return "Enter your authenticator code";
   }, [mode]);
 
   const maskedEmail = useMemo(() => maskEmail(email), [email]);
-  const maskedPhone = useMemo(() => maskPhone(phoneNumber), [phoneNumber]);
   const deliveryHint = useMemo(() => {
-    if (mode === "sms") return maskedPhone || "your phone number";
     if (mode === "email") return maskedEmail || "your email address";
     return "";
-  }, [maskedEmail, maskedPhone, mode]);
+  }, [maskedEmail, mode]);
 
-  const sendDeliveryCode = async (deliveryMethod: "sms" | "email") => {
+  const sendDeliveryCode = async () => {
     if (!challengeToken) return;
     setError(null);
     setStatus(null);
-    setIsSending(deliveryMethod);
+    setIsSending("email");
     try {
-      if (deliveryMethod === "sms") {
-        await twoFactorApi.sendSms({ challenge_token: challengeToken });
-      } else {
-        await twoFactorApi.sendEmail({ challenge_token: challengeToken });
-      }
-      setValue("mode", deliveryMethod, { shouldValidate: true });
-      setStatus(
-        deliveryMethod === "sms"
-          ? "SMS sent. Check your phone."
-          : "Email sent. Check your inbox.",
-      );
+      await twoFactorApi.sendEmail({ challenge_token: challengeToken });
+      setValue("mode", "email", { shouldValidate: true });
+      setStatus("Email sent. Check your inbox.");
     } catch (err: any) {
       setError(parseFastApiError(err));
     } finally {
@@ -156,17 +144,18 @@ export default function TwoFactorPage() {
     const currentMode = mode;
 
     try {
-      const result = await twoFactorApi.verify(
+      const payload =
         currentMode === "backup"
           ? { challenge_token: challengeToken, backup_code: values.backupCode }
-          : currentMode === "sms" || currentMode === "email"
-            ? {
-                challenge_token: challengeToken,
-                code: values.code,
-                delivery_method: currentMode,
-              } // <--- Ahora es 100% seguro
-            : { challenge_token: challengeToken, code: values.code },
-      );
+          : currentMode === "email"
+          ? {
+              challenge_token: challengeToken,
+              code: values.code,
+              delivery_method: currentMode,
+            }
+          : { challenge_token: challengeToken, code: values.code };
+
+      const result = await twoFactorApi.verify(payload);
 
       if (!result.tokens || !result.user) {
         throw new Error("Two-factor verification did not return tokens");
@@ -198,7 +187,7 @@ export default function TwoFactorPage() {
                 <p className="max-w-md text-sm leading-6 text-white/70">
                   {maskedEmail
                     ? `We need an additional verification step for ${maskedEmail}.`
-                    : "Enter the code from your authenticator app, backup code, SMS, or email."}
+                    : "Enter the code from your authenticator app, backup code, or email."}
                 </p>
               </div>
             </div>
@@ -227,7 +216,7 @@ export default function TwoFactorPage() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-2">
-              {(["totp", "sms", "email", "backup"] as const).map((value) => (
+              {(["totp", "email", "backup"] as const).map((value) => (
                 <button
                   key={value}
                   type="button"
@@ -241,7 +230,7 @@ export default function TwoFactorPage() {
               ))}
             </div>
 
-            {(mode === "sms" || mode === "email") && (
+            {mode === "email" && (
               <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
                 The code will be sent to {deliveryHint}.
               </div>
@@ -297,14 +286,6 @@ export default function TwoFactorPage() {
                 </button>
                 <button
                   type="button"
-                  disabled={isSending === "sms"}
-                  onClick={() => sendDeliveryCode("sms")}
-                  className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isSending === "sms" ? "Sending SMS..." : "Send SMS code"}
-                </button>
-                <button
-                  type="button"
                   disabled={isSending === "email"}
                   onClick={() => sendDeliveryCode("email")}
                   className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
@@ -329,7 +310,7 @@ export default function TwoFactorPage() {
 
             <p className="mt-8 text-xs leading-5 text-slate-500">
               If you lost access to your authenticator, use a backup code or
-              request a fallback code by SMS or email.
+              request a fallback code by email.
             </p>
           </div>
         </div>

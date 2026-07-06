@@ -1,5 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useIntl } from 'react-intl';
+import { useAuth } from '../contexts/AuthContext';
 import { useLayout } from '../contexts/LayoutContext';
 import {
   processMenuItems,
@@ -14,6 +16,7 @@ import {
 import { Lock, X } from 'lucide-react';
 import { MobileOptimizedDrawer } from '@/accessibility/components/MobileOptimized';
 import { useCloseOnNavigation } from '@/accessibility/hooks/useMobileViewport';
+import DaniLogo from './DaniLogo';
 
 interface SidebarProps {
   profile: 'foundational' | 'established' | 'advanced' | 'mature';
@@ -23,6 +26,7 @@ interface SidebarProps {
 
 export default function SidebarPro({ profile, onProfileClick, darkMode }: SidebarProps) {
   const { navView, setNavView, isSidebarOpen, toggleSidebar, userPlan } = useLayout();
+  const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const intl = useIntl();
@@ -43,6 +47,11 @@ export default function SidebarPro({ profile, onProfileClick, darkMode }: Sideba
 
   const drawerTitle = intl.formatMessage({ id: 'sidebar.menu', defaultMessage: 'Menú' });
 
+  // Force navigation view to 'process' so 'module' view is not reachable
+  useEffect(() => {
+    setNavView('process');
+  }, [setNavView]);
+
   const handleNavigation = (item: MenuItem) => {
     if (hasAccess(item.requiredPlan, userPlan)) {
       navigate(item.path);
@@ -56,41 +65,15 @@ export default function SidebarPro({ profile, onProfileClick, darkMode }: Sideba
 
   const renderNavigation = () => (
     <>
-      <div className="px-5 pt-[14px] pb-[6px]">
-        <div className="text-[10px] uppercase tracking-[1.2px] text-white/35 font-semibold">
-          {intl.formatMessage({ id: 'sidebar.orgProfile' })}
-        </div>
-      </div>
-      <div className="mx-4 mb-4">
-        <button
-          onClick={onProfileClick}
-          className={`w-full px-3 py-2 rounded-md text-xs font-semibold flex items-center gap-2 transition-all hover:opacity-80 ${profileConfig[profile].color}`}
-        >
-          <span className={`w-[7px] h-[7px] rounded-full ${profileConfig[profile].dot}`} />
-          <span>{profileConfig[profile].label}</span>
-          <span className="ml-auto text-[11px] opacity-60">
-            {intl.formatMessage({ id: 'sidebar.change' })} ›
-          </span>
-        </button>
-      </div>
-
       <div className="mx-4 mb-1">
         <div className="flex bg-white/5 rounded-md p-[3px]">
           <button
             onClick={() => setNavView('process')}
-            className={`flex-1 text-center py-1.5 text-[11px] font-medium rounded transition-all ${
+            className={`w-full text-center py-1.5 text-[11px] font-medium rounded transition-all ${
               navView === 'process' ? 'bg-white/10 text-white' : 'text-white/45'
             }`}
           >
             {intl.formatMessage({ id: 'sidebar.byProcess' })}
-          </button>
-          <button
-            onClick={() => setNavView('module')}
-            className={`flex-1 text-center py-1.5 text-[11px] font-medium rounded transition-all ${
-              navView === 'module' ? 'bg-white/10 text-white' : 'text-white/45'
-            }`}
-          >
-            {intl.formatMessage({ id: 'sidebar.byModule' })}
           </button>
         </div>
       </div>
@@ -145,17 +128,21 @@ export default function SidebarPro({ profile, onProfileClick, darkMode }: Sideba
                 intl={intl}
               />
             ))}
-            <NavSection label={intl.formatMessage({ id: 'sidebar.regulatoryModules' })} />
-            {regulatoryModulesItems.map((item) => (
-              <NavItem
-                key={item.id}
-                item={item}
-                isActive={isPathActive(item.path)}
-                onClick={() => handleNavigation(item)}
-                userPlan={userPlan}
-                intl={intl}
-              />
-            ))}
+            {regulatoryModulesItems.length > 0 && (
+              <>
+                <NavSection label={intl.formatMessage({ id: 'sidebar.regulatoryModules' })} />
+                {regulatoryModulesItems.map((item) => (
+                  <NavItem
+                    key={item.id}
+                    item={item}
+                    isActive={isPathActive(item.path)}
+                    onClick={() => handleNavigation(item)}
+                    userPlan={userPlan}
+                    intl={intl}
+                  />
+                ))}
+              </>
+            )}
           </>
         )}
       </nav>
@@ -175,16 +162,34 @@ export default function SidebarPro({ profile, onProfileClick, darkMode }: Sideba
 
         <div className="px-6 py-4 flex items-center gap-2.5 cursor-pointer hover:bg-white/5 transition-all">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] flex items-center justify-center text-[13px] font-semibold text-white">
-            MK
+            {getInitials()}
           </div>
           <div className="text-[12.5px]">
-            <div>Max Kellner</div>
-            <div className="text-[11px] text-white/40">CISO · WellQ</div>
+            <div>{displayName}</div>
+            <div className="text-[11px] text-white/40">{displaySubtitle}</div>
           </div>
         </div>
       </div>
     </>
   );
+
+  const getInitials = () => {
+    if (user?.full_name) {
+      return user.full_name
+        .split(' ')
+        .filter(Boolean)
+        .map((part) => part[0].toUpperCase())
+        .slice(0, 2)
+        .join('')
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase()
+    }
+    return 'US'
+  }
+
+  const displayName = user?.full_name || user?.email || 'Usuario'
+  const displaySubtitle = user?.email ? user.email : 'Cuenta activa'
 
   return (
     <>
@@ -203,13 +208,16 @@ export default function SidebarPro({ profile, onProfileClick, darkMode }: Sideba
           text-white hidden lg:flex flex-col h-screen overflow-y-auto transition-all duration-300 z-50 w-[260px] sticky top-0
         `}
       >
-        <div className="px-5 py-[22px] border-b border-white/10 flex items-center gap-3">
-          <div className="w-[34px] h-[34px] rounded-lg bg-[#4F6EF7] flex items-center justify-center font-bold text-[15px]">
-            D
-          </div>
-          <div>
-            <div className="text-[15px] font-semibold -tracking-[0.2px]">Dani Platform</div>
-            <div className="text-[11px] text-white/45 mt-0.5">v4 — Compliance Intelligence</div>
+        <div className="px-5 py-[22px] border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <DaniLogo size={64} showText={false} />
+            <div className="leading-tight">
+              <div className="text-[15px] font-semibold tracking-tight text-white">DANI Platform</div>
+              <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-white/50 mt-1">
+                <span className="rounded-full bg-white/10 px-2 py-1">v4</span>
+                <span>Compliance Intelligence</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -254,7 +262,7 @@ function NavItem({ item, isActive, onClick, userPlan, intl }: NavItemProps) {
         {/* Icon or Step Number */}
         {item.stepNum ? (
           <span
-            className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-semibold flex-shrink-0 ${
+            className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-semibold ${
               item.isCompleted
                 ? 'bg-[#1DB954]'
                 : isActive

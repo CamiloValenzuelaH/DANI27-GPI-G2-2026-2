@@ -1,0 +1,733 @@
+{
+  "rows": [
+    [
+      "findings.answeredQuestions",
+      "Preguntas respondidas",
+      "Answered questions",
+      "Perguntas respondidas",
+      "Questions répondues",
+      "Fragen beantwortet",
+      "Domande risposte"
+    ],
+    [
+      "findings.capaLoadError",
+      "No se pudieron cargar los datos de CAPA. Vuelve a intentarlo.",
+      "Could not load CAPA data. Please try again.",
+      "Não foi possível carregar os dados de CAPA. Tente novamente.",
+      "Impossible de charger les données CAPA. Veuillez réessayer.",
+      "CAPA-Daten konnten nicht geladen werden. Bitte versuche es erneut.",
+      "Impossibile caricare i dati CAPA. Riprova."
+    ],
+    [
+      "findings.controlOwner",
+      "Control / Responsable",
+      "Control / Owner",
+      "Controle / Responsável",
+      "Contrôle / Responsable",
+      "Kontrolle / Verantwortlicher",
+      "Controllo / Responsabile"
+    ],
+    [
+      "findings.create.descriptionPlaceholder",
+      "Describe la acción correctiva requerida",
+      "Describe the required corrective action",
+      "Descreva a ação corretiva necessária",
+      "Décrivez l'action corrective requise",
+      "Beschreibe die erforderliche Korrekturmaßnahme",
+      "Descrivi l'azione correttiva richiesta"
+    ],
+    [
+      "findings.create.fieldControlId",
+      "Control ID",
+      "Control ID",
+      "Control ID",
+      "Control ID",
+      "Control ID",
+      "Control ID"
+    ],
+    [
+      "findings.create.fieldDescription",
+      "Descripción",
+      "Description",
+      "Descrição",
+      "Description",
+      "Beschreibung",
+      "Descrizione"
+    ],
+    [
+      "findings.create.fieldDueDate",
+      "Fecha límite",
+      "Due Date",
+      "Prazo",
+      "Date d'échéance",
+      "Fälligkeitsdatum",
+      "Data di scadenza"
+    ],
+    [
+      "findings.create.fieldPriority",
+      "Prioridad",
+      "Priority",
+      "Prioridade",
+      "Priorité",
+      "Priorität",
+      "Priorità"
+    ],
+    [
+      "findings.create.fieldProgress",
+      "Progreso",
+      "Progress",
+      "Progresso",
+      "Avancement",
+      "Fortschritt",
+      "Progresso"
+    ],
+    [
+      "findings.create.fieldSource",
+      "Origen",
+      "Source",
+      "Origem",
+      "Source",
+      "Quelle",
+      "Fonte"
+    ],
+    [
+      "findings.create.fieldTitle",
+      "Título",
+      "Title",
+      "Título",
+      "Titre",
+      "Titel",
+      "Titolo"
+    ],
+    [
+      "findings.create.subtitle",
+      "Registra rápidamente una acción correctiva y mantén los datos sincronizados.",
+      "Quickly register a corrective action and keep data synchronized.",
+      "Registre rapidamente uma ação corretiva e mantenha os dados sincronizados.",
+      "Enregistrez rapidement une action corrective et gardez les données synchronisées.",
+      "Erfasse schnell eine Korrekturmaßnahme und halte die Daten synchron.",
+      "Registra rapidamente un'azione correttiva e mantieni i dati sincronizzati."
+    ],
+    [
+      "findings.create.title",
+      "Crear nueva CAPA",
+      "Create new CAPA",
+      "Criar nova CAPA",
+      "Créer une nouvelle CAPA",
+      "Neue CAPA erstellen",
+      "Crea nuova CAPA"
+    ],
+    [
+      "findings.create.titlePlaceholder",
+      "ej. Revisar evidencia de control de acceso",
+      "e.g. Review access control evidence",
+      "ex. Revisar evidências de controle de acesso",
+      "ex. Vérifier les preuves de contrôle d'accès",
+      "z. B. Zugriffskontrollnachweise prüfen",
+      "es. Verificare le evidenze del controllo accessi"
+    ],
+    [
+      "findings.createAction",
+      "Crear CAPA",
+      "Create CAPA",
+      "Criar CAPA",
+      "Créer CAPA",
+      "CAPA erstellen",
+      "Crea CAPA"
+    ],
+    [
+      "findings.createError",
+      "No se pudo crear la CAPA. Por favor revisa los campos y vuelve a intentar.",
+      "Could not create CAPA. Please review the fields and try again.",
+      "Não foi possível criar a CAPA. Verifique os campos e tente novamente.",
+      "Impossible de créer la CAPA. Veuillez vérifier les champs et réessayer.",
+      "Konnte die CAPA nicht erstellen. Bitte überprüfe die Felder und versuche es erneut.",
+      "Impossibile creare la CAPA. Controlla i campi e riprova."
+    ],
+    [
+      "findings.createTitleRequired",
+      "El título es obligatorio para crear una CAPA.",
+      "Title is required to create a CAPA.",
+      "O título é obrigatório para criar uma CAPA.",
+      "Le titre est requis pour créer une CAPA.",
+      "Ein Titel ist erforderlich, um eine CAPA zu erstellen.",
+      "Il titolo è obbligatorio per creare una CAPA."
+    ],
+    [
+      "findings.createdUpdated",
+      "Creado / Actualizado",
+      "Created / Updated",
+      "Criado / Atualizado",
+      "Créé / Mis à jour",
+      "Erstellt / Aktualisiert",
+      "Creato / Aggiornato"
+    ],
+    [
+      "findings.creating",
+      "Creando...",
+      "Creating...",
+      "Criando...",
+      "Création...",
+      "Erstelle...",
+      "Creazione in corso..."
+    ],
+    [
+      "findings.criticalGaps",
+      "Brechas críticas",
+      "Critical gaps",
+      "Lacunas críticas",
+      "Écarts critiques",
+      "Kritische Lücken",
+      "Lacune critiche"
+    ],
+    [
+      "findings.description",
+      "Descripción",
+      "Description",
+      "Descrição",
+      "Description",
+      "Beschreibung",
+      "Descrizione"
+    ],
+    [
+      "findings.emptyCapas",
+      "Aún no hay CAPAs registradas. Crea una nueva para comenzar.",
+      "No CAPAs registered yet. Create a new CAPA to begin.",
+      "Ainda não há CAPAs registradas. Crie uma nova para começar.",
+      "Aucune CAPA n'est encore enregistrée. Créez-en une nouvelle pour commencer.",
+      "Es sind noch keine CAPAs registriert. Erstelle eine neue, um zu beginnen.",
+      "Non ci sono ancora CAPA registrate. Crea una nuova per iniziare."
+    ],
+    [
+      "findings.emptyFiltered",
+      "No hay CAPAs coincidentes. Ajusta los filtros para ver resultados.",
+      "No matching CAPAs. Adjust filters to see results.",
+      "Nenhuma CAPA corresponde aos filtros. Ajuste os filtros para ver resultados.",
+      "Aucune CAPA ne correspond aux filtres. Ajustez les filtres pour voir les résultats.",
+      "Keine passende CAPA gefunden. Passe die Filter an, um Ergebnisse zu sehen.",
+      "Nessuna CAPA corrisponde ai filtri. Regola i filtri per visualizzare i risultati."
+    ],
+    [
+      "findings.filter.allPriorities",
+      "Todas las prioridades",
+      "All priorities",
+      "Todas as prioridades",
+      "Toutes les priorités",
+      "Alle Prioritäten",
+      "Tutte le priorità"
+    ],
+    [
+      "findings.filter.allStatuses",
+      "Todos los estados",
+      "All statuses",
+      "Todos os status",
+      "Tous les statuts",
+      "Alle Stati",
+      "Tutti gli stati"
+    ],
+    [
+      "findings.filter.priority",
+      "Filtrar por prioridad",
+      "Filter by priority",
+      "Filtrar por prioridade",
+      "Filtrer par priorité",
+      "Nach Priorität filtern",
+      "Filtra per priorità"
+    ],
+    [
+      "findings.filter.status",
+      "Filtrar por estado",
+      "Filter by status",
+      "Filtrar por status",
+      "Filtrer par statut",
+      "Nach Status filtern",
+      "Filtra per stato"
+    ],
+    [
+      "findings.gapFindings",
+      "Hallazgos de Gap Analysis",
+      "Gap Analysis Findings",
+      "Resultados da análise de lacunas",
+      "Résultats de l'analyse des écarts",
+      "Ergebnisse der Lückenanalyse",
+      "Risultati dell'analisi delle lacune"
+    ],
+    [
+      "findings.gapsLoadError",
+      "No se pudieron cargar los datos de hallazgos. Vuelve a intentarlo.",
+      "Could not load findings data. Please try again.",
+      "Não foi possível carregar os resultados. Tente novamente.",
+      "Impossible de charger les résultats. Veuillez réessayer.",
+      "Ergebnisse konnten nicht geladen werden. Bitte versuche es erneut.",
+      "Impossibile caricare i risultati. Riprova."
+    ],
+    [
+      "findings.indicators",
+      "Indicadores de hallazgos",
+      "Findings indicators",
+      "Indicadores de achados",
+      "Indicateurs de constats",
+      "Kennzahlen zu Befunden",
+      "Indicatori dei riscontri"
+    ],
+    [
+      "findings.kpi.closed",
+      "Cerradas",
+      "Closed",
+      "Fechadas",
+      "Fermées",
+      "Geschlossen",
+      "Chiuse"
+    ],
+    [
+      "findings.kpi.closedHelp",
+      "CAPAs completadas",
+      "Completed CAPAs",
+      "CAPAs concluídas",
+      "CAPAs terminées",
+      "Abgeschlossene CAPAs",
+      "CAPA completate"
+    ],
+    [
+      "findings.kpi.open",
+      "CAPAs abiertas",
+      "Open CAPAs",
+      "CAPAs abertas",
+      "CAPAs ouvertes",
+      "Offene CAPAs",
+      "CAPA aperte"
+    ],
+    [
+      "findings.kpi.openHelp",
+      "Acciones actualmente en curso",
+      "Actions currently in progress",
+      "Ações atualmente em andamento",
+      "Actions actuellement en cours",
+      "Aktionen, die derzeit laufen",
+      "Azioni attualmente in corso"
+    ],
+    [
+      "findings.kpi.overdue",
+      "Vencidas",
+      "Overdue",
+      "Atrasadas",
+      "En retard",
+      "Überfällig",
+      "In ritardo"
+    ],
+    [
+      "findings.kpi.overdueHelp",
+      "CAPAs fuera de plazo pendientes",
+      "Past due CAPAs pending completion",
+      "CAPAs vencidas pendentes de conclusão",
+      "CAPAs en retard en attente de clôture",
+      "Überfällige CAPAs, die auf Abschluss warten",
+      "CAPA scadute in attesa di completamento"
+    ],
+    [
+      "findings.kpi.total",
+      "Total CAPAs",
+      "Total CAPAs",
+      "Total CAPAs",
+      "Total CAPAs",
+      "Total CAPAs",
+      "Totale CAPAs"
+    ],
+    [
+      "findings.kpi.totalHelp",
+      "Incluye todas las CAPAs registradas",
+      "Includes all registered CAPAs",
+      "Inclui todas as CAPAs registradas",
+      "Comprend toutes les CAPAs enregistrées",
+      "Beinhaltet alle registrierten CAPAs",
+      "Include tutte le CAPA registrate"
+    ],
+    [
+      "findings.loadingCapas",
+      "Cargando CAPAs...",
+      "Loading CAPAs...",
+      "Carregando CAPAs...",
+      "Chargement des CAPAs...",
+      "Lade CAPAs...",
+      "Caricamento CAPA..."
+    ],
+    [
+      "findings.loadingGaps",
+      "Cargando brechas...",
+      "Loading gaps...",
+      "Carregando lacunas...",
+      "Chargement des écarts...",
+      "Lücken werden geladen...",
+      "Caricamento delle lacune..."
+    ],
+    [
+      "findings.noDescription",
+      "Sin descripción disponible.",
+      "No description available.",
+      "Nenhuma descrição disponível.",
+      "Aucune description disponible.",
+      "Keine Beschreibung verfügbar.",
+      "Nessuna descrizione disponibile."
+    ],
+    [
+      "findings.noGaps",
+      "No se encontraron brechas en este momento.",
+      "No gaps found at this moment.",
+      "Nenhuma lacuna encontrada no momento.",
+      "Aucune lacune trouvée pour le moment.",
+      "Im Moment wurden keine Lücken gefunden.",
+      "Nessuna lacuna trovata al momento."
+    ],
+    [
+      "findings.noOwner",
+      "Sin responsable",
+      "No owner",
+      "Sem responsável",
+      "Sans responsable",
+      "Kein Verantwortlicher",
+      "Nessun responsabile"
+    ],
+    [
+      "findings.onTime",
+      "En tiempo",
+      "On time",
+      "No prazo",
+      "Dans les temps",
+      "Rechtzeitig",
+      "In tempo"
+    ],
+    [
+      "findings.openCorrectiveActions",
+      "Acciones correctivas abiertas",
+      "Open Corrective Actions",
+      "Ações corretivas em aberto",
+      "Actions correctives ouvertes",
+      "Offene Korrekturmaßnahmen",
+      "Azioni correttive aperte"
+    ],
+    [
+      "findings.openCriticalGaps",
+      "Brechas críticas abiertas",
+      "Open critical gaps",
+      "Lacunas críticas abertas",
+      "Écarts critiques ouverts",
+      "Offene kritische Lücken",
+      "Lacune critiche aperte"
+    ],
+    [
+      "findings.optional",
+      "Opcional",
+      "Optional",
+      "Opcional",
+      "Optionnel",
+      "Optional",
+      "Facoltativo"
+    ],
+    [
+      "findings.overdue",
+      "Vencida",
+      "Overdue",
+      "Atrasadas",
+      "En retard",
+      "Überfällig",
+      "In ritardo"
+    ],
+    [
+      "findings.phaseFallback",
+      "Fase {index}",
+      "Phase {index}",
+      "Fase {index}",
+      "Phase {index}",
+      "Phase {index}",
+      "Fase {index}"
+    ],
+    [
+      "findings.phaseSummary",
+      "{unanswered} brechas sin responder · {critical} críticas",
+      "{unanswered} unanswered gaps · {critical} critical",
+      "{unanswered} lacunas sem resposta · {critical} críticas",
+      "{unanswered} écarts sans réponse · {critical} critiques",
+      "{unanswered} unbeantwortete Lücken · {critical} kritisch",
+      "{unanswered} lacune senza risposta · {critical} critiche"
+    ],
+    [
+      "findings.priority.critical",
+      "Crítica",
+      "Critical",
+      "Crítica",
+      "Critique",
+      "Kritisch",
+      "Critica"
+    ],
+    [
+      "findings.priority.high",
+      "Alta",
+      "High",
+      "Alta",
+      "Haute",
+      "Hoch",
+      "Alta"
+    ],
+    [
+      "findings.priority.low",
+      "Baja",
+      "Low",
+      "Baixa",
+      "Faible",
+      "Niedrig",
+      "Bassa"
+    ],
+    [
+      "findings.priority.medium",
+      "Media",
+      "Medium",
+      "Média",
+      "Moyenne",
+      "Mittel",
+      "Media"
+    ],
+    [
+      "findings.priorityBreakdown",
+      "Desglose por prioridad",
+      "Priority Breakdown",
+      "Detalhamento por prioridade",
+      "Répartition par priorité",
+      "Aufschlüsselung nach Priorität",
+      "Ripartizione per priorità"
+    ],
+    [
+      "findings.progress",
+      "Progreso",
+      "Progress",
+      "Progresso",
+      "Avancement",
+      "Fortschritt",
+      "Progresso"
+    ],
+    [
+      "findings.progressHelp",
+      "Avance del gap analysis",
+      "Gap analysis completion",
+      "Avanço do gap analysis",
+      "Avancement de l'analyse des écarts",
+      "Fortschritt der Lückenanalyse",
+      "Avanzamento dell'analisi delle lacune"
+    ],
+    [
+      "findings.showing",
+      "Mostrando {shown} de {total} CAPAs",
+      "Showing {shown} of {total} CAPAs",
+      "Mostrando {shown} de {total} CAPAs",
+      "Affichage de {shown} sur {total} CAPAs",
+      "Zeige {shown} von {total} CAPAs",
+      "Visualizzo {shown} di {total} CAPA"
+    ],
+    [
+      "findings.source",
+      "Origen",
+      "Source",
+      "Origem",
+      "Source",
+      "Quelle",
+      "Origine"
+    ],
+    [
+      "findings.source.externalAudit",
+      "Auditoría externa",
+      "External Audit",
+      "Auditoria externa",
+      "Audit externe",
+      "Externes Audit",
+      "Audit esterno"
+    ],
+    [
+      "findings.source.incident",
+      "Incidente",
+      "Incident",
+      "Incidente",
+      "Incident",
+      "Vorfall",
+      "Incidente"
+    ],
+    [
+      "findings.source.internalAudit",
+      "Auditoría interna",
+      "Internal Audit",
+      "Auditoria interna",
+      "Audit interne",
+      "Interne Revision",
+      "Audit interno"
+    ],
+    [
+      "findings.source.managementReview",
+      "Revisión de dirección",
+      "Management Review",
+      "Revisão da direção",
+      "Revue de direction",
+      "Management Review",
+      "Riesame della direzione"
+    ],
+    [
+      "findings.status.closed",
+      "Cerrada",
+      "Closed",
+      "Fechada",
+      "Fermée",
+      "Geschlossen",
+      "Chiusa"
+    ],
+    [
+      "findings.status.inProgress",
+      "En progreso",
+      "In Progress",
+      "Em andamento",
+      "En cours",
+      "In Bearbeitung",
+      "In corso"
+    ],
+    [
+      "findings.status.open",
+      "Abierta",
+      "Open",
+      "Aberta",
+      "Ouverte",
+      "Offen",
+      "Aperta"
+    ],
+    [
+      "findings.status.resolved",
+      "Resuelta",
+      "Resolved",
+      "Resolvida",
+      "Résolue",
+      "Gelöst",
+      "Risolta"
+    ],
+    [
+      "findings.subtitle",
+      "Gestiona acciones correctivas, prioridades y fechas de cierre desde un solo espacio.",
+      "Manage corrective actions, priorities, and due dates from one workspace.",
+      "Gerencie ações corretivas, prioridades e prazos a partir de um único espaço.",
+      "Gérez les actions correctives, les priorités et les dates butoir à partir d'un espace unique.",
+      "Verwalte Korrekturmaßnahmen, Prioritäten und Fälligkeitsdaten an einem Ort.",
+      "Gestisci azioni correttive, priorità e date di scadenza da un unico spazio."
+    ],
+    [
+      "findings.table.dueDate",
+      "Fecha límite",
+      "Due Date",
+      "Prazo",
+      "Date d'échéance",
+      "Fälligkeitsdatum",
+      "Data di scadenza"
+    ],
+    [
+      "findings.table.overdue",
+      "Vencimiento",
+      "Overdue",
+      "Vencimento",
+      "En retard",
+      "Überfällig",
+      "In ritardo"
+    ],
+    [
+      "findings.table.priority",
+      "Prioridad",
+      "Priority",
+      "Prioridade",
+      "Priorité",
+      "Priorität",
+      "Priorità"
+    ],
+    [
+      "findings.table.progress",
+      "Progreso",
+      "Progress",
+      "Progresso",
+      "Avancement",
+      "Fortschritt",
+      "Progresso"
+    ],
+    [
+      "findings.table.status",
+      "Estado",
+      "Status",
+      "Estado",
+      "Statut",
+      "Status",
+      "Stato"
+    ],
+    [
+      "findings.title",
+      "Seguimiento CAPA",
+      "CAPA Tracker",
+      "Rastreador CAPA",
+      "Suivi CAPA",
+      "CAPA-Tracker",
+      "Monitor CAPA"
+    ],
+    [
+      "findings.totalGaps",
+      "Brechas totales",
+      "Total gaps",
+      "Lacunas totais",
+      "Écarts totaux",
+      "Gesamte Lücken",
+      "Lacune totali"
+    ],
+    [
+      "findings.totalGapsHelp",
+      "Preguntas del gap analysis",
+      "Gap analysis questions",
+      "Perguntas do gap analysis",
+      "Questions de l'analyse des écarts",
+      "Fragen der Lückenanalyse",
+      "Domande dell'analisi delle lacune"
+    ],
+    [
+      "findings.unanswered",
+      "Sin responder",
+      "Unanswered",
+      "Sem resposta",
+      "Sans réponse",
+      "Unbeantwortet",
+      "Senza risposta"
+    ],
+    [
+      "findings.unansweredHelp",
+      "Incluye brechas críticas",
+      "Includes critical gaps",
+      "Inclui lacunas críticas",
+      "Comprend des écarts critiques",
+      "Beinhaltet kritische Lücken",
+      "Include lacune critiche"
+    ],
+    [
+      "findings.unassigned",
+      "No asignado",
+      "Unassigned",
+      "Não atribuído",
+      "Non attribué",
+      "Nicht zugewiesen",
+      "Non assegnato"
+    ],
+    [
+      "findings.validationFindings",
+      "Hallazgos de validación",
+      "Validation findings",
+      "Resultados de validação",
+      "Résultats de validation",
+      "Validierungsergebnisse",
+      "Risultati di validazione"
+    ],
+    [
+      "findings.validationFindingsHelp",
+      "Revisa los hallazgos generados por la validación granular de documentos en el historial reciente.",
+      "Review findings generated by granular document validation in recent history.",
+      "Revise os achados gerados pela validação granular de documentos no histórico recente.",
+      "Passez en revue les constats générés par la validation granulaire des documents dans l'historique récent.",
+      "Überprüfe die Befunde, die durch die granulare Dokumentvalidierung in der jüngsten Historie erzeugt wurden.",
+      "Rivedi i riscontri generati dalla validazione granulare dei documenti nella cronologia recente."
+    ]
+  ]
+}

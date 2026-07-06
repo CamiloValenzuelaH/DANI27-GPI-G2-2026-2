@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { useIntl } from 'react-intl'
 import { X, ArrowLeft, ArrowRight, ChevronRight, Bot } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { getLocalizedTutorials, type TutorialStep } from '../data/tutorialContent'
 
 interface OnboardingTourProps {
   open: boolean
@@ -12,136 +13,174 @@ export default function OnboardingTour({ open, setOpen }: OnboardingTourProps) {
   const intl = useIntl()
   const location = useLocation()
   const navigate = useNavigate()
-  const [currentStep, setCurrentStep] = useState(0)
+  const [currentStepIndex, setCurrentStepIndex] = useState(0)
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0)
   const [readyToStart, setReadyToStart] = useState(false)
+  const contentRef = useRef<HTMLDivElement | null>(null)
 
-  const steps = useMemo(
-    () => [
-      {
-        path: '/dashboard',
-        title: intl.formatMessage({ id: 'tutorial.step1.title', defaultMessage: 'Panel de Control' }),
-        description: intl.formatMessage({
-          id: 'tutorial.step1.description',
-          defaultMessage: 'Revisa el estado general de cumplimiento, alertas y progresos clave desde tu panel principal.',
-        }),
-      },
-      {
-        path: '/assets',
-        title: intl.formatMessage({ id: 'tutorial.step2.title', defaultMessage: 'Inventario de Activos' }),
-        description: intl.formatMessage({
-          id: 'tutorial.step2.description',
-          defaultMessage: 'Gestiona tus activos, asigna responsables y enlaza evidencias críticas para el cumplimiento.',
-        }),
-      },
-      {
-        path: '/documents',
-        title: intl.formatMessage({ id: 'tutorial.step3.title', defaultMessage: 'Controles de Documentos' }),
-        description: intl.formatMessage({
-          id: 'tutorial.step3.description',
-          defaultMessage: 'Visualiza tus controles documentales, genera políticas y revisa el estado de cada documento.',
-        }),
-      },
-      {
-        path: '/risks',
-        title: intl.formatMessage({ id: 'tutorial.step4.title', defaultMessage: 'Gestión de Riesgos' }),
-        description: intl.formatMessage({
-          id: 'tutorial.step4.description',
-          defaultMessage: 'Analiza los riesgos identificados, revisa su criticidad y controla los planes de tratamiento.',
-        }),
-      },
-      {
-        path: '/audit',
-        title: intl.formatMessage({ id: 'tutorial.step5.title', defaultMessage: 'Preparar Auditoría' }),
-        description: intl.formatMessage({
-          id: 'tutorial.step5.description',
-          defaultMessage: 'Valida tu evidencia, consulta hallazgos y avanza en la preparación para la auditoría con claridad.',
-        }),
-      },
-      {
-        path: '/assessment',
-        title: intl.formatMessage({ id: 'tutorial.step6.title', defaultMessage: 'Autoevaluación' }),
-        description: intl.formatMessage({
-          id: 'tutorial.step6.description',
-          defaultMessage: 'Completa tu autoevaluación para medir tu nivel de cumplimiento y ver recomendaciones inmediatas.',
-        }),
-      },
-      {
-        path: '/settings',
-        title: intl.formatMessage({ id: 'tutorial.step7.title', defaultMessage: 'Configuración' }),
-        description: intl.formatMessage({
-          id: 'tutorial.step7.description',
-          defaultMessage: 'Ajusta tus preferencias, idioma y notificaciones para que el programa se adapte a tu equipo.',
-        }),
-      },
-    ],
-    [intl]
-  )
+  const tutorials = useMemo(() => getLocalizedTutorials(intl), [intl, intl.locale])
 
-  useEffect(() => {
-    if (!open) {
-      return
-    }
+  // Map tutorial steps by path for quick lookup
+  const stepsByPath = useMemo(() => {
+    const map: Record<string, number> = {}
+    tutorials.forEach((step, idx) => {
+      map[step.path] = idx
+    })
+    return map
+  }, [tutorials])
 
-    if (!readyToStart) {
-      return
-    }
+  // Get current tutorial step
+  const currentStep: TutorialStep | undefined = tutorials[currentStepIndex]
+  const currentSection = currentStep?.sections[currentSectionIndex]
+  const totalSteps = tutorials.length
+  const totalSectionsInStep = currentStep?.sections.length ?? 0
+  const isLastSection =
+    currentSectionIndex === totalSectionsInStep - 1 && currentStepIndex === totalSteps - 1
 
-    const step = steps[currentStep]
-    if (step && location.pathname !== step.path) {
+  // Apply highlights to DOM elements
+  const applyHighlights = useCallback((selectors: string[] | undefined) => {
+    if (!selectors) return
+
+    // Remove all previous highlights
+    document.querySelectorAll('.tutorial-highlight').forEach((el) => {
+      el.classList.remove('tutorial-highlight')
+    })
+
+    // Add new highlights
+    selectors.forEach((selector) => {
       try {
-        navigate(step.path)
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Onboarding navigation failed', err)
-      }
-    }
-  }, [currentStep, open, readyToStart, location.pathname, navigate, steps])
+        const elements = document.querySelectorAll(selector)
+        elements.forEach((el) => {
+          el.classList.add('tutorial-highlight')
+        })
 
-  useEffect(() => {
-    if (!open || readyToStart) {
-      return
-    }
-
-    const stepIndex = steps.findIndex((step) => step.path === location.pathname)
-    setCurrentStep(stepIndex >= 0 ? stepIndex : 0)
-  }, [open, readyToStart, location.pathname, steps])
-
-  const step = steps[currentStep]
-  const isKnownRoute = steps.some((item) => item.path === location.pathname)
-
-  const goPrevious = () => setCurrentStep((prev) => Math.max(prev - 1, 0))
-  const goNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1))
-
-  const handleStart = () => {
-    setReadyToStart(true)
-    setCurrentStep(0)
-    // Navega al inicio con un pequeño delay para evitar conflictos durante el render
-    setTimeout(() => {
-      try {
-        if (location.pathname !== steps[0].path) {
-          navigate(steps[0].path)
+        // Scroll first element into view
+        if (elements.length > 0) {
+          elements[0].scrollIntoView({ behavior: 'smooth', block: 'center' })
         }
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Onboarding navigation failed', err)
+      } catch (e) {
+        // Invalid selector, skip
       }
-    }, 60)
-  }
+    })
+  }, [])
 
-  const handleClose = () => {
+  // Navigate to next section/step
+  const handleNextClick = useCallback(() => {
+    if (!currentStep) return
+
+    if (currentSectionIndex < currentStep.sections.length - 1) {
+      // Go to next section in current step
+      setCurrentSectionIndex((prev) => prev + 1)
+    } else if (currentStepIndex < tutorials.length - 1) {
+      // Go to next step
+      const nextStep = tutorials[currentStepIndex + 1]
+      setCurrentStepIndex((prev) => prev + 1)
+      setCurrentSectionIndex(0)
+
+      // Navigate to next step path
+      if (nextStep.path && location.pathname !== nextStep.path) {
+        navigate(nextStep.path)
+      }
+    } else {
+      // Tutorial complete
+      handleClose()
+    }
+  }, [currentStep, currentStepIndex, currentSectionIndex, location.pathname, navigate, tutorials])
+
+  // Navigate to previous section/step
+  const handlePreviousClick = useCallback(() => {
+    if (currentSectionIndex > 0) {
+      setCurrentSectionIndex((prev) => prev - 1)
+    } else if (currentStepIndex > 0) {
+      // Go to previous step
+      const prevStep = tutorials[currentStepIndex - 1]
+      setCurrentStepIndex((prev) => prev - 1)
+      setCurrentSectionIndex(prevStep.sections.length - 1)
+
+      if (prevStep.path && location.pathname !== prevStep.path) {
+        navigate(prevStep.path)
+      }
+    }
+  }, [currentSectionIndex, currentStepIndex, location.pathname, navigate, tutorials])
+
+  // Start tutorial
+  const handleStart = useCallback(() => {
+    setReadyToStart(true)
+    setCurrentStepIndex(0)
+    setCurrentSectionIndex(0)
+
+    setTimeout(() => {
+      const firstStep = tutorials[0]
+      if (firstStep?.path && location.pathname !== firstStep.path) {
+        navigate(firstStep.path)
+      }
+    }, 100)
+  }, [location.pathname, navigate, tutorials])
+
+  // Close tutorial
+  const handleClose = useCallback(() => {
     setReadyToStart(false)
-    setCurrentStep(0)
+    setCurrentStepIndex(0)
+    setCurrentSectionIndex(0)
+    document.querySelectorAll('.tutorial-highlight').forEach((el) => {
+      el.classList.remove('tutorial-highlight')
+    })
     setOpen(false)
-  }
+  }, [setOpen])
+
+  // Navigate to step when it changes
+  useEffect(() => {
+    if (!open || !readyToStart || !currentStep) return
+
+    if (currentStep.path && location.pathname !== currentStep.path) {
+      navigate(currentStep.path)
+    }
+  }, [currentStepIndex, readyToStart, open, currentStep, location.pathname, navigate])
+
+  // Apply highlights when section changes
+  useEffect(() => {
+    if (!readyToStart || !currentSection) return
+
+    setTimeout(() => {
+      applyHighlights(currentSection.highlights)
+    }, 300)
+  }, [currentSectionIndex, currentStepIndex, readyToStart, currentSection, applyHighlights])
+
+  useEffect(() => {
+    if (!readyToStart) return
+
+    const timer = window.setTimeout(() => {
+      if (contentRef.current) {
+        contentRef.current.scrollTop = 0
+      }
+    }, 0)
+
+    return () => window.clearTimeout(timer)
+  }, [currentStepIndex, currentSectionIndex, readyToStart, intl.locale])
+
+  // Determine current route when tour opens
+  useEffect(() => {
+    if (!open || readyToStart) return
+
+    const currentPathIndex = stepsByPath[location.pathname]
+    if (currentPathIndex !== undefined) {
+      setCurrentStepIndex(currentPathIndex)
+    } else {
+      setCurrentStepIndex(0)
+    }
+  }, [open, readyToStart, location.pathname, stepsByPath])
+
+  // Check if current route is a known tutorial route
+  const isKnownRoute = stepsByPath[location.pathname] !== undefined
 
   if (!open) {
     return null
   }
 
   return (
-    <div className="fixed right-6 top-24 z-50 w-[min(380px,calc(100%-1rem))] rounded-[28px] border border-slate-200 bg-white/95 p-4 shadow-2xl backdrop-blur-sm transition-all duration-200 dark:border-slate-800 dark:bg-slate-950/90">
+    <div className="fixed right-6 top-20 z-50 w-[min(420px,calc(100%-1rem))] rounded-[28px] border border-slate-200 bg-white/95 p-5 shadow-2xl backdrop-blur-sm transition-all duration-200 dark:border-slate-800 dark:bg-slate-950/90 max-h-[calc(100vh-80px)] flex flex-col">
       <div className="absolute -top-2 right-12 h-4 w-4 rotate-45 rounded-sm bg-white/95 shadow-sm dark:bg-slate-950/90" />
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 flex-shrink-0">
         <div className="grid h-12 w-12 place-items-center rounded-3xl bg-gradient-to-br from-[#4F6EF7] to-[#8B5CF6] text-white shadow-lg">
           <Bot className="h-6 w-6" />
         </div>
@@ -156,14 +195,17 @@ export default function OnboardingTour({ open, setOpen }: OnboardingTourProps) {
                 {intl.formatMessage({ id: 'tutorial.title', defaultMessage: 'Hola, soy Dani27' })}
               </h2>
               <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                {intl.formatMessage({ id: 'tutorial.subtitle', defaultMessage: 'Tu asistente virtual te guía por la plataforma paso a paso.' })}
+                {intl.formatMessage({
+                  id: 'tutorial.subtitle',
+                  defaultMessage: 'Tu asistente virtual te guía por la plataforma paso a paso.',
+                })}
               </p>
             </div>
             <button
               type="button"
               onClick={handleClose}
               aria-label={intl.formatMessage({ id: 'tutorial.close', defaultMessage: 'Cerrar guía' })}
-              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white flex-shrink-0"
             >
               <X className="h-4 w-4" />
             </button>
@@ -175,8 +217,14 @@ export default function OnboardingTour({ open, setOpen }: OnboardingTourProps) {
         <div className="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
           <p className="text-sm text-slate-700 dark:text-slate-300">
             {isKnownRoute
-              ? intl.formatMessage({ id: 'tutorial.startPromptKnown', defaultMessage: 'Presiona iniciar para comenzar el tutorial desde el panel principal.' })
-              : intl.formatMessage({ id: 'tutorial.startPromptUnknown', defaultMessage: 'Estás en otra sección. Inicia el recorrido para regresar al inicio y seguir el flujo correcto.' })}
+              ? intl.formatMessage({
+                  id: 'tutorial.startPromptKnown',
+                  defaultMessage: 'Presiona iniciar para comenzar el tutorial desde el panel principal.',
+                })
+              : intl.formatMessage({
+                  id: 'tutorial.startPromptUnknown',
+                  defaultMessage: 'Estás en otra sección. Inicia el recorrido para regresar al inicio y seguir el flujo correcto.',
+                })}
           </p>
           <div className="mt-4 flex items-center gap-2">
             <button
@@ -196,38 +244,46 @@ export default function OnboardingTour({ open, setOpen }: OnboardingTourProps) {
             </button>
           </div>
         </div>
-      ) : (
-        <div className="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-center justify-between gap-3 mb-3">
+      ) : currentStep && currentSection ? (
+        <div className="mt-4 rounded-[24px] border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900 flex flex-col flex-1 min-h-0">
+          <div className="flex items-center justify-between gap-3 mb-3 flex-shrink-0">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                {intl.formatMessage({ id: 'tutorial.progressLabel', defaultMessage: 'Paso' })} {currentStep + 1} / {steps.length}
+                {intl.formatMessage({ id: 'tutorial.progressLabel', defaultMessage: 'Paso' })} {currentStepIndex + 1} / {totalSteps} —{' '}
+                {currentSectionIndex + 1} / {totalSectionsInStep}
               </div>
-              <div className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">{step.title}</div>
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              {intl.formatMessage({ id: 'tutorial.stepHint', defaultMessage: 'Mini explicación de la sección actual' })}
-            </div>
-          </div>
-          <p className="text-sm leading-7 text-slate-700 dark:text-slate-300">{step.description}</p>
-          <div className="mt-4 rounded-2xl bg-white p-3 text-sm text-slate-600 shadow-sm dark:bg-slate-950 dark:text-slate-300">
-            <div className="flex items-start gap-3">
-              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                <Bot className="h-5 w-5" />
+              <div className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
+                {currentStep.icon} {currentStep.title}
               </div>
-              <div>
-                <p className="font-semibold text-slate-900 dark:text-slate-100">Dani27 está hablando</p>
-                <p className="mt-1 leading-6 text-slate-600 dark:text-slate-300">
-                  {intl.formatMessage({ id: 'tutorial.routeHint', defaultMessage: 'El tutorial va marcando cada ruta, sigue las flechas para avanzar.' })}
-                </p>
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {currentSection.title}
               </div>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between gap-2">
+
+          {/* Scrollable Content Area */}
+          <div ref={contentRef} className="flex-1 overflow-y-auto mb-3 pr-2">
+            {/* Content Section */}
+            <div className="rounded-2xl bg-white p-4 shadow-sm dark:bg-slate-950 mb-3">
+              <p className="text-sm leading-6 text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                {currentSection.content}
+              </p>
+            </div>
+
+            {/* Action Hint */}
+            {currentSection.action && (
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-blue-50 dark:bg-blue-950/20 p-3 text-sm text-slate-700 dark:text-slate-300">
+                💡 <span className="font-semibold">Acción:</span> {currentSection.action}
+              </div>
+            )}
+          </div>
+
+          {/* Navigation Buttons - Always Visible */}
+          <div className="flex items-center justify-between gap-2 flex-shrink-0 pt-3 border-t border-slate-200 dark:border-slate-700">
             <button
               type="button"
-              onClick={goPrevious}
-              disabled={currentStep === 0}
+              onClick={handlePreviousClick}
+              disabled={currentStepIndex === 0 && currentSectionIndex === 0}
               className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -235,17 +291,17 @@ export default function OnboardingTour({ open, setOpen }: OnboardingTourProps) {
             </button>
             <button
               type="button"
-              onClick={currentStep === steps.length - 1 ? handleClose : goNext}
+              onClick={handleNextClick}
               className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
             >
-              {currentStep === steps.length - 1
+              {isLastSection
                 ? intl.formatMessage({ id: 'tutorial.finish', defaultMessage: 'Finalizar' })
                 : intl.formatMessage({ id: 'tutorial.next', defaultMessage: 'Siguiente' })}
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

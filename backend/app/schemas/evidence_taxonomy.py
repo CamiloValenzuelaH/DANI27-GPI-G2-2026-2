@@ -16,6 +16,8 @@ class EvidenceTaxonomyItem(BaseModel):
     control_id: str
     clause_ref: str
     organization_id: str
+    question_id: Optional[str] = None
+    answer_id: Optional[str] = None
     validity_days: Optional[int] = Field(default=None, gt=0)
     freshness_status: Literal["fresh", "expiring", "expired"]
 

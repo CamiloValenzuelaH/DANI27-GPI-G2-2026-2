@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '../contexts/AuthContext'
 import { useIntl } from 'react-intl'
 import type { LoginRequest } from '../../api/types'
+import DaniLogo from '../components/DaniLogo'
 
 const TWO_FACTOR_SESSION_KEY = 'dani_two_factor_challenge'
 
@@ -48,9 +49,14 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-6">
 
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">{msg('login.welcome', 'Welcome to Dani27001')}</h1>
-          <p className="text-sm text-muted-foreground">{msg('login.subtitle', 'Sign in to your account')}</p>
+        <div className="text-center space-y-4">
+          <div className="flex flex-col items-center gap-3">
+            <DaniLogo size={150} showText={false} />
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">{msg('login.welcome', 'Welcome to Dani27001')}</h1>
+              <p className="text-sm text-muted-foreground">{msg('login.subtitle', 'Sign in to your account')}</p>
+            </div>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

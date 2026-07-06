@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useIntl } from 'react-intl'
 
 export interface DocumentEditorProps {
   title: string
@@ -137,6 +138,7 @@ export default function DocumentEditor({
   onUpload,
   readOnly = false,
 }: DocumentEditorProps) {
+  const intl = useIntl()
   const editorRef = useRef<HTMLDivElement>(null)
   const isInternalChange = useRef(false)
   const [editableTitle, setEditableTitle] = useState(title)
@@ -291,48 +293,55 @@ export default function DocumentEditor({
 
   return (
     <div
-      className={`flex flex-col rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden transition-all ${
+      className={`flex flex-col rounded-2xl border border-[#2A2E3D] bg-[#0B1116] shadow-sm overflow-hidden transition-all dark:bg-[#111318] dark:border-[#2A2E3D] ${
         isFullscreen ? 'fixed inset-4 z-50 shadow-2xl' : ''
       }`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-3 bg-slate-50">
+      <div className="flex items-center justify-between gap-3 border-b border-[#2A2E3D] px-5 py-3 bg-[#0F1729]">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="text-xs font-medium text-slate-400 uppercase tracking-wider shrink-0">
+            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider shrink-0 dark:text-[#93C5FD]">
             Editor
           </span>
           {readOnly ? (
-            <span className="text-sm font-semibold text-slate-700 truncate">{editableTitle}</span>
+            <span className="text-sm font-semibold text-slate-700 truncate dark:text-white">{editableTitle}</span>
           ) : (
             <input
               value={editableTitle}
               onChange={(e) => setEditableTitle(e.target.value)}
-              className="flex-1 min-w-0 bg-transparent text-sm font-semibold text-slate-800 focus:outline-none border-b border-transparent focus:border-blue-400 transition-colors"
-              placeholder="Título del documento"
+              className="flex-1 min-w-0 bg-transparent text-sm font-semibold text-slate-800 dark:text-white focus:outline-none border-b border-transparent focus:border-blue-400 transition-colors"
+              placeholder={intl.formatMessage({ id: 'documentEditor.titlePlaceholder', defaultMessage: 'Document title' })}
             />
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {/* Stats */}
-          <span className="hidden sm:block text-xs text-slate-400">
-            {wordCount} palabras · {charCount} caracteres
+          <span className="hidden sm:block text-xs text-slate-400 dark:text-white/60">
+            {intl.formatMessage(
+              { id: 'documentEditor.stats', defaultMessage: '{words} words · {chars} characters' },
+              { words: wordCount, chars: charCount },
+            )}
           </span>
           {/* Auto-save indicator */}
           {!readOnly && (
             <span
               className={`text-xs transition-opacity ${isSaved ? 'text-green-500 opacity-100' : 'text-slate-300 opacity-60'}`}
             >
-              {isSaved ? '✓ Guardado' : '○ Sin guardar'}
+              {isSaved
+                ? intl.formatMessage({ id: 'documentEditor.saved', defaultMessage: '✓ Saved' })
+                : intl.formatMessage({ id: 'documentEditor.unsaved', defaultMessage: '○ Unsaved' })}
             </span>
           )}
           {/* Copy button */}
           <button
             type="button"
             onClick={handleCopy}
-            title="Copiar como texto"
-            className="rounded-lg px-2 py-1 text-xs font-medium text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition"
+            title={intl.formatMessage({ id: 'documentEditor.copyAsText', defaultMessage: 'Copy as text' })}
+            className="rounded-lg px-2 py-1 text-xs font-medium text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition dark:text-white/60 dark:hover:bg-[#0F1729]"
           >
-            {isCopied ? '✓ Copiado' : 'Copiar'}
+            {isCopied
+              ? intl.formatMessage({ id: 'documentEditor.copied', defaultMessage: '✓ Copied' })
+              : intl.formatMessage({ id: 'documentEditor.copy', defaultMessage: 'Copy' })}
           </button>
           
           {/* Upload button */}
@@ -346,7 +355,7 @@ export default function DocumentEditor({
               }}
               className="rounded-lg bg-green-600 px-3 py-1 text-xs font-semibold text-white hover:bg-green-700 transition"
             >
-              Subir
+              {intl.formatMessage({ id: 'documentEditor.upload', defaultMessage: 'Upload' })}
             </button>
           )}
 
@@ -357,14 +366,16 @@ export default function DocumentEditor({
               onClick={handleSave}
               className="rounded-lg bg-blue-600 px-3 py-1 text-xs font-semibold text-white hover:bg-blue-700 transition"
             >
-              Guardar
+              {intl.formatMessage({ id: 'documentEditor.save', defaultMessage: 'Save' })}
             </button>
           )}
           {/* Fullscreen toggle */}
           <button
             type="button"
             onClick={() => setIsFullscreen((v) => !v)}
-            title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+            title={isFullscreen
+              ? intl.formatMessage({ id: 'documentEditor.exitFullscreen', defaultMessage: 'Exit fullscreen' })
+              : intl.formatMessage({ id: 'documentEditor.fullscreen', defaultMessage: 'Fullscreen' })}
             className="rounded-lg px-2 py-1 text-xs text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition"
           >
             {isFullscreen ? '⊠' : '⊡'}
@@ -374,46 +385,35 @@ export default function DocumentEditor({
 
       {/* Toolbar */}
       {!readOnly && (
-        <div className="flex flex-wrap items-center gap-0.5 border-b border-slate-100 px-3 py-1.5 bg-white">
+        <div className="flex flex-wrap items-center gap-0.5 border-b border-[#2A2E3D] px-3 py-1.5 bg-[#0F1729]">
           {TOOLBAR_BUTTONS.map((item, index) => {
             if ('separator' in item) {
-              return (
-                <div
-                  key={`sep-${index}`}
-                  className="mx-1 h-5 w-px bg-slate-200"
-                />
-              )
+              return <div key={`sep-${index}`} className="w-px h-6 bg-slate-200/10 mx-2" />
             }
             const isActive = activeFormats.has(item.command)
             return (
               <button
                 key={item.command}
                 type="button"
-                title={item.title}
+                title={intl.formatMessage({ id: `documentEditor.toolbar.${item.command}`, defaultMessage: item.title })}
                 onMouseDown={(e) => {
                   e.preventDefault() // evita perder el foco del editor
                   applyFormat(item.command)
                 }}
                 className={`rounded-md px-2 py-1 text-xs font-semibold transition select-none ${
                   isActive
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                } ${
-                  item.command === 'bold' ? 'font-extrabold' : ''
-                } ${
-                  item.command === 'italic' ? 'italic' : ''
-                } ${
-                  item.command === 'underline' ? 'underline' : ''
-                }`}
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-white'
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-white/60 dark:hover:bg-[#0F1729]'
+                } ${item.command === 'bold' ? 'font-extrabold' : ''} ${item.command === 'italic' ? 'italic' : ''} ${item.command === 'underline' ? 'underline' : ''}`}
               >
                 {item.label}
               </button>
             )
           })}
-          <div className="ml-auto flex items-center gap-1 text-xs text-slate-400">
-            <kbd className="rounded border border-slate-200 px-1 py-0.5 font-mono text-xs">Ctrl+B</kbd>
-            <kbd className="rounded border border-slate-200 px-1 py-0.5 font-mono text-xs">Ctrl+I</kbd>
-            <kbd className="rounded border border-slate-200 px-1 py-0.5 font-mono text-xs">Ctrl+S</kbd>
+          <div className="ml-auto flex items-center gap-1 text-xs text-slate-400 dark:text-white/60">
+            <kbd className="rounded border border-[#2A2E3D] px-1 py-0.5 font-mono text-xs">Ctrl+B</kbd>
+            <kbd className="rounded border border-[#2A2E3D] px-1 py-0.5 font-mono text-xs">Ctrl+I</kbd>
+            <kbd className="rounded border border-[#2A2E3D] px-1 py-0.5 font-mono text-xs">Ctrl+S</kbd>
           </div>
         </div>
       )}
@@ -434,28 +434,26 @@ export default function DocumentEditor({
           onMouseUp={updateActiveFormats}
           onKeyDown={handleKeyDown}
           spellCheck
-          className={`min-h-[400px] px-8 py-6 text-sm leading-7 text-slate-800 focus:outline-none
-            [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-slate-900 [&_h1]:mt-6 [&_h1]:mb-3 [&_h1]:border-b [&_h1]:border-slate-200 [&_h1]:pb-2
-            [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-slate-800 [&_h2]:mt-5 [&_h2]:mb-2
-            [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-700 [&_h3]:mt-4 [&_h3]:mb-1
-            [&_p]:mb-3 [&_p]:text-slate-700
+          className={`min-h-[400px] px-8 py-6 text-sm leading-7 text-white focus:outline-none bg-[#071016]
+            [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-white [&_h1]:mt-6 [&_h1]:mb-3 [&_h1]:border-b [&_h1]:border-[#2A2E3D] [&_h1]:pb-2
+            [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:text-white [&_h2]:mt-5 [&_h2]:mb-2
+            [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-white [&_h3]:mt-4 [&_h3]:mb-1
+            [&_p]:mb-3 [&_p]:text-white
             [&_ul]:mb-3 [&_ul]:pl-5 [&_ul]:list-disc [&_ul_li]:mb-1
             [&_ol]:mb-3 [&_ol]:pl-5 [&_ol]:list-decimal [&_ol_li]:mb-1
-            [&_blockquote]:border-l-4 [&_blockquote]:border-blue-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:my-3
-            [&_hr]:border-slate-200 [&_hr]:my-6
-            [&_strong]:font-semibold [&_strong]:text-slate-900
+            [&_blockquote]:border-l-4 [&_blockquote]:border-blue-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-white [&_blockquote]:my-3
+            [&_hr]:border-[#2A2E3D] [&_hr]:my-6
+            [&_strong]:font-semibold [&_strong]:text-white
             ${readOnly ? 'cursor-default' : 'cursor-text'}
           `}
-          data-placeholder="Empieza a escribir o genera un documento con IA..."
+          data-placeholder={intl.formatMessage({ id: 'documentEditor.placeholder', defaultMessage: 'Start typing or generate a document with AI...' })}
         />
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between border-t border-slate-100 px-5 py-2 bg-slate-50 text-xs text-slate-400">
-        <span>ISO 27001 · DANI Platform</span>
-        <span className="sm:hidden">
-          {wordCount} palabras
-        </span>
+      <div className="flex items-center justify-between border-t border-[#2A2E3D] px-5 py-2 bg-[#0F1729] text-xs text-white/60">
+        <span className="text-white/60">{intl.formatMessage({ id: 'documentEditor.footerBrand', defaultMessage: 'ISO 27001 · DANI Platform' })}</span>
+        <span className="sm:hidden text-white/60">{intl.formatMessage({ id: 'documentEditor.mobileWords', defaultMessage: '{count} words' }, { count: wordCount })}</span>
       </div>
 
       {/* Placeholder CSS via style tag */}

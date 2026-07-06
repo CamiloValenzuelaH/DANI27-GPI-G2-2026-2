@@ -5,7 +5,11 @@ import base64
 import csv
 import io
 import json
+import markdown
+from pathlib import Path
+from xhtml2pdf import pisa
 import textwrap
+import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Any
@@ -18,18 +22,21 @@ from app.core.config import settings
 from app.db.database import SessionLocal
 from celery.exceptions import SoftTimeLimitExceeded
 from app.models.report_job import ReportJob
-from app.models.assessment_progress import AssessmentProgress
 from app.models.audit_checklist import AuditChecklist
+from app.models.assessment_progress import AssessmentProgress
 from app.models.notification import NotificationType
 from app.models.risk import Risk
 from app.services.notification_service import notification_service
+from app.services.soa import compute_soa_summary
 from app.workers.celery_app import celery_app
+from app.workers.gemini_service import _call_deepseek_json
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 JOB_KEY_PREFIX = "report:job:"
 JOB_TTL_SECONDS = 60 * 60 * 24 * 7
 REPORT_DIR = "/tmp/reports"
+logger = logging.getLogger(__name__)
 
 
 def _job_key(job_id: str) -> str:
@@ -42,6 +49,7 @@ async def _publish_report_progress(
     progress: int,
     message: str,
     metadata: dict[str, Any],
+    file_path: str | None = None,
 ) -> None:
     redis_client = aioredis.from_url(settings.redis_url, decode_responses=True)
     try:
@@ -61,6 +69,7 @@ async def _publish_report_progress(
             "created_at": metadata.get("created_at", now),
             "created_date": metadata.get("created_date", now_date),
             "updated_at": now,
+            "file_path": file_path or metadata.get("file_path", ""),
         }
         await redis_client.hset(_job_key(job_id), mapping=payload)
         await redis_client.expire(_job_key(job_id), JOB_TTL_SECONDS)
@@ -80,6 +89,7 @@ async def _publish_report_progress(
                     report_template=metadata.get("report_template"),
                     report_format=metadata.get("report_format"),
                     created_date=metadata.get("created_date") or now_date,
+                    file_path=file_path,
                 )
                 db.add(record)
             else:
@@ -90,6 +100,8 @@ async def _publish_report_progress(
                 existing.report_template = metadata.get("report_template")
                 existing.report_format = metadata.get("report_format")
                 existing.created_date = metadata.get("created_date") or existing.created_date
+                if file_path is not None:
+                    existing.file_path = file_path
             db.commit()
         except Exception:
             try:
@@ -123,82 +135,84 @@ def _generate_pdf(
     template: str,
     generated_at: str,
 ) -> bytes:
+    
+    # Convertimos el texto a HTML
+    html_content = markdown.markdown(content, extensions=['tables', 'fenced_code'])
+
+    # Plantilla HTML refinada
+    html_template = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <style>
+            @page {{
+                size: letter portrait;
+                margin: 2.5cm;
+                @frame header_frame {{
+                    -pdf-frame-content: header_content;
+                    left: 2.5cm; width: 16.5cm; top: 1cm; height: 1cm;
+                }}
+                @frame footer_frame {{
+                    -pdf-frame-content: footer_content;
+                    left: 2.5cm; width: 16.5cm; bottom: 1cm; height: 1cm;
+                }}
+            }}
+            body {{
+                font-family: Helvetica, sans-serif;
+                font-size: 11pt;
+                color: #334155;
+                line-height: 1.6;
+            }}
+            h1 {{ color: #0f172a; font-size: 20pt; border-bottom: 2px solid #2563eb; padding-bottom: 5px; margin-top: 20px; margin-bottom: 15px; }}
+            h2 {{ color: #1e293b; font-size: 14pt; margin-top: 25px; margin-bottom: 10px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }}
+            h3 {{ color: #334155; font-size: 12pt; font-weight: bold; }}
+            p {{ margin-bottom: 15px; text-align: justify; }}
+            ul, ol {{ margin-bottom: 15px; margin-left: 20px; }}
+            li {{ margin-bottom: 8px; }}
+            table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; margin-top: 10px; }}
+            th, td {{ border: 1px solid #cbd5e1; padding: 10px; text-align: left; vertical-align: top; }}
+            th {{ background-color: #f8fafc; font-weight: bold; color: #0f172a; }}
+
+            .cover-page {{ text-align: center; margin-top: 150px; }}
+            .cover-title {{ font-size: 28pt; font-weight: bold; color: #0f172a; margin-bottom: 20px; line-height: 1.2; }}
+            .cover-desc {{ font-size: 14pt; color: #64748b; margin-bottom: 50px; padding: 0 20px; }}
+            .cover-meta {{ font-size: 11pt; color: #475569; margin-top: 80px; padding: 25px; border-top: 3px solid #2563eb; background: #f8fafc; display: inline-block; text-align: left; border-radius: 8px; width: 60%; }}
+        </style>
+    </head>
+    <body>
+        <div id="header_content">
+            <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; color: #64748b; font-size: 9pt; text-align: right;">
+                <strong>DANI Platform</strong> | Sistema de Cumplimiento ISO 27001
+            </div>
+        </div>
+        <div id="footer_content" style="border-top: 1px solid #e2e8f0; padding-top: 5px; font-size: 9pt; color: #94a3b8; text-align: center;">
+            Página <pdf:pagenumber> de <pdf:pagecount>
+        </div>
+
+        <div class="cover-page">
+            <div class="cover-title">{title or "Documento ISO 27001"}</div>
+            <div class="cover-desc">{description or "Generado mediante asistencia de IA para el cumplimiento normativo."}</div>
+            <div class="cover-meta">
+                <strong style="color: #0f172a;">Plantilla:</strong> {template.replace('_', ' ').title()}<br><br>
+                <strong style="color: #0f172a;">Generado el:</strong> {generated_at}
+            </div>
+        </div>
+
+        <pdf:nextpage />
+
+        {html_content}
+    </body>
+    </html>
+    """
+
     buf = io.BytesIO()
-    c = canvas.Canvas(buf, pagesize=letter)
-    width, height = letter
-    x_margin = 40
-    y = height - 60
+    pisa_status = pisa.CreatePDF(io.StringIO(html_template), dest=buf)
 
-    def _new_page() -> None:
-        nonlocal y
-        c.showPage()
-        y = height - 60
+    if pisa_status.err:
+        raise Exception("Ocurrió un error al compilar el PDF con estilos.")
 
-    def _draw_line(text: str, font_name: str, font_size: int, leading: int) -> None:
-        nonlocal y
-        if y < 80:
-            _new_page()
-        c.setFont(font_name, font_size)
-        wrapped = textwrap.wrap(text, width=100)
-        for part in wrapped:
-            if y < 80:
-                _new_page()
-            c.drawString(x_margin, y, part)
-            y -= leading
-
-    # Portada simple
-    c.setFont("Helvetica-Bold", 22)
-    c.drawString(x_margin, y, title or "Reporte Ejecutivo")
-    y -= 28
-
-    c.setFont("Helvetica", 11)
-    if description:
-        for line in textwrap.wrap(description, width=95):
-            c.drawString(x_margin, y, line)
-            y -= 14
-        y -= 10
-
-    c.setFont("Helvetica-Oblique", 9)
-    c.drawString(x_margin, y, f"Plantilla: {template.replace('_', ' ').title()}    Generado: {generated_at}")
-    y -= 16
-
-    c.setStrokeColorRGB(0.65, 0.65, 0.65)
-    c.setLineWidth(0.8)
-    c.line(x_margin, y, width - x_margin, y)
-    y -= 26
-
-    # Contenido principal
-    for line in content.split("\n"):
-        if not line.strip():
-            y -= 10
-            continue
-        if line.endswith(":") and not line.startswith("•"):
-            c.setFont("Helvetica-Bold", 12)
-            if y < 80:
-                _new_page()
-            c.drawString(x_margin, y, line)
-            y -= 18
-            continue
-
-        if line.startswith("•"):
-            c.setFont("Helvetica", 10)
-            if y < 80:
-                _new_page()
-            wrapped = textwrap.wrap(line[2:], width=92)
-            c.drawString(x_margin + 12, y, "• " + wrapped[0])
-            y -= 14
-            for part in wrapped[1:]:
-                if y < 80:
-                    _new_page()
-                c.drawString(x_margin + 20, y, part)
-                y -= 14
-            continue
-
-        _draw_line(line, "Helvetica", 10, 14)
-
-    c.save()
-    buf.seek(0)
-    return buf.read()
+    return buf.getvalue()
 
 
 def _generate_csv(document: dict[str, Any]) -> bytes:
@@ -290,44 +304,16 @@ def _render_template_data(template: str, organization_id: str, db_payload: dict[
         pass
 
     with SessionLocal() as db:
+        STATUS_MAP = {
+            "pending": "Pendiente",
+            "completed": "Completado",
+            "done": "Completado",
+            "in_progress": "En progreso",
+            "na": "No aplica",
+        }
+
         if template == "soa":
-            audit = db.query(AuditChecklist).filter(AuditChecklist.organization_id == org_id).first()
-            controls = []
-            implemented = 0
-            pending = 0
-            if audit and isinstance(audit.checklist_data, list):
-                for idx, item in enumerate(audit.checklist_data):
-                    status = item.get("status", "Desconocido")
-                    if status.lower() in {"implementado", "completo", "cerrado", "done"}:
-                        implemented += 1
-                    else:
-                        pending += 1
-                    controls.append(
-                        {
-                            "control": item.get("control", f"Control {idx + 1}"),
-                            "status": status,
-                            "justification": item.get("justification", "Sin justificación"),
-                        }
-                    )
-            if not controls:
-                controls = [
-                    {
-                        "control": "Sin controles definidos",
-                        "status": "No disponible",
-                        "justification": "No se encontraron datos de checklist.",
-                    }
-                ]
-            coverage = f"{implemented}/{len(controls)} controles implementados" if controls else "Sin datos de controles"
-            summary = (
-                "Evaluación del SOA con foco en la madurez de controles y la identificación de brechas. "
-                f"Actualmente se identifican {coverage}."
-            )
-            return {
-                "summary": summary,
-                "controls": controls,
-                "implemented_controls": implemented,
-                "pending_controls": pending,
-            }
+            return compute_soa_summary(org_id, db)
 
         if template == "risk_register":
             risks = db.query(Risk).filter(Risk.organization_id == org_id).all()
@@ -361,13 +347,16 @@ def _render_template_data(template: str, organization_id: str, db_payload: dict[
             progress = db.query(AssessmentProgress).filter(AssessmentProgress.organization_id == org_id).first()
             breaches = []
             for item in (audit.checklist_data if audit and isinstance(audit.checklist_data, list) else [])[:12]:
-                breaches.append(
-                    {
-                        "item": item.get("control", "Control"),
-                        "status": item.get("status", "Pendiente"),
-                        "recommendation": item.get("recommendation", "Revisar el control."),
-                    }
-                )
+                raw_status = item.get("status", "").lower()
+                status_display = STATUS_MAP.get(raw_status, item.get("status") or "Pendiente")
+                control_code = item.get("control_code") or ""
+                title = item.get("title") or "Control"
+                control_label = f"{control_code} — {title}" if control_code else title
+                breaches.append({
+                    "item": control_label,
+                    "status": status_display,
+                    "recommendation": item.get("notes") or "Sin notas registradas.",
+                })
             if not breaches:
                 breaches = [
                     {
@@ -379,7 +368,7 @@ def _render_template_data(template: str, organization_id: str, db_payload: dict[
             score = 0
             total = len(breaches)
             if total > 0:
-                score = sum(1 for breach in breaches if breach["status"].lower() in {"implementado", "completo", "cerrado", "done"}) * 100 // total
+                score = sum(1 for b in breaches if b["status"].lower() in {"implementado", "completo", "cerrado", "done", "completado"}) * 100 // total
             overall_status = "Satisfactorio" if score >= 70 else "Moderado" if score >= 40 else "Crítico"
             trend = "Estable" if not progress or not isinstance(progress.progress_data, dict) else progress.progress_data.get("status", "Estable")
             return {
@@ -393,41 +382,67 @@ def _render_template_data(template: str, organization_id: str, db_payload: dict[
             }
 
         if template == "gap_analysis":
-            progress = db.query(AssessmentProgress).filter(AssessmentProgress.organization_id == org_id).first()
+            from app.api.v1.assessment import compute_gaps_summary
+
+            gaps_data = compute_gaps_summary(org_id, db)
             phases = []
             completed = 0
             pending = 0
-            if progress and isinstance(progress.progress_data, dict):
-                for phase, value in progress.progress_data.items():
-                    status = "Completo" if value in {"complete", "completed", True, 1} else "Pendiente"
-                    if status == "Completo":
-                        completed += 1
-                    else:
-                        pending += 1
-                    phases.append(
-                        {
-                            "phase": phase.capitalize(),
-                            "status": status,
-                            "recommendation": "Revisar y actualizar el estado de la fase.",
-                        }
+
+            for phase_detail in gaps_data["phase_details"]:
+                if phase_detail["percent"] == 100:
+                    status = "Completo"
+                elif phase_detail["answered"] == 0:
+                    status = "Pendiente"
+                else:
+                    status = "En progreso"
+
+                if phase_detail["unanswered"] > 0:
+                    recommendation = (
+                        f"{phase_detail['unanswered']} preguntas sin responder"
+                        + (f", {phase_detail['critical_unanswered']} críticas" if phase_detail["critical_unanswered"] > 0 else "")
                     )
+                else:
+                    recommendation = "Fase completa"
+
+                phases.append(
+                    {
+                        "phase": phase_detail["phase_name"],
+                        "status": status,
+                        "recommendation": recommendation,
+                    }
+                )
+
+                if status == "Completo":
+                    completed += 1
+                else:
+                    pending += 1
+
             if not phases:
                 phases = [
                     {
-                        "phase": "Planificación",
-                        "status": "Pendiente",
-                        "recommendation": "Registre el progreso de la evaluación para iniciar el gap analysis.",
+                        "phase": "Sin fases configuradas",
+                        "status": "N/A",
+                        "recommendation": "No hay fases de assessment configuradas en el sistema.",
                     }
                 ]
-            phase_summary = f"{completed} fases completas, {pending} pendientes"
+
+            completion_percentage = int(gaps_data["overall_progress"])
+            answered = gaps_data["answered"]
+            total = gaps_data["total_questions"]
+            critical_unanswered = gaps_data["critical_unanswered"]
+
             return {
                 "summary": (
                     "Gap analysis con enfoque en la brecha entre estado actual y objetivos de cumplimiento. "
-                    f"Resumen: {phase_summary}."
+                    f"Progreso: {answered}/{total} preguntas respondidas ({completion_percentage}%). "
+                    f"Brechas críticas pendientes: {critical_unanswered}."
                 ),
                 "phases": phases,
                 "completed_phases": completed,
                 "pending_phases": pending,
+                "completion_percentage": completion_percentage,
+                "critical_unanswered": critical_unanswered,
             }
 
     return {"summary": "Datos del reporte no disponibles."}
@@ -449,13 +464,20 @@ def _build_report_document(
             intro_lines.extend(textwrap.wrap(description, width=100))
         sections.append({"heading": "Resumen ejecutivo", "paragraphs": intro_lines})
 
-    sections.append({"heading": "Hallazgos", "paragraphs": [rendered.get("summary", "") or "No hay resumen disponible."]})
+    summary_text = rendered.get("ai_summary") or rendered.get("summary", "")
+    sections.append({"heading": "Hallazgos", "paragraphs": [summary_text or "No hay resumen disponible."]})
+
+    if rendered.get("document_context"):
+        sections.append({
+            "heading": "Documento de referencia",
+            "paragraphs": [rendered.get("document_context")],
+        })
 
     if template == "soa":
         controls = rendered.get("controls", [])
         sections.append({
             "heading": "Controles de seguridad",
-            "rows": [["Control", "Estado", "Justificación"]] + [[c["control"], c["status"], c["justification"]] for c in controls],
+            "rows": [["Control", "Estado", "Justificación"]] + [[c["control"], c["implementation_status"], c["exclusion_justification"]] for c in controls],
         })
         sections.append({
             "heading": "Conclusiones",
@@ -504,6 +526,27 @@ def _build_report_document(
             ],
         })
 
+    actions = rendered.get("ai_recommended_actions")
+    if actions:
+        actions_paragraphs = [str(action) for action in actions]
+    else:
+        if template == "soa":
+            actions_paragraphs = ["Priorice la completitud de controles con estado pendiente y documente evidencia concreta para cada hallazgo."]
+        elif template == "risk_register":
+            actions_paragraphs = ["A partir de esta clasificación, enfoque las mitigaciones en riesgos de nivel alto y medio-alto."]
+        elif template == "audit_report":
+            actions_paragraphs = ["Focalice esfuerzos en cerrar los hallazgos con mayor impacto operativo y validar evidencia de cierre."]
+        elif template == "gap_analysis":
+            actions_paragraphs = ["Alinee el cierre de fases pendientes con el cronograma de riesgo y la capacidad del equipo."]
+        else:
+            actions_paragraphs = []
+
+    if actions_paragraphs:
+        sections.append({
+            "heading": "Acciones recomendadas",
+            "paragraphs": actions_paragraphs,
+        })
+
     if generated_at:
         sections.insert(0, {"heading": "Metadatos", "paragraphs": [f"Generado: {generated_at}", f"Plantilla: {template.replace('_', ' ').title()}"]})
 
@@ -517,89 +560,95 @@ def _render_report_text(
     description: str | None = None,
 ) -> str:
     lines: list[str] = []
-    if title:
-        lines.append(title)
-    if description:
-        lines.append(description)
-    lines.append(f"Plantilla: {template.replace('_', ' ').title()}")
-    lines.append("")
-    lines.append("Resumen ejecutivo:")
-    lines.append(rendered.get("summary", ""))
-    lines.append("")
+    
+    # Eliminamos la repetición del título porque la portada ya lo tiene.
+    lines.append("## Resumen ejecutivo")
+    
+    # Aseguramos que el texto del editor tenga saltos de línea dobles
+    # para que no se aglomere en un solo bloque.
+    summary_text = rendered.get("ai_summary") or rendered.get("summary", "")
+    summary_text = summary_text.replace("\n", "\n\n")
+    lines.append(summary_text)
+
+    document_context = rendered.get("document_context")
+    if document_context:
+        lines.append("## Documento de referencia")
+        lines.append(str(document_context).replace("\n", "\n\n"))
 
     if template == "soa":
         implemented = rendered.get("implemented_controls")
         pending = rendered.get("pending_controls")
         if implemented is not None and pending is not None:
-            lines.append("Estado actual de controles:")
-            lines.append(f"- Controles implementados: {implemented}")
-            lines.append(f"- Controles pendientes: {pending}")
-            lines.append("")
-        lines.append("Detalles de controles:")
+            lines.append("## Estado actual de controles")
+            lines.append(f"- **Controles implementados:** {implemented}")
+            lines.append(f"- **Controles pendientes:** {pending}")
+        lines.append("## Detalles de controles")
         for control in rendered.get("controls", []):
-            lines.append(
-                f"• {control['control']} — Estado: {control['status']}. Justificación: {control['justification']}"
-            )
-        lines.append("")
-        lines.append("Recomendaciones principales:")
-        lines.append(
-            "Priorice la completitud de controles con estado pendiente y documente evidencia concreta para cada hallazgo."
-        )
+            lines.append(f"- **{control['control']}**<br>Estado: *{control['implementation_status']}*<br>Justificación: {control['exclusion_justification']}")
+        if rendered.get("ai_recommended_actions"):
+            lines.append("## Acciones recomendadas")
+            for action in rendered["ai_recommended_actions"]:
+                lines.append(f"- {action}")
+        else:
+            lines.append("## Recomendaciones principales")
+            lines.append("Priorice la completitud de controles con estado pendiente y documente evidencia concreta para cada hallazgo.")
+        
     elif template == "risk_register":
         counts = rendered.get("risk_counts", {})
         if counts:
-            lines.append("Distribución de riesgos:")
+            lines.append("## Distribución de riesgos")
             for level, count in counts.items():
-                lines.append(f"- {level}: {count}")
-            lines.append("")
-        lines.append("Riesgos clave:")
+                lines.append(f"- **{level}:** {count}")
+        lines.append("## Riesgos clave")
         for row in rendered.get("rows", []):
             if row and row[0] != "Riesgo":
-                lines.append(
-                    f"• {row[0]} (Activo: {row[1]}, Probabilidad: {row[2]}, Impacto: {row[3]}, Nivel: {row[4]})"
-                )
-        lines.append("")
-        lines.append("Implicaciones:")
-        lines.append(
-            "A partir de esta clasificación, enfoque las mitigaciones en riesgos de nivel alto y medio-alto."
-        )
+                lines.append(f"- **{row[0]}** (Activo: {row[1]}, Probabilidad: {row[2]}, Impacto: {row[3]}, Nivel: {row[4]})")
+        if rendered.get("ai_recommended_actions"):
+            lines.append("## Acciones recomendadas")
+            for action in rendered["ai_recommended_actions"]:
+                lines.append(f"- {action}")
+        else:
+            lines.append("## Implicaciones")
+            lines.append("A partir de esta clasificación, enfoque las mitigaciones en riesgos de nivel alto y medio-alto.")
+        
     elif template == "audit_report":
         score = rendered.get("score")
         trend = rendered.get("trend")
         if score is not None:
-            lines.append("Métrica de cumplimiento:")
-            lines.append(f"- Health score estimado: {score}%")
-            lines.append(f"- Tendencia del programa: {trend}")
-            lines.append("")
-        lines.append("Hallazgos operativos:")
+            lines.append("## Métrica de cumplimiento")
+            lines.append(f"- **Health score estimado:** {score}%")
+            lines.append(f"- **Tendencia del programa:** {trend}")
+        lines.append("## Hallazgos operativos")
         for breach in rendered.get("breaches", []):
-            lines.append(
-                f"• {breach['item']} — Estado: {breach['status']}. Recomendación: {breach['recommendation']}"
-            )
-        lines.append("")
-        lines.append("Acciones recomendadas:")
-        lines.append(
-            "Focalice esfuerzos en cerrar los hallazgos con mayor impacto operativo y validar evidencia de cierre."
-        )
+            lines.append(f"- **{breach['item']}**<br>Estado: *{breach['status']}*<br>Recomendación: {breach['recommendation']}")
+        if rendered.get("ai_recommended_actions"):
+            lines.append("## Acciones recomendadas")
+            for action in rendered["ai_recommended_actions"]:
+                lines.append(f"- {action}")
+        else:
+            lines.append("## Acciones recomendadas")
+            lines.append("Focalice esfuerzos en cerrar los hallazgos con mayor impacto operativo y validar evidencia de cierre.")
+        
     elif template == "gap_analysis":
         completed = rendered.get("completed_phases")
         pending = rendered.get("pending_phases")
         if completed is not None and pending is not None:
-            lines.append("Progreso del programa:")
-            lines.append(f"- Fases completadas: {completed}")
-            lines.append(f"- Fases pendientes: {pending}")
-            lines.append("")
-        lines.append("Estado por fase:")
+            lines.append("## Progreso del programa")
+            lines.append(f"- **Fases completadas:** {completed}")
+            lines.append(f"- **Fases pendientes:** {pending}")
+        lines.append("## Estado por fase")
         for phase in rendered.get("phases", []):
-            lines.append(
-                f"• {phase['phase']} — Estado: {phase['status']}. Recomendación: {phase['recommendation']}"
-            )
-        lines.append("")
-        lines.append("Siguiente pasos:")
-        lines.append(
-            "Alinee el cierre de fases pendientes con el cronograma de riesgo y la capacidad del equipo."
-        )
-    return "\n".join(lines)
+            lines.append(f"- **{phase['phase']}**<br>Estado: *{phase['status']}*<br>Recomendación: {phase['recommendation']}")
+        if rendered.get("ai_recommended_actions"):
+            lines.append("## Acciones recomendadas")
+            for action in rendered["ai_recommended_actions"]:
+                lines.append(f"- {action}")
+        else:
+            lines.append("## Siguiente pasos")
+            lines.append("Alinee el cierre de fases pendientes con el cronograma de riesgo y la capacidad del equipo.")
+        
+    # Unimos todo con \n\n para que Markdown respete los espacios entre párrafos
+    return "\n\n".join(lines)
 
 
 def _render_rows(
@@ -619,7 +668,7 @@ def _render_rows(
 
     if template == "soa":
         rows.append(["Control", "Estado", "Justificación"])
-        rows.extend([[c["control"], c["status"], c["justification"]] for c in rendered.get("controls", [])])
+        rows.extend([[c["control"], c["implementation_status"], c["exclusion_justification"]] for c in rendered.get("controls", [])])
         rows.append([])
         rows.append(["Indicadores", "Valor"])
         rows.append(["Controles implementados", rendered.get("implemented_controls", "-")])
@@ -651,6 +700,38 @@ def _render_rows(
     return rows
 
 
+async def _enrich_report_with_ai(template: str, rendered: dict[str, Any]) -> dict[str, Any]:
+    """Enriquece el resumen y agrega recomendaciones usando IA, basado en datos reales ya calculados.
+    Si falla, retorna el rendered original sin cambios."""
+    try:
+        system_prompt = (
+            "Eres un consultor experto en cumplimiento ISO 27001. Recibes datos reales ya calculados "
+            "de un reporte de auditoría/riesgos. Tu trabajo es redactar un resumen ejecutivo profesional "
+            "y 3-4 acciones recomendadas concretas, basándote ÚNICAMENTE en los datos proporcionados. "
+            "NO inventes números, controles, o riesgos que no estén en los datos. "
+            "Responde en JSON con esta estructura exacta: "
+            '{"executive_summary": "texto de 2-3 párrafos", "recommended_actions": ["acción 1", "acción 2", "acción 3"]}'
+        )
+        user_prompt = f"Template: {template}\n\nDatos del reporte:\n{json.dumps(rendered, ensure_ascii=False, default=str)}"
+        
+        result = await _call_deepseek_json(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            max_output_tokens=800,
+            temperature=0.3,
+        )
+        
+        if result.get("executive_summary"):
+            rendered["ai_summary"] = result["executive_summary"]
+        if result.get("recommended_actions"):
+            rendered["ai_recommended_actions"] = result["recommended_actions"]
+        
+        return rendered
+    except Exception as exc:
+        logger.warning(f"AI enrichment failed for report, using fallback text: {exc}")
+        return rendered
+
+
 @celery_app.task(bind=True, name="generate_report")
 def generate_report(
     self,
@@ -659,13 +740,20 @@ def generate_report(
     organization_id: str,
     user_id: str,
 ):
-    async def _update_state(status: str, progress: int, message: str, metadata: dict[str, Any]) -> None:
+    async def _update_state(
+        status: str,
+        progress: int,
+        message: str,
+        metadata: dict[str, Any],
+        file_path: str | None = None,
+    ) -> None:
         await _publish_report_progress(
             job_id=job_id,
             status=status,
             progress=progress,
             message=message,
             metadata=metadata,
+            file_path=file_path,
         )
 
     async def _generate_job() -> dict[str, Any]:
@@ -680,7 +768,10 @@ def generate_report(
         }
 
         await _update_state("started", 10, "Iniciando generación de reporte", metadata)
+        
         rendered = _render_template_data(request_data.get("template"), organization_id, request_data)
+        rendered = await _enrich_report_with_ai(request_data.get("template"), rendered)
+
         document = _build_report_document(
             request_data.get("template"),
             rendered,
@@ -688,6 +779,7 @@ def generate_report(
             request_data.get("description"),
             metadata["created_at"],
         )
+
         text_content = _render_report_text(
             request_data.get("template"),
             rendered,
@@ -716,6 +808,11 @@ def generate_report(
         else:
             raise ValueError("Formato de reporte no soportado")
 
+        report_dir = Path(REPORT_DIR) / organization_id
+        report_dir.mkdir(parents=True, exist_ok=True)
+        file_path = str(report_dir / f"{job_id}.{report_format}")
+        Path(file_path).write_bytes(report_bytes)
+
         encoded = base64.b64encode(report_bytes).decode("utf-8")
         download_key = f"report:download:{job_id}"
         redis_client = aioredis.from_url(settings.redis_url, decode_responses=True)
@@ -724,7 +821,7 @@ def generate_report(
         finally:
             await redis_client.close()
 
-        await _update_state("completed", 100, "Reporte generado exitosamente", {**metadata, "download_url": ""})
+        await _update_state("completed", 100, "Reporte generado exitosamente", {**metadata, "download_url": ""}, file_path=file_path)
         try:
             notification_service.send(
                 NotificationType.document_published,

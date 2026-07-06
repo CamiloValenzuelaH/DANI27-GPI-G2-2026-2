@@ -69,6 +69,8 @@ def update_user(user_id: UUID, data: UpdateUserRequest, org_id: UUID, db: Sessio
         user.full_name = data.full_name
     if data.is_active is not None:
         user.is_active = data.is_active
+    if data.language is not None:
+        user.language = data.language
 
     db.commit()
     db.refresh(user)

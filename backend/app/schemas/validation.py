@@ -18,6 +18,22 @@ class ValidationJobResponse(BaseModel):
     stream_url: str
 
 
+class ValidationJobListItem(BaseModel):
+    job_id: str
+    status: JobState
+    progress: int = Field(ge=0, le=100)
+    message: str | None = None
+    organization_id: UUID | None = None
+    user_id: UUID | None = None
+    file_name: str | None = None
+    file_path: str | None = None
+    total_chunks: int = 0
+    overall_score: int | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    created_date: str | None = None
+
+
 class ValidationObservation(BaseModel):
     severity: SeverityLevel
     text: str
@@ -47,6 +63,8 @@ class ValidationReportResponse(BaseModel):
     overall_score: int | None = None
     findings: list[ChunkValidationResult] = Field(default_factory=list)
     summary: str | None = None
+    evidence_verified: bool | None = None
+    evidence_gaps: list[str] = Field(default_factory=list)
     error: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
@@ -56,6 +74,20 @@ class ValidationReportResponse(BaseModel):
 class ValidationSSEEnvelope(BaseModel):
     event: str
     data: ValidationReportResponse
+
+
+class CrossCheckRequest(BaseModel):
+    job_ids: list[str] = Field(min_items=2)
+
+
+class CrossCheckInconsistency(BaseModel):
+    description: str
+    documents: list[str] = Field(default_factory=list)
+    severity: SeverityLevel
+
+
+class CrossCheckResponse(BaseModel):
+    inconsistencies: list[CrossCheckInconsistency] = Field(default_factory=list)
 
 
 class GenerateMissingRequest(BaseModel):

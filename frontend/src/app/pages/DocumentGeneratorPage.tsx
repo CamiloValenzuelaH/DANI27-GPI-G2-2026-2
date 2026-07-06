@@ -1,4 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useIntl } from 'react-intl'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   DocumentDetailResponse,
@@ -15,6 +16,8 @@ import {
   generateReport,
   getReportStatus,
   getReportTemplates,
+  listReports,
+  deleteReport,
   ReportFormat,
   ReportStatusResponse,
   ReportTemplate,
@@ -41,7 +44,19 @@ const staticDocuments = [
 
 type EditorTab = 'view' | 'edit' | 'generate' | 'report' | 'upload'
 
+type ReportHistoryItem = {
+  job_id: string
+  report_title?: string
+  report_template?: string
+  report_format?: string
+  status: string
+  created_at?: string
+  file_path?: string | null
+  download_url?: string
+}
+
 export default function DocumentGeneratorPage() {
+  const intl = useIntl()
   const location = useLocation()
   const navigate = useNavigate()
   const params = useMemo(() => new URLSearchParams(location.search), [location.search])
@@ -53,6 +68,8 @@ export default function DocumentGeneratorPage() {
   const [isLoadingDocs, setIsLoadingDocs] = useState(false)
   const [isLoadingDocument, setIsLoadingDocument] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showAllDocuments, setShowAllDocuments] = useState(false)
 
   // ── Upload ───────────────────────────────────────────────────────
   const [uploadTitle, setUploadTitle] = useState('')
@@ -64,13 +81,14 @@ export default function DocumentGeneratorPage() {
   const [uploadLoading, setUploadLoading] = useState(false)
 
   // ── Generación IA ────────────────────────────────────────────────
-  const [generateTitle, setGenerateTitle] = useState('Nuevo documento ISO 27001')
+  const [generateTitle, setGenerateTitle] = useState(intl.formatMessage({ id: 'documents.generate.defaultTitle', defaultMessage: 'New ISO 27001 document' }))
   const [generateDescription, setGenerateDescription] = useState(
-    'Genera un documento obligatorio de ISO 27001 con soporte de IA.',
+    intl.formatMessage({ id: 'documents.generate.defaultDescription', defaultMessage: 'Generate a mandatory ISO 27001 document with AI support.' }),
   )
-  const [generateAudience, setGenerateAudience] = useState('Equipo de seguridad')
+  const [generateAudience, setGenerateAudience] = useState(intl.formatMessage({ id: 'documents.generate.defaultAudience', defaultMessage: 'Security team' }))
   const [generateLanguage, setGenerateLanguage] = useState('es')
   const [generateTone, setGenerateTone] = useState('formal')
+  const [generateType, setGenerateType] = useState<'policy' | 'report' | 'procedure' | 'general'>('policy')
   const [generateSections, setGenerateSections] = useState('')
   const [generateControlRefs, setGenerateControlRefs] = useState('')
   const [generateError, setGenerateError] = useState<string | null>(null)
@@ -84,19 +102,42 @@ export default function DocumentGeneratorPage() {
   const [reportTemplates, setReportTemplates] = useState<ReportTemplateResponse[]>([])
   const [selectedReportTemplate, setSelectedReportTemplate] = useState<ReportTemplate>('soa')
   const [reportFormat, setReportFormat] = useState<ReportFormat>('pdf')
-  const [reportTitle, setReportTitle] = useState('Reporte de cumplimiento')
-  const [reportDescription, setReportDescription] = useState('Resumen de estado y brechas de cumplimiento.')
+  const [reportTitle, setReportTitle] = useState(intl.formatMessage({ id: 'documents.report.defaultTitle', defaultMessage: 'Compliance report' }))
+  const [reportDescription, setReportDescription] = useState(intl.formatMessage({ id: 'documents.report.defaultDescription', defaultMessage: 'Status summary and compliance gaps.' }))
   const [reportJobId, setReportJobId] = useState<string | null>(null)
   const [reportStatus, setReportStatus] = useState<ReportStatusResponse | null>(null)
+  const [reportHistory, setReportHistory] = useState<ReportHistoryItem[]>([])
+  const [reportSearchQuery, setReportSearchQuery] = useState('')
+  const [showAllReports, setShowAllReports] = useState(false)
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [isGeneratingReport, setIsGeneratingReport] = useState(false)
   const [reportError, setReportError] = useState<string | null>(null)
+  const [exportStartTime, setExportStartTime] = useState<number | null>(null)
   const [isReportPolling, setIsReportPolling] = useState(false)
   const reportPollingRef = useRef<number | null>(null)
+
+  const filteredReportHistory = useMemo(() => {
+    const normalizedQuery = reportSearchQuery.trim().toLowerCase()
+
+    return [...reportHistory]
+      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+      .filter((entry) =>
+        entry.report_title?.toLowerCase().includes(normalizedQuery) ||
+        entry.report_template?.toLowerCase().includes(normalizedQuery),
+      )
+  }, [reportHistory, reportSearchQuery])
+
+  const visibleReportHistory = showAllReports ? filteredReportHistory : filteredReportHistory.slice(0, 5)
 
   // ── UI ───────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState<EditorTab>('view')
   // Contenido editable en el editor (independiente del original)
   const [editorContent, setEditorContent] = useState('')
+
+  // ── Exportación ──────────────────────────────────────────────────
+  const [exportTemplate, setExportTemplate] = useState('SOA')
+  const [exportFormat, setExportFormat] = useState('PDF')
+  const [isExporting, setIsExporting] = useState(false)
 
   // ── Computed ──────────────────────────────────────────────────────
   const allDocuments = useMemo(
@@ -129,6 +170,29 @@ export default function DocumentGeneratorPage() {
     return null
   }, [activeDocument, selectedStaticDocument])
 
+  const visibleDocuments = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+    const list = allDocuments
+      .map((doc) => ({
+        ...doc,
+        createdAt: doc.createdAt || new Date().toISOString(),
+      }))
+      .filter((doc) =>
+        doc.title.toLowerCase().includes(normalizedQuery) ||
+        (doc.description ?? '').toLowerCase().includes(normalizedQuery),
+      )
+
+    return showAllDocuments ? list : list.slice(0, 5)
+  }, [allDocuments, searchQuery, showAllDocuments])
+
+  const documentCount = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase()
+    return allDocuments.filter((doc) =>
+      doc.title.toLowerCase().includes(normalizedQuery) ||
+      (doc.description ?? '').toLowerCase().includes(normalizedQuery),
+    ).length
+  }, [allDocuments, searchQuery])
+
   // ── Carga de documentos ──────────────────────────────────────────
   const loadDocumentList = useCallback(async () => {
     setIsLoadingDocs(true)
@@ -137,11 +201,11 @@ export default function DocumentGeneratorPage() {
       const docs = await listDocuments()
       setUploadedDocuments(docs)
     } catch {
-      setLoadError('No se pudieron cargar los documentos. Intenta recargar la página.')
+      setLoadError(intl.formatMessage({ id: 'documents.error.loadList', defaultMessage: 'Could not load documents. Try reloading the page.' }))
     } finally {
       setIsLoadingDocs(false)
     }
-  }, [])
+  }, [intl])
 
   const loadSelectedDocument = useCallback(async () => {
     setIsLoadingDocument(true)
@@ -167,12 +231,24 @@ export default function DocumentGeneratorPage() {
       }
       setActiveDocument(null)
     } catch {
-      setLoadError('No se pudo cargar el documento seleccionado.')
+      setLoadError(intl.formatMessage({ id: 'documents.error.loadSelected', defaultMessage: 'Could not load the selected document.' }))
       setActiveDocument(null)
     } finally {
       setIsLoadingDocument(false)
     }
-  }, [selectedDocumentId, uploadedDocuments, selectedStaticDocument])
+  }, [selectedDocumentId, uploadedDocuments, selectedStaticDocument, intl])
+
+  const loadReportHistory = useCallback(async () => {
+    setIsLoadingHistory(true)
+    try {
+      const reports = await listReports()
+      setReportHistory(reports)
+    } catch (error) {
+      console.error('Error loading report history', error)
+    } finally {
+      setIsLoadingHistory(false)
+    }
+  }, [])
 
   useEffect(() => { loadDocumentList() }, [loadDocumentList])
   useEffect(() => { loadSelectedDocument() }, [loadSelectedDocument])
@@ -194,15 +270,35 @@ export default function DocumentGeneratorPage() {
   }, [])
 
   useEffect(() => {
+    loadReportHistory()
+  }, [loadReportHistory])
+
+  useEffect(() => {
     if (!reportJobId || !isReportPolling) return
 
     const pollStatus = async () => {
       try {
+        if (exportStartTime && Date.now() - exportStartTime >= 300000) {
+          if (reportPollingRef.current) {
+            window.clearInterval(reportPollingRef.current)
+            reportPollingRef.current = null
+          }
+          setReportError(intl.formatMessage({ id: 'documents.report.error.timeout', defaultMessage: 'Report generation took too long. Please try again.' }))
+          setIsReportPolling(false)
+          setIsGeneratingReport(false)
+          setExportStartTime(null)
+          return
+        }
+
         const status = await getReportStatus(reportJobId)
         setReportStatus(status)
+        if (status.status === 'completed') {
+          await loadReportHistory()
+        }
         if (status.status === 'completed' || status.status === 'failed') {
           setIsReportPolling(false)
           setIsGeneratingReport(false)
+          setExportStartTime(null)
           if (reportPollingRef.current) {
             window.clearInterval(reportPollingRef.current)
             reportPollingRef.current = null
@@ -210,9 +306,10 @@ export default function DocumentGeneratorPage() {
         }
       } catch (error) {
         console.error('Error polling report status', error)
-        setReportError('No se pudo obtener el estado del reporte. Intenta de nuevo.')
+        setReportError(intl.formatMessage({ id: 'documents.report.error.status', defaultMessage: 'Could not retrieve report status. Please try again.' }))
         setIsReportPolling(false)
         setIsGeneratingReport(false)
+        setExportStartTime(null)
         if (reportPollingRef.current) {
           window.clearInterval(reportPollingRef.current)
           reportPollingRef.current = null
@@ -230,11 +327,11 @@ export default function DocumentGeneratorPage() {
         reportPollingRef.current = null
       }
     }
-  }, [reportJobId, isReportPolling])
+  }, [reportJobId, isReportPolling, intl, exportStartTime, reportTitle, selectedReportTemplate, reportFormat, loadDocumentList])
 
   // ── Handlers ─────────────────────────────────────────────────────
   const handleDeleteDocument = async (docId: string) => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este documento?')) return;
+    if (!window.confirm(intl.formatMessage({ id: 'documents.confirmDelete', defaultMessage: 'Are you sure you want to delete this document?' }))) return;
     try {
       await deleteDocument(docId);
       setUploadedDocuments(prev => prev.filter(d => d.documentId !== docId));
@@ -246,9 +343,19 @@ export default function DocumentGeneratorPage() {
       }
     } catch (error) {
       console.error('Error al eliminar:', error);
-      alert('No se pudo eliminar el documento.');
+      alert(intl.formatMessage({ id: 'documents.error.delete', defaultMessage: 'Could not delete document.' }));
     }
   };
+
+  const handleDeleteReport = async (jobId: string) => {
+    if (!window.confirm(intl.formatMessage({ id: 'documents.report.confirmDelete', defaultMessage: 'Are you sure you want to delete this report?' }))) return;
+    try {
+      await deleteReport(jobId)
+      await loadReportHistory()
+    } catch (error) {
+      console.error('Error deleting report', error)
+    }
+  }
 
   const handleSelectDocument = (documentId: string) => {
     navigate(`/documents?docId=${documentId}`)
@@ -256,14 +363,21 @@ export default function DocumentGeneratorPage() {
   }
 
   const handleGenerateReport = async () => {
+    if (!selectedDocument?.documentId) {
+      setReportError(intl.formatMessage({ id: 'documents.report.error.selectFirst', defaultMessage: 'Please select a document from the sidebar first.' }));
+      return;
+    }
+
     setReportError(null)
+    setExportStartTime(Date.now())
     setIsGeneratingReport(true)
     setReportStatus(null)
     setReportJobId(null)
 
     try {
       const payload = {
-        title: reportTitle.trim() || 'Reporte de cumplimiento',
+        documentId: selectedDocument.documentId,
+        title: reportTitle.trim() || intl.formatMessage({ id: 'documents.report.defaultTitle', defaultMessage: 'Compliance report' }),
         description: reportDescription.trim(),
         template: selectedReportTemplate,
         format: reportFormat,
@@ -279,7 +393,7 @@ export default function DocumentGeneratorPage() {
       })
     } catch (error: any) {
       console.error('Error generating report', error)
-      setReportError(error?.response?.data?.detail ?? 'No se pudo iniciar la generación del reporte.')
+      setReportError(error?.response?.data?.detail ?? intl.formatMessage({ id: 'documents.report.error.start', defaultMessage: 'Could not start report generation.' }))
       setIsGeneratingReport(false)
     }
   }
@@ -294,6 +408,7 @@ export default function DocumentGeneratorPage() {
     setReportStatus(null)
     setReportError(null)
     setIsGeneratingReport(false)
+    setExportStartTime(null)
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -309,13 +424,13 @@ export default function DocumentGeneratorPage() {
     setUploadError(null)
     setUploadSuccess(null)
     if (!uploadFile && !uploadContent.trim()) {
-      setUploadError('Debes seleccionar un archivo o escribir el contenido.')
+      setUploadError(intl.formatMessage({ id: 'documents.upload.error.missingInput', defaultMessage: 'You must select a file or enter content.' }))
       return
     }
     setUploadLoading(true)
     try {
       const formData = new FormData()
-      formData.append('title', uploadTitle.trim() || (uploadFile?.name ?? 'Documento cargado'))
+      formData.append('title', uploadTitle.trim() || (uploadFile?.name ?? intl.formatMessage({ id: 'documents.upload.defaultTitle', defaultMessage: 'Uploaded document' })))
       if (uploadDescription.trim()) formData.append('description', uploadDescription.trim())
       if (uploadFile) {
         formData.append('file', uploadFile)
@@ -323,7 +438,7 @@ export default function DocumentGeneratorPage() {
         formData.append('content', uploadContent.trim())
       }
       const response = await uploadDocument(formData)
-      setUploadSuccess('Documento subido correctamente.')
+      setUploadSuccess(intl.formatMessage({ id: 'documents.upload.success', defaultMessage: 'Document uploaded successfully.' }))
       setUploadTitle('')
       setUploadDescription('')
       setUploadContent('')
@@ -331,12 +446,12 @@ export default function DocumentGeneratorPage() {
       setUploadedDocuments((prev) => [...prev, { 
         documentId: response.documentId,
         title: response.title,
-        description: uploadDescription.trim() || 'Documento Cargado',
+        description: uploadDescription.trim() || intl.formatMessage({ id: 'documents.upload.defaultDescription', defaultMessage: 'Uploaded document' }),
       }])
       navigate(`/documents?docId=${response.documentId}`)
       setActiveTab('view')
     } catch {
-      setUploadError('Error al subir el documento. Intenta de nuevo.')
+      setUploadError(intl.formatMessage({ id: 'documents.upload.error.generic', defaultMessage: 'Error uploading document. Please try again.' }))
     } finally {
       setUploadLoading(false)
     }
@@ -346,18 +461,17 @@ export default function DocumentGeneratorPage() {
     setGenerateError(null)
     setIsGenerating(true)
     setGenerationProgress(0)
-    setGenerationMessage('Iniciando generación...')
+    setGenerationMessage(intl.formatMessage({ id: 'documents.generate.starting', defaultMessage: 'Starting generation...' }))
     setGeneratedDocumentText('')
     setGeneratedDocumentTitle(generateTitle)
 
     try {
       const payload = {
-        title: generateTitle.trim() || 'Documento ISO 27001',
+        title: generateTitle.trim() || intl.formatMessage({ id: 'documents.generate.fallbackTitle', defaultMessage: 'ISO 27001 document' }),
         description: generateDescription.trim(),
         targetAudience: generateAudience.trim(),
         language: generateLanguage,
-        tone: generateTone,
-        sections: generateSections
+        tone: generateTone,        type: generateType,        sections: generateSections
           .split(/[,\n]/)
           .map((item) => item.trim())
           .filter(Boolean),
@@ -397,20 +511,20 @@ export default function DocumentGeneratorPage() {
         },
         () => {
           setIsGenerating(false)
-          setGenerationMessage('Generación completada')
+          setGenerationMessage(intl.formatMessage({ id: 'documents.generate.completed', defaultMessage: 'Generation completed' }))
           loadDocumentList()
         },
         (error) => {
           setIsGenerating(false)
           setGenerateError(error.message)
-          setGenerationMessage('Error en la generación')
+          setGenerationMessage(intl.formatMessage({ id: 'documents.generate.errorStatus', defaultMessage: 'Generation error' }))
         },
       )
     } catch {
-      setGenerateError('No se pudo iniciar la generación. Revisa la configuración.')
+      setGenerateError(intl.formatMessage({ id: 'documents.generate.errorStart', defaultMessage: 'Could not start generation. Check configuration.' }))
       setIsGenerating(false)
     }
-  }
+  } 
 
   const handleUploadGenerated = async (title: string, content: string) => {
     try {
@@ -423,7 +537,7 @@ export default function DocumentGeneratorPage() {
       setUploadedDocuments(prev => [...prev, {
         documentId: saved.documentId,
         title: saved.title,
-        description: generateDescription.trim() || 'Documento generado con IA'
+        description: generateDescription.trim() || intl.formatMessage({ id: 'documents.generate.defaultUploadedDescription', defaultMessage: 'AI-generated document' })
       }]);
       
       setGeneratedDocumentText('');
@@ -433,111 +547,147 @@ export default function DocumentGeneratorPage() {
       navigate(`/documents?docId=${saved.documentId}`);
       setActiveTab('view');
     } catch (error) {
-      alert('Error al subir el documento generado.');
+      alert(intl.formatMessage({ id: 'documents.generate.uploadError', defaultMessage: 'Error uploading generated document.' }));
     }
   };
 
   // ── Tab config ────────────────────────────────────────────────────
   const tabs: { id: EditorTab; label: string }[] = [
-    { id: 'view', label: 'Vista' },
-    { id: 'edit', label: 'Editor' },
-    { id: 'generate', label: 'Generar con IA' },
-    { id: 'report', label: 'Exportar reporte' },
-    { id: 'upload', label: 'Subir' },
+    { id: 'view', label: intl.formatMessage({ id: 'documents.tab.view', defaultMessage: 'View' }) },
+    { id: 'edit', label: intl.formatMessage({ id: 'documents.tab.edit', defaultMessage: 'Editor' }) },
+    { id: 'generate', label: intl.formatMessage({ id: 'documents.tab.generate', defaultMessage: 'Generate with AI' }) },
+    { id: 'report', label: intl.formatMessage({ id: 'documents.tab.report', defaultMessage: 'Export report' }) },
+    { id: 'upload', label: intl.formatMessage({ id: 'documents.tab.upload', defaultMessage: 'Upload' }) },
   ]
 
   return (
-    <div className="overflow-x-hidden px-3 py-6 sm:px-6 lg:px-8 max-w-full sm:max-w-7xl mx-auto space-y-6 pb-28 text-sm sm:text-base">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-semibold text-slate-900">Document Generator</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Crea, edita y gestiona documentos ISO 27001 con asistencia de IA.
-        </p>
+    <div className="p-8 max-w-7xl mx-auto">
+      <div className="mb-8 rounded-[28px] border border-[#1f2a45] bg-gradient-to-r from-[#08111f] via-[#0a1528] to-[#0c192f] p-8 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.9)]">
+        <h1 className="text-4xl font-semibold text-white tracking-tight">{intl.formatMessage({ id: 'documents.title', defaultMessage: 'Document Generator' })}</h1>
+        <p className="mt-3 max-w-2xl text-base text-slate-300">{intl.formatMessage({ id: 'documents.hero.subtitle', defaultMessage: 'Create, edit, and manage ISO 27001 documents with AI assistance in a clearer professional flow.' })}</p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+      <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
         {/* Sidebar — lista de documentos */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-sm self-start">
-          <h2 className="text-sm font-semibold text-slate-700 uppercase tracking-wider mb-3">
-            Documentos
-          </h2>
+        <div className="rounded-[28px] border border-[#2A2E3D] bg-[#09101c] p-4 shadow-[0_18px_50px_-30px_rgba(0,0,0,0.75)] self-start">
+          <div className="flex items-center justify-between mb-4 gap-4">
+            <div>
+              <h2 className="text-sm font-semibold text-white uppercase tracking-[0.24em]">{intl.formatMessage({ id: 'menu.documents', defaultMessage: 'Documents' })}</h2>
+              <p className="text-xs text-slate-400 mt-1">{intl.formatMessage({ id: 'documents.sidebar.quickAccess', defaultMessage: 'Quick access to your saved documents.' })}</p>
+            </div>
+            <span className="rounded-full bg-slate-800/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">{documentCount}</span>
+          </div>
           {isLoadingDocs ? (
-            <div className="text-sm text-slate-400">Cargando...</div>
+            <div className="text-sm text-slate-400">{intl.formatMessage({ id: 'understand.loading', defaultMessage: 'Loading...' })}</div>
           ) : (
-            <div className="space-y-1.5">
-              {allDocuments.map((doc) => (
-                <div key={doc.documentId} className="relative group w-full">
-                  <button
-                    type="button"
-                    onClick={() => handleSelectDocument(doc.documentId)}
-                    className={`w-full rounded-xl border p-3 text-left transition pr-10 ${
-                      selectedDocumentId === doc.documentId
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-slate-100 bg-white hover:border-slate-300 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="text-sm font-medium text-slate-800 line-clamp-1">{doc.title}</div>
-                    {doc.description && (
-                      <div className="mt-0.5 text-xs text-slate-500 line-clamp-2">{doc.description}</div>
-                    )}
-                  </button>
+            <>
+              <div className="mb-4 flex items-center gap-2 rounded-2xl border border-[#2A2E3D] bg-[#0B1116] px-3 py-2">
+                <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18.5a7.5 7.5 0 006.15-2.85z" />
+                </svg>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={intl.formatMessage({ id: 'documents.sidebar.searchPlaceholder', defaultMessage: 'Search documents' })}
+                  className="w-full bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+                />
+              </div>
 
-                  {/* Botón de eliminar (Se oculta para los estáticos que empiezan con doc-) */}
-                  {!doc.documentId.startsWith('doc-') && (
+              <div className="space-y-1.5">
+                {visibleDocuments.map((doc) => (
+                  <div key={doc.documentId} className="relative group w-full">
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Evita que se seleccione el documento al hacer clic en eliminar
-                        handleDeleteDocument(doc.documentId);
-                      }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
-                      title="Eliminar documento"
+                      onClick={() => handleSelectDocument(doc.documentId)}
+                      className={`w-full rounded-xl border p-3 text-left transition pr-10 ${
+                        selectedDocumentId === doc.documentId
+                          ? 'border-blue-500 bg-blue-800/60 text-white'
+                          : 'border-[#1F2933] bg-[#0B1116] hover:border-[#2A2E3D] hover:bg-[#0F1729] text-white'
+                      }`}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-sm font-medium line-clamp-1">{doc.title}</div>
+                        <span className="text-[11px] uppercase tracking-[0.18em] text-white/50">
+                          {new Date(doc.createdAt ?? new Date().toISOString()).toLocaleDateString('es-ES', {
+                            day: '2-digit', month: 'short', year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      {doc.description && (
+                        <div className="mt-1 text-xs text-white/60 line-clamp-2">{doc.description}</div>
+                      )}
                     </button>
-                  )}
-                </div>
-              ))}
-            </div>
+
+                    {!doc.documentId.startsWith('doc-') && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteDocument(doc.documentId);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all"
+                        title={intl.formatMessage({ id: 'documents.deleteDocument', defaultMessage: 'Delete document' })}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {documentCount > 5 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllDocuments((prev) => !prev)}
+                  className="mt-4 w-full rounded-xl border border-[#2A2E3D] bg-[#0B1116] px-3 py-2 text-sm font-medium text-white hover:bg-[#0F1729] transition"
+                >
+                  {showAllDocuments
+                    ? intl.formatMessage({ id: 'documents.viewLess', defaultMessage: 'View less' })
+                    : intl.formatMessage({ id: 'documents.viewMoreCount', defaultMessage: 'View more ({count} more)' }, { count: documentCount - 5 })}
+                </button>
+              )}
+            </>
           )}
-          <button
-            type="button"
-            onClick={() => setActiveTab('generate')}
-            className="mt-4 w-full rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 transition"
-          >
-            + Generar con IA
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('report')}
-            className="mt-2 w-full rounded-xl bg-slate-800 px-3 py-2 text-sm font-semibold text-white hover:bg-slate-900 transition"
-          >
-            + Exportar reporte
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('upload')}
-            className="mt-2 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition"
-          >
-            + Subir documento
-          </button>
+          <div className="mt-4 space-y-3">
+            <button
+              type="button"
+              onClick={() => setActiveTab('generate')}
+              className="w-full rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:from-cyan-400 hover:to-blue-500"
+            >
+              {intl.formatMessage({ id: 'documents.action.generateAi', defaultMessage: '+ Generate with AI' })}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('report')}
+              className="w-full rounded-2xl border border-[#2A2E3D] bg-[#08121f] px-4 py-3 text-sm font-semibold text-white hover:bg-[#0f172c] transition"
+            >
+              {intl.formatMessage({ id: 'documents.action.exportReport', defaultMessage: '+ Export report' })}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('upload')}
+              className="w-full rounded-2xl border border-[#2A2E3D] bg-[#0b1320] px-4 py-3 text-sm font-semibold text-white hover:bg-[#121a2a] transition"
+            >
+              {intl.formatMessage({ id: 'documents.action.uploadDocument', defaultMessage: '+ Upload document' })}
+            </button>
+          </div>
         </div>
 
         {/* Panel principal con tabs */}
         <div className="space-y-4">
           {/* Tabs */}
-          <div className="flex gap-1 rounded-xl border border-slate-200 bg-slate-100 p-1 w-full overflow-x-auto">
-            <div className="flex min-w-max">
+          <div className="flex gap-2 rounded-[24px] border border-[#202d46] bg-[#08131f] p-1.5 w-full overflow-x-auto shadow-[0_10px_30px_-20px_rgba(0,0,0,0.8)]">
+            <div className="flex min-w-max gap-2 px-1">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-shrink-0 rounded-lg px-4 py-1.5 text-sm font-medium transition ${
+                className={`flex-shrink-0 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
                   activeTab === tab.id
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-slate-900 shadow-sm shadow-blue-500/20'
+                    : 'text-slate-300/60 hover:text-white hover:bg-[#0f172c]'
                 }`}
               >
                 {tab.label}
@@ -548,46 +698,39 @@ export default function DocumentGeneratorPage() {
 
           {/* Tab: Vista */}
           {activeTab === 'view' && (
-            <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-100">
+            <div className="rounded-[28px] border border-[#1f2a45] bg-[#08121f] shadow-[0_20px_60px_-30px_rgba(0,0,0,0.85)] overflow-hidden">
+              <div className="flex flex-col gap-4 px-4 sm:px-6 py-5 border-b border-[#16213a] sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">
-                    {selectedDocument?.title ?? 'Sin documento'}
-                  </h2>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    ID: {selectedDocument?.documentId ?? 'N/A'} · ISO 27001
-                  </p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-sky-400/80">{intl.formatMessage({ id: 'documents.viewLabel', defaultMessage: 'Document view' })}</p>
+                  <h2 className="mt-2 text-2xl font-semibold text-white">{selectedDocument?.title ?? intl.formatMessage({ id: 'documents.noDocumentSelected', defaultMessage: 'No document selected' })}</h2>
+                  <p className="text-sm text-slate-400 mt-1">ID: {selectedDocument?.documentId ?? 'N/A'} · ISO 27001</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-3">
                   <button
                     type="button"
                     onClick={() => setActiveTab('edit')}
                     disabled={!selectedDocument}
-                    className="rounded-xl border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition disabled:opacity-40"
+                    className="rounded-2xl border border-[#2A2E3D] bg-[#0f172c] px-4 py-2 text-sm font-medium text-white hover:bg-[#16203c] transition disabled:opacity-40"
                   >
-                    Editar
+                    {intl.formatMessage({ id: 'common.edit', defaultMessage: 'Edit' })}
                   </button>
                   <button
                     type="button"
                     onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
                     disabled={!selectedDocument}
-                    className="rounded-xl bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-40"
+                    className="rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 hover:from-sky-400 hover:to-cyan-400 transition disabled:opacity-40"
                   >
-                    Abrir asistente
+                    {intl.formatMessage({ id: 'documents.openAssistant', defaultMessage: 'Open assistant' })}
                   </button>
                 </div>
               </div>
-              <div className="px-4 sm:px-8 py-6 overflow-y-auto lg:max-h-[600px]">
+              <div className="px-4 sm:px-8 py-8 overflow-y-auto lg:max-h-[600px] text-white">
                 {isLoadingDocument ? (
-                  <div className="text-sm text-slate-400">Cargando documento...</div>
+                  <div className="text-sm text-slate-400">{intl.formatMessage({ id: 'documents.loadingDocument', defaultMessage: 'Loading document...' })}</div>
                 ) : selectedDocument?.documentText ? (
-                  <div className="prose prose-sm max-w-full text-slate-700 whitespace-pre-line leading-7">
-                    {selectedDocument.documentText}
-                  </div>
+                  <div className="prose prose-sm max-w-full text-white whitespace-pre-line leading-8">{selectedDocument.documentText}</div>
                 ) : (
-                  <div className="text-sm text-slate-400">
-                    Selecciona un documento para ver su contenido.
-                  </div>
+                  <div className="text-sm text-slate-400">{intl.formatMessage({ id: 'documents.selectToView', defaultMessage: 'Select a document to view its content.' })}</div>
                 )}
               </div>
             </div>
@@ -596,7 +739,7 @@ export default function DocumentGeneratorPage() {
           {/* Tab: Editor enriquecido — DANI-FE-029 */}
           {activeTab === 'edit' && (
             <DocumentEditor
-              title={generatedDocumentTitle || selectedDocument?.title || 'Documento sin título'}
+              title={generatedDocumentTitle || selectedDocument?.title || intl.formatMessage({ id: 'documents.untitled', defaultMessage: 'Untitled document' })}
               content={editorContent || selectedDocument?.documentText || ''}
               onChange={setEditorContent}
               
@@ -612,96 +755,100 @@ export default function DocumentGeneratorPage() {
 
           {/* Tab: Generar con IA */}
           {activeTab === 'generate' && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <div className="rounded-2xl border border-[#2A2E3D] bg-[#111318] p-6 shadow-sm space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Generar documento con IA</h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  El agente LLM generará un documento ISO 27001 completo sección por sección.
-                </p>
+                <h3 className="text-lg font-semibold text-white">{intl.formatMessage({ id: 'documents.generate.title', defaultMessage: 'Generate document with AI' })}</h3>
+                <p className="text-sm text-white/60 mt-1">{intl.formatMessage({ id: 'documents.generate.subtitle', defaultMessage: 'The LLM agent will generate a full ISO 27001 document section by section.' })}</p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Título</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.title', defaultMessage: 'Title' })}</label>
                   <input
                     value={generateTitle}
                     onChange={(e) => setGenerateTitle(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Título del documento"
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={intl.formatMessage({ id: 'documents.placeholder.title', defaultMessage: 'Document title' })}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.description', defaultMessage: 'Description' })}</label>
                   <input
                     value={generateDescription}
                     onChange={(e) => setGenerateDescription(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Contexto del documento"
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={intl.formatMessage({ id: 'documents.placeholder.context', defaultMessage: 'Document context' })}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Audiencia</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.audience', defaultMessage: 'Audience' })}</label>
                   <input
                     value={generateAudience}
                     onChange={(e) => setGenerateAudience(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Equipo destinatario"
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={intl.formatMessage({ id: 'documents.placeholder.audience', defaultMessage: 'Target team' })}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Idioma</label>
+                    <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.language', defaultMessage: 'Language' })}</label>
                     <select
                       value={generateLanguage}
                       onChange={(e) => setGenerateLanguage(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="es">Español</option>
-                      <option value="en">Inglés</option>
+                      <option value="es">{intl.formatMessage({ id: 'language.es', defaultMessage: 'Spanish' })}</option>
+                      <option value="en">{intl.formatMessage({ id: 'language.en', defaultMessage: 'English' })}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Tono</label>
+                    <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.tone', defaultMessage: 'Tone' })}</label>
                     <select
                       value={generateTone}
                       onChange={(e) => setGenerateTone(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="formal">Formal</option>
-                      <option value="informal">Informal</option>
+                      <option value="formal">{intl.formatMessage({ id: 'documents.tone.formal', defaultMessage: 'Formal' })}</option>
+                      <option value="informal">{intl.formatMessage({ id: 'documents.tone.informal', defaultMessage: 'Informal' })}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.type', defaultMessage: 'Type' })}</label>
+                    <select
+                      value={generateType}
+                      onChange={(e) => setGenerateType(e.target.value as 'policy' | 'report' | 'procedure' | 'general')}
+                      className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="policy">{intl.formatMessage({ id: 'documents.type.policy', defaultMessage: 'Policy' })}</option>
+                      <option value="report">{intl.formatMessage({ id: 'documents.type.report', defaultMessage: 'Report' })}</option>
+                      <option value="procedure">{intl.formatMessage({ id: 'documents.type.procedure', defaultMessage: 'Procedure' })}</option>
+                      <option value="general">{intl.formatMessage({ id: 'documents.type.general', defaultMessage: 'General' })}</option>
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Secciones <span className="text-slate-400">(opcional)</span>
-                  </label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.sections', defaultMessage: 'Sections' })} <span className="text-white/60">({intl.formatMessage({ id: 'common.optional', defaultMessage: 'optional' })})</span></label>
                   <textarea
                     value={generateSections}
                     onChange={(e) => setGenerateSections(e.target.value)}
                     rows={3}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Separadas por comas o saltos de línea"
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={intl.formatMessage({ id: 'documents.placeholder.sections', defaultMessage: 'Separated by commas or line breaks' })}
                   />
                 </div>
               </div>
 
               {/* Progreso */}
               {isGenerating && (
-                <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 space-y-2">
+                <div className="rounded-xl bg-[#0F1729] border border-[#2A2E3D] p-4 space-y-2 text-white/90">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600">{generationMessage}</span>
-                    <span className="font-semibold text-slate-800">{generationProgress}%</span>
+                    <span className="text-white/80">{generationMessage}</span>
+                    <span className="font-semibold text-white">{generationProgress}%</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-slate-200 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-blue-500 transition-all duration-500"
-                      style={{ width: `${generationProgress}%` }}
-                    />
+                  <div className="h-2 w-full rounded-full bg-[#111318] overflow-hidden">
+                    <div className="h-full rounded-full bg-blue-500 transition-all duration-500" style={{ width: `${generationProgress}%` }} />
                   </div>
-                  {generationJobId && (
-                    <div className="text-xs text-slate-400">Job ID: {generationJobId}</div>
-                  )}
+                  {generationJobId && <div className="text-xs text-white/60">{intl.formatMessage({ id: 'documents.jobId', defaultMessage: 'Job ID:' })} {generationJobId}</div>}
                 </div>
               )}
 
@@ -718,7 +865,9 @@ export default function DocumentGeneratorPage() {
                   disabled={isGenerating}
                   className="rounded-xl bg-green-600 px-5 py-2 text-sm font-semibold text-white hover:bg-green-700 transition disabled:opacity-50"
                 >
-                  {isGenerating ? 'Generando...' : 'Generar documento'}
+                  {isGenerating
+                    ? intl.formatMessage({ id: 'documents.generate.generating', defaultMessage: 'Generating...' })
+                    : intl.formatMessage({ id: 'documents.generate.button', defaultMessage: 'Generate document' })}
                 </button>
                 
                 {/* Estos botones SOLO aparecen cuando la IA termina de generar el texto */}
@@ -729,7 +878,7 @@ export default function DocumentGeneratorPage() {
                       onClick={() => setActiveTab('edit')}
                       className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 transition"
                     >
-                      Abrir en editor →
+                      {intl.formatMessage({ id: 'documents.openInEditor', defaultMessage: 'Open in editor' })} →
                     </button>
 
                     {/* NUEVO BOTÓN: Subir a la plataforma */}
@@ -738,7 +887,7 @@ export default function DocumentGeneratorPage() {
                       onClick={() => handleUploadGenerated(generatedDocumentTitle, generatedDocumentText)}
                       className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 shadow-sm transition"
                     >
-                      Subir documento generado
+                      {intl.formatMessage({ id: 'documents.uploadGenerated', defaultMessage: 'Upload generated document' })}
                     </button>
                   </>
                 )}
@@ -746,40 +895,50 @@ export default function DocumentGeneratorPage() {
             </div>
           )}
 
+          {/* Tab: Exportar reporte */}
           {activeTab === 'report' && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <div className="rounded-2xl border border-[#2A2E3D] bg-[#111318] p-6 shadow-sm space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Exportar reporte</h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  Genera un informe descargable con estado de cumplimiento y brechas.
-                </p>
+                <h3 className="text-lg font-semibold text-white">{intl.formatMessage({ id: 'documents.report.title', defaultMessage: 'Export report' })}</h3>
+                <p className="text-sm text-white/60 mt-1">{intl.formatMessage({ id: 'documents.report.subtitle', defaultMessage: 'Generate a downloadable report based on the currently selected document.' })}</p>
+              </div>
+
+              <div className="rounded-xl border border-blue-800 bg-[#071826] p-4 flex items-center gap-3 text-white/90">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-white">{intl.formatMessage({ id: 'documents.report.documentToExport', defaultMessage: 'Document to export:' })}</p>
+                  <p className="text-sm text-white/80">{selectedDocument?.title || intl.formatMessage({ id: 'documents.report.noneSelected', defaultMessage: 'No document selected in the sidebar' })}</p>
+                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Título del reporte</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.report.fieldTitle', defaultMessage: 'Report title' })}</label>
                   <input
                     value={reportTitle}
                     onChange={(e) => setReportTitle(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Título del reporte"
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    placeholder={intl.formatMessage({ id: 'documents.report.fieldTitle', defaultMessage: 'Report title' })}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.description', defaultMessage: 'Description' })}</label>
                   <input
                     value={reportDescription}
                     onChange={(e) => setReportDescription(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Resumen del reporte"
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    placeholder={intl.formatMessage({ id: 'documents.report.placeholderDescription', defaultMessage: 'E.g. Executive summary of ISO control status for management review' })}
                   />
+                  <p className="mt-2 text-sm text-white/60">{intl.formatMessage({ id: 'documents.report.descriptionHint', defaultMessage: 'This text will appear as subtitle in the generated report header.' })}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Plantilla</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.report.template', defaultMessage: 'Template' })}</label>
                   <select
                     value={selectedReportTemplate}
                     onChange={(e) => setSelectedReportTemplate(e.target.value as ReportTemplate)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                   >
                     {reportTemplates.map((template) => (
                       <option key={template.id} value={template.id}>
@@ -789,11 +948,12 @@ export default function DocumentGeneratorPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Formato</label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.report.format', defaultMessage: 'Format' })}</label>
                   <select
                     value={reportFormat}
                     onChange={(e) => setReportFormat(e.target.value as ReportFormat)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={!selectedDocument}
+                    className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                   >
                     <option value="pdf">PDF</option>
                     <option value="xlsx">XLSX</option>
@@ -804,128 +964,187 @@ export default function DocumentGeneratorPage() {
               </div>
 
               {reportError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {reportError}
-                </div>
+                <div className="rounded-xl border border-red-700 bg-[#3B1717] px-4 py-3 text-sm text-red-300">{reportError}</div>
               )}
 
               {reportStatus && (
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
+                <div className="rounded-xl border border-[#2A2E3D] bg-[#0F1729] p-4 space-y-3 text-white/90">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-sm text-slate-500">Estado del reporte</p>
-                      <p className="text-lg font-semibold text-slate-900">{reportStatus.status.replace('_', ' ').toUpperCase()}</p>
+                      <p className="text-sm text-white/60">{intl.formatMessage({ id: 'documents.report.status', defaultMessage: 'Report status' })}</p>
+                      <p className="text-lg font-semibold text-white">{reportStatus.status.replace('_', ' ').toUpperCase()}</p>
                     </div>
-                    <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
-                      {reportStatus.progress}%
-                    </span>
+                    <span className="rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">{reportStatus.progress}%</span>
                   </div>
-                  {reportStatus.message && (
-                    <p className="text-sm text-slate-600">{reportStatus.message}</p>
-                  )}
-                  <div className="h-2 w-full rounded-full bg-white shadow-inner overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-blue-600 transition-all duration-500"
-                      style={{ width: `${reportStatus.progress}%` }}
-                    />
+                  {reportStatus.message && <p className="text-sm text-white/80">{reportStatus.message}</p>}
+                  <div className="h-2 w-full rounded-full bg-[#111318] shadow-inner overflow-hidden">
+                    <div className="h-full rounded-full bg-blue-600 transition-all duration-500" style={{ width: `${reportStatus.progress}%` }} />
                   </div>
-                  {reportStatus.download_url && (
-                    <button
-                      type="button"
-                      onClick={handleDownloadReport}
-                      className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition"
-                    >
-                      Descargar reporte
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={handleGenerateAnotherReport}
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
-                  >
-                    Generar otro reporte
-                  </button>
+                  <div className="flex gap-2 pt-2">
+                    {reportStatus.download_url && (
+                      <button type="button" onClick={handleDownloadReport} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition">{intl.formatMessage({ id: 'documents.report.download', defaultMessage: 'Download report' })}</button>
+                    )}
+                    <button type="button" onClick={handleGenerateAnotherReport} className="rounded-xl border border-[#2A2E3D] bg-[#111318] px-4 py-2 text-sm font-medium text-white hover:bg-[#0F1729] transition">{intl.formatMessage({ id: 'documents.report.generateAnother', defaultMessage: 'Generate another' })}</button>
+                  </div>
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={handleGenerateReport}
-                disabled={isGeneratingReport}
-                className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-950 transition disabled:opacity-50"
-              >
-                {isGeneratingReport ? 'Generando reporte...' : 'Iniciar exportación'}
-              </button>
+              {filteredReportHistory.length > 0 && (
+                <div className="border-t border-[#2A2E3D] pt-6 mt-6 space-y-4 text-white/90">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm font-medium text-white/60">{intl.formatMessage({ id: 'documents.report.recent', defaultMessage: 'Recent reports' })}</p>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <div className="flex items-center gap-2 rounded-2xl border border-[#2A2E3D] bg-[#0B1116] px-3 py-2">
+                        <svg className="h-4 w-4 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18.5a7.5 7.5 0 006.15-2.85z" />
+                        </svg>
+                        <input
+                          type="search"
+                          value={reportSearchQuery}
+                          onChange={(e) => setReportSearchQuery(e.target.value)}
+                          placeholder={intl.formatMessage({ id: 'documents.report.searchPlaceholder', defaultMessage: 'Search reports' })}
+                          className="w-full bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+                        />
+                      </div>
+                      {filteredReportHistory.length > 5 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllReports((prev) => !prev)}
+                          className="rounded-xl border border-[#2A2E3D] bg-[#111318] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0F1729] transition"
+                        >
+                          {showAllReports ? 'Ver menos' : 'Ver más'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {visibleReportHistory.map((entry) => {
+                      const formattedDate = entry.created_at
+                        ? new Date(entry.created_at).toLocaleString('es-CL', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : ''
+
+                      const statusClasses =
+                        entry.status === 'completed'
+                          ? 'bg-emerald-500 text-emerald-900'
+                          : entry.status === 'failed'
+                          ? 'bg-red-500 text-red-900'
+                          : 'bg-yellow-500 text-yellow-900'
+
+                      return (
+                        <div key={entry.job_id} className="rounded-xl border border-[#2A2E3D] bg-[#0F1729] p-4 space-y-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                              <p className="text-sm font-semibold text-white">{entry.report_title}</p>
+                              <p className="text-sm text-white/60">{entry.report_template}</p>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                              <span className={`rounded-full px-2 py-1 font-semibold ${statusClasses}`}>
+                                {entry.status}
+                              </span>
+                              <span className="text-white/60">{formattedDate}</span>
+                            </div>
+                          </div>
+                          <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] items-center">
+                            <div className="text-sm text-white/70">{entry.report_format?.toUpperCase()}</div>
+                            {entry.download_url && (
+                              <button
+                                type="button"
+                                onClick={() => window.open(entry.download_url, '_blank', 'noopener')}
+                                className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-800 transition"
+                              >
+                                {intl.formatMessage({ id: 'documents.report.download', defaultMessage: 'Download' })}
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteReport(entry.job_id)}
+                              className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-slate-800 transition"
+                            >
+                              {intl.formatMessage({ id: 'documents.report.delete', defaultMessage: 'Delete' })}
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <button type="button" onClick={handleGenerateReport} disabled={!selectedDocument || isGeneratingReport} className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-semibold text-white hover:bg-slate-950 transition disabled:opacity-50">{isGeneratingReport ? intl.formatMessage({ id: 'documents.report.generating', defaultMessage: 'Generating report...' }) : intl.formatMessage({ id: 'documents.report.startExport', defaultMessage: 'Start export' })}</button>
             </div>
           )}
 
           {/* Tab: Subir */}
           {activeTab === 'upload' && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <div className="rounded-2xl border border-[#2A2E3D] bg-[#111318] p-6 shadow-sm space-y-4">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Subir documento</h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  Sube un archivo o pega el contenido directamente.
-                </p>
+                <h3 className="text-lg font-semibold text-white">{intl.formatMessage({ id: 'documents.upload.title', defaultMessage: 'Upload document' })}</h3>
+                <p className="text-sm text-white/60 mt-1">{intl.formatMessage({ id: 'documents.upload.subtitle', defaultMessage: 'Upload a file or paste content directly.' })}</p>
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Título</label>
-                  <input
-                    value={uploadTitle}
-                    onChange={(e) => setUploadTitle(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Título del documento"
-                  />
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.title', defaultMessage: 'Title' })}</label>
+                    <input
+                      value={uploadTitle}
+                      onChange={(e) => setUploadTitle(e.target.value)}
+                      className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={intl.formatMessage({ id: 'documents.placeholder.title', defaultMessage: 'Document title' })}
+                    />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Descripción</label>
-                  <input
-                    value={uploadDescription}
-                    onChange={(e) => setUploadDescription(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Resumen breve"
-                  />
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.field.description', defaultMessage: 'Description' })}</label>
+                    <input
+                      value={uploadDescription}
+                      onChange={(e) => setUploadDescription(e.target.value)}
+                      className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={intl.formatMessage({ id: 'documents.upload.placeholderSummary', defaultMessage: 'Short summary' })}
+                    />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Archivo</label>
-                  <input
-                    type="file"
-                    accept=".txt,.md,.json,.docx,.pdf"
-                    onChange={handleFileChange}
-                    className="w-full text-sm text-slate-600"
-                  />
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.upload.file', defaultMessage: 'File' })}</label>
+                    <input
+                      type="file"
+                      accept=".txt,.md,.json,.docx,.pdf"
+                      onChange={handleFileChange}
+                      className="w-full text-sm text-white/60"
+                    />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    Contenido alternativo
-                  </label>
+                  <label className="block text-sm font-medium text-white/80 mb-1">{intl.formatMessage({ id: 'documents.upload.altContent', defaultMessage: 'Alternative content' })}</label>
                   <textarea
-                    value={uploadContent}
-                    onChange={(e) => setUploadContent(e.target.value)}
-                    rows={6}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Pega aquí el contenido si no subes un archivo"
-                  />
+                      value={uploadContent}
+                      onChange={(e) => setUploadContent(e.target.value)}
+                      rows={6}
+                      className="w-full rounded-xl border border-[#2A2E3D] px-3 py-2 text-sm bg-[#0B1116] text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={intl.formatMessage({ id: 'documents.upload.altPlaceholder', defaultMessage: 'Paste content here if you do not upload a file' })}
+                    />
                 </div>
-                {uploadError && (
-                  <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {uploadError}
-                  </div>
-                )}
-                {uploadSuccess && (
-                  <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                    {uploadSuccess}
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={handleUploadDocument}
-                  disabled={uploadLoading}
-                  className="rounded-xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-50"
-                >
-                  {uploadLoading ? 'Subiendo...' : 'Subir documento'}
-                </button>
+                  {uploadError && (
+                    <div className="rounded-xl border border-red-700 bg-[#3B1717] px-4 py-3 text-sm text-red-300">
+                      {uploadError}
+                    </div>
+                  )}
+                  {uploadSuccess && (
+                    <div className="rounded-xl border border-green-700 bg-[#0B2F1C] px-4 py-3 text-sm text-green-300">
+                      {uploadSuccess}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleUploadDocument}
+                    disabled={uploadLoading}
+                    className="rounded-xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition disabled:opacity-50"
+                  >
+                    {uploadLoading
+                      ? intl.formatMessage({ id: 'documents.upload.uploading', defaultMessage: 'Uploading...' })
+                      : intl.formatMessage({ id: 'documents.upload.button', defaultMessage: 'Upload document' })}
+                  </button>
               </div>
             </div>
           )}

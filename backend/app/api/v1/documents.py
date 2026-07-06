@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 from datetime import datetime
 from uuid import UUID, uuid4
@@ -15,6 +16,8 @@ from app.core.dependencies import get_current_user, require_roles
 from app.core.redis import get_redis_client
 from app.db.database import get_db
 from app.models.user import User
+from app.models.document import Document, DocumentType, DocumentVersion, DocumentReviewAction
+from app.models.policy import Policy, PolicyStatus
 from app.schemas.document import (
     DocumentDetailResponse,
     DocumentGenerationJobResponse,
@@ -22,6 +25,11 @@ from app.schemas.document import (
     DocumentGenerationRequest,
     DocumentMetadata,
     DocumentUploadResponse,
+    DocumentSubmitReviewRequest,
+    DocumentApprovalRequest,
+    DocumentRejectionRequest,
+    DocumentPublishRequest,
+    DocumentReviewActionResponse,
 )
 from app.workers.document_tasks import generate_document_full, JOB_KEY_PREFIX
 
@@ -58,33 +66,6 @@ async def _load_user_document(document_id: str, current_user: User) -> dict[str,
     return raw
 
 
-async def _list_user_documents(current_user: User) -> list[DocumentMetadata]:
-    redis_client = get_redis_client()
-    document_ids = await redis_client.smembers(_user_document_index_key(str(current_user.organization_id)))
-    documents: list[DocumentMetadata] = []
-
-    for document_id in sorted(document_ids):
-        raw = await redis_client.hgetall(_user_document_key(document_id))
-        if not raw:
-            await redis_client.srem(_user_document_index_key(str(current_user.organization_id)), document_id)
-            continue
-
-        created_date = raw.get("created_date")
-        if not created_date and raw.get("created_at"):
-            try:
-                created_date = datetime.fromisoformat(raw.get("created_at")).date().isoformat()
-            except Exception:
-                created_date = None
-
-        documents.append(DocumentMetadata(
-            documentId=document_id,
-            title=raw.get("title", "Documento sin título"),
-            description=raw.get("description"),
-            created_at=datetime.fromisoformat(raw.get("created_at")) if raw.get("created_at") else None,
-            created_date=created_date,
-        ))
-
-    return documents
 
 
 def _load_control_contexts(db: Session, control_ids: list[str] | None) -> list[dict[str, str]]:
@@ -191,6 +172,56 @@ async def _read_job_state(job_id: str) -> DocumentGenerationProgressResponse:
     )
 
 
+def _sync_published_policy_from_document(db: Session, document: Document) -> None:
+    """Sincroniza un documento policy publicado con la tabla policies."""
+    if document.type != DocumentType.policy:
+        return
+
+    latest_version = (
+        db.query(DocumentVersion)
+        .filter(DocumentVersion.document_id == document.id)
+        .order_by(DocumentVersion.created_at.desc(), DocumentVersion.version_number.desc())
+        .first()
+    )
+
+    existing_policy = (
+        db.query(Policy)
+        .filter(
+            Policy.organization_id == str(document.organization_id),
+            Policy.title == document.title,
+        )
+        .first()
+    )
+
+    title = document.title or (latest_version.title if latest_version else "Política")
+    content = latest_version.content if latest_version else (document.summary or "")
+    summary = document.description or (latest_version.summary if latest_version else None)
+    version_number = latest_version.version_number if latest_version else "1.0"
+
+    if existing_policy:
+        existing_policy.title = title
+        existing_policy.summary = summary
+        existing_policy.content = content
+        existing_policy.status = PolicyStatus.published
+        existing_policy.document_version = version_number
+        existing_policy.published_at = datetime.utcnow()
+        existing_policy.organization_id = str(document.organization_id)
+        db.add(existing_policy)
+        return
+
+    policy = Policy(
+        organization_id=str(document.organization_id),
+        title=title,
+        summary=summary,
+        content=content,
+        status=PolicyStatus.published,
+        document_version=version_number,
+        mandatory=True,
+        published_at=datetime.utcnow(),
+    )
+    db.add(policy)
+
+
 def _get_user_from_access_token(access_token: str | None, db: Session) -> User:
     if not access_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token requerido")
@@ -219,7 +250,7 @@ def _get_user_from_access_token(access_token: str | None, db: Session) -> User:
 @router.post("/generate/full", response_model=DocumentGenerationJobResponse, status_code=status.HTTP_202_ACCEPTED)
 async def create_document_generation_job(
     payload: DocumentGenerationRequest,
-    current_user: User = Depends(require_roles("admin", "ciso")),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     job_id = str(uuid4())
@@ -275,6 +306,7 @@ async def upload_document(
     content: str | None = Form(None),
     file: UploadFile | None = File(None),
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     document_id = str(uuid4())
     document_text = (content or "").strip()
@@ -287,6 +319,36 @@ async def upload_document(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Se requiere contenido o archivo")
 
     title = title.strip() or (file.filename if file is not None else "Documento cargado")
+
+    content_hash = hashlib.sha256(document_text.encode("utf-8")).hexdigest()
+
+    doc = Document(
+        id=UUID(document_id),
+        organization_id=current_user.organization_id,
+        created_by=current_user.id,
+        updated_by=current_user.id,
+        type=DocumentType.policy,
+        status="draft",
+        title=title,
+        description=description or None,
+        summary=None,
+    )
+    db.add(doc)
+    db.flush()
+
+    version = DocumentVersion(
+        document_id=doc.id,
+        version_number="1.0",
+        title=title,
+        description=description or None,
+        summary=None,
+        content=document_text,
+        content_hash=content_hash,
+        created_by=current_user.id,
+    )
+    db.add(version)
+    db.commit()
+
     redis_client = get_redis_client()
     await redis_client.hset(
         _user_document_key(document_id),
@@ -320,23 +382,92 @@ async def upload_document(
 @router.get("", response_model=list[DocumentMetadata])
 async def list_documents(
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    doc_type: str | None = None,
+    status_filter: str | None = None,
 ):
-    return await _list_user_documents(current_user)
+    query = db.query(Document).filter(
+        Document.organization_id == current_user.organization_id
+    )
+    
+    if doc_type:
+        query = query.filter(Document.type == doc_type)
+    if status_filter:
+        query = query.filter(Document.status == status_filter)
+    
+    documents = query.order_by(Document.created_at.desc()).all()
+    
+    return [
+        DocumentMetadata(
+            documentId=str(doc.id),
+            title=doc.title,
+            description=doc.description,
+            created_at=doc.created_at,
+            created_date=doc.created_at.date().isoformat() if doc.created_at else None,
+        )
+        for doc in documents
+    ]
 
 
 @router.get("/{document_id}", response_model=DocumentDetailResponse)
 async def get_document(
     document_id: str,
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    raw = await _load_user_document(document_id, current_user)
-    return DocumentDetailResponse(
-        documentId=document_id,
-        title=raw.get("title", "Documento sin título"),
-        description=raw.get("description"),
-        documentText=raw.get("document_text"),
-        created_at=datetime.fromisoformat(raw.get("created_at")) if raw.get("created_at") else None,
-    )
+    """Obtiene un documento: primero desde PostgreSQL, luego fallback a Redis (compatibilidad)."""
+    try:
+        doc_uuid = UUID(document_id)
+    except ValueError:
+        # Fallback: intentar obtener de Redis con UUID inválido (compatibilidad)
+        raw = await _load_user_document(document_id, current_user)
+        return DocumentDetailResponse(
+            documentId=document_id,
+            title=raw.get("title", "Documento sin título"),
+            description=raw.get("description"),
+            created_at=datetime.fromisoformat(raw.get("created_at")) if raw.get("created_at") else None,
+            created_date=raw.get("created_date"),
+            documentText=raw.get("document_text"),
+        )
+    
+    # Intenta obtener desde PostgreSQL
+    doc = db.query(Document).filter(
+        Document.id == doc_uuid,
+        Document.organization_id == current_user.organization_id,
+    ).first()
+    
+    if doc:
+        # Obtener la versión más reciente
+        latest_version = db.query(DocumentVersion).filter(
+            DocumentVersion.document_id == doc.id
+        ).order_by(DocumentVersion.created_at.desc()).first()
+        
+        document_text = latest_version.content if latest_version else ""
+        
+        return DocumentDetailResponse(
+            documentId=str(doc.id),
+            title=doc.title,
+            description=doc.description,
+            created_at=doc.created_at,
+            created_date=doc.created_at.date().isoformat() if doc.created_at else None,
+            documentText=document_text,
+        )
+    
+    # Fallback: intentar obtener de Redis (documentos viejos/manuales)
+    try:
+        raw = await _load_user_document(document_id, current_user)
+        return DocumentDetailResponse(
+            documentId=document_id,
+            title=raw.get("title", "Documento sin título"),
+            description=raw.get("description"),
+            created_at=datetime.fromisoformat(raw.get("created_at")) if raw.get("created_at") else None,
+            created_date=raw.get("created_date"),
+            documentText=raw.get("document_text"),
+        )
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Documento no encontrado")
 
 
 @router.get("/generate/full/{job_id}", response_model=DocumentGenerationProgressResponse)
@@ -399,16 +530,67 @@ async def update_document(
     title: str = Form(...),
     content: str = Form(...),
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    raw = await _load_user_document(document_id, current_user)
+    title_text = title.strip()
+    content_text = content.strip()
+    document_uuid = None
 
+    try:
+        document_uuid = UUID(document_id)
+    except ValueError:
+        document_uuid = None
+
+    if document_uuid is not None:
+        doc = db.query(Document).filter(
+            Document.id == document_uuid,
+            Document.organization_id == current_user.organization_id,
+        ).first()
+
+        if doc:
+            doc.title = title_text
+            doc.updated_by = current_user.id
+            doc.updated_at = datetime.utcnow()
+
+            latest_version = db.query(DocumentVersion).filter(
+                DocumentVersion.document_id == doc.id
+            ).order_by(DocumentVersion.created_at.desc(), DocumentVersion.version_number.desc()).first()
+
+            if latest_version:
+                latest_version.title = title_text
+                latest_version.content = content_text
+                latest_version.content_hash = hashlib.sha256(content_text.encode("utf-8")).hexdigest()
+                latest_version.updated_at = datetime.utcnow()
+                db.add(latest_version)
+
+            db.add(doc)
+            db.commit()
+
+            redis_client = get_redis_client()
+            redis_key = _user_document_key(document_id)
+            if await redis_client.exists(redis_key):
+                raw = await redis_client.hgetall(redis_key)
+                await redis_client.hset(
+                    redis_key,
+                    mapping={
+                        **raw,
+                        "title": title_text,
+                        "document_text": content_text,
+                        "updated_at": datetime.utcnow().isoformat(),
+                        "updated_date": datetime.utcnow().date().isoformat(),
+                    },
+                )
+
+            return {"message": "Documento actualizado correctamente", "document_id": document_id}
+
+    raw = await _load_user_document(document_id, current_user)
     redis_client = get_redis_client()
     await redis_client.hset(
         _user_document_key(document_id),
         mapping={
             **raw,
-            "title": title.strip(),
-            "document_text": content.strip(),
+            "title": title_text,
+            "document_text": content_text,
             "updated_at": datetime.utcnow().isoformat(),
             "updated_date": datetime.utcnow().date().isoformat(),
         },
@@ -420,10 +602,272 @@ async def update_document(
 async def delete_document(
     document_id: str,
     current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    # Verificamos que exista y pertenezca al usuario
+    document_uuid = None
+
+    try:
+        document_uuid = UUID(document_id)
+    except ValueError:
+        document_uuid = None
+
+    if document_uuid is not None:
+        doc = db.query(Document).filter(
+            Document.id == document_uuid,
+            Document.organization_id == current_user.organization_id,
+        ).first()
+
+        if doc:
+            db.delete(doc)
+            db.commit()
+
+            redis_client = get_redis_client()
+            await redis_client.delete(_user_document_key(document_id))
+            await redis_client.srem(_user_document_index_key(str(current_user.organization_id)), document_id)
+            return
+
+    # Si no hay documento en PostgreSQL o el ID no es UUID válido, probamos en Redis.
     await _load_user_document(document_id, current_user)
 
     redis_client = get_redis_client()
     await redis_client.delete(_user_document_key(document_id))
     await redis_client.srem(_user_document_index_key(str(current_user.organization_id)), document_id)
+
+
+# ============================================================================
+# PASO 3: Approval Workflow Endpoints
+# ============================================================================
+
+@router.post("/{document_id}/submit-review", response_model=DocumentReviewActionResponse)
+async def submit_document_for_review(
+    document_id: str,
+    payload: DocumentSubmitReviewRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Enviar un documento a revisión (cambiar status de draft a pending_review)"""
+    try:
+        doc_uuid = UUID(document_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Document ID inválido")
+    
+    doc = db.query(Document).filter(
+        Document.id == doc_uuid,
+        Document.organization_id == current_user.organization_id,
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Documento no encontrado")
+    
+    # Solo se puede enviar a revisión documentos en estado draft
+    if doc.status != "draft":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Solo documentos en draft pueden ser enviados a revisión. Estado actual: {doc.status}"
+        )
+    
+    # Actualizar documento
+    doc.status = "pending_review"
+    doc.submitted_at = datetime.utcnow()
+    doc.submitted_by = current_user.id
+    db.add(doc)
+    
+    # Registrar acción de revisión
+    action = DocumentReviewAction(
+        document_id=doc.id,
+        action="submit_review",
+        user_id=current_user.id,
+        comment=None,
+    )
+    db.add(action)
+    db.commit()
+    
+    return DocumentReviewActionResponse(
+        documentId=str(doc.id),
+        status=doc.status,
+        action="submit_review",
+        performedBy=current_user.id,
+        performedAt=doc.submitted_at,
+        message="Documento enviado a revisión correctamente",
+    )
+
+
+@router.post("/{document_id}/approve", response_model=DocumentReviewActionResponse)
+async def approve_document(
+    document_id: str,
+    payload: DocumentApprovalRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Aprobar un documento (cambiar status de pending_review a approved)"""
+    try:
+        doc_uuid = UUID(document_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Document ID inválido")
+    
+    doc = db.query(Document).filter(
+        Document.id == doc_uuid,
+        Document.organization_id == current_user.organization_id,
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Documento no encontrado")
+    
+    # Solo se puede aprobar documentos en estado pending_review
+    if doc.status != "pending_review":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Solo documentos en pending_review pueden ser aprobados. Estado actual: {doc.status}"
+        )
+    
+    # No puede aprobar su propio documento
+    if doc.created_by == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No puede aprobar su propio documento"
+        )
+    
+    # Actualizar documento
+    doc.status = "approved"
+    doc.approved_at = datetime.utcnow()
+    doc.approved_by = current_user.id
+    db.add(doc)
+    
+    # Registrar acción de revisión
+    action = DocumentReviewAction(
+        document_id=doc.id,
+        action="approve",
+        user_id=current_user.id,
+        comment=None,
+    )
+    db.add(action)
+    db.commit()
+    
+    return DocumentReviewActionResponse(
+        documentId=str(doc.id),
+        status=doc.status,
+        action="approve",
+        performedBy=current_user.id,
+        performedAt=doc.approved_at,
+        message="Documento aprobado correctamente",
+    )
+
+
+@router.post("/{document_id}/reject", response_model=DocumentReviewActionResponse)
+async def reject_document(
+    document_id: str,
+    payload: DocumentRejectionRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Rechazar un documento (cambiar status de pending_review a rejected)"""
+    try:
+        doc_uuid = UUID(document_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Document ID inválido")
+    
+    doc = db.query(Document).filter(
+        Document.id == doc_uuid,
+        Document.organization_id == current_user.organization_id,
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Documento no encontrado")
+    
+    # Solo se puede rechazar documentos en estado pending_review
+    if doc.status != "pending_review":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Solo documentos en pending_review pueden ser rechazados. Estado actual: {doc.status}"
+        )
+    
+    # No puede rechazar su propio documento
+    if doc.created_by == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No puede rechazar su propio documento"
+        )
+    
+    # Actualizar documento
+    doc.status = "rejected"
+    doc.rejected_at = datetime.utcnow()
+    doc.rejected_by = current_user.id
+    doc.rejection_reason = payload.reason
+    db.add(doc)
+    
+    # Registrar acción de revisión
+    action = DocumentReviewAction(
+        document_id=doc.id,
+        action="reject",
+        user_id=current_user.id,
+        comment=payload.reason,
+    )
+    db.add(action)
+    db.commit()
+    
+    return DocumentReviewActionResponse(
+        documentId=str(doc.id),
+        status=doc.status,
+        action="reject",
+        performedBy=current_user.id,
+        performedAt=doc.rejected_at,
+        message=f"Documento rechazado: {payload.reason}",
+    )
+
+
+@router.post("/{document_id}/publish", response_model=DocumentReviewActionResponse)
+async def publish_document(
+    document_id: str,
+    payload: DocumentPublishRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Publicar un documento (cambiar status de approved a published)"""
+    try:
+        doc_uuid = UUID(document_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Document ID inválido")
+    
+    doc = db.query(Document).filter(
+        Document.id == doc_uuid,
+        Document.organization_id == current_user.organization_id,
+    ).first()
+    
+    if not doc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Documento no encontrado")
+    
+    # Solo se puede publicar documentos en estado approved
+    if doc.status != "approved":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Solo documentos aprobados pueden ser publicados. Estado actual: {doc.status}"
+        )
+    
+    # Actualizar documento
+    doc.status = "published"
+    doc.published_at = datetime.utcnow()
+    doc.published_by = current_user.id
+    db.add(doc)
+
+    # Sincronizar con la tabla de políticas SOLO para documentos de tipo policy
+    if doc.type == DocumentType.policy:
+        _sync_published_policy_from_document(db, doc)
+    
+    # Registrar acción de revisión
+    action = DocumentReviewAction(
+        document_id=doc.id,
+        action="publish",
+        user_id=current_user.id,
+        comment=None,
+    )
+    db.add(action)
+    db.commit()
+    
+    return DocumentReviewActionResponse(
+        documentId=str(doc.id),
+        status=doc.status,
+        action="publish",
+        performedBy=current_user.id,
+        performedAt=doc.published_at,
+        message="Documento publicado correctamente",
+    )

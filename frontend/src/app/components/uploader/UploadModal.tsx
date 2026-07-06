@@ -1,9 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { useIntl } from "react-intl";
 import { AlertCircle, CheckCircle2, CloudUpload, FileText, RefreshCw, X } from "lucide-react";
 
 import { storage } from "../../../api/client";
+import { evidencesApi } from "../../../api/evidences";
+import { buildTenantStorageKey } from "../../lib/tenantStorage";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import {
@@ -32,12 +35,21 @@ const ACCEPTED_MIME_TYPES = new Set([
 ]);
 const ACCEPTED_LABEL = "PDF, DOCX, XLSX, PNG, JPG";
 
-const API_ROOT = import.meta.env.VITE_API_URL ?? "/api/v1";
-const API_BASE = API_ROOT.replace(/\/api\/v1\/?$/, "");
-const EVIDENCE_UPLOAD_URL = `${API_BASE}/api/evidences`;
-const VALIDATION_EXTERNAL_URL = `${API_BASE}/api/validate/external`;
+const API_ROOT = (import.meta.env.VITE_API_URL ?? "/api/v1").replace(/\/$/, "").replace(/\/v1$/, "");
+const VALIDATION_EXTERNAL_URL = `${API_ROOT}/validate/external`;
 
+const EVIDENCE_TYPES = ["POLICY", "PROCEDURE", "INSTRUCTION", "CONTROL", "RECORD"] as const;
+
+type EvidenceType = (typeof EVIDENCE_TYPES)[number];
 type UploadStatus = "queued" | "uploading" | "classifying" | "completed" | "failed";
+
+const normalizeEvidenceType = (value: string | undefined): string | undefined => {
+  const resolved = value?.trim().toUpperCase();
+  if (!resolved) {
+    return undefined;
+  }
+  return EVIDENCE_TYPES.includes(resolved as EvidenceType) ? resolved : undefined;
+};
 
 export interface EvidenceMetadata {
   name: string;
@@ -233,82 +245,97 @@ const deriveClauseFromControl = (controlId: string): string => {
   return match?.[0] ?? "";
 };
 
-// enqueueExternalValidationJob moved into UploadModal component
-
-const requestWithAuth = async (url: string, init: RequestInit): Promise<Response> => {
-  const token = storage.getToken();
-  const headers = new Headers(init.headers ?? undefined);
-
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+const normalizeControlId = (value: string | undefined): string | undefined => {
+  if (!value?.trim()) {
+    return undefined;
   }
 
-  return fetch(url, {
-    ...init,
-    headers,
-  });
+  const normalized = value
+    .trim()
+    .replace(/\s+/g, " ")
+    .toUpperCase();
+
+  const match = normalized.match(/^(?:ISO\s*27001\s*)?(A\.)?([5-8](?:\.[0-9]+){1,2})$/i);
+  if (!match) {
+    return undefined;
+  }
+
+  const clauseSegment = match[2];
+  return `ISO 27001 A.${clauseSegment}`;
 };
 
-const uploadFile = (
+const normalizeClauseRef = (value: string | undefined, controlId?: string): string | undefined => {
+  const raw = value?.trim();
+  if (raw) {
+    const clean = raw.replace(/\s+/g, "");
+    if (/^(?:A\.)?[5-8](?:\.[0-9]+){0,2}$/i.test(clean)) {
+      return clean.startsWith("A.") ? clean.toUpperCase() : `A.${clean}`;
+    }
+    return undefined;
+  }
+
+  if (controlId) {
+    const derived = deriveClauseFromControl(controlId);
+    return derived || undefined;
+  }
+
+  return undefined;
+};
+
+// enqueueExternalValidationJob moved into UploadModal component
+
+const uploadFile = async (
   item: UploadItem,
   onProgress: (progress: number) => void,
-): Promise<unknown> =>
-  new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    const token = storage.getToken();
-    const formData = new FormData();
-    const metadata = item.metadata;
+  questionId?: string,
+): Promise<unknown> => {
+  const formData = new FormData();
+  const metadata = item.metadata;
 
-    formData.append("file", item.file);
-    formData.append("name", metadata.name || item.file.name);
-    if (metadata.type?.trim()) {
-      formData.append("type", metadata.type.trim().toUpperCase());
-    }
-    if (metadata.control_id?.trim()) {
-      formData.append("control_id", metadata.control_id.trim());
-    }
-    const clauseRef = metadata.clause_ref?.trim() || deriveClauseFromControl(metadata.control_id || "");
-    if (clauseRef) {
-      formData.append("clause_ref", clauseRef);
-    }
+  formData.append("file", item.file);
+  formData.append("name", metadata.name || item.file.name);
 
-    xhr.open("POST", EVIDENCE_UPLOAD_URL);
-    xhr.responseType = "text";
+  if (questionId?.trim()) {
+    formData.append("question_id", questionId.trim());
+  }
 
-    if (token) {
-      xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-    }
+  const normalizedType = normalizeEvidenceType(metadata.type);
+  if (metadata.type?.trim() && !normalizedType) {
+    throw new Error(`Tipo inválido. Use uno de: ${EVIDENCE_TYPES.join(', ')}`);
+  }
 
-    xhr.upload.onprogress = (event) => {
+  if (normalizedType) {
+    formData.append("type", normalizedType);
+  }
+
+  const normalizedControlId = normalizeControlId(metadata.control_id);
+  if (metadata.control_id?.trim() && !normalizedControlId) {
+    throw new Error(
+      "control_id inválido. Usa el formato 'ISO 27001 A.5.1' o deja el campo vacío para usar el valor por defecto según el tipo."
+    );
+  }
+  if (normalizedControlId) {
+    formData.append("control_id", normalizedControlId);
+  }
+
+  const clauseRef = normalizeClauseRef(metadata.clause_ref, normalizedControlId);
+  if (metadata.clause_ref?.trim() && !clauseRef) {
+    throw new Error("clause_ref inválido. Usa 'A.5.1' o deja el campo vacío para inferirlo desde control_id.");
+  }
+  if (clauseRef) {
+    formData.append("clause_ref", clauseRef);
+  }
+
+  const response = await evidencesApi.upload(formData, {
+    onUploadProgress: (event) => {
       if (event.lengthComputable && event.total > 0) {
         onProgress(Math.round((event.loaded / event.total) * 100));
       }
-    };
-
-    xhr.onload = () => {
-      const responseText = xhr.responseText || "";
-
-      if (xhr.status < 200 || xhr.status >= 300) {
-        reject(new Error(responseText || `Upload failed with status ${xhr.status}`));
-        return;
-      }
-
-      if (!responseText.trim()) {
-        resolve(null);
-        return;
-      }
-
-      try {
-        resolve(JSON.parse(responseText));
-      } catch {
-        resolve(responseText);
-      }
-    };
-
-    xhr.onerror = () => reject(new Error("No se pudo subir el archivo"));
-    xhr.onabort = () => reject(new Error("La subida fue cancelada"));
-    xhr.send(formData);
+    },
   });
+
+  return response;
+};
 
 const retryAsync = async <T,>(task: () => Promise<T>, attempts = MAX_RETRIES): Promise<T> => {
   let lastError: unknown;
@@ -332,6 +359,7 @@ const retryAsync = async <T,>(task: () => Promise<T>, attempts = MAX_RETRIES): P
 };
 
 function FileDropZone({ disabled = false, fileCount, onFilesSelected }: FileDropZoneProps) {
+  const intl = useIntl();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
 
@@ -385,9 +413,9 @@ function FileDropZone({ disabled = false, fileCount, onFilesSelected }: FileDrop
             <CloudUpload className="size-5" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-semibold tracking-wide uppercase text-cyan-200">Carga masiva</p>
-            <h3 className="text-lg font-semibold">Arrastra los archivos o selecciónalos manualmente</h3>
-            <p className="text-sm text-slate-300">Acepta hasta {MAX_FILES} archivos simultáneos. Formatos permitidos: {ACCEPTED_LABEL}.</p>
+            <p className="text-sm font-semibold tracking-wide uppercase text-cyan-200">{intl.formatMessage({ id: 'upload.massUpload', defaultMessage: 'Bulk upload' })}</p>
+            <h3 className="text-lg font-semibold">{intl.formatMessage({ id: 'upload.dragOrSelect', defaultMessage: 'Drag files or select them manually' })}</h3>
+            <p className="text-sm text-slate-300">{intl.formatMessage({ id: 'upload.acceptsUpTo', defaultMessage: 'Accepts up to {max} files at once. Allowed formats: {formats}.' }, { max: MAX_FILES, formats: ACCEPTED_LABEL })}</p>
           </div>
         </div>
 
@@ -397,12 +425,12 @@ function FileDropZone({ disabled = false, fileCount, onFilesSelected }: FileDrop
             className="bg-cyan-400 text-slate-950 hover:bg-cyan-300"
             disabled={disabled || fileCount >= MAX_FILES}
             onClick={() => inputRef.current?.click()}
-            title="Seleccionar rápido: abre el selector de archivos para una carga rápida sin editar metadatos"
-            aria-label="Seleccionar archivos rápido"
+            title={intl.formatMessage({ id: 'upload.quickSelectTitle', defaultMessage: 'Quick select: open file picker for fast upload without editing metadata' })}
+            aria-label={intl.formatMessage({ id: 'upload.quickSelectAria', defaultMessage: 'Quick file select' })}
           >
-            Seleccionar (rápido)
+            {intl.formatMessage({ id: 'upload.selectQuick', defaultMessage: 'Select (quick)' })}
           </Button>
-          <span className="text-xs text-slate-400">{fileCount}/{MAX_FILES} cargados</span>
+          <span className="text-xs text-slate-400">{intl.formatMessage({ id: 'upload.loadedCount', defaultMessage: '{count}/{max} loaded' }, { count: fileCount, max: MAX_FILES })}</span>
         </div>
 
         <input
@@ -423,21 +451,22 @@ function FileDropZone({ disabled = false, fileCount, onFilesSelected }: FileDrop
 }
 
 function FileList({ files, onRemove }: FileListProps) {
+  const intl = useIntl();
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5">
       <div className="flex items-center justify-between px-4 py-3">
         <div>
-          <p className="text-sm font-semibold text-slate-100">Archivos seleccionados</p>
-          <p className="text-xs text-slate-400">Nombre, tamaño y estado en tiempo real</p>
+          <p className="text-sm font-semibold text-slate-100">{intl.formatMessage({ id: 'upload.selectedFiles', defaultMessage: 'Selected files' })}</p>
+          <p className="text-xs text-slate-400">{intl.formatMessage({ id: 'upload.selectedFilesHint', defaultMessage: 'Name, size and status in real time' })}</p>
         </div>
         <Badge variant="outline" className="border-white/10 text-slate-200">
-          {files.length} archivo{files.length === 1 ? "" : "s"}
+          {intl.formatMessage({ id: 'upload.filesCount', defaultMessage: '{count} file(s)' }, { count: files.length })}
         </Badge>
       </div>
       <Separator className="bg-white/10" />
       <ul className="divide-y divide-white/10">
         {files.length === 0 ? (
-          <li className="px-4 py-5 text-sm text-slate-400">Todavía no has agregado archivos.</li>
+          <li className="px-4 py-5 text-sm text-slate-400">{intl.formatMessage({ id: 'upload.noFilesYet', defaultMessage: 'You have not added files yet.' })}</li>
         ) : (
           files.map((item) => (
             <li key={item.id} className="flex items-start justify-between gap-3 px-4 py-4">
@@ -465,31 +494,36 @@ function FileList({ files, onRemove }: FileListProps) {
 }
 
 function AIClassificationPreview({ fileName, classification, status, error }: AIClassificationPreviewProps) {
+  const intl = useIntl();
   return (
     <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/5 px-4 py-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">AI Classification Preview</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">{intl.formatMessage({ id: 'upload.classificationPreview', defaultMessage: 'Classification preview' })}</p>
           <h4 className="mt-1 text-sm font-medium text-slate-100">{fileName}</h4>
         </div>
         <Badge variant="outline" className="border-cyan-400/20 text-cyan-200">
-          {status === "completed" ? "Clasificado" : status === "classifying" ? "Clasificando" : "Pendiente"}
+          {status === "completed"
+            ? intl.formatMessage({ id: 'upload.status.classified', defaultMessage: 'Classified' })
+            : status === "classifying"
+              ? intl.formatMessage({ id: 'upload.status.classifying', defaultMessage: 'Classifying' })
+              : intl.formatMessage({ id: 'upload.status.pending', defaultMessage: 'Pending' })}
         </Badge>
       </div>
 
       <div className="mt-3 space-y-2 text-sm text-slate-200">
         <p>
-          <span className="text-slate-400">Sugerencia ISO:</span>{" "}
-          <span className="font-medium">{classification?.controlId ?? "Esperando respuesta del backend"}</span>
+          <span className="text-slate-400">{intl.formatMessage({ id: 'upload.isoSuggestion', defaultMessage: 'ISO suggestion:' })}</span>{" "}
+          <span className="font-medium">{classification?.controlId ?? intl.formatMessage({ id: 'upload.waitingBackend', defaultMessage: 'Waiting backend response' })}</span>
         </p>
         {classification?.controlName && (
           <p>
-            <span className="text-slate-400">Detalle:</span> {classification.controlName}
+            <span className="text-slate-400">{intl.formatMessage({ id: 'upload.detail', defaultMessage: 'Detail:' })}</span> {classification.controlName}
           </p>
         )}
         {typeof classification?.confidence === "number" && (
           <p>
-            <span className="text-slate-400">Confianza:</span> {Math.round(classification.confidence * 100)}%
+            <span className="text-slate-400">{intl.formatMessage({ id: 'upload.confidence', defaultMessage: 'Confidence:' })}</span> {Math.round(classification.confidence * 100)}%
           </p>
         )}
         {classification?.rationale && <p className="text-slate-300">{classification.rationale}</p>}
@@ -500,6 +534,7 @@ function AIClassificationPreview({ fileName, classification, status, error }: AI
 }
 
 function MetadataForm({ metadata, disabled = false, onChange }: MetadataFormProps) {
+  const intl = useIntl();
   const update = (patch: Partial<EvidenceMetadata>) => {
     onChange({ ...metadata, ...patch });
   };
@@ -508,63 +543,70 @@ function MetadataForm({ metadata, disabled = false, onChange }: MetadataFormProp
     <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-100">Metadata editable</p>
-          <p className="text-xs text-slate-400">Actualiza nombre, control_id, tipo y fecha de validez</p>
+          <p className="text-sm font-semibold text-slate-100">{intl.formatMessage({ id: 'upload.editableMetadata', defaultMessage: 'Editable metadata' })}</p>
+          <p className="text-xs text-slate-400">{intl.formatMessage({ id: 'upload.editableMetadataHint', defaultMessage: 'Update name, control_id, type, and validity date' })}</p>
         </div>
         <Badge variant="outline" className="border-white/10 text-slate-300">
-          Inline
+          {intl.formatMessage({ id: 'upload.inline', defaultMessage: 'Inline' })}
         </Badge>
       </div>
 
       <div className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
         <label className="space-y-1">
-          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Nombre</span>
+          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">{intl.formatMessage({ id: 'upload.field.name', defaultMessage: 'Name' })}</span>
           <Input
             value={metadata.name}
             disabled={disabled}
             onChange={(event) => update({ name: event.target.value })}
-            placeholder="Nombre del archivo"
+            placeholder={intl.formatMessage({ id: 'upload.placeholder.fileName', defaultMessage: 'File name' })}
             className="border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500"
           />
         </label>
         <label className="space-y-1">
-          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">control_id</span>
+          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">{intl.formatMessage({ id: 'upload.field.controlId', defaultMessage: 'control_id' })}</span>
           <Input
             value={metadata.control_id}
             disabled={disabled}
             onChange={(event) => update({ control_id: event.target.value })}
-            placeholder="ISO 27001 A.5.1"
+            placeholder={intl.formatMessage({ id: 'upload.placeholder.controlId', defaultMessage: 'ISO 27001 A.5.1' })}
             className="border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500"
           />
         </label>
         <label className="space-y-1">
-          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">clause_ref</span>
+          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">{intl.formatMessage({ id: 'upload.field.clauseRef', defaultMessage: 'clause_ref' })}</span>
           <Input
             value={metadata.clause_ref}
             disabled={disabled}
             onChange={(event) => update({ clause_ref: event.target.value })}
-            placeholder="A.5.1"
+            placeholder={intl.formatMessage({ id: 'upload.placeholder.clauseRef', defaultMessage: 'A.5.1' })}
             className="border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500"
           />
         </label>
         <label className="space-y-1">
-          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Tipo</span>
+          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">{intl.formatMessage({ id: 'upload.field.type', defaultMessage: 'Type' })}</span>
           <Input
+            list="evidence-type-options"
             value={metadata.type}
             disabled={disabled}
             onChange={(event) => update({ type: event.target.value })}
-            placeholder="POLICY, PROCEDURE, INSTRUCTION, CONTROL, RECORD"
+            placeholder={intl.formatMessage({ id: 'upload.placeholder.type', defaultMessage: 'POLICY, PROCEDURE, INSTRUCTION, CONTROL, RECORD' })}
             className="border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500"
           />
+          <datalist id="evidence-type-options">
+            {EVIDENCE_TYPES.map((option) => (
+              <option key={option} value={option} />
+            ))}
+          </datalist>
         </label>
         <label className="space-y-1">
-          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Fecha de validez</span>
+          <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">{intl.formatMessage({ id: 'upload.field.validUntil', defaultMessage: 'Valid until' })}</span>
           <Input
             type="date"
             value={metadata.valid_until}
             disabled={disabled}
             onChange={(event) => update({ valid_until: event.target.value })}
-            className="border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500"
+            className="border-white/10 bg-white/5 text-slate-100 placeholder:text-slate-500 [color-scheme:dark] accent-white"
+            style={{ colorScheme: 'dark', accentColor: 'white' }}
           />
         </label>
       </div>
@@ -573,6 +615,7 @@ function MetadataForm({ metadata, disabled = false, onChange }: MetadataFormProp
 }
 
 function UploadProgress({ progress, status, attempts, error, onRetry }: UploadProgressProps) {
+  const intl = useIntl();
   const isFailed = status === "failed";
   const isActive = status === "uploading" || status === "classifying";
 
@@ -580,15 +623,15 @@ function UploadProgress({ progress, status, attempts, error, onRetry }: UploadPr
     <div className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-4">
       <div className="flex items-center justify-between gap-3">
         <div className="space-y-1">
-          <p className="text-sm font-semibold text-slate-100">Progreso</p>
+          <p className="text-sm font-semibold text-slate-100">{intl.formatMessage({ id: 'upload.progress', defaultMessage: 'Progress' })}</p>
           <p className="text-xs text-slate-400">
-            {statusLabel(status)} · intento {Math.min(attempts, MAX_RETRIES)}/{MAX_RETRIES}
+            {statusLabel(status, intl)} · {intl.formatMessage({ id: 'upload.attempt', defaultMessage: 'attempt' })} {Math.min(attempts, MAX_RETRIES)}/{MAX_RETRIES}
           </p>
         </div>
         {isFailed && onRetry && (
           <Button type="button" variant="outline" size="sm" onClick={onRetry} className="border-white/10 bg-white/5 text-slate-100 hover:bg-white/10">
             <RefreshCw className="size-4" />
-            Reintentar
+            {intl.formatMessage({ id: 'upload.retry', defaultMessage: 'Retry' })}
           </Button>
         )}
       </div>
@@ -596,8 +639,8 @@ function UploadProgress({ progress, status, attempts, error, onRetry }: UploadPr
       <Progress value={status === "completed" ? 100 : progress} className="mt-3 bg-white/10" />
 
       <div className="mt-3 flex items-center justify-between gap-3 text-xs text-slate-400">
-        <span>{isActive ? `${progress}% completado` : status === "completed" ? "Procesamiento finalizado" : "En espera"}</span>
-        {isFailed && <span className="text-rose-300">{error ?? "Error inesperado"}</span>}
+        <span>{isActive ? intl.formatMessage({ id: 'upload.progressCompleted', defaultMessage: '{progress}% completed' }, { progress }) : status === "completed" ? intl.formatMessage({ id: 'upload.processingFinished', defaultMessage: 'Processing finished' }) : intl.formatMessage({ id: 'upload.waiting', defaultMessage: 'Waiting' })}</span>
+        {isFailed && <span className="text-rose-300">{error ?? intl.formatMessage({ id: 'upload.unexpectedError', defaultMessage: 'Unexpected error' })}</span>}
       </div>
     </div>
   );
@@ -617,24 +660,26 @@ function statusBadgeVariant(status: UploadStatus): React.ComponentProps<typeof B
   }
 }
 
-function statusLabel(status: UploadStatus): string {
+function statusLabel(status: UploadStatus, intl?: ReturnType<typeof useIntl>): string {
+  const t = (id: string, defaultMessage: string) => intl ? intl.formatMessage({ id, defaultMessage }) : defaultMessage;
   switch (status) {
     case "queued":
-      return "En cola";
+      return t('upload.status.queued', 'Queued');
     case "uploading":
-      return "Subiendo";
+      return t('upload.status.uploading', 'Uploading');
     case "classifying":
-      return "Clasificando";
+      return t('upload.status.classifying', 'Classifying');
     case "completed":
-      return "Completado";
+      return t('upload.status.completed', 'Completed');
     case "failed":
-      return "Fallido";
+      return t('upload.status.failed', 'Failed');
     default:
       return status;
   }
 }
 
 export function UploadModal({ open, onOpenChange, onComplete, questionId }: UploadModalProps) {
+  const intl = useIntl();
   const [items, setItems] = React.useState<UploadItem[]>([]);
 
   const enqueueExternalValidationJob = async (file: File): Promise<unknown> => {
@@ -681,7 +726,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
     if (!open || !questionId) return;
 
     try {
-      const historyKey = `evidence-upload-history:${questionId}`;
+      const historyKey = buildTenantStorageKey(`evidence-upload-history:${questionId}`);
       const raw = localStorage.getItem(historyKey);
       const previous = raw ? JSON.parse(raw) : [];
 
@@ -738,12 +783,12 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
     if (!open || !questionId) return;
 
     try {
-      const historyKey = `evidence-upload-history:${questionId}`;
+      const historyKey = buildTenantStorageKey(`evidence-upload-history:${questionId}`);
       const raw = localStorage.getItem(historyKey);
 
       if (raw) return; // already handled by previous effect
 
-      const progressRaw = localStorage.getItem('assessment-progress-v1');
+      const progressRaw = localStorage.getItem(buildTenantStorageKey('assessment-progress-v1'));
       if (!progressRaw) return;
 
       const progress = JSON.parse(progressRaw);
@@ -806,7 +851,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
 
         if (accepted.length === 0) {
           if (files.length > 0) {
-            setGlobalError(`Solo se admiten archivos ${ACCEPTED_LABEL}.`);
+            setGlobalError(intl.formatMessage({ id: 'upload.onlyAccepted', defaultMessage: 'Only {formats} files are accepted.' }, { formats: ACCEPTED_LABEL }));
           }
           return current;
         }
@@ -842,7 +887,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
 
         const response = await uploadFile(item, (progress) => {
           updateItem(item.id, { progress: Math.min(progress, 99) });
-        });
+        }, questionId);
 
         const reference = readEvidenceReference(response) ?? item.file.name;
         updateItem(item.id, { progress: 100, uploadReference: reference });
@@ -889,7 +934,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
     const failed = results.find((result) => result.status === "rejected") as PromiseRejectedResult | undefined;
 
     if (failed) {
-      const message = failed.reason instanceof Error ? failed.reason.message : "No se pudo completar la carga";
+      const message = failed.reason instanceof Error ? failed.reason.message : intl.formatMessage({ id: 'upload.error.couldNotComplete', defaultMessage: 'Could not complete upload' });
 
       setGlobalError(message);
       setItems((current) =>
@@ -908,7 +953,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
       .map((result) => result.value);
 
     if (questionId && completedItems.length > 0) {
-      const historyKey = `evidence-upload-history:${questionId}`;
+      const historyKey = buildTenantStorageKey(`evidence-upload-history:${questionId}`);
       const nextHistoryItems = completedItems.map((item) => ({
         id: item.uploadReference || item.id,
         name: item.file.name,
@@ -973,7 +1018,7 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
       try {
         await processItem(item);
       } catch (error) {
-        const message = error instanceof Error ? error.message : "No se pudo reintentar el archivo";
+        const message = error instanceof Error ? error.message : intl.formatMessage({ id: 'upload.error.retryFile', defaultMessage: 'Could not retry file' });
         updateItem(id, { status: "failed", error: message });
       } finally {
         setIsProcessing(false);
@@ -995,20 +1040,20 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden border-none bg-slate-950 p-0 text-slate-50 shadow-none !left-0 !top-0 !max-w-none !rounded-none !translate-x-0 !translate-y-0 lg:!inset-auto lg:!top-[50%] lg:!left-[50%] lg:!translate-x-[-50%] lg:!translate-y-[-50%] lg:h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-2rem)] lg:w-[min(100vw-2rem,1120px)] lg:max-w-[1120px] lg:rounded-[32px] lg:shadow-2xl">
+      <DialogContent className="fixed inset-0 z-50 m-0 flex h-screen w-screen flex-col overflow-hidden border-none bg-slate-950 p-0 text-slate-50 shadow-none !left-0 !top-0 !max-w-none !rounded-none !translate-x-0 !translate-y-0 lg:!inset-auto lg:!top-[50%] lg:!left-[50%] lg:!translate-x-[-50%] lg:!translate-y-[-50%] lg:h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-2rem)] lg:w-[min(100vw-2rem,1400px)] lg:max-w-[1400px] lg:rounded-[32px] lg:shadow-2xl">
         <div className="border-b border-white/10 bg-[linear-gradient(135deg,rgba(14,165,233,0.12),rgba(15,23,42,0.4))] px-6 py-5">
           <DialogHeader className="text-left">
-            <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-50">Upload Evidence</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold tracking-tight text-slate-50">{intl.formatMessage({ id: 'upload.dialogTitle', defaultMessage: 'Upload Evidence' })}</DialogTitle>
             <DialogDescription className="max-w-3xl text-sm text-slate-300">
-              Flujo DANI-FE-022: carga por archivo en taxonomía ISO y edición inline de metadata.
+              {intl.formatMessage({ id: 'upload.flowDescription', defaultMessage: 'DANI-FE-022 flow: file upload in ISO taxonomy with inline metadata editing.' })}
             </DialogDescription>
           </DialogHeader>
 
           <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-300">
-            <Badge variant="outline" className="border-white/10 text-slate-200">Máximo {MAX_FILES} archivos</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">Formatos {ACCEPTED_LABEL}</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/evidences</Badge>
-            <Badge variant="outline" className="border-white/10 text-slate-200">POST /api/validate/external</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">{intl.formatMessage({ id: 'upload.maxFilesBadge', defaultMessage: 'Maximum {max} files' }, { max: MAX_FILES })}</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">{intl.formatMessage({ id: 'upload.formatsBadge', defaultMessage: 'Formats {formats}' }, { formats: ACCEPTED_LABEL })}</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">{intl.formatMessage({ id: 'upload.api.primary', defaultMessage: 'POST /api/v1/evidences' })}</Badge>
+            <Badge variant="outline" className="border-white/10 text-slate-200">{intl.formatMessage({ id: 'upload.api.secondary', defaultMessage: 'POST /api/validate/external' })}</Badge>
           </div>
         </div>
 
@@ -1020,21 +1065,21 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-slate-100">Estado general</p>
-                    <p className="text-xs text-slate-400">Resumen de la cola actual</p>
+                    <p className="text-sm font-semibold text-slate-100">{intl.formatMessage({ id: 'upload.overallStatus', defaultMessage: 'Overall status' })}</p>
+                    <p className="text-xs text-slate-400">{intl.formatMessage({ id: 'upload.queueSummary', defaultMessage: 'Current queue summary' })}</p>
                   </div>
                   <Badge variant="outline" className="border-white/10 text-slate-200">
-                    {completedCount}/{items.length || 0} listos
+                    {intl.formatMessage({ id: 'upload.readyCount', defaultMessage: '{done}/{total} ready' }, { done: completedCount, total: items.length || 0 })}
                   </Badge>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                   <div className="rounded-xl border border-white/10 bg-slate-950/60 p-3">
-                    <p className="text-xs text-slate-400">Pendientes</p>
+                    <p className="text-xs text-slate-400">{intl.formatMessage({ id: 'upload.pending', defaultMessage: 'Pending' })}</p>
                     <p className="mt-1 text-lg font-semibold text-slate-50">{queuedCount}</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-slate-950/60 p-3">
-                    <p className="text-xs text-slate-400">Completados</p>
+                    <p className="text-xs text-slate-400">{intl.formatMessage({ id: 'upload.completed', defaultMessage: 'Completed' })}</p>
                     <p className="mt-1 text-lg font-semibold text-emerald-300">{completedCount}</p>
                   </div>
                 </div>
@@ -1061,9 +1106,9 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
                     <div className="flex size-14 items-center justify-center rounded-full bg-cyan-400/10 text-cyan-200 ring-1 ring-cyan-400/20">
                       <FileText className="size-6" />
                     </div>
-                    <h3 className="mt-4 text-lg font-semibold text-slate-100">No hay archivos aún</h3>
+                    <h3 className="mt-4 text-lg font-semibold text-slate-100">{intl.formatMessage({ id: 'upload.noFilesYetTitle', defaultMessage: 'No files yet' })}</h3>
                     <p className="mt-2 max-w-md text-sm text-slate-400">
-                      Agrega hasta {MAX_FILES} archivos y luego ejecuta la carga para obtener la sugerencia de control ISO.
+                      {intl.formatMessage({ id: 'upload.noFilesYetHint', defaultMessage: 'Add up to {max} files and then run upload to get ISO control suggestions.' }, { max: MAX_FILES })}
                     </p>
                   </div>
                 ) : (
@@ -1075,17 +1120,17 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
                             <FileText className="size-4 text-slate-400" />
                             <h4 className="text-base font-semibold text-slate-50">{item.file.name}</h4>
                           </div>
-                          <p className="text-sm text-slate-400">{formatBytes(item.file.size)} · {statusLabel(item.status)}</p>
+                          <p className="text-sm text-slate-400">{formatBytes(item.file.size)} · {statusLabel(item.status, intl)}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={statusBadgeVariant(item.status)}>{statusLabel(item.status)}</Badge>
+                          <Badge variant={statusBadgeVariant(item.status)}>{statusLabel(item.status, intl)}</Badge>
                           <Badge variant="outline" className="border-white/10 text-slate-300">
-                            {item.file.type || "mime desconocido"}
+                            {item.file.type || intl.formatMessage({ id: 'upload.unknownMime', defaultMessage: 'unknown mime' })}
                           </Badge>
                         </div>
                       </div>
 
-                      <div className="mt-4 grid gap-4 2xl:grid-cols-[1.1fr_0.9fr]">
+                      <div className="mt-4 grid gap-4 2xl:grid-cols-[0.9fr_1.1fr]">
                         <div className="space-y-4">
                           <AIClassificationPreview
                             fileName={item.file.name}
@@ -1119,11 +1164,11 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
         <DialogFooter className="relative z-20 shrink-0 border-t border-white/10 bg-slate-950 px-6 py-4 sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <CheckCircle2 className="size-4 text-emerald-300" />
-            <span>Cada subida crea o actualiza la evidencia documental en la taxonomía ISO.</span>
+            <span>{intl.formatMessage({ id: 'upload.footerNote', defaultMessage: 'Each upload creates or updates documentary evidence in the ISO taxonomy.' })}</span>
           </div>
           <div className="flex items-center gap-2">
             <Button type="button" variant="outline" className="border-white/10 bg-white/5 text-slate-100 hover:bg-white/10" onClick={() => handleClose(false)} disabled={isProcessing}>
-              Cerrar
+              {intl.formatMessage({ id: 'common.close', defaultMessage: 'Close' })}
             </Button>
             <Button
               type="button"
@@ -1132,7 +1177,11 @@ export function UploadModal({ open, onOpenChange, onComplete, questionId }: Uplo
               disabled={isProcessing || queuedCount === 0}
             >
               <RefreshCw className={cn("size-4", isProcessing && "animate-spin")} />
-              {isProcessing ? "Procesando" : queuedCount > 0 ? `Subir ${queuedCount} archivo${queuedCount === 1 ? "" : "s"}` : "Sin archivos pendientes"}
+              {isProcessing
+                ? intl.formatMessage({ id: 'upload.processing', defaultMessage: 'Processing' })
+                : queuedCount > 0
+                  ? intl.formatMessage({ id: 'upload.uploadNFiles', defaultMessage: 'Upload {count} file(s)' }, { count: queuedCount })
+                  : intl.formatMessage({ id: 'upload.noPendingFiles', defaultMessage: 'No pending files' })}
             </Button>
           </div>
         </DialogFooter>

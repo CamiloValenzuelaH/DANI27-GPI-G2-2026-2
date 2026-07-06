@@ -65,35 +65,87 @@ while [ "$attempt" -le "$MIGRATION_MAX_RETRIES" ]; do
 done
 
 if is_true "$AUTO_SEED"; then
-  echo "[entrypoint] Auto-seed ISO chunks habilitado (modo background)."
+  echo "[entrypoint] Auto-seed habilitado (modo background)."
   (
+    # Seed evidence taxonomy used by Audit Room search and binder
     attempt=1
     while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
-      if python /app/scripts/seed_iso_chunks.py; then
-        echo "[entrypoint] Seed ISO chunks finalizado."
+      if python /app/scripts/seed_evidence_taxonomy.py; then
+        echo "[entrypoint] Seed de taxonomía de evidencias finalizado."
         break
       fi
 
-      echo "[entrypoint] Seed ISO chunks fallÃ³ (intento $attempt/$SEED_MAX_RETRIES)."
+      echo "[entrypoint] Seed de taxonomía de evidencias falló (intento $attempt/$SEED_MAX_RETRIES)."
       if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
-        echo "[entrypoint] Se agotaron reintentos de seed ISO chunks."
+        echo "[entrypoint] Se agotaron reintentos de seed de taxonomía de evidencias."
       fi
 
       attempt=$((attempt + 1))
       sleep "$SEED_RETRY_SECONDS"
     done
 
+    # Seed assessment questions
+    attempt=1
+    while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
+      if python /app/scripts/seed_assessment_questions.py; then
+        echo "[entrypoint] Seed de assessment (fases/preguntas) finalizado."
+        break
+      fi
+
+      echo "[entrypoint] Seed de assessment falló (intento $attempt/$SEED_MAX_RETRIES)."
+      if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
+        echo "[entrypoint] Se agotaron reintentos de seed de assessment."
+      fi
+
+      attempt=$((attempt + 1))
+      sleep "$SEED_RETRY_SECONDS"
+    done
+
+    # Seed ISO chunks (manual only; disabled at startup)
+    # attempt=1
+    # while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
+    #   if python /app/scripts/seed_iso_chunks.py; then
+    #     echo "[entrypoint] Seed ISO chunks finalizado."
+    #     break
+    #   fi
+    #
+    #   echo "[entrypoint] Seed ISO chunks falló (intento $attempt/$SEED_MAX_RETRIES)."
+    #   if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
+    #     echo "[entrypoint] Se agotaron reintentos de seed ISO chunks."
+    #   fi
+    #
+    #   attempt=$((attempt + 1))
+    #   sleep "$SEED_RETRY_SECONDS"
+    # done
+
+    # Seed ISO threat catalog
     attempt=1
     while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
       if python /app/scripts/seed_iso_threat_catalog.py; then
         echo "[entrypoint] Seed catálogo de amenazas ISO finalizado."
-        exit 0
+        break
       fi
 
       echo "[entrypoint] Seed catálogo de amenazas ISO fallÃ³ (intento $attempt/$SEED_MAX_RETRIES)."
       if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
         echo "[entrypoint] Se agotaron reintentos de seed catálogo de amenazas ISO."
-        exit 0
+      fi
+
+      attempt=$((attempt + 1))
+      sleep "$SEED_RETRY_SECONDS"
+    done
+
+    # Seed demo (assets y usuarios)
+    attempt=1
+    while [ "$attempt" -le "$SEED_MAX_RETRIES" ]; do
+      if python /app/scripts/seed_demo.py; then
+        echo "[entrypoint] Seed demo (assets y usuarios) finalizado."
+        break
+      fi
+
+      echo "[entrypoint] Seed demo (assets y usuarios) fallÃ³ (intento $attempt/$SEED_MAX_RETRIES)."
+      if [ "$attempt" -eq "$SEED_MAX_RETRIES" ]; then
+        echo "[entrypoint] Se agotaron reintentos de seed demo (assets y usuarios)."
       fi
 
       attempt=$((attempt + 1))
@@ -101,7 +153,7 @@ if is_true "$AUTO_SEED"; then
     done
   ) &
 else
-  echo "[entrypoint] Auto-seed ISO chunks deshabilitado (AUTO_SEED_ISO_CHUNKS=$AUTO_SEED)."
+  echo "[entrypoint] Auto-seed deshabilitado (AUTO_SEED_ISO_CHUNKS=$AUTO_SEED)."
 fi
 
 if [ "$#" -eq 0 ]; then

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -16,6 +16,7 @@ class DocumentGenerationRequest(BaseModel):
     target_audience: str | None = None
     language: str = Field(default="es")
     tone: str | None = Field(default="formal")
+    type: Literal["policy", "report", "procedure", "general"] = Field(default="general")
     sections: list[str] | None = None
     control_refs: list[str] | None = None
     control_ids: list[str] | None = Field(default=None, alias="controlIds")
@@ -74,3 +75,34 @@ class DocumentGenerationProgressResponse(BaseModel):
     created_at: datetime | None = None
     updated_at: datetime | None = None
     created_date: str | None = None
+
+
+# Workflow schemas
+class DocumentSubmitReviewRequest(BaseModel):
+    """Solicitar revisión de un documento (cambiar status a pending_review)"""
+    pass
+
+
+class DocumentApprovalRequest(BaseModel):
+    """Aprobar un documento (cambiar status a approved)"""
+    pass
+
+
+class DocumentRejectionRequest(BaseModel):
+    """Rechazar un documento (cambiar status a rejected)"""
+    reason: str = Field(..., min_length=10)
+
+
+class DocumentPublishRequest(BaseModel):
+    """Publicar un documento (cambiar status a published)"""
+    pass
+
+
+class DocumentReviewActionResponse(BaseModel):
+    """Respuesta de una acción de revisión/aprobación"""
+    document_id: str = Field(alias="documentId")
+    status: str
+    action: str
+    performed_by: UUID = Field(alias="performedBy")
+    performed_at: datetime = Field(alias="performedAt")
+    message: str | None = None

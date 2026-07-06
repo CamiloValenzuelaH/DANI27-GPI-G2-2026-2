@@ -38,23 +38,6 @@ export default function Sidebar({ activePage, setActivePage, profile, setShowPro
         </div>
       </div>
 
-      {/* Profile Badge */}
-      <div className="px-5 pt-[14px] pb-[6px]">
-        <div className="text-[10px] uppercase tracking-[1.2px] text-white/35 font-semibold">
-          Organization Profile
-        </div>
-      </div>
-      <div className="mx-4 mb-4">
-        <button
-          onClick={() => setShowProfileOverlay(true)}
-          className={`w-full px-3 py-2 rounded-md text-xs font-semibold flex items-center gap-2 transition-all hover:opacity-80 ${profileConfig[profile].color}`}
-        >
-          <span className={`w-[7px] h-[7px] rounded-full ${profileConfig[profile].dot}`} />
-          <span>{profileConfig[profile].label}</span>
-          <span className="ml-auto text-[11px] opacity-60">Change ›</span>
-        </button>
-      </div>
-
       {/* Nav Toggle */}
       <div className="mx-4 mb-1">
         <div className="flex bg-white/5 rounded-md p-[3px]">

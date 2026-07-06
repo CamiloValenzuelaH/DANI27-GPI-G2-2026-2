@@ -1,14 +1,21 @@
 """Tareas Celery para generación y orquestación de documentos IA."""
 
 import asyncio
+import hashlib
 import json
+import logging
+import uuid
 from datetime import datetime, timezone
 from typing import Any
 
 from app.core.redis import get_redis_client
 from app.core.config import settings
+from app.db.database import SessionLocal
+from app.models.document import Document, DocumentSection, DocumentType, DocumentVersion
 from app.services.ai.document_agent import DocumentAgentOrchestrator
 from app.workers.celery_app import celery_app
+
+logger = logging.getLogger(__name__)
 
 JOB_KEY_PREFIX = "document:job:"
 JOB_TTL_SECONDS = 60 * 60 * 24 * 7
@@ -16,6 +23,80 @@ JOB_TTL_SECONDS = 60 * 60 * 24 * 7
 
 def _job_key(job_id: str) -> str:
     return f"{JOB_KEY_PREFIX}{job_id}"
+
+
+def _persist_generated_document(
+    organization_id: str,
+    user_id: str,
+    request_payload: dict[str, Any],
+    document_text: str,
+    sections: list[dict[str, Any]],
+) -> None:
+    db = SessionLocal()
+    try:
+        document_type_value = str(request_payload.get("type") or "general").lower()
+        try:
+            document_type = DocumentType(document_type_value)
+        except ValueError:
+            document_type = DocumentType.general
+
+        document = Document(
+            organization_id=uuid.UUID(organization_id),
+            created_by=uuid.UUID(user_id),
+            updated_by=uuid.UUID(user_id),
+            type=document_type,
+            title=str(request_payload.get("title") or "Documento generado"),
+            description=str(request_payload.get("description") or ""),
+            summary=str(request_payload.get("description") or document_text[:200] or "Documento generado por IA."),
+        )
+        db.add(document)
+        db.flush()
+
+        content_hash = hashlib.sha256(document_text.encode("utf-8")).hexdigest()
+        version = DocumentVersion(
+            document_id=document.id,
+            version_number="1",
+            title=document.title,
+            description=document.description,
+            summary=document.summary,
+            content=document_text,
+            content_hash=content_hash,
+            created_by=uuid.UUID(user_id),
+        )
+        db.add(version)
+        db.flush()
+
+        control_contexts = request_payload.get("control_contexts") or request_payload.get("control_refs") or []
+        if not isinstance(control_contexts, list):
+            control_contexts = []
+
+        for index, section in enumerate(sections, start=1):
+            section_title = str(section.get("title") or f"Sección {index}")
+            section_content = str(section.get("content") or section.get("summary") or "").strip()
+            if not section_content:
+                continue
+
+            document_section = DocumentSection(
+                document_version_id=version.id,
+                section_index=index,
+                section_title=section_title,
+                section_content=section_content,
+                control_contexts=control_contexts,
+            )
+            db.add(document_section)
+
+        db.commit()
+    except Exception:
+        try:
+            db.rollback()
+        except Exception:
+            pass
+        raise
+    finally:
+        try:
+            db.close()
+        except Exception:
+            pass
 
 
 async def publish_document_progress(
@@ -28,6 +109,7 @@ async def publish_document_progress(
     organization_id: str,
     user_id: str,
     document_title: str | None = None,
+    document_type: str | None = None,
     total_sections: int | None = None,
     current_section_index: int | None = None,
     current_section_title: str | None = None,
@@ -58,6 +140,7 @@ async def publish_document_progress(
         "organization_id": organization_id,
         "user_id": user_id,
         "document_title": document_title or "",
+        "document_type": document_type or "",
         "total_sections": str(total_sections or 0),
         "completed_sections": str(completed_sections or 0),
         "current_section_index": str(current_section_index or 0),
@@ -142,6 +225,7 @@ def generate_document_full(
             organization_id=organization_id,
             user_id=user_id,
             document_title=request_payload.get("title"),
+            document_type=str(request_payload.get("type") or "general"),
             total_sections=total_sections,
             current_section_index=section_index,
             current_section_title=current_section_title,
@@ -164,6 +248,17 @@ def generate_document_full(
         )
 
         result = loop.run_until_complete(orchestrator.generate_full_document())
+
+        try:
+            _persist_generated_document(
+                organization_id=organization_id,
+                user_id=user_id,
+                request_payload=request_payload,
+                document_text=str(result.get("document_text") or ""),
+                sections=result.get("sections") or [],
+            )
+        except Exception as e:
+            logger.error(f"Error persisting generated document for job {job_id}: {str(e)}", exc_info=True)
 
         return result
     except Exception as exc:
